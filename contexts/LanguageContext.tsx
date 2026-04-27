@@ -1,0 +1,284 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+
+type Language = 'vi' | 'km';
+
+interface LanguageContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: string) => string;
+}
+
+const translations = {
+  vi: {
+    // Common
+    leaderboard: 'Bảng xếp hạng',
+    weekly: 'Hàng tuần',
+    all_time: 'Tất cả',
+    settings: 'Cài đặt ứng dụng',
+    language: 'Ngôn ngữ',
+    vietnamese: 'Tiếng Việt',
+    khmer: 'Tiếng Khmer',
+    back: 'Quay lại',
+    confirm: 'Xác nhận',
+    close: 'Đóng',
+    save: 'Lưu',
+    login: 'Đăng nhập tài khoản',
+
+    // Settings Screen
+    notif_settings: 'Thông báo',
+    study_reminder: 'Nhắc học bài mỗi ngày',
+    reminder_time: 'Thời gian nhắc',
+    app_info: 'Thông tin ứng dụng',
+    intro: 'Giới thiệu',
+    version: 'Phiên bản',
+    // Support Screen
+    support_feedback: 'Hỗ trợ và Phản hồi',
+    feedback_type: 'Loại phản hồi',
+    suggestion: 'Góp ý',
+    report_issue: 'Báo lỗi',
+    subject: 'Tiêu đề',
+    detail: 'Nội dung chi tiết',
+    send_feedback: 'Gửi phản hồi',
+    login_to_send: 'Đăng nhập để gửi phản hồi',
+    // Profile Screen
+    my_profile: 'Hồ sơ của tôi',
+    edit_profile: 'Chỉnh sửa hồ sơ',
+    favorites: 'Nội dung yêu thích',
+    logout: 'Đăng xuất',
+    logout_full: 'Đăng xuất tài khoản',
+    points: 'Điểm',
+    rank: 'Thành tích',
+    guest: 'Khách',
+    login_to_view: 'Đăng nhập để xem thông tin',
+    login_to_use: 'Đăng nhập để sử dụng tính năng này',
+    logout_confirm_msg: 'Bạn có chắc chắn muốn đăng xuất?',
+    login_required: 'Yêu cầu đăng nhập',
+    // Ranks
+    rank_bronze: 'Đồng',
+    rank_silver: 'Bạc',
+    rank_gold: 'Vàng',
+    rank_diamond: 'Kim cương',
+
+    // Quiz Screen
+    quiz_title: 'Thử thách',
+    start_quiz: 'Bắt đầu',
+    daily_challenge: 'Thử thách hằng ngày',
+    quiz_desc: 'Vượt qua các câu hỏi để tích lũy thêm điểm',
+    total_score: 'Tổng điểm',
+    current_rank: 'Hạng hiện tại',
+    categories: 'Chủ đề',
+    history: 'Lịch sử',
+    culture: 'Văn hóa',
+    geography: 'Địa lý',
+    questions: 'Bộ câu hỏi',
+    performance: 'Thành tích',
+    view_all: 'Xem tất cả',
+    completed: 'Hoàn thành',
+    accuracy: 'Chính xác',
+    recent_performance: 'Dựa trên các bài thi gần đây',
+    choose_topic: 'Hôm nay bạn muốn học gì nào',
+    general_knowledge: 'Kiến thức',
+    pagoda_quiz: 'Chùa Khmer',
+    culture_quiz: 'Văn hóa',
+    food_quiz: 'Ẩm thực',
+    vocab_quiz: 'Từ vựng Khmer',
+
+
+
+    // Personal Info
+    personal_info: 'Thông tin cá nhân',
+    full_name: 'Họ và tên',
+    email: 'Email',
+    change_password: 'Đổi mật khẩu',
+    current_password: 'Mật khẩu hiện tại',
+    new_password: 'Mật khẩu mới',
+    confirm_new_password: 'Xác nhận mật khẩu mới',
+    save_changes: 'Lưu thay đổi',
+    error: 'Lỗi',
+    name_required: 'Họ và tên không được để trống',
+    not_logged_in: 'Chưa đăng nhập',
+    pass_fields_required: 'Vui lòng điền đầy đủ các trường để đổi mật khẩu',
+    pass_mismatch: 'Mật khẩu mới không khớp',
+    pass_too_short: 'Mật khẩu mới tối thiểu 6 ký tự',
+    user_not_found: 'Không tìm thấy tài khoản',
+    wrong_old_pass: 'Mật khẩu hiện tại không chính xác',
+    update_success: 'Cập nhật thành công',
+    update_failed: 'Cập nhật thất bại',
+    // Support Screen Extra
+    faq: 'Câu hỏi thường gặp',
+    feedback_section: 'Gửi phản hồi cho chúng tôi',
+    feedback_placeholder: 'Chúng tôi luôn lắng nghe các ý kiến đóng góp của bạn để hoàn thiện ứng dụng...',
+    subject_placeholder: 'Nhập tiêu đề phản hồi...',
+    subject_required: 'Vui lòng nhập tiêu đề',
+    content_required: 'Vui lòng nhập nội dung phản hồi',
+    feedback_success: 'Đã gửi phản hồi thành công! Cảm ơn bạn.',
+    feedback_failed: 'Gửi phản hồi thất bại. Vui lòng thử lại.',
+    // FAQ Extra
+    faq_how_to_use: 'Cách sử dụng ứng dụng',
+    faq_how_to_quiz: 'Cách làm bài kiểm tra',
+    faq_how_to_learn: 'Cách học hiệu quả hơn',
+    faq_use_content: 'Chào mừng bạn đến với KhmerGo! Để sử dụng ứng dụng, bạn có thể bắt đầu bằng cách khám phá các ngôi chùa tại mục Trang chủ, tham gia trả lời câu đố tại mục Thử thách để tích lũy điểm và thăng hạng.',
+    faq_quiz_content: 'Mỗi bài trắc nghiệm sẽ có các câu hỏi về văn hóa và ngôn ngữ Khmer. Bạn cần chọn câu trả lời đúng trong thời gian quy định để nhận được điểm thưởng.',
+    faq_learn_content: 'Để học hiệu quả, hãy luyện tập hàng ngày và sử dụng tính năng nhắc nhở học tập trong phần Cài đặt. Việc kết hợp giữa học từ vựng và tham gia thử thách sẽ giúp bạn ghi nhớ lâu hơn.',
+  },
+  km: {
+    // Common
+    leaderboard: 'តារាងពិន្ទុ',
+    weekly: 'ប្រចាំសប្តាហ៍',
+    all_time: 'គ្រប់ពេល',
+    settings: 'ការកំណត់កម្មវិធី',
+    language: 'ភាសា',
+    vietnamese: 'ភាសាវៀតណាម',
+    khmer: 'ភាសាខ្មែរ',
+    back: 'ត្រឡប់ក្រោយ',
+    confirm: 'បញ្ជាក់',
+    close: 'បិទ',
+    save: 'រក្សាទុក',
+    cancel: 'បោះបង់',
+    login: 'ចូល',
+    // Settings Screen
+    notif_settings: 'ការជូនដំណឹង',
+    study_reminder: 'រំលឹកការសិក្សារាល់ថ្ងៃ',
+    reminder_time: 'ម៉ោងរំលឹក',
+    app_info: 'ព័ត៌មានកម្មវិធី',
+    intro: 'អំពីយើង',
+    version: 'ជំនាន់',
+    // Support Screen
+    support_feedback: 'ជំនួយ និងមតិកែលម្អ',
+    feedback_type: 'ប្រភេទមតិកែលម្អ',
+    suggestion: 'មតិកែលម្អ',
+    report_issue: 'រាយការណ៍បញ្ហា',
+    subject: 'ប្រធានបទ',
+    detail: 'ខ្លឹមសារលម្អិត',
+    send_feedback: 'ផ្ញើមតិកែលម្អ',
+    login_to_send: 'ចូលដើម្បីផ្ញើមតិ',
+    // Profile Screen
+    my_profile: 'ប្រវត្តិរូបរបស់ខ្ញុំ',
+    edit_profile: 'កែសម្រួលប្រវត្តិរូប',
+    favorites: 'មាតិកាដែលចូលចិត្ត',
+    logout: 'ចាកចេញ',
+    logout_full: 'ចាកចេញពីគណនី',
+    points: 'ពិន្ទុ',
+    rank: 'សមិទ្ធផល',
+    guest: 'ភ្ញៀវ',
+    login_to_view: 'ចូលដើម្បីមើលព័ត៌មាន',
+    login_to_use: 'ចូលដើម្បីប្រើប្រាស់មុខងារនេះ',
+    logout_confirm_msg: 'តើអ្នកប្រាកដថាចង់ចាកចេញមែនទេ?',
+    login_required: 'តម្រូវឱ្យចូល',
+    // Ranks
+    rank_bronze: 'សំរិទ្ធ',
+    rank_silver: 'ប្រាក់',
+    rank_gold: 'មាស',
+    rank_diamond: 'ពេជ្រ',
+
+    // Quiz Screen
+    quiz_title: 'ការសាកល្បង',
+    start_quiz: 'ចាប់ផ្តើម',
+    daily_challenge: 'ការសាកល្បងប្រចាំថ្ងៃ',
+    quiz_desc: 'ឆ្លងកាត់សំណួរដើម្បីទទួលបានពិន្ទុបន្ថែម!',
+    total_score: 'ពិន្ទុរួម',
+    current_rank: 'ចំណាត់ថ្នាក់បច្ចុប្បន្ន',
+    categories: 'ប្រធានបទ',
+    history: 'ប្រវត្តិសាស្ត្រ',
+    culture: 'វប្បធម៌',
+    geography: 'ភូមិសាស្ត្រ',
+    questions: 'សំណួរ',
+    performance: 'សមិទ្ធផល',
+    view_all: 'មើលទាំងអស់',
+    completed: 'បានបញ្ចប់',
+    accuracy: 'ភាពត្រឹមត្រូវ',
+    recent_performance: 'ផ្អែកលើការសាកល្បងថ្មីៗ',
+    choose_topic: 'តើអ្នកចង់រៀនអ្វីនៅថ្ងៃនេះ',
+    general_knowledge: 'ចំណេះដឹងទូទៅ',
+    pagoda_quiz: 'វត្តខ្មែរ',
+    culture_quiz: 'វប្បធម៌',
+    food_quiz: 'ម្ហូបអាហារ',
+    vocab_quiz: 'វាក្យសព្ទខ្មែរ',
+
+
+    // Personal Info
+    personal_info: 'ព័ត៌មានផ្ទាល់ខ្លួន',
+    full_name: 'ឈ្មោះពេញ',
+    email: 'អ៊ីមែល',
+    change_password: 'ផ្លាស់ប្តូរពាក្យសម្ងាត់',
+    current_password: 'ពាក្យសម្ងាត់បច្ចុប្បន្ន',
+    new_password: 'ពាក្យសម្ងាត់ថ្មី',
+    confirm_new_password: 'បញ្ជាក់ពាក្យសម្ងាត់ថ្មី',
+    save_changes: 'រក្សាទុកការផ្លាស់ប្តូរ',
+    error: 'កំហុស',
+    name_required: 'ឈ្មោះមិនអាចនៅទំនេរទេ',
+    not_logged_in: 'មិនទាន់បានចូល',
+    pass_fields_required: 'សូមបំពេញគ្រប់ព័ត៌មានដើម្បីប្តូរពាក្យសម្ងាត់',
+    pass_mismatch: 'ពាក្យសម្ងាត់ថ្មីមិនត្រូវគ្នា',
+    pass_too_short: 'ពាក្យសម្ងាត់ថ្មីយ៉ាងហោចណាស់ ៦ តួអក្សរ',
+    user_not_found: 'រកមិនឃើញគណនី',
+    wrong_old_pass: 'ពាក្យសម្ងាត់បច្ចុប្បន្នមិនត្រឹមត្រូវ',
+    update_success: 'បច្ចុប្បន្នភាពបានជោគជ័យ',
+    update_failed: 'បច្ចុប្បន្នភាពបរាជ័យ',
+    // Support Screen Extra
+    faq: 'សំណួរដែលសួរញឹកញាប់',
+    feedback_section: 'ផ្ញើមតិកែលម្អមកយើង',
+    feedback_placeholder: 'យើងតែងតែស្តាប់មតិរបស់អ្នកដើម្បីកែលម្អកម្មវិធី...',
+    subject_placeholder: 'បញ្ចូលប្រធានបទមតិ...',
+    subject_required: 'សូមបញ្ចូលប្រធានបទ',
+    content_required: 'សូមបញ្ចូលខ្លឹមសារមតិ',
+    feedback_success: 'បានផ្ញើមតិដោយជោគជ័យ! អរគុណ។',
+    feedback_failed: 'ផ្ញើមតិបរាជ័យ។ សូមព្យាយាមម្តងទៀត។',
+    // FAQ Extra
+    faq_how_to_use: 'របៀបប្រើកម្មវិធី',
+    faq_how_to_quiz: 'របៀបធ្វើតេស្ត',
+    faq_how_to_learn: 'របៀបរៀនឱ្យមានប្រសិទ្ធភាព',
+    faq_use_content: 'សូម chào មកកាន់ KhmerGo! ដើម្បីប្រើកម្មវិធី អ្នក có thể ចាប់ផ្តើមដោយការរុករកវត្តអារាមនានានៅក្នុងទំព័រដើម ចូលរួមឆ្លើយសំណួរក្នុងផ្នែកសាកល្បង ដើម្បីបង្កើនពិន្ទុ និងតម្លើងឋានៈ។',
+    faq_quiz_content: 'រាល់ការសាកល្បងនីមួយៗនឹងមានសំណួរអំពីវប្បធម៌ និងភាសាខ្មែរ។ អ្នកត្រូវជ្រើសរើសចម្លើយដែលត្រឹមត្រូវក្នុងរយៈពេលកំណត់ ដើម្បីទទួលបានពិន្ទុបន្ថែម។',
+    faq_learn_content: 'ដើម្បីរៀនបានយ៉ាងមានប្រសិទ្ធភាព សូមហាត់រៀនជារៀងរាល់ថ្ងៃ និងប្រើមុខងាររំលឹកការសិក្សានៅក្នុងការកំណត់។ ការរួមបញ្ចូលគ្នារវាងការរៀនពាក្យ និងការសាកល្បងនឹងជួយឱ្យអ្នកចងចាំបានយូរ។',
+  }
+};
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [language, setLangState] = useState<Language>('vi');
+
+  useEffect(() => {
+    loadLanguage();
+  }, []);
+
+  const loadLanguage = async () => {
+    try {
+      const savedLang = await AsyncStorage.getItem('appLanguage');
+      if (savedLang === 'vi' || savedLang === 'km') {
+        setLangState(savedLang);
+      }
+    } catch (error) {
+      console.log('Error loading language', error);
+    }
+  };
+
+  const setLanguage = async (lang: Language) => {
+    setLangState(lang);
+    try {
+      await AsyncStorage.setItem('appLanguage', lang);
+    } catch (error) {
+      console.log('Error saving language', error);
+    }
+  };
+
+  const t = (key: string) => {
+    return translations[language][key as keyof typeof translations['vi']] || key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+};
+
+export const useLanguage = () => {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+};
