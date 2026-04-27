@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: '900',
     color: '#1A1A1A', // Black text
     lineHeight: 32,
   },

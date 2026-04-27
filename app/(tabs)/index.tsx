@@ -19,8 +19,6 @@ const categories = [
   { id: 2, icon: require('@/assets/images/festival.jpg'), label: 'Văn hóa' },
   { id: 3, icon: require('@/assets/images/amthuc.jpg'), label: 'Ẩm thực' },
   { id: 6, icon: require('@/assets/images/hoctap.jpg'), label: 'Học tiếng Khmer' },
-  { id: 4, icon: require('@/assets/images/tovisit.jpg'), label: 'Khám phá' },
-  { id: 7, icon: require('@/assets/images/quiz.jpg'), label: 'Thử thách' },
 ];
 
 
@@ -101,6 +99,7 @@ export default function HomeScreen() {
                 key={category.id}
                 style={styles.serviceItem}
                 onPress={() => handleCategoryPress(category.id)}
+                activeOpacity={1}
               >
                 <View style={styles.serviceIcon}>
                   <Image source={category.icon} style={styles.serviceIconImage} />
@@ -228,16 +227,22 @@ const styles = StyleSheet.create({
   serviceIcon: {
     width: 60,
     height: 60,
-    borderRadius: 30,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 6,
-    backgroundColor: 'transparent',
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   serviceIconImage: {
-    width: 30,
-    height: 30,
+    width: 35,
+    height: 35,
     resizeMode: 'contain',
+    borderRadius: 8,
   },
   serviceText: {
     fontSize: 10,

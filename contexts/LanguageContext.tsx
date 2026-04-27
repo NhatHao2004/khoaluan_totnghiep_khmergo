@@ -77,14 +77,12 @@ const translations = {
     completed: 'Hoàn thành',
     accuracy: 'Chính xác',
     recent_performance: 'Dựa trên các bài thi gần đây',
-    choose_topic: 'Hôm nay bạn muốn học gì nào',
+    choose_topic: 'Hôm nay bạn muốn học về gì nào',
     general_knowledge: 'Kiến thức',
     pagoda_quiz: 'Chùa Khmer',
-    culture_quiz: 'Văn hóa',
-    food_quiz: 'Ẩm thực',
-    vocab_quiz: 'Từ vựng Khmer',
-
-
+    culture_quiz: 'Văn hóa Khmer',
+    food_quiz: 'Ẩm thực Khmer',
+    vocab_quiz: 'Học tiếng Khmer',
 
     // Personal Info
     personal_info: 'Thông tin cá nhân',

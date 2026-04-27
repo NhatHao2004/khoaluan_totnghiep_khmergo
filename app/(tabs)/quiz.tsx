@@ -94,47 +94,68 @@ export default function QuizScreen() {
 
         <View style={styles.bentoContainer}>
           <View style={styles.bentoRow}>
-            <TouchableOpacity style={[styles.bentoCardTall, { backgroundColor: '#FFD18B', flex: 0.8 }]}>
-
-
+            <TouchableOpacity
+              activeOpacity={1}
+              style={[styles.bentoCardTall, { backgroundColor: '#FFD18B', flex: 0.8 }]}
+            >
               <Text style={styles.bentoTitle} numberOfLines={1}>{t('pagoda_quiz')}</Text>
-
-
               <Text style={styles.bentoSubtitle}>10 {t('questions')}</Text>
               <View style={styles.bentoSpacer} />
-              <Ionicons name="home" size={40} color="rgba(0,0,0,0.2)" style={styles.bentoIconBottom} />
+              <View style={styles.bentoImageContainerLarge}>
+                <Image
+                  source={require('@/assets/images/pagoda.jpg')}
+                  style={styles.bentoImageInside}
+                />
+              </View>
             </TouchableOpacity>
 
             {/* Right Column - Stacked Cards */}
             <View style={styles.bentoRightCol}>
-              <TouchableOpacity style={[styles.bentoCardSquare, { backgroundColor: '#B8E1FF' }]}>
+              <TouchableOpacity
+                activeOpacity={1}
+                style={[styles.bentoCardSquare, { backgroundColor: '#B8E1FF' }]}
+              >
+                <View style={styles.bentoImageContainerSmall}>
+                  <Image
+                    source={require('@/assets/images/festival.jpg')}
+                    style={styles.bentoImageInside}
+                  />
+                </View>
                 <Text style={styles.bentoTitleSmall} numberOfLines={1}>{t('culture_quiz')}</Text>
-
-
-                <Ionicons name="color-palette" size={32} color="rgba(0,0,0,0.2)" style={styles.bentoIconRight} />
               </TouchableOpacity>
 
-              <TouchableOpacity style={[styles.bentoCardWide, { backgroundColor: '#FFB8EF' }]}>
+              <TouchableOpacity
+                activeOpacity={1}
+                style={[styles.bentoCardWide, { backgroundColor: '#FFB8EF' }]}
+              >
                 <View style={styles.bentoSocialIcons}>
-                  <Ionicons name="restaurant" size={24} color="#FFF" style={styles.bentoSocialIcon} />
-                  <Ionicons name="pizza" size={24} color="#FFF" style={styles.bentoSocialIcon} />
-                  <Ionicons name="beer" size={24} color="#FFF" style={styles.bentoSocialIcon} />
+                  <View style={styles.bentoImageContainerSmallInline}>
+                    <Image
+                      source={require('@/assets/images/amthuc.jpg')}
+                      style={styles.bentoImageInside}
+                    />
+                  </View>
                 </View>
                 <Text style={styles.bentoTitleSmall} numberOfLines={1}>{t('food_quiz')}</Text>
-
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Bottom Wide Card */}
-          <TouchableOpacity style={[styles.bentoCardFull, { backgroundColor: '#E3D7FF', marginTop: 15 }]}>
+          <TouchableOpacity
+            activeOpacity={1}
+            style={[styles.bentoCardFull, { backgroundColor: '#E3D7FF', marginTop: 15 }]}
+          >
             <View style={styles.bentoFullContent}>
               <View>
                 <Text style={styles.bentoTitle} numberOfLines={1}>{t('vocab_quiz')}</Text>
-
-
               </View>
-              <Ionicons name="language" size={45} color="rgba(0,0,0,0.15)" />
+              <View style={styles.bentoImageContainerFull}>
+                <Image
+                  source={require('@/assets/images/hoctap.jpg')}
+                  style={styles.bentoImageInside}
+                />
+              </View>
             </View>
           </TouchableOpacity>
         </View>
@@ -146,11 +167,6 @@ export default function QuizScreen() {
     </SafeAreaView>
   );
 }
-
-
-
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -250,7 +266,7 @@ const styles = StyleSheet.create({
   cardStats: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: '#F9F9F9',
+    backgroundColor: '#ffffffff',
     borderRadius: 10,
     paddingVertical: 10,
   },
@@ -374,15 +390,17 @@ const styles = StyleSheet.create({
     height: 102.5,
     borderRadius: 24,
     padding: 15,
-    position: 'relative',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
   },
-
   bentoCardWide: {
     height: 102.5,
     borderRadius: 24,
     padding: 15,
     justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
   },
   bentoCardFull: {
     width: '100%',
@@ -391,20 +409,16 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'flex-end',
   },
-
-
   bentoTitle: {
-
-    fontSize: 17,
+    fontSize: 21,
     fontWeight: '800',
     color: '#1A1A1A',
   },
-
-
   bentoTitleSmall: {
     fontSize: 16,
     fontWeight: '800',
     color: '#1A1A1A',
+    textAlign: 'center',
   },
   bentoSubtitle: {
     fontSize: 12,
@@ -414,26 +428,77 @@ const styles = StyleSheet.create({
   bentoSpacer: {
     flex: 1,
   },
-  bentoIconBottom: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-  },
-  bentoIconRight: {
+  bentoImageContainerLarge: {
     position: 'absolute',
     bottom: 15,
     right: 15,
+    width: 65,
+    height: 65,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  bentoImageContainerSmall: {
+    width: 45,
+    height: 45,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  bentoImageContainerSmallInline: {
+    width: 45,
+    height: 45,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  bentoImageContainerFull: {
+    width: 80,
+    height: 80,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  bentoImageInside: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+    resizeMode: 'contain',
   },
   bentoSocialIcons: {
     flexDirection: 'row',
     gap: 8,
-    marginBottom: 10,
-  },
-  bentoSocialIcon: {
-    backgroundColor: 'rgba(255,255,255,0.5)',
-    padding: 6,
-    borderRadius: 12,
-    overflow: 'hidden',
+    marginBottom: 8,
+    width: '100%',
+    justifyContent: 'center',
   },
   bentoFullContent: {
     flexDirection: 'row',
