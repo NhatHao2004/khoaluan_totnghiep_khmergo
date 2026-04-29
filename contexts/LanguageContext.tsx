@@ -136,6 +136,11 @@ const translations = {
     promo_pagoda_title: 'Khám phá vẻ đẹp của các ngôi chùa Khmer',
     tagline: 'Khám phá nền văn hóa Khmer',
     search_placeholder: 'Tìm kiếm địa điểm...',
+    location: 'Vị trí',
+    search: 'Tìm kiếm',
+    discovery_time: 'Thời gian khám phá',
+    current_discovery: 'Khám phá gần đây',
+    new_discovery: 'Khám phá mới',
     you: 'Bạn',
 
     // Auth Screens
@@ -279,6 +284,11 @@ const translations = {
     promo_vocab_title: 'បញ្ចុះតម្លៃ ៣០%\nលើវគ្គសិក្សាភាសា',
     tagline: 'ស្វែងយល់ពីវប្បធម៌ខ្មែរ',
     search_placeholder: 'ស្វែងរកទីតាំង...',
+    location: 'ទីតាំង',
+    search: 'ស្វែងរក',
+    discovery_time: 'ពេលវេលាស្វែងយល់',
+    current_discovery: 'ការស្វែងយល់ថ្មីៗ',
+    new_discovery: 'ការស្វែងយល់ថ្មី',
     you: 'អ្នក',
 
     // Auth Screens

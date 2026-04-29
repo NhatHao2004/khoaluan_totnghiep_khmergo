@@ -1,237 +1,216 @@
 import { ThemedText } from '@/components/themed-text';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Dimensions,
-  ImageBackground,
+  Image,
   ScrollView,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
+import Animated, {
+  FadeInDown,
+  FadeInRight,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
+
+const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useLanguage();
-  const textColor = useThemeColor({}, 'text');
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState(0);
 
-  const categories = [
-    { id: 0, label: t('temple'), key: 'temple' },
-    { id: 1, label: t('culture'), key: 'culture' },
-    { id: 2, label: t('food'), key: 'food' },
-    { id: 3, label: t('language_study'), key: 'language_study' }
+  // Animation for the notification bell
+  const bellRotation = useSharedValue(0);
+
+  useEffect(() => {
+    bellRotation.value = withRepeat(
+      withSequence(
+        withTiming(-12, { duration: 100 }),
+        withTiming(12, { duration: 100 }),
+        withTiming(-12, { duration: 100 }),
+        withTiming(12, { duration: 100 }),
+        withTiming(0, { duration: 100 }),
+        withDelay(2000, withTiming(0, { duration: 0 }))
+      ),
+      -1,
+      false
+    );
+  }, []);
+
+  const animatedBellStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotate: `${bellRotation.value}deg` }],
+    };
+  });
+
+  const services = [
+    { id: 1, label: t('temple'), icon: '🏮', color: '#FFF4E6', route: '/(tabs)/index' },
+    { id: 2, label: t('food'), icon: '🍜', color: '#EBF4FF', route: '/(tabs)/index' },
+    { id: 3, label: t('culture'), icon: '🎭', color: '#F3E8FF', route: '/(tabs)/index' },
+    { id: 4, label: t('language_study'), icon: '📚', color: '#E6FFFA', route: '/(tabs)/index' },
   ];
 
-  const getActiveData = () => {
-    switch (activeCategory) {
-      case 0: // Temple
-        return [
-          { id: 101, name: t('som_rong_temple'), location: t('soc_trang_vn'), rating: '4.8', image: require('@/assets/images/pagoda.jpg') },
-          { id: 102, name: 'Chùa Hang', location: t('tra_vinh_vn'), rating: '4.7', image: require('@/assets/images/backgroud.jpg') },
-          { id: 103, name: 'Chùa Dơi', location: t('soc_trang_vn'), rating: '4.9', image: require('@/assets/images/pagoda.jpg') },
-        ];
-      case 1: // Culture
-        return [
-          { id: 201, name: t('oc_om_boc_festival'), location: t('tra_vinh_vn'), rating: '4.9', image: require('@/assets/images/festival.jpg') },
-          { id: 202, name: 'Lễ hội Đua Ghe Ngo', location: t('soc_trang_vn'), rating: '4.8', image: require('@/assets/images/backgroud.jpg') },
-          { id: 203, name: 'Múa Robam', location: t('tra_vinh_vn'), rating: '4.7', image: require('@/assets/images/festival.jpg') },
-        ];
-      case 2: // Food
-        return [
-          { id: 301, name: 'Bún Nước Lèo', location: t('tra_vinh_vn'), rating: '4.9', image: require('@/assets/images/amthuc.jpg') },
-          { id: 302, name: 'Bánh Cống', location: t('soc_trang_vn'), rating: '4.8', image: require('@/assets/images/amthuc.jpg') },
-          { id: 303, name: 'Cốm Dẹp', location: t('tra_vinh_vn'), rating: '4.7', image: require('@/assets/images/amthuc.jpg') },
-        ];
-      case 3: // Language Study
-        return [
-          { id: 401, name: 'Giao tiếp cơ bản', location: 'Trực tuyến', rating: '4.9', image: require('@/assets/images/hoctap.jpg') },
-          { id: 402, name: 'Ngữ pháp Khmer', location: 'Trực tuyến', rating: '4.8', image: require('@/assets/images/hoctap.jpg') },
-          { id: 403, name: 'Từ vựng hằng ngày', location: 'Trực tuyến', rating: '4.7', image: require('@/assets/images/hoctap.jpg') },
-        ];
-      default:
-        return [];
+  const featuredDestinations = [
+    {
+      id: 1,
+      name: t('som_rong_temple'),
+      price: '4.8 ★',
+      tag: t('temple'),
+      image: require('@/assets/images/pagoda.jpg'),
+      accent: '#FF7A00'
+    },
+    {
+      id: 2,
+      name: 'Bún Nước Lèo',
+      price: '5.0 ★',
+      tag: t('food'),
+      image: require('@/assets/images/amthuc.jpg'),
+      accent: '#3B82F6'
     }
+  ];
+
+  const handleCategoryPress = (route: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    router.push(route as any);
   };
 
   return (
     <View style={styles.container}>
-      {/* Header with background image */}
-      <ImageBackground
-        source={require('@/assets/images/backgroud.jpg')}
-        style={styles.header}
-        imageStyle={styles.headerImage}
+      {/* Header */}
+      <Animated.View entering={FadeInDown.delay(100)} style={styles.header}>
+        <View style={styles.userInfo}>
+          <TouchableOpacity
+            style={styles.headerActionBtn}
+            onPress={() => router.push('/(tabs)/profile' as any)}
+          >
+            {user?.avatar ? (
+              <Image source={{ uri: user.avatar }} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <Ionicons name="person-circle-outline" size={40} color="#64748B" />
+              </View>
+            )}
+          </TouchableOpacity>
+          <View style={styles.welcomeText}>
+            <ThemedText style={styles.helloText}>Chào mừng bạn 👋</ThemedText>
+            <ThemedText style={styles.userName}>{user?.name || t('guest')}</ThemedText>
+          </View>
+        </View>
+        <TouchableOpacity
+          style={styles.notificationBtnSimple}
+          onPress={() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)}
+        >
+          <Animated.View style={animatedBellStyle}>
+            <Ionicons name="notifications-outline" size={30} color="#000" />
+            <View style={styles.notificationBadge}>
+              <ThemedText style={styles.badgeText}>2</ThemedText>
+            </View>
+          </Animated.View>
+        </TouchableOpacity>
+      </Animated.View>
+
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 }}
       >
-        <View style={styles.headerOverlay}>
-          <View style={styles.headerTop}>
-            <View style={styles.greeting}>
-              <ThemedText style={styles.appName}>KhmerGo</ThemedText>
-              <ThemedText style={styles.tagline}>{t('tagline') || 'Khám phá nền văn hóa Khmer'}</ThemedText>
-            </View>
-          </View>
+        {/* Promo Banner */}
+        <Animated.View entering={FadeInDown.delay(300)} style={styles.promoBanner}>
+          <Image
+            source={require('@/assets/images/banner.png')}
+            style={styles.promoImage}
+            resizeMode="cover"
+          />
+        </Animated.View>
 
-
-          {/* Search Bar */}
-          <View style={styles.searchContainer}>
-            <View style={styles.searchBox}>
-              <ThemedText style={styles.searchIcon}>🔍</ThemedText>
-              <TextInput
-                style={[styles.searchInput, { color: textColor }]}
-                placeholder={t('search_placeholder') || 'Tìm kiếm...'}
-                placeholderTextColor="#717171ff"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-            </View>
-          </View>
-        </View>
-      </ImageBackground>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Promotions Section */}
+        {/* Categories Grid */}
         <View style={styles.sectionHeader}>
-          <ThemedText style={styles.sectionTitle}>{t('promotions')}</ThemedText>
+          <ThemedText style={styles.sectionTitle}>Khám phá dịch vụ</ThemedText>
+          <TouchableOpacity>
+            <ThemedText style={styles.viewAllText}>{t('view_all')}</ThemedText>
+          </TouchableOpacity>
         </View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.promoScroll}
-        >
-          {/* Pagoda Promo */}
-          <ImageBackground
-            source={require('@/assets/images/pagoda.jpg')}
-            style={styles.promoCardLarge}
-            imageStyle={{ borderRadius: 25 }}
-          >
-            <View style={[styles.promoOverlay, { backgroundColor: 'rgba(160, 82, 45, 0.45)' }]}>
-              <ThemedText style={styles.promoTag}>{t('temple')}</ThemedText>
-              <ThemedText style={styles.promoText}>{t('promo_pagoda_title')}</ThemedText>
-              <TouchableOpacity
-                style={styles.promoBtn}
-                onPress={() => setActiveCategory(0)}
-              >
-                <ThemedText style={styles.promoBtnText}>{t('see_all')}</ThemedText>
-                <ThemedText style={{ fontSize: 14 }}>→</ThemedText>
-              </TouchableOpacity>
-            </View>
-          </ImageBackground>
 
-          {/* Culture Promo */}
-          <ImageBackground
-            source={require('@/assets/images/festival.jpg')}
-            style={styles.promoCardLarge}
-            imageStyle={{ borderRadius: 25 }}
-          >
-            <View style={[styles.promoOverlay, { backgroundColor: 'rgba(65, 105, 225, 0.45)' }]}>
-              <ThemedText style={styles.promoTag}>{t('culture')}</ThemedText>
-              <ThemedText style={styles.promoText}>Tìm hiểu các nghi lễ và văn hóa độc đáo</ThemedText>
-              <TouchableOpacity
-                style={styles.promoBtn}
-                onPress={() => setActiveCategory(1)}
-              >
-                <ThemedText style={styles.promoBtnText}>{t('see_all')}</ThemedText>
-                <ThemedText style={{ fontSize: 14 }}>→</ThemedText>
-              </TouchableOpacity>
-            </View>
-          </ImageBackground>
-
-          {/* Food Promo */}
-          <ImageBackground
-            source={require('@/assets/images/amthuc.jpg')}
-            style={styles.promoCardLarge}
-            imageStyle={{ borderRadius: 25 }}
-          >
-            <View style={[styles.promoOverlay, { backgroundColor: 'rgba(46, 139, 87, 0.45)' }]}>
-              <ThemedText style={styles.promoTag}>{t('food')}</ThemedText>
-              <ThemedText style={styles.promoText}>Khám phá các món ăn Khmer đặc sắc</ThemedText>
-              <TouchableOpacity
-                style={styles.promoBtn}
-                onPress={() => setActiveCategory(2)}
-              >
-                <ThemedText style={styles.promoBtnText}>{t('see_all')}</ThemedText>
-                <ThemedText style={{ fontSize: 14 }}>→</ThemedText>
-              </TouchableOpacity>
-            </View>
-          </ImageBackground>
-
-          {/* Learning Promo */}
-          <ImageBackground
-            source={require('@/assets/images/hoctap.jpg')}
-            style={styles.promoCardLarge}
-            imageStyle={{ borderRadius: 25 }}
-          >
-            <View style={[styles.promoOverlay, { backgroundColor: 'rgba(153, 50, 204, 0.45)' }]}>
-              <ThemedText style={styles.promoTag}>{t('language_study')}</ThemedText>
-              <ThemedText style={styles.promoText}>Bắt đầu học tiếng Khmer ngay hôm nay</ThemedText>
-              <TouchableOpacity
-                style={styles.promoBtn}
-                onPress={() => setActiveCategory(3)}
-              >
-                <ThemedText style={styles.promoBtnText}>{t('learn_now')}</ThemedText>
-                <ThemedText style={{ fontSize: 14 }}>→</ThemedText>
-              </TouchableOpacity>
-            </View>
-          </ImageBackground>
-        </ScrollView>
-
-        {/* Category Pills */}
-        <View style={styles.sectionHeader}>
-          <ThemedText style={styles.sectionTitle}>{t('category')}</ThemedText>
-        </View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoryScroll}
-        >
-          {categories.map((cat) => (
-            <TouchableOpacity
-              key={cat.id}
-              style={[styles.categoryPill, activeCategory === cat.id && styles.categoryPillActive]}
-              onPress={() => setActiveCategory(cat.id)}
-            >
-              <ThemedText style={[styles.categoryPillText, activeCategory === cat.id && styles.categoryPillTextActive]}>
-                {cat.label}
-              </ThemedText>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        {/* Dynamic Content Grid */}
-        <View style={styles.destinationContainer}>
-          {getActiveData().map((item) => (
-            <TouchableOpacity
+        <View style={styles.gridContainer}>
+          {services.map((item, index) => (
+            <Animated.View
               key={item.id}
-              style={styles.destCard}
-              onPress={() => {
-                if (activeCategory === 0) {
-                  router.push('/pagoda' as any);
-                }
-              }}
+              entering={FadeInDown.delay(400 + index * 50)}
+              style={styles.gridItem}
             >
-              <ImageBackground source={item.image} style={styles.destImage} imageStyle={{ borderRadius: 25 }}>
-                <View style={styles.destOverlay}>
-                  <View style={styles.destInfo}>
-                    <ThemedText style={styles.destName}>{item.name}</ThemedText>
-                    <View style={styles.destLocation}>
-                      <ThemedText style={styles.pinIcon}>📍</ThemedText>
-                      <ThemedText style={styles.locationText}>{item.location}</ThemedText>
-                    </View>
-                  </View>
-                  <View style={styles.destRating}>
-                    <ThemedText style={styles.starIconSmall}>⭐</ThemedText>
-                    <ThemedText style={styles.ratingTextSmall}>{item.rating}</ThemedText>
-                  </View>
+              <TouchableOpacity
+                onPress={() => handleCategoryPress(item.route)}
+                style={styles.iconContainer}
+              >
+                <View style={[styles.iconBox, { backgroundColor: item.color }]}>
+                  <ThemedText style={{ fontSize: 24 }}>{item.icon}</ThemedText>
                 </View>
-              </ImageBackground>
-            </TouchableOpacity>
+                <ThemedText style={styles.itemLabel} numberOfLines={1}>{item.label}</ThemedText>
+              </TouchableOpacity>
+            </Animated.View>
           ))}
         </View>
 
-        <View style={{ height: 80 }} />
+        {/* Featured List */}
+        <View style={styles.sectionHeader}>
+          <ThemedText style={styles.sectionTitle}>Gợi ý cho bạn</ThemedText>
+          <TouchableOpacity>
+            <ThemedText style={styles.viewAllText}>{t('view_all')}</ThemedText>
+          </TouchableOpacity>
+        </View>
+
+        {featuredDestinations.map((item, index) => (
+          <Animated.View
+            key={item.id}
+            entering={FadeInRight.delay(600 + index * 100)}
+            style={styles.card}
+          >
+            <View style={styles.cardHeader}>
+              <View style={styles.imageContainer}>
+                <Image source={item.image} style={styles.cardAvatar} />
+                <View style={[styles.statusDot, { backgroundColor: item.accent }]} />
+              </View>
+              <View style={styles.cardInfo}>
+                <ThemedText style={styles.cardTitle}>{item.name}</ThemedText>
+                <View style={styles.ratingRow}>
+                  <Ionicons name="star" size={14} color="#FFD700" />
+                  <ThemedText style={styles.cardPrice}>{item.price}</ThemedText>
+                </View>
+              </View>
+              <View style={[styles.tag, { backgroundColor: item.accent + '20' }]}>
+                <ThemedText style={[styles.tagText, { color: item.accent }]}>{item.tag}</ThemedText>
+              </View>
+            </View>
+            <View style={styles.cardActions}>
+              <TouchableOpacity
+                style={styles.secondaryBtn}
+                onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+              >
+                <Ionicons name="map-outline" size={18} color="#666" />
+                <ThemedText style={styles.secondaryBtnText}>Vị trí</ThemedText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.primaryBtn, { backgroundColor: item.accent }]}
+                onPress={() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)}
+              >
+                <ThemedText style={styles.primaryBtnText}>Đặt chỗ ngay</ThemedText>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        ))}
       </ScrollView>
     </View>
   );
@@ -240,342 +219,342 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#F8FAFC',
+    paddingTop: 50,
   },
   header: {
-    height: 220,
-    position: 'relative',
-  },
-  headerImage: {
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-  },
-  headerOverlay: {
-    flex: 1,
-    padding: 20,
-    paddingTop: 50,
-    backgroundColor: 'rgba(196, 196, 196, 0.3)',
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-  },
-  headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 10,
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    marginBottom: 20,
   },
-  greeting: {
-    flex: 1,
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
-  appName: {
-    fontSize: 38,
-    fontWeight: '900',
-    color: '#2C1810',
-    marginBottom: 2,
-    lineHeight: 40,
-    includeFontPadding: true,
-    textShadowColor: '#ffffff',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+  avatar: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 18,
   },
-  tagline: {
-    fontSize: 20,
+  avatarPlaceholder: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F1F5F9',
+  },
+  welcomeText: {
+    justifyContent: 'center',
+  },
+  helloText: {
+    fontSize: 14,
+    color: '#1E293B',
     fontWeight: '700',
-    color: 'rgba(0, 0, 0, 0.9)',
-    lineHeight: 28,
-    includeFontPadding: true,
-    textShadowColor: '#ffffff',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+    letterSpacing: 0.3,
   },
-  headerLogo: {
-    width: 55,
-    height: 55,
-    borderRadius: 10,
-    marginBottom: 10,
+  userName: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#1E293B',
   },
-  searchContainer: {
-    marginTop: 'auto',
-  },
-  searchBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 12,
-    paddingHorizontal: 18,
-    paddingVertical: 3,
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.8)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  searchIcon: {
-    fontSize: 18,
-    marginRight: 12,
-    color: '#666666',
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 13,
-    color: '#333333',
-    fontWeight: '600',
-  },
-  content: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  servicesSection: {
-    backgroundColor: '#ffffff',
-    padding: 18,
-    paddingBottom: 10,
-    marginHorizontal: 10,
-    marginTop: -8,
-    marginBottom: 0,
-    borderRadius: 20,
-  },
-  servicesGrid: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  serviceItem: {
-    width: (Dimensions.get('window').width - 56) / 4,
-    alignItems: 'center',
-    paddingHorizontal: 4,
-  },
-  serviceIcon: {
-    width: 60,
-    height: 60,
+  headerActionBtn: {
+    width: 52,
+    height: 52,
+    backgroundColor: '#FFF',
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 6,
-    backgroundColor: '#FFFFFF',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  serviceIconImage: {
-    width: 35,
-    height: 35,
-    resizeMode: 'contain',
-    borderRadius: 8,
-  },
-  serviceText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#6b6b6b',
-    textAlign: 'center',
-    lineHeight: 14,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 25,
-    marginTop: 25,
-    marginBottom: 15,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#1A1A1A',
-  },
-  seeAllText: {
-    fontSize: 14,
-    color: '#FF6347',
-    fontWeight: '600',
-  },
-  promoScroll: {
-    paddingLeft: 25,
-    paddingRight: 10,
-    paddingVertical: 10, // Added padding for shadow
-  },
-  promoCardLarge: {
-    width: Dimensions.get('window').width * 0.75,
-    height: 180,
-    marginRight: 18,
-    borderRadius: 25,
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
     shadowRadius: 10,
-    overflow: 'visible', // To show shadow
-  },
-  promoOverlay: {
-    flex: 1,
-    padding: 22,
-    borderRadius: 25,
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
-  },
-  promoTag: {
-    fontSize: 11,
-    fontWeight: '900',
-    color: '#FFF',
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
-    marginBottom: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 1.2,
+    elevation: 3,
     overflow: 'hidden',
   },
-  promoText: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: '#FFF',
-    marginBottom: 18,
-    lineHeight: 26,
-    textShadowColor: 'rgba(0, 0, 0, 0.4)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
+  notificationBtnSimple: {
+    width: 52,
+    height: 52,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  promoBtn: {
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    paddingHorizontal: 18,
-    paddingVertical: 10,
+  notificationBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -4,
+    backgroundColor: '#EF4444',
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#FFF',
+    zIndex: 99,
+    elevation: 5,
+  },
+  badgeText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: '900',
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    includeFontPadding: false,
+    lineHeight: 14,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    paddingHorizontal: 24,
+    gap: 10,
+    marginBottom: 20,
+  },
+  searchBox: {
+    flex: 1,
+    height: 50,
+    backgroundColor: '#FFF',
+    borderRadius: 22,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    shadowColor: '#64748B',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#1E293B',
+    fontWeight: '500',
+  },
+  filterBtn: {
+    width: 58,
+    height: 58,
+    backgroundColor: '#1E293B',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  content: {
+    flex: 1,
+  },
+  promoBanner: {
+    marginHorizontal: 24,
+    height: 170,
+    backgroundColor: '#DBEAFE',
+    borderRadius: 28,
+    flexDirection: 'row',
+    overflow: 'hidden',
+    marginBottom: 30,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.5)',
+  },
+  promoLeft: {
+    flex: 1.3,
+    padding: 24,
+    justifyContent: 'center',
+    zIndex: 2,
+  },
+  promoOff: {
+    fontSize: 13,
+    color: '#3B82F6',
+    fontWeight: '800',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  promoTitle: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#1E293B',
+    marginBottom: 18,
+    lineHeight: 24,
+  },
+  bookBtn: {
+    backgroundColor: '#1E293B',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
     borderRadius: 14,
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
   },
-  promoBtnText: {
+  bookBtnText: {
+    color: '#FFF',
     fontSize: 13,
     fontWeight: '800',
-    color: '#1A1A1A',
   },
-  promoCardSmall: {
-    width: Dimensions.get('window').width * 0.45,
-    height: 160,
-    borderRadius: 20,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  promoTextSmall: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#FFF',
-    marginBottom: 12,
-    lineHeight: 20,
-  },
-  promoBtnSmall: {
-    backgroundColor: '#FFF',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-  },
-  promoBtnTextSmall: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#1A1A1A',
-  },
-  categoryScroll: {
-    paddingLeft: 25,
-    paddingRight: 10,
-    marginBottom: 10,
-  },
-  categoryPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 25,
-    backgroundColor: '#F3F4F6',
-    marginRight: 12,
-  },
-  categoryPillActive: {
-    backgroundColor: '#FF6347', // Orange/Salmon
-  },
-  categoryIcon: {
-    fontSize: 16,
-    marginRight: 8,
-  },
-  categoryPillText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#6B7280',
-    lineHeight: 20,
-  },
-  categoryPillTextActive: {
-    color: '#FFF',
-  },
-  destinationContainer: {
-    paddingHorizontal: 25,
-    marginTop: 20,
-    gap: 20,
-  },
-  destCard: {
+  promoImage: {
+    ...StyleSheet.absoluteFillObject,
     width: '100%',
-    height: 220,
-    borderRadius: 25,
-    overflow: 'hidden',
+    height: '100%',
+    opacity: 1,
   },
-  destImage: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  destOverlay: {
+  sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    padding: 20,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
+    alignItems: 'center',
+    paddingHorizontal: 25,
+    marginBottom: 16,
   },
-  destInfo: {
-    flex: 1,
-  },
-  destName: {
+  sectionTitle: {
     fontSize: 20,
+    fontWeight: '900',
+    color: '#1E293B',
+  },
+  viewAllText: {
+    color: '#64748B',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 16,
+    marginBottom: 24,
+  },
+  gridItem: {
+    width: '25%',
+    marginBottom: 20,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconBox: {
+    width: 64,
+    height: 64,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+    backgroundColor: '#FFF',
+    shadowColor: '#64748B',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  itemLabel: {
+    fontSize: 11,
     fontWeight: '800',
-    color: '#FFF',
-    marginBottom: 4,
+    color: '#475569',
+    textAlign: 'center',
   },
-  destLocation: {
+  card: {
+    marginHorizontal: 24,
+    backgroundColor: '#FFF',
+    borderRadius: 28,
+    padding: 20,
+    marginBottom: 18,
+    shadowColor: '#64748B',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 15,
+    elevation: 4,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  imageContainer: {
+    position: 'relative',
+  },
+  cardAvatar: {
+    width: 68,
+    height: 68,
+    borderRadius: 20,
+    backgroundColor: '#F1F5F9',
+  },
+  statusDot: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderWidth: 2,
+    borderColor: '#FFF',
+  },
+  cardInfo: {
+    flex: 1,
+    marginLeft: 16,
+  },
+  cardTitle: {
+    fontSize: 17,
+    fontWeight: '900',
+    color: '#1E293B',
+    marginBottom: 6,
+  },
+  ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
-  pinIcon: {
-    fontSize: 12,
+  cardPrice: {
+    fontSize: 14,
+    color: '#64748B',
+    fontWeight: '800',
   },
-  locationText: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.8)',
-    fontWeight: '600',
-  },
-  destRating: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+  tag: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 12,
-    gap: 4,
   },
-  starIconSmall: {
-    fontSize: 12,
+  tagText: {
+    fontSize: 11,
+    fontWeight: '900',
+    textTransform: 'uppercase',
   },
-  ratingTextSmall: {
+  cardActions: {
+    flexDirection: 'row',
+    gap: 14,
+  },
+  secondaryBtn: {
+    flex: 1,
+    height: 52,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#F1F5F9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  secondaryBtnText: {
     fontSize: 14,
     fontWeight: '800',
+    color: '#64748B',
+  },
+  primaryBtn: {
+    flex: 1.4,
+    height: 52,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  primaryBtnText: {
+    fontSize: 14,
+    fontWeight: '900',
     color: '#FFF',
   },
 });
