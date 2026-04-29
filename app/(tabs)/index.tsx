@@ -95,63 +95,84 @@ export default function HomeScreen() {
         {/* Promotions Section */}
         <View style={styles.sectionHeader}>
           <ThemedText style={styles.sectionTitle}>{t('promotions')}</ThemedText>
-          <TouchableOpacity>
-            <ThemedText style={styles.seeAllText}>{t('see_all')}</ThemedText>
-          </TouchableOpacity>
         </View>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.promoScroll}
         >
+          {/* Pagoda Promo */}
           <ImageBackground
-            source={require('@/assets/images/backgroud.jpg')}
+            source={require('@/assets/images/pagoda.jpg')}
             style={styles.promoCardLarge}
-            imageStyle={{ borderRadius: 20 }}
+            imageStyle={{ borderRadius: 25 }}
           >
-            <View style={styles.promoOverlay}>
+            <View style={[styles.promoOverlay, { backgroundColor: 'rgba(160, 82, 45, 0.45)' }]}>
+              <ThemedText style={styles.promoTag}>{t('temple')}</ThemedText>
               <ThemedText style={styles.promoText}>{t('promo_pagoda_title')}</ThemedText>
-              <TouchableOpacity style={styles.promoBtn}>
-                <ThemedText style={styles.promoBtnText}>{t('get_coupon')}</ThemedText>
+              <TouchableOpacity
+                style={styles.promoBtn}
+                onPress={() => setActiveCategory(0)}
+              >
+                <ThemedText style={styles.promoBtnText}>{t('see_all')}</ThemedText>
+                <ThemedText style={{ fontSize: 14 }}>→</ThemedText>
               </TouchableOpacity>
             </View>
           </ImageBackground>
 
+          {/* Culture Promo */}
           <ImageBackground
-            source={require('@/assets/images/backgroud.jpg')}
+            source={require('@/assets/images/festival.jpg')}
             style={styles.promoCardLarge}
-            imageStyle={{ borderRadius: 20 }}
+            imageStyle={{ borderRadius: 25 }}
           >
-            <View style={styles.promoOverlay}>
-              <ThemedText style={styles.promoText}>{t('promo_pagoda_title')}</ThemedText>
-              <TouchableOpacity style={styles.promoBtn}>
-                <ThemedText style={styles.promoBtnText}>{t('get_coupon')}</ThemedText>
+            <View style={[styles.promoOverlay, { backgroundColor: 'rgba(65, 105, 225, 0.45)' }]}>
+              <ThemedText style={styles.promoTag}>{t('culture')}</ThemedText>
+              <ThemedText style={styles.promoText}>Tìm hiểu các nghi lễ và văn hóa độc đáo</ThemedText>
+              <TouchableOpacity
+                style={styles.promoBtn}
+                onPress={() => setActiveCategory(1)}
+              >
+                <ThemedText style={styles.promoBtnText}>{t('see_all')}</ThemedText>
+                <ThemedText style={{ fontSize: 14 }}>→</ThemedText>
               </TouchableOpacity>
             </View>
           </ImageBackground>
 
+          {/* Food Promo */}
           <ImageBackground
-            source={require('@/assets/images/backgroud.jpg')}
+            source={require('@/assets/images/amthuc.jpg')}
             style={styles.promoCardLarge}
-            imageStyle={{ borderRadius: 20 }}
+            imageStyle={{ borderRadius: 25 }}
           >
-            <View style={styles.promoOverlay}>
-              <ThemedText style={styles.promoText}>{t('promo_pagoda_title')}</ThemedText>
-              <TouchableOpacity style={styles.promoBtn}>
-                <ThemedText style={styles.promoBtnText}>{t('get_coupon')}</ThemedText>
+            <View style={[styles.promoOverlay, { backgroundColor: 'rgba(46, 139, 87, 0.45)' }]}>
+              <ThemedText style={styles.promoTag}>{t('food')}</ThemedText>
+              <ThemedText style={styles.promoText}>Khám phá các món ăn Khmer đặc sắc</ThemedText>
+              <TouchableOpacity
+                style={styles.promoBtn}
+                onPress={() => setActiveCategory(2)}
+              >
+                <ThemedText style={styles.promoBtnText}>{t('see_all')}</ThemedText>
+                <ThemedText style={{ fontSize: 14 }}>→</ThemedText>
               </TouchableOpacity>
             </View>
           </ImageBackground>
 
+          {/* Learning Promo */}
           <ImageBackground
-            source={require('@/assets/images/backgroud.jpg')}
+            source={require('@/assets/images/hoctap.jpg')}
             style={styles.promoCardLarge}
-            imageStyle={{ borderRadius: 20 }}
+            imageStyle={{ borderRadius: 25 }}
           >
-            <View style={styles.promoOverlay}>
-              <ThemedText style={styles.promoText}>{t('promo_pagoda_title')}</ThemedText>
-              <TouchableOpacity style={styles.promoBtn}>
-                <ThemedText style={styles.promoBtnText}>{t('get_coupon')}</ThemedText>
+            <View style={[styles.promoOverlay, { backgroundColor: 'rgba(153, 50, 204, 0.45)' }]}>
+              <ThemedText style={styles.promoTag}>{t('language_study')}</ThemedText>
+              <ThemedText style={styles.promoText}>Bắt đầu học tiếng Khmer ngay hôm nay</ThemedText>
+              <TouchableOpacity
+                style={styles.promoBtn}
+                onPress={() => setActiveCategory(3)}
+              >
+                <ThemedText style={styles.promoBtnText}>{t('learn_now')}</ThemedText>
+                <ThemedText style={{ fontSize: 14 }}>→</ThemedText>
               </TouchableOpacity>
             </View>
           </ImageBackground>
@@ -178,13 +199,6 @@ export default function HomeScreen() {
             </TouchableOpacity>
           ))}
         </ScrollView>
-
-        {/* Dynamic Section Title */}
-        <View style={styles.sectionHeader}>
-          <ThemedText style={styles.sectionTitle}>
-            {categories.find(c => c.id === activeCategory)?.label}
-          </ThemedText>
-        </View>
 
         {/* Dynamic Content Grid */}
         <View style={styles.destinationContainer}>
@@ -379,37 +393,70 @@ const styles = StyleSheet.create({
   promoScroll: {
     paddingLeft: 25,
     paddingRight: 10,
+    paddingVertical: 10, // Added padding for shadow
   },
   promoCardLarge: {
-    width: Dimensions.get('window').width * 0.7,
-    height: 160,
-    marginRight: 15,
-    justifyContent: 'flex-end',
+    width: Dimensions.get('window').width * 0.75,
+    height: 180,
+    marginRight: 18,
+    borderRadius: 25,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    overflow: 'visible', // To show shadow
   },
   promoOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.2)',
-    padding: 20,
-    borderRadius: 20,
+    padding: 22,
+    borderRadius: 25,
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  promoTag: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#FFF',
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+    overflow: 'hidden',
   },
   promoText: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 20,
+    fontWeight: '900',
     color: '#FFF',
-    marginBottom: 15,
-    lineHeight: 24,
+    marginBottom: 18,
+    lineHeight: 26,
+    textShadowColor: 'rgba(0, 0, 0, 0.4)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   promoBtn: {
-    backgroundColor: '#FFF',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 15,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 14,
     alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   promoBtnText: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '800',
     color: '#1A1A1A',
   },
   promoCardSmall: {
