@@ -54,11 +54,6 @@ const translations = {
     login_to_use: 'Đăng nhập để sử dụng tính năng này',
     logout_confirm_msg: 'Bạn có chắc chắn muốn đăng xuất',
     login_required: 'Yêu cầu đăng nhập',
-    // Ranks
-    rank_bronze: 'Đồng',
-    rank_silver: 'Bạc',
-    rank_gold: 'Vàng',
-    rank_diamond: 'Kim cương',
 
     // Quiz Screen
     quiz_title: 'Thử thách',
@@ -67,17 +62,13 @@ const translations = {
     quiz_desc: 'Vượt qua các câu hỏi để tích lũy thêm điểm',
     total_score: 'Tổng điểm',
     current_rank: 'Hạng hiện tại',
-    categories: 'Chủ đề',
-    history: 'Lịch sử',
-    geography: 'Địa lý',
+    categories: 'Chủ đề thử thách',
     questions: 'Bộ câu hỏi',
     performance: 'Thành tích',
     view_all: 'Xem tất cả...',
     completed: 'Hoàn thành',
-    accuracy: 'Chính xác',
     recent_performance: 'Dựa trên các bài thi gần đây',
-    choose_topic: 'Hôm nay bạn muốn học về gì nào',
-    general_knowledge: 'Kiến thức',
+    choose_topic: 'Hôm nay bạn muốn thử thách về chủ đề gì nào',
     pagoda_quiz: 'Chùa Khmer',
     culture_quiz: 'Văn hóa Khmer',
     food_quiz: 'Ẩm thực Khmer',
@@ -102,6 +93,7 @@ const translations = {
     wrong_old_pass: 'Mật khẩu hiện tại không chính xác',
     update_success: 'Cập nhật thành công',
     update_failed: 'Cập nhật thất bại',
+
     // Support Screen Extra
     faq: 'Câu hỏi thường gặp',
     feedback_section: 'Gửi phản hồi cho chúng tôi',
@@ -212,11 +204,6 @@ const translations = {
     login_to_use: 'ចូលដើម្បីប្រើប្រាស់មុខងារនេះ',
     logout_confirm_msg: 'តើអ្នកប្រាកដថាចង់ចាកចេញមែនទេ?',
     login_required: 'តម្រូវឱ្យចូល',
-    // Ranks
-    rank_bronze: 'សំរិទ្ធ',
-    rank_silver: 'ប្រាក់',
-    rank_gold: 'មាស',
-    rank_diamond: 'ពេជ្រ',
 
     // Quiz Screen
     quiz_title: 'ការសាកល្បង',

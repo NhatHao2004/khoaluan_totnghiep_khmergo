@@ -6,9 +6,10 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const { width } = Dimensions.get('window');
+const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function QuizScreen() {
   const { t } = useLanguage();
@@ -47,6 +48,8 @@ export default function QuizScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+
+
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t('quiz_title')}</Text>
@@ -54,47 +57,39 @@ export default function QuizScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 
+        {/* Profile Card - Floating */}
         <View style={styles.profileCard}>
-          <View style={{ zIndex: 10 }}>
-            <View style={styles.cardHeader}>
-              <View style={styles.avatarWrapper}>
-                {user?.avatar ? (
-                  <Image source={{ uri: user.avatar }} style={styles.cardAvatar} />
-                ) : (
-                  <Ionicons name="person-circle-outline" size={70} color="#000000ff" />
+          <View style={styles.cardHeader}>
+            <View style={styles.avatarWrapper}>
+              {user?.avatar ? (
+                <Image source={{ uri: user.avatar }} style={styles.cardAvatar} />
+              ) : (
+                <Ionicons name="person-circle-outline" size={70} color="#000000ff" />
+              )}
+            </View>
 
-                )}
-
-              </View>
-
-              <View style={styles.nameContainer}>
-                <Text style={styles.cardName}>{user?.name || t('guest')}</Text>
-                <Text style={styles.cardSubtitle}>
+            <View style={styles.nameContainer}>
+              <Text style={styles.cardName} numberOfLines={1}>{user?.name || t('guest')}</Text>
+              <View style={styles.rankBadge}>
+                <Text style={styles.cardRankText}>
                   {`${t('current_rank')}: ${userRank}`}
                 </Text>
               </View>
             </View>
+          </View>
 
-            <View style={styles.cardStats}>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{user?.points || 0}</Text>
-                <Text style={styles.statLabel}>{t('total_score')}</Text>
-              </View>
-              <View style={styles.statDivider} />
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>0/0</Text>
-                <Text style={styles.statLabel}>{t('completed')}</Text>
-              </View>
-              <View style={styles.statDivider} />
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{user?.accuracy || 0}%</Text>
-                <Text style={styles.statLabel}>{t('accuracy')}</Text>
-              </View>
+          <View style={styles.cardStats}>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{user?.points || 0}</Text>
+              <Text style={styles.statLabel}>{t('total_score')}</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>0</Text>
+              <Text style={styles.statLabel}>{t('completed')}</Text>
             </View>
           </View>
         </View>
-
-
 
         {/* Categories Section */}
         <View style={styles.sectionHeader}>
@@ -106,73 +101,80 @@ export default function QuizScreen() {
 
         <View style={styles.bentoContainer}>
           <View style={styles.bentoRow}>
-            <TouchableOpacity
-              activeOpacity={1}
-              style={[styles.bentoCardTall, { backgroundColor: '#ffffffff', flex: 0.8 }]}
-            >
-              <Text style={styles.bentoTitle} numberOfLines={1}>{t('pagoda_quiz')}</Text>
-              <Text style={styles.bentoSubtitle}>10 {t('questions')}</Text>
-              <View style={styles.bentoSpacer} />
-              <View style={styles.bentoImageContainerLarge}>
-                <Image
-                  source={require('@/assets/images/pagoda.jpg')}
-                  style={styles.bentoImageInside}
-                />
-              </View>
-            </TouchableOpacity>
-
-            {/* Right Column - Stacked Cards */}
-            <View style={styles.bentoRightCol}>
+            {/* Pagoda Quiz - Featured */}
+            <View style={{ flex: 1.2 }}>
               <TouchableOpacity
                 activeOpacity={1}
-                style={[styles.bentoCardSquare, { backgroundColor: '#ffffffff' }]}
+                style={[styles.bentoCard, { height: 220 }]}
               >
-                <View style={styles.bentoImageContainerSmall}>
+                <Text style={styles.bentoTitle} numberOfLines={2}>{t('pagoda_quiz')}</Text>
+                <Text style={styles.bentoSubtitle}>10 {t('questions')}</Text>
+                <View style={styles.bentoImageContainer}>
                   <Image
-                    source={require('@/assets/images/festival.jpg')}
-                    style={styles.bentoImageInside}
+                    source={require('@/assets/images/pagoda.jpg')}
+                    style={styles.bentoImage}
                   />
                 </View>
-                <Text style={styles.bentoTitleSmall} numberOfLines={1}>{t('culture_quiz')}</Text>
               </TouchableOpacity>
+            </View>
 
-              <TouchableOpacity
-                activeOpacity={1}
-                style={[styles.bentoCardWide, { backgroundColor: '#ffffffff' }]}
-              >
-                <View style={styles.bentoSocialIcons}>
-                  <View style={styles.bentoImageContainerSmallInline}>
+            {/* Right Column */}
+            <View style={{ flex: 1, gap: 15 }}>
+              {/* Culture Quiz */}
+              <View>
+                <TouchableOpacity
+                  activeOpacity={1}
+                  style={[styles.bentoCard, { height: 102.5 }]}
+                >
+                  <Text style={styles.bentoTitleSmall} numberOfLines={1}>{t('culture_quiz')}</Text>
+                  <View style={styles.bentoImageContainerSmall}>
                     <Image
-                      source={require('@/assets/images/amthuc.jpg')}
-                      style={styles.bentoImageInside}
+                      source={require('@/assets/images/festival.jpg')}
+                      style={styles.bentoImage}
                     />
                   </View>
-                </View>
-                <Text style={styles.bentoTitleSmall} numberOfLines={1}>{t('food_quiz')}</Text>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              </View>
+
+              {/* Food Quiz */}
+              <View>
+                <TouchableOpacity
+                  activeOpacity={1}
+                  style={[styles.bentoCard, { height: 102.5 }]}
+                >
+                  <Text style={styles.bentoTitleSmall} numberOfLines={1}>{t('food_quiz')}</Text>
+                  <View style={styles.bentoImageContainerSmall}>
+                    <Image
+                      source={require('@/assets/images/amthuc.jpg')}
+                      style={styles.bentoImage}
+                    />
+                  </View>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
 
-          {/* Bottom Wide Card */}
-          <TouchableOpacity
-            activeOpacity={1}
-            style={[styles.bentoCardFull, { backgroundColor: '#ffffffff', marginTop: 15 }]}
-          >
-            <View style={styles.bentoFullContent}>
-              <View>
-                <Text style={styles.bentoTitle} numberOfLines={1}>{t('vocab_quiz')}</Text>
+          {/* Bottom Full Width Card - Vocab */}
+          <View>
+            <TouchableOpacity
+              activeOpacity={1}
+              style={[styles.bentoCardFull, { marginTop: 15 }]}
+            >
+              <View style={styles.bentoFullContent}>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.bentoTitle, { textAlign: 'left' }]}>{t('vocab_quiz')}</Text>
+                  <Text style={[styles.bentoSubtitle, { textAlign: 'left' }]}>20 {t('questions')}</Text>
+                </View>
+                <View style={styles.bentoImageContainerFull}>
+                  <Image
+                    source={require('@/assets/images/hoctap.jpg')}
+                    style={styles.bentoImage}
+                  />
+                </View>
               </View>
-              <View style={styles.bentoImageContainerFull}>
-                <Image
-                  source={require('@/assets/images/hoctap.jpg')}
-                  style={styles.bentoImageInside}
-                />
-              </View>
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
         </View>
-
-
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -183,104 +185,85 @@ export default function QuizScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffffff',
+    backgroundColor: '#FFFFFF',
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
-    paddingTop: 0,
-    paddingBottom: 15,
-    minHeight: 60,
+    minHeight: 50,
+    backgroundColor: '#FFFFFF',
+    zIndex: 10,
   },
-
   headerTitle: {
     fontSize: 22,
-    fontWeight: '800',
-    color: '#1A1A1A',
-    lineHeight: 48,
-    paddingVertical: 5,
-  },
-  headerBtn: {
-    position: 'absolute',
-    right: 25,
+    fontWeight: '900',
+    color: '#000000ff',
+    lineHeight: 32,
   },
 
-  notifBadge: {
-    position: 'absolute',
-    top: 2,
-    right: 2,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#FF3B30',
-    borderWidth: 1.5,
-    borderColor: '#FFF',
-  },
-  scrollContent: {
-    paddingHorizontal: 25,
-  },
   profileCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 28,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
     padding: 20,
-    marginTop: 0,
-    marginBottom: 30,
-    overflow: 'hidden',
-    borderWidth: 1,
+    marginBottom: 15,
+    borderWidth: 1, // Added subtle gray border
     borderColor: '#F0F0F0',
   },
-
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 15,
-    marginBottom: 25,
+    marginBottom: 20,
   },
   avatarWrapper: {
-    position: 'relative',
-  },
-  cardAvatar: {
     width: 70,
     height: 70,
     borderRadius: 35,
-    borderWidth: 3,
-    borderColor: 'rgba(255,255,255,0.4)',
+    backgroundColor: '#ffffffff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
   },
-
+  cardAvatar: {
+    width: '100%',
+    height: '100%',
+  },
   nameContainer: {
     flex: 1,
   },
   cardName: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#1A1A1A',
-    marginBottom: 5,
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#000000ff',
+    marginBottom: 4,
   },
   rankBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#ffffffff',
     paddingHorizontal: 0,
-    paddingVertical: 0,
-    borderRadius: 15,
+    paddingVertical: 2,
+    borderRadius: 10,
     alignSelf: 'flex-start',
-    gap: 0,
+    gap: 6,
   },
-
-  cardSubtitle: {
+  cardRankText: {
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#000000ff',
   },
-
   cardStats: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     backgroundColor: '#ffffffff',
-    borderRadius: 10,
-    paddingVertical: 10,
+    borderRadius: 16,
+    paddingVertical: 15,
   },
   statItem: {
     alignItems: 'center',
@@ -288,93 +271,36 @@ const styles = StyleSheet.create({
   statDivider: {
     width: 1,
     height: '60%',
-    backgroundColor: '#EEE',
+    backgroundColor: '#E2E8F0',
     alignSelf: 'center',
-  },
-  statLabel: {
-    fontSize: 11,
-    color: '#666',
-    fontWeight: '600',
-    marginTop: 2,
   },
   statValue: {
     fontSize: 18,
-    fontWeight: '800',
-    color: '#1A1A1A',
+    fontWeight: '900',
+    color: '#1E293B',
   },
-
-  ornament: {
-    position: 'absolute',
+  statLabel: {
+    fontSize: 10,
+    color: '#64748B',
+    fontWeight: '700',
+    marginTop: 0,
+    textTransform: 'uppercase',
   },
-
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    marginBottom: 15,
+    marginBottom: 20,
+    alignItems: 'flex-start',
   },
   sectionTitle: {
     fontSize: 22,
-    fontWeight: '800',
-    color: '#1A1A1A',
+    fontWeight: '900',
+    color: '#1E293B',
+    textAlign: 'left',
   },
   sectionSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: '#64748B',
     marginTop: 5,
-  },
-  viewAll: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#000000ff',
-  },
-  horizontalScroll: {
-    paddingBottom: 25,
-    gap: 15,
-  },
-  skillCard: {
-    width: 160,
-    backgroundColor: '#FFF',
-    borderRadius: 20,
-    padding: 15,
-    borderWidth: 1,
-    borderColor: '#F0F0F0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
-  },
-
-  skillIconCover: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  skillTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#1A1A1A',
-    marginBottom: 4,
-  },
-  skillSubtitle: {
-    fontSize: 11,
-    color: '#999',
-    marginBottom: 12,
-  },
-  progressBarContainer: {
-    width: '100%',
-    height: 4,
-    backgroundColor: '#F0F0F0',
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  progressBar: {
-    height: '100%',
-    borderRadius: 2,
+    textAlign: 'left',
   },
   bentoContainer: {
     width: '100%',
@@ -383,123 +309,95 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 15,
   },
-
-  bentoCardTall: {
-    height: 220,
+  bentoCard: {
     borderRadius: 24,
-    paddingVertical: 20,
-    paddingHorizontal: 15,
+    padding: 16,
+    overflow: 'visible',
     position: 'relative',
-    borderWidth: 0.5,
-    borderColor: '#000000ff',
-  },
-
-  bentoRightCol: {
-    flex: 1,
-    gap: 15,
-  },
-  bentoCardSquare: {
-    height: 102.5,
-    borderRadius: 24,
-    padding: 15,
-    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
-    borderWidth: 0.5,
-    borderColor: '#000000ff',
-  },
-  bentoCardWide: {
-    height: 102.5,
-    borderRadius: 24,
-    padding: 15,
     justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-    borderWidth: 0.5,
-    borderColor: '#000000ff',
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2, // Reduced elevation to avoid gray artifacts
   },
   bentoCardFull: {
     width: '100%',
-    height: 140,
+    height: 180,
     borderRadius: 24,
     padding: 20,
-    justifyContent: 'flex-end',
-    borderWidth: 1,
-    borderColor: '#000000ff',
+    overflow: 'visible',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2, // Reduced elevation to avoid gray artifacts
   },
+
   bentoTitle: {
-    fontSize: 21,
+    fontSize: 18,
     fontWeight: '800',
-    color: '#1A1A1A',
+    color: '#1E293B',
+    lineHeight: 24,
+    textAlign: 'center',
   },
   bentoTitleSmall: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '800',
-    color: '#1A1A1A',
+    color: '#1E293B',
     textAlign: 'center',
   },
   bentoSubtitle: {
     fontSize: 12,
-    color: 'rgba(0,0,0,0.5)',
-    marginTop: 4,
+    color: '#64748B',
+    fontWeight: '600',
+    marginTop: 2,
+    textAlign: 'center',
   },
-  bentoSpacer: {
-    flex: 1,
-  },
-  bentoImageContainerLarge: {
-    position: 'absolute',
-    bottom: 10,
-    right: 10,
-    width: 85,
-    height: 85,
-    borderRadius: 18,
+  bentoImageContainer: {
+    width: 110,
+    height: 110,
+    opacity: 1,
+    alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 0,
+    marginTop: 10,
+    borderRadius: 20,
+    overflow: 'hidden',
   },
   bentoImageContainerSmall: {
-    width: 60,
-    height: 60,
-    borderRadius: 12,
+    width: 50,
+    height: 50,
+    opacity: 1,
+    alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 0,
-  },
-  bentoImageContainerSmallInline: {
-    width: 60,
-    height: 60,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 0,
+    marginTop: 5,
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   bentoImageContainerFull: {
-    width: 100,
-    height: 100,
+    width: 110,
+    height: 110,
+    opacity: 1,
+    backgroundColor: 'transparent', // Ensure transparency
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 0,
+    overflow: 'hidden',
   },
-  bentoImageInside: {
-    width: '80%',
-    height: '80%',
-    borderRadius: 8,
-    resizeMode: 'contain',
-  },
-  bentoSocialIcons: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 8,
+  bentoImage: {
     width: '100%',
-    justifyContent: 'center',
+    height: '100%',
+    resizeMode: 'contain', // Changed back to show the full image
   },
   bentoFullContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    width: '100%',
   },
-
 });
-
-

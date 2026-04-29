@@ -29,7 +29,7 @@ const menuItems: MenuItem[] = [
   { id: 'favorites', titleKey: 'favorites', icon: 'heart-outline' },
   { id: 'support', titleKey: 'support_feedback', icon: 'chatbubble-ellipses-outline' },
   { id: 'settings', titleKey: 'settings', icon: 'settings-outline' },
-  { id: 'login', titleKey: 'login', icon: 'log-out-outline', color: '#0022ffff' },
+  { id: 'login', titleKey: 'login', icon: 'power-outline', color: '#0022ffff' },
   { id: 'logout', titleKey: 'logout_full', icon: 'power-outline', color: '#FF4D4D' },
 ];
 
@@ -126,7 +126,7 @@ export default function ProfileScreen() {
               (
                 <Image source={{ uri: user.avatar }} style={styles.avatar} />
               ) : (
-                <Ionicons name="person-circle-outline" size={115} color="#CCC" />
+                <Ionicons name="person-circle-outline" size={115} color="#000000ff" />
               )}
           </View>
 
@@ -134,24 +134,8 @@ export default function ProfileScreen() {
           <View style={styles.profileInfo}>
             <Text style={styles.profileName}>{user?.name || t('guest')}</Text>
             <Text style={styles.profileEmail}>{user?.email || t('login_to_view')}</Text>
-            {/* Stats */}
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{(user?.points ?? 0)}</Text>
-                <Text style={styles.statLabel}>{t('points')}</Text>
-              </View>
-              <View style={styles.statDivider} />
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>
-                  {userRank !== '---' ? `${userRank}` : '---'}
-                </Text>
-                <Text style={styles.statLabel}>{t('current_rank')}</Text>
-              </View>
-            </View>
           </View>
         </View>
-
-
 
         {/* Menu List */}
         <View style={styles.menuList}>
@@ -204,7 +188,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 20,
     paddingTop: 0,
-    paddingBottom: 15,
+    paddingBottom: 5,
     minHeight: 60,
   },
 
@@ -221,7 +205,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 15,
     backgroundColor: '#00CFA3',
-    marginTop: 15,
+    marginTop: 10,
     alignSelf: 'center',
   },
 
@@ -244,12 +228,12 @@ const styles = StyleSheet.create({
 
   // Profile Card
   profileCard: {
-    flexDirection: 'row',
+    flexDirection: 'column', // Changed from row to center vertically
     alignItems: 'center',
     paddingHorizontal: 33,
-    paddingTop: 4,
-    paddingBottom: 20,
-    gap: 18,
+    paddingTop: 0, // Increased top padding
+    paddingBottom: 0, // Increased bottom padding
+    gap: 15,
   },
   avatarWrapper: {
     position: 'relative',
@@ -273,48 +257,25 @@ const styles = StyleSheet.create({
     borderColor: '#FFF',
   },
   profileInfo: {
-    flex: 1,
-    gap: -5,
+    alignItems: 'center', // Center text horizontally
+    gap: 0,
   },
   profileName: {
-    fontSize: 22,
-    fontWeight: '700',
+    fontSize: 24,
+    fontWeight: '800',
     color: '#1A1A1A',
     marginBottom: 5,
-    lineHeight: 40,
+    lineHeight: 32,
+    textAlign: 'center',
   },
   profileEmail: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 20,
+    marginBottom: 0,
     lineHeight: 20,
+    textAlign: 'center',
   },
-  statsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1A1A1A',
-    lineHeight: 28,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#888',
-    marginTop: 4,
-    lineHeight: 18,
-  },
-  statDivider: {
-    width: 1,
-    height: 30,
-    backgroundColor: '#EEE',
-  },
+
 
   // Menu
   menuList: {

@@ -70,6 +70,9 @@ export default function MedalScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Background Cement Gray */}
+      <View style={styles.headerBackground} />
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
@@ -106,7 +109,7 @@ export default function MedalScreen() {
             <View style={[styles.podiumItem, { marginTop: -45 }]}>
               <View style={styles.crownContainer}>
               </View>
-              <View style={[styles.avatarContainer, { width: 80, height: 80, borderRadius: 40, borderWidth: 2, borderColor: '#FFD700' }]}>
+              <View style={[styles.avatarContainer, { width: 80, height: 80, borderRadius: 40, borderWidth: 1, borderColor: '#000000ff' }]}>
                 {topThree[1].avatar ? (
                   <Image source={{ uri: topThree[1].avatar }} style={styles.avatar} />
                 ) : (
@@ -129,7 +132,7 @@ export default function MedalScreen() {
 
             {/* 2nd Place */}
             <View style={styles.podiumItem}>
-              <View style={[styles.avatarContainer, { width: 80, height: 80, borderRadius: 40, borderWidth: 2, borderColor: '#C0C0C0' }]}>
+              <View style={[styles.avatarContainer, { width: 80, height: 80, borderRadius: 40, borderWidth: 1, borderColor: '#000000ff' }]}>
                 {topThree[0].avatar ? (
                   <Image source={{ uri: topThree[0].avatar }} style={styles.avatar} />
                 ) : (
@@ -152,7 +155,7 @@ export default function MedalScreen() {
 
             {/* 3rd Place */}
             <View style={styles.podiumItem}>
-              <View style={[styles.avatarContainer, { width: 80, height: 80, borderRadius: 40, borderWidth: 2, borderColor: '#CD7F32' }]}>
+              <View style={[styles.avatarContainer, { width: 80, height: 80, borderRadius: 40, borderWidth: 1, borderColor: '#000000ff' }]}>
                 {topThree[2].avatar ? (
                   <Image source={{ uri: topThree[2].avatar }} style={styles.avatar} />
                 ) : (
@@ -234,7 +237,17 @@ export default function MedalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffffff', // White background
+    backgroundColor: '#FFFFFF', // White background
+  },
+  headerBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 478, // Covers header and podium
+    backgroundColor: '#ffffffff', // Cement Gray
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
   },
   header: {
     flexDirection: 'row',
@@ -298,7 +311,7 @@ const styles = StyleSheet.create({
 
 
   podiumWrapper: {
-    marginTop: 80,
+    marginTop: 70,
     paddingBottom: 0,
   },
 
@@ -352,7 +365,7 @@ const styles = StyleSheet.create({
 
   crownContainer: {
     position: 'absolute',
-    top: -25,
+    top: -20,
     zIndex: 10,
   },
   crownHexagon: {
@@ -420,14 +433,10 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F5F5F5',
   },
   listItemRankContainer: {
-    width: 38, // Increased from 32
-    height: 38, // Increased from 32
-    borderRadius: 19,
-    borderWidth: 1,
-    borderColor: '#F0F0F0',
+    width: 19, // Reduced from 38
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 15,
   },
   listItemRank: {
     fontSize: 14,

@@ -108,10 +108,10 @@ export default function HomeScreen() {
   });
 
   const services = [
-    { id: 1, label: t('temple'), icon: require('@/assets/images/pagoda.jpg'), color: '#FF7000', route: '/pagoda' },
-    { id: 3, label: t('culture'), icon: require('@/assets/images/festival.jpg'), color: '#A000FF', route: '/(tabs)/index' },
-    { id: 2, label: t('food'), icon: require('@/assets/images/amthuc.jpg'), color: '#FF0050', route: '/(tabs)/index' },
-    { id: 4, label: t('language_study'), icon: require('@/assets/images/hoctap.jpg'), color: '#00C850', route: '/(tabs)/index' },
+    { id: 1, label: t('temple'), icon: require('@/assets/images/pagoda.jpg'), color: '#FF7000', route: '/(tabs)/pagoda' },
+    { id: 3, label: t('culture'), icon: require('@/assets/images/festival.jpg'), color: '#A000FF', route: '/(tabs)/culture' },
+    { id: 2, label: t('food'), icon: require('@/assets/images/amthuc.jpg'), color: '#FF0050', route: '/(tabs)/food' },
+    { id: 4, label: t('language_study'), icon: require('@/assets/images/hoctap.jpg'), color: '#00C850', route: '/(tabs)/language_study' },
   ];
 
 
@@ -140,13 +140,13 @@ export default function HomeScreen() {
               <Image source={{ uri: user.avatar }} style={styles.avatar} />
             ) : (
               <View style={styles.avatarPlaceholder}>
-                <Ionicons name="person-circle-outline" size={40} color="#000000ff" />
+                <Ionicons name="person-circle-outline" size={53} color="#000000ff" />
               </View>
             )}
           </TouchableOpacity>
           <View style={styles.welcomeText}>
             <ThemedText style={styles.helloText}>{t('welcome_hello')}</ThemedText>
-            <ThemedText style={styles.userName}>{user?.name || t('guest')}</ThemedText>
+            <ThemedText style={styles.userName} numberOfLines={1}>{user?.name || t('guest')}</ThemedText>
           </View>
         </View>
         <TouchableOpacity
@@ -281,15 +281,15 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 18,
+    width: 50,
+    height: 50,
+    borderRadius: 26, // Half of 52 to make it a circle
     backgroundColor: '#F1F5F9',
   },
   avatarPlaceholder: {
-    width: 52,
-    height: 52,
-    borderRadius: 18,
+    width: 50,
+    height: 50,
+    borderRadius: 25, // Half of 52 to make it a circle
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F1F5F9',

@@ -29,6 +29,7 @@ export default function RootLayout() {
           tabBarInactiveTintColor: COLORS.inactive,
           headerShown: false,
           tabBarButton: HapticTab,
+          animation: 'none', // Disable tab switching animation
           tabBarStyle: {
             height: 70,
             paddingBottom: 20,
