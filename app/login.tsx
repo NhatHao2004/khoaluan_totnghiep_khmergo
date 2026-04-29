@@ -53,9 +53,9 @@ export default function LoginScreen() {
         <View style={styles.innerContent}>
           {/* Top Navigation */}
           <View style={styles.topNav}>
-            <Text style={styles.navActive} numberOfLines={1}>{t('login_title')}</Text>
+            <Text style={styles.navActive}>{t('login_title')}</Text>
             <TouchableOpacity onPress={() => router.replace('/register')}>
-              <Text style={styles.navInactive} numberOfLines={1}>{t('register_title')}</Text>
+              <Text style={styles.navInactive}>{t('register_title')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -154,13 +154,13 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: '700',
     color: '#000',
-    lineHeight: 36,
+    lineHeight: 38,
   },
   navInactive: {
     fontSize: 18,
     fontWeight: '500',
     color: '#B0B0B0',
-    lineHeight: 28,
+    lineHeight: 30,
   },
 
   avatarWrapper: {
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     letterSpacing: 1,
     textAlign: 'center',
-    lineHeight: 26, // Increased slightly
+    lineHeight: 28, 
   },
 
   bottomSection: {

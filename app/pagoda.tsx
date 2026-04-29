@@ -5,13 +5,12 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   Dimensions,
+  FlatList,
   ImageBackground,
-  ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  View,
-  FlatList
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -23,21 +22,16 @@ export default function PagodaScreen() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const pagodaData = [
-    { id: 1, name: t('som_rong_temple'), location: t('soc_trang_vn'), rating: '4.8', image: require('@/assets/images/pagoda.jpg') },
-    { id: 2, name: t('oc_om_boc_festival'), location: t('tra_vinh_vn'), rating: '4.9', image: require('@/assets/images/festival.jpg') },
-    { id: 3, name: t('som_rong_temple'), location: t('soc_trang_vn'), rating: '4.8', image: require('@/assets/images/pagoda.jpg') },
-    { id: 4, name: 'Chùa Hang', location: t('tra_vinh_vn'), rating: '4.7', image: require('@/assets/images/backgroud.jpg') },
-    { id: 5, name: 'Chùa Dơi', location: t('soc_trang_vn'), rating: '4.9', image: require('@/assets/images/pagoda.jpg') },
-    { id: 6, name: 'Chùa Vàng', location: t('soc_trang_vn'), rating: '4.6', image: require('@/assets/images/festival.jpg') },
+    { id: 1, name: 'Chùa Âng', location: t('Tỉnh Vĩnh Long'), image: require('@/assets/images/chuaang.jpg') },
   ];
 
-  const filteredData = pagodaData.filter(item => 
+  const filteredData = pagodaData.filter(item =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const renderItem = ({ item }: { item: typeof pagodaData[0] }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.card}
       onPress={() => console.log('Detail for', item.name)}
     >
@@ -49,10 +43,6 @@ export default function PagodaScreen() {
               <ThemedText style={styles.pinIcon}>📍</ThemedText>
               <ThemedText style={styles.locationText}>{item.location}</ThemedText>
             </View>
-          </View>
-          <View style={styles.cardRating}>
-            <ThemedText style={styles.starIcon}>⭐</ThemedText>
-            <ThemedText style={styles.ratingText}>{item.rating}</ThemedText>
           </View>
         </View>
       </ImageBackground>

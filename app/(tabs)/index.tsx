@@ -31,6 +31,7 @@ export default function HomeScreen() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+  const [favorites, setFavorites] = useState<number[]>([]);
 
   // Animation for the notification bell
   const bellRotation = useSharedValue(0);
@@ -66,21 +67,42 @@ export default function HomeScreen() {
   const featuredDestinations = [
     {
       id: 1,
-      name: t('som_rong_temple'),
-      price: '4.8 ★',
+      title: 'Chùa Âng',
+      location: 'Tỉnh Vĩnh Long',
+      image: require('@/assets/images/chuaang.jpg'),
       tag: t('temple'),
-      image: require('@/assets/images/pagoda.jpg'),
-      accent: '#FF7A00'
+      reviews: 10,
+      accent: '#FF7A00',
+      route: '/(tabs)/index'
     },
     {
       id: 2,
-      name: 'Bún Nước Lèo',
-      price: '5.0 ★',
-      tag: t('food'),
+      title: 'Bún Nước Lèo',
+      location: t('soc_trang_vn'),
       image: require('@/assets/images/amthuc.jpg'),
-      accent: '#3B82F6'
+      tag: t('food'),
+      reviews: 98,
+      accent: '#3B82F6',
+      route: '/(tabs)/index'
+    },
+    {
+      id: 3,
+      title: 'Bún Nước Lèo',
+      location: t('soc_trang_vn'),
+      image: require('@/assets/images/amthuc.jpg'),
+      tag: t('food'),
+      reviews: 98,
+      accent: '#3B82F6',
+      route: '/(tabs)/index'
     }
   ];
+
+  const toggleFavorite = (id: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setFavorites(prev =>
+      prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
+    );
+  };
 
   const handleCategoryPress = (route: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -124,7 +146,7 @@ export default function HomeScreen() {
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }}
+        contentContainerStyle={{ paddingBottom: 70 }}
       >
         {/* Promo Banner */}
         <Animated.View entering={FadeInDown.delay(300)} style={styles.promoBanner}>
@@ -167,9 +189,9 @@ export default function HomeScreen() {
 
         {/* Featured List */}
         <View style={styles.sectionHeader}>
-          <ThemedText style={styles.sectionTitle}>Gợi ý cho bạn</ThemedText>
-          <TouchableOpacity>
-            <ThemedText style={styles.viewAllText}>{t('view_all')}</ThemedText>
+          <ThemedText style={[styles.sectionTitle, { flex: 1 }]}>Gợi ý cho bạn</ThemedText>
+          <TouchableOpacity onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
+            <ThemedText style={styles.viewAllText}>{t('see_all')}</ThemedText>
           </TouchableOpacity>
         </View>
 
@@ -177,39 +199,50 @@ export default function HomeScreen() {
           <Animated.View
             key={item.id}
             entering={FadeInRight.delay(600 + index * 100)}
-            style={styles.card}
+            style={styles.featuredCard}
           >
-            <View style={styles.cardHeader}>
-              <View style={styles.imageContainer}>
-                <Image source={item.image} style={styles.cardAvatar} />
-                <View style={[styles.statusDot, { backgroundColor: item.accent }]} />
-              </View>
-              <View style={styles.cardInfo}>
-                <ThemedText style={styles.cardTitle}>{item.name}</ThemedText>
-                <View style={styles.ratingRow}>
-                  <Ionicons name="star" size={14} color="#FFD700" />
-                  <ThemedText style={styles.cardPrice}>{item.price}</ThemedText>
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => handleCategoryPress(item.route)}
+            >
+              <View style={styles.cardImageContainer}>
+                <Image source={item.image} style={styles.cardImage} />
+                <View style={styles.cardOverlay}>
+                  <View style={[styles.tagBadge, { backgroundColor: item.accent + 'CC' }]}>
+                    <ThemedText style={styles.tagText}>{item.tag}</ThemedText>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.heartBtn}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(item.id);
+                    }}
+                  >
+                    <Ionicons
+                      name={favorites.includes(item.id) ? "heart" : "heart-outline"}
+                      size={25}
+                      color={favorites.includes(item.id) ? "#ff0000ff" : "#ffffffff"}
+                    />
+                  </TouchableOpacity>
                 </View>
               </View>
-              <View style={[styles.tag, { backgroundColor: item.accent + '20' }]}>
-                <ThemedText style={[styles.tagText, { color: item.accent }]}>{item.tag}</ThemedText>
+
+              <View style={styles.cardContent}>
+                <View style={styles.cardHeaderRow}>
+                  <ThemedText style={styles.cardTitle} numberOfLines={1}>{item.title}</ThemedText>
+                </View>
+
+                <View style={styles.cardFooter}>
+                  <View style={styles.locationInfo}>
+                    <Ionicons name="location-sharp" size={14} color="#64748B" />
+                    <ThemedText style={styles.locationText}>{item.location}</ThemedText>
+                  </View>
+                  <View style={styles.reviewInfo}>
+                    <ThemedText style={styles.reviewText}>({item.reviews} đánh giá)</ThemedText>
+                  </View>
+                </View>
               </View>
-            </View>
-            <View style={styles.cardActions}>
-              <TouchableOpacity
-                style={styles.secondaryBtn}
-                onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
-              >
-                <Ionicons name="map-outline" size={18} color="#666" />
-                <ThemedText style={styles.secondaryBtnText}>Vị trí</ThemedText>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.primaryBtn, { backgroundColor: item.accent }]}
-                onPress={() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)}
-              >
-                <ThemedText style={styles.primaryBtnText}>Đặt chỗ ngay</ThemedText>
-              </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           </Animated.View>
         ))}
       </ScrollView>
@@ -410,7 +443,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 25,
+    paddingHorizontal: 20,
     marginBottom: 12,
   },
   sectionTitle: {
@@ -422,7 +455,7 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     color: '#64748B',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
   },
   gridContainer: {
@@ -436,9 +469,10 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   serviceCardMini: {
-    height: 100,
+    height: 105,
     borderRadius: 20,
-    padding: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
@@ -466,21 +500,21 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   serviceLabelMini: {
-    fontSize: 9,
+    fontSize: 8.5,
     fontWeight: '800',
     color: '#1E293B',
     textAlign: 'center',
     marginTop: 2,
-    lineHeight: 10,
+    lineHeight: 11,
   },
   sideActionMini: {
     position: 'absolute',
-    right: -15,
+    right: -12,
     top: '50%',
-    marginTop: -14,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    marginTop: -12,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.15)',
     zIndex: 20,
@@ -489,9 +523,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: -1,
     top: '50%',
-    marginTop: -14,
+    marginTop: -12,
     width: 5,
-    height: 28,
+    height: 24,
     backgroundColor: '#F8FAFC',
     zIndex: 15,
   },
@@ -532,103 +566,96 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 2,
   },
-  card: {
-    marginHorizontal: 24,
+  featuredCard: {
+    marginHorizontal: 25,
     backgroundColor: '#FFF',
     borderRadius: 28,
-    padding: 20,
-    marginBottom: 18,
-    shadowColor: '#64748B',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
-    shadowRadius: 15,
-    elevation: 4,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 20,
+    shadowColor: '#1E293B',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
   },
-  imageContainer: {
+  cardImageContainer: {
+    height: 180,
     position: 'relative',
+    overflow: 'hidden',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
   },
-  cardAvatar: {
-    width: 68,
-    height: 68,
-    borderRadius: 20,
-    backgroundColor: '#F1F5F9',
+  cardImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
-  statusDot: {
-    position: 'absolute',
-    bottom: -2,
-    right: -2,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    borderWidth: 2,
-    borderColor: '#FFF',
-  },
-  cardInfo: {
-    flex: 1,
-    marginLeft: 16,
-  },
-  cardTitle: {
-    fontSize: 17,
-    fontWeight: '900',
-    color: '#1E293B',
-    marginBottom: 6,
-  },
-  ratingRow: {
+  cardOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    padding: 16,
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
-  cardPrice: {
-    fontSize: 14,
-    color: '#64748B',
-    fontWeight: '800',
-  },
-  tag: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
+  tagBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
   },
   tagText: {
-    fontSize: 11,
-    fontWeight: '900',
+    color: '#FFF',
+    fontSize: 9,
+    fontWeight: '800',
     textTransform: 'uppercase',
   },
-  cardActions: {
-    flexDirection: 'row',
-    gap: 14,
+  heartBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#475569',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  secondaryBtn: {
+  cardContent: {
+    padding: 18,
+  },
+  cardHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#1E293B',
     flex: 1,
-    height: 52,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: '#F1F5F9',
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginRight: 10,
+  },
+  cardFooter: {
     flexDirection: 'row',
-    gap: 8,
-  },
-  secondaryBtnText: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#64748B',
-  },
-  primaryBtn: {
-    flex: 1.4,
-    height: 52,
-    borderRadius: 16,
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+  },
+  locationInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  locationText: {
+    fontSize: 13,
+    color: '#64748B',
+    marginLeft: 4,
+    fontWeight: '600',
+  },
+  reviewInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  reviewText: {
+    fontSize: 12,
+    color: '#94A3B8',
+    fontWeight: '500',
   },
   primaryBtnText: {
     fontSize: 14,
