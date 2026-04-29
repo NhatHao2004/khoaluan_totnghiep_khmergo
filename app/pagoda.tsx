@@ -13,6 +13,11 @@ import {
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, { 
+  FadeIn, 
+  FadeInDown, 
+  Layout 
+} from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
 
@@ -30,38 +35,40 @@ export default function PagodaScreen() {
     item.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const renderItem = ({ item }: { item: typeof pagodaData[0] }) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => console.log('Detail for', item.name)}
-    >
-      <ImageBackground source={item.image} style={styles.cardImage} imageStyle={{ borderRadius: 20 }}>
-        <View style={styles.cardOverlay}>
-          <View style={styles.cardInfo}>
-            <ThemedText style={styles.cardName}>{item.name}</ThemedText>
-            <View style={styles.cardLocation}>
-              <ThemedText style={styles.pinIcon}>📍</ThemedText>
-              <ThemedText style={styles.locationText}>{item.location}</ThemedText>
+  const renderItem = ({ item, index }: { item: typeof pagodaData[0], index: number }) => (
+    <Animated.View entering={FadeInDown.delay(200 + index * 100)}>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => console.log('Detail for', item.name)}
+      >
+        <ImageBackground source={item.image} style={styles.cardImage} imageStyle={{ borderRadius: 20 }}>
+          <View style={styles.cardOverlay}>
+            <View style={styles.cardInfo}>
+              <ThemedText style={styles.cardName}>{item.name}</ThemedText>
+              <View style={styles.cardLocation}>
+                <ThemedText style={styles.pinIcon}>📍</ThemedText>
+                <ThemedText style={styles.locationText}>{item.location}</ThemedText>
+              </View>
             </View>
           </View>
-        </View>
-      </ImageBackground>
-    </TouchableOpacity>
+        </ImageBackground>
+      </TouchableOpacity>
+    </Animated.View>
   );
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
+      <Animated.View entering={FadeInDown} style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={28} color="#1A1A1A" />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>{t('temple')}</ThemedText>
         <View style={{ width: 40 }} />
-      </View>
+      </Animated.View>
 
       {/* Search Bar */}
-      <View style={styles.searchSection}>
+      <Animated.View entering={FadeInDown.delay(100)} style={styles.searchSection}>
         <View style={styles.searchContainer}>
           <Ionicons name="search-outline" size={20} color="#666" style={styles.searchIcon} />
           <TextInput
@@ -72,7 +79,7 @@ export default function PagodaScreen() {
             placeholderTextColor="#999"
           />
         </View>
-      </View>
+      </Animated.View>
 
       {/* List */}
       <FlatList

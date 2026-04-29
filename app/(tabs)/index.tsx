@@ -23,6 +23,8 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
+import { db } from '@/utils/firebaseConfig';
+import { collection, onSnapshot, query, doc } from 'firebase/firestore';
 
 const { width } = Dimensions.get('window');
 
@@ -32,9 +34,59 @@ export default function HomeScreen() {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [favorites, setFavorites] = useState<number[]>([]);
+  const [destData, setDestData] = useState([
+    {
+      id: 1,
+      title: 'Chùa Âng',
+      location: 'Tỉnh Vĩnh Long',
+      image: require('@/assets/images/chuaang.jpg'),
+      tag: t('temple'),
+      reviews: 0,
+      accent: '#FF7A00',
+      route: '/pagoda'
+    },
+    {
+      id: 2,
+      title: t('oc_om_boc_festival'),
+      location: 'Hằng năm vào tháng 10',
+      image: require('@/assets/images/lehoi.jpg'),
+      tag: t('culture'),
+      reviews: 0,
+      accent: '#BF5AF2',
+      route: '/(tabs)/index'
+    },
+    {
+      id: 3,
+      title: 'Bún Nước Lèo',
+      location: 'Đặc sản nổi tiếng',
+      image: require('@/assets/images/cuisine.jpg'),
+      tag: t('food'),
+      reviews: 0,
+      accent: '#FF375F',
+      route: '/(tabs)/index'
+    }
+  ]);
 
   // Animation for the notification bell
   const bellRotation = useSharedValue(0);
+
+  useEffect(() => {
+    // Lắng nghe thay đổi reviews từ Firestore cho các địa điểm
+    const q = query(collection(db, 'destinations'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const liveData = snapshot.docs.map(doc => ({
+        id: doc.data().id,
+        reviews: doc.data().reviews || 0,
+      }));
+      
+      setDestData(prev => prev.map(item => {
+        const liveItem = liveData.find(ld => ld.id === item.id);
+        return liveItem ? { ...item, reviews: liveItem.reviews } : item;
+      }));
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     bellRotation.value = withRepeat(
@@ -58,44 +110,13 @@ export default function HomeScreen() {
   });
 
   const services = [
-    { id: 1, label: t('temple'), icon: require('@/assets/images/pagoda.jpg'), color: '#FF7000', route: '/(tabs)/index' },
+    { id: 1, label: t('temple'), icon: require('@/assets/images/pagoda.jpg'), color: '#FF7000', route: '/pagoda' },
     { id: 3, label: t('culture'), icon: require('@/assets/images/festival.jpg'), color: '#A000FF', route: '/(tabs)/index' },
     { id: 2, label: t('food'), icon: require('@/assets/images/amthuc.jpg'), color: '#FF0050', route: '/(tabs)/index' },
     { id: 4, label: t('language_study'), icon: require('@/assets/images/hoctap.jpg'), color: '#00C850', route: '/(tabs)/index' },
   ];
 
-  const featuredDestinations = [
-    {
-      id: 1,
-      title: 'Chùa Âng',
-      location: 'Tỉnh Vĩnh Long',
-      image: require('@/assets/images/chuaang.jpg'),
-      tag: t('temple'),
-      reviews: 10,
-      accent: '#FF7A00',
-      route: '/(tabs)/index'
-    },
-    {
-      id: 2,
-      title: t('oc_om_boc_festival'),
-      location: 'Sóc Trăng, VN',
-      image: require('@/assets/images/festival.jpg'),
-      tag: t('culture'),
-      reviews: 124,
-      accent: '#BF5AF2',
-      route: '/(tabs)/index'
-    },
-    {
-      id: 3,
-      title: 'Bún Nước Lèo',
-      location: t('soc_trang_vn'),
-      image: require('@/assets/images/amthuc.jpg'),
-      tag: t('food'),
-      reviews: 156,
-      accent: '#FF375F',
-      route: '/(tabs)/index'
-    }
-  ];
+  const featuredDestinations = destData;
 
   const toggleFavorite = (id: number) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -112,7 +133,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <Animated.View entering={FadeInDown} style={styles.header}>
+      <Animated.View entering={FadeInDown.springify()} style={styles.header}>
         <View style={styles.userInfo}>
           <TouchableOpacity
             onPress={() => router.push('/(tabs)/profile' as any)}
@@ -149,7 +170,7 @@ export default function HomeScreen() {
         contentContainerStyle={{ paddingBottom: 70 }}
       >
         {/* Promo Banner */}
-        <Animated.View entering={FadeInDown.delay(300)} style={styles.promoBanner}>
+        <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.promoBanner}>
           <Image
             source={require('@/assets/images/banner.png')}
             style={styles.promoImage}
@@ -158,26 +179,21 @@ export default function HomeScreen() {
         </Animated.View>
 
         {/* Categories Grid */}
-        <View style={styles.sectionHeader}>
+        <Animated.View entering={FadeInDown.delay(300)} style={styles.sectionHeader}>
           <ThemedText style={styles.sectionTitle}>Danh mục khám phá</ThemedText>
-        </View>
+        </Animated.View>
 
         <View style={styles.gridContainer}>
           {services.map((item, index) => (
             <Animated.View
               key={item.id}
-              entering={FadeInDown.delay(400 + index * 100)}
+              entering={FadeInDown.delay(400 + index * 50).springify()}
               style={styles.gridItemQuarter}
             >
               <TouchableOpacity
                 onPress={() => handleCategoryPress(item.route)}
                 style={styles.serviceCardMini}
               >
-                {/* Custom Border Layer */}
-                <View style={styles.cardOutline} />
-                <View style={styles.notchShield} />
-                <View style={[styles.sideActionMini, { backgroundColor: '#F8FAFC' }]} />
-                <View style={styles.outsideMask} />
                 <View style={styles.iconGlassMini}>
                   <Image source={item.icon} style={styles.serviceIconImage} />
                 </View>
@@ -188,17 +204,17 @@ export default function HomeScreen() {
         </View>
 
         {/* Featured List */}
-        <View style={styles.sectionHeader}>
+        <Animated.View entering={FadeInDown.delay(500)} style={styles.sectionHeader}>
           <ThemedText style={[styles.sectionTitle, { flex: 1 }]}>Gợi ý cho bạn</ThemedText>
           <TouchableOpacity onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
             <ThemedText style={styles.viewAllText}>{t('see_all')}</ThemedText>
           </TouchableOpacity>
-        </View>
+        </Animated.View>
 
         {featuredDestinations.map((item, index) => (
           <Animated.View
             key={item.id}
-            entering={FadeInRight.delay(600 + index * 100)}
+            entering={FadeInRight.delay(600 + index * 100).springify()}
             style={styles.featuredCard}
           >
             <TouchableOpacity
@@ -234,7 +250,6 @@ export default function HomeScreen() {
 
                 <View style={styles.cardFooter}>
                   <View style={styles.locationInfo}>
-                    <Ionicons name="location-sharp" size={14} color="#64748B" />
                     <ThemedText style={styles.locationText}>{item.location}</ThemedText>
                   </View>
                   <View style={styles.reviewInfo}>
@@ -477,14 +492,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
     backgroundColor: '#FFF',
-    overflow: 'visible',
-  },
-  cardOutline: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.15)',
-    zIndex: 1,
+    borderColor: 'rgba(0,0,0,0.1)',
   },
   iconGlassMini: {
     width: 38,
@@ -506,38 +515,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 2,
     lineHeight: 11,
-  },
-  sideActionMini: {
-    position: 'absolute',
-    right: -12,
-    top: '50%',
-    marginTop: -12,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.15)',
-    zIndex: 20,
-  },
-  notchShield: {
-    position: 'absolute',
-    right: -1,
-    top: '50%',
-    marginTop: -12,
-    width: 5,
-    height: 24,
-    backgroundColor: '#F8FAFC',
-    zIndex: 15,
-  },
-  outsideMask: {
-    position: 'absolute',
-    right: -30,
-    top: '50%',
-    marginTop: -20,
-    width: 30,
-    height: 40,
-    backgroundColor: '#F8FAFC',
-    zIndex: 25,
   },
   iconContainer: {
     alignItems: 'center',
@@ -571,13 +548,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderRadius: 28,
     marginBottom: 20,
-    shadowColor: '#1E293B',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
-    elevation: 6,
     borderWidth: 1,
     borderColor: '#F1F5F9',
+    shadowColor: '#1E293B',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 8,
   },
   cardImageContainer: {
     height: 180,
@@ -645,7 +622,6 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 13,
     color: '#64748B',
-    marginLeft: 4,
     fontWeight: '600',
   },
   reviewInfo: {
