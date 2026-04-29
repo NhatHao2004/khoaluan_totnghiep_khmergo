@@ -57,10 +57,10 @@ export default function HomeScreen() {
   });
 
   const services = [
-    { id: 1, label: t('temple'), icon: '🏮', color: '#FFF4E6', route: '/(tabs)/index' },
-    { id: 2, label: t('food'), icon: '🍜', color: '#EBF4FF', route: '/(tabs)/index' },
-    { id: 3, label: t('culture'), icon: '🎭', color: '#F3E8FF', route: '/(tabs)/index' },
-    { id: 4, label: t('language_study'), icon: '📚', color: '#E6FFFA', route: '/(tabs)/index' },
+    { id: 1, label: t('temple'), icon: require('@/assets/images/pagoda.jpg'), color: '#FF7000', route: '/(tabs)/index' },
+    { id: 3, label: t('culture'), icon: require('@/assets/images/festival.jpg'), color: '#A000FF', route: '/(tabs)/index' },
+    { id: 2, label: t('food'), icon: require('@/assets/images/amthuc.jpg'), color: '#FF0050', route: '/(tabs)/index' },
+    { id: 4, label: t('language_study'), icon: require('@/assets/images/hoctap.jpg'), color: '#00C850', route: '/(tabs)/index' },
   ];
 
   const featuredDestinations = [
@@ -90,17 +90,16 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <Animated.View entering={FadeInDown.delay(100)} style={styles.header}>
+      <Animated.View entering={FadeInDown} style={styles.header}>
         <View style={styles.userInfo}>
           <TouchableOpacity
-            style={styles.headerActionBtn}
             onPress={() => router.push('/(tabs)/profile' as any)}
           >
             {user?.avatar ? (
               <Image source={{ uri: user.avatar }} style={styles.avatar} />
             ) : (
               <View style={styles.avatarPlaceholder}>
-                <Ionicons name="person-circle-outline" size={40} color="#64748B" />
+                <Ionicons name="person-circle-outline" size={40} color="#000000ff" />
               </View>
             )}
           </TouchableOpacity>
@@ -138,27 +137,29 @@ export default function HomeScreen() {
 
         {/* Categories Grid */}
         <View style={styles.sectionHeader}>
-          <ThemedText style={styles.sectionTitle}>Khám phá dịch vụ</ThemedText>
-          <TouchableOpacity>
-            <ThemedText style={styles.viewAllText}>{t('view_all')}</ThemedText>
-          </TouchableOpacity>
+          <ThemedText style={styles.sectionTitle}>Danh mục khám phá</ThemedText>
         </View>
 
         <View style={styles.gridContainer}>
           {services.map((item, index) => (
             <Animated.View
               key={item.id}
-              entering={FadeInDown.delay(400 + index * 50)}
-              style={styles.gridItem}
+              entering={FadeInDown.delay(400 + index * 100)}
+              style={styles.gridItemQuarter}
             >
               <TouchableOpacity
                 onPress={() => handleCategoryPress(item.route)}
-                style={styles.iconContainer}
+                style={styles.serviceCardMini}
               >
-                <View style={[styles.iconBox, { backgroundColor: item.color }]}>
-                  <ThemedText style={{ fontSize: 24 }}>{item.icon}</ThemedText>
+                {/* Custom Border Layer */}
+                <View style={styles.cardOutline} />
+                <View style={styles.notchShield} />
+                <View style={[styles.sideActionMini, { backgroundColor: '#F8FAFC' }]} />
+                <View style={styles.outsideMask} />
+                <View style={styles.iconGlassMini}>
+                  <Image source={item.icon} style={styles.serviceIconImage} />
                 </View>
-                <ThemedText style={styles.itemLabel} numberOfLines={1}>{item.label}</ThemedText>
+                <ThemedText style={styles.serviceLabelMini} numberOfLines={2}>{item.label}</ThemedText>
               </TouchableOpacity>
             </Animated.View>
           ))}
@@ -235,13 +236,15 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   avatar: {
-    width: '100%',
-    height: '100%',
+    width: 52,
+    height: 52,
     borderRadius: 18,
+    backgroundColor: '#F1F5F9',
   },
   avatarPlaceholder: {
-    width: '100%',
-    height: '100%',
+    width: 52,
+    height: 52,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F1F5F9',
@@ -353,7 +356,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     flexDirection: 'row',
     overflow: 'hidden',
-    marginBottom: 30,
+    marginBottom: 17,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.5)',
   },
@@ -408,12 +411,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 25,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 17,
     fontWeight: '900',
     color: '#1E293B',
+    lineHeight: 22,
+    paddingBottom: 0,
   },
   viewAllText: {
     color: '#64748B',
@@ -424,35 +429,108 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingHorizontal: 16,
-    marginBottom: 24,
+    marginBottom: 10,
   },
-  gridItem: {
+  gridItemQuarter: {
     width: '25%',
-    marginBottom: 20,
+    padding: 5,
+  },
+  serviceCardMini: {
+    height: 100,
+    borderRadius: 20,
+    padding: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+    backgroundColor: '#FFF',
+    overflow: 'visible',
+  },
+  cardOutline: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.15)',
+    zIndex: 1,
+  },
+  iconGlassMini: {
+    width: 38,
+    height: 38,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  serviceIconImage: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+  },
+  serviceLabelMini: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#1E293B',
+    textAlign: 'center',
+    marginTop: 2,
+    lineHeight: 10,
+  },
+  sideActionMini: {
+    position: 'absolute',
+    right: -15,
+    top: '50%',
+    marginTop: -14,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.15)',
+    zIndex: 20,
+  },
+  notchShield: {
+    position: 'absolute',
+    right: -1,
+    top: '50%',
+    marginTop: -14,
+    width: 5,
+    height: 28,
+    backgroundColor: '#F8FAFC',
+    zIndex: 15,
+  },
+  outsideMask: {
+    position: 'absolute',
+    right: -30,
+    top: '50%',
+    marginTop: -20,
+    width: 30,
+    height: 40,
+    backgroundColor: '#F8FAFC',
+    zIndex: 25,
   },
   iconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   iconBox: {
-    width: 64,
-    height: 64,
-    borderRadius: 22,
+    width: 68,
+    height: 68,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
     backgroundColor: '#FFF',
-    shadowColor: '#64748B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 3,
+    shadowColor: '#1E293B',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 1.5,
+    borderColor: '#FFF',
   },
   itemLabel: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '800',
-    color: '#475569',
+    color: '#334155',
     textAlign: 'center',
+    marginTop: 2,
   },
   card: {
     marginHorizontal: 24,
