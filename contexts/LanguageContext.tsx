@@ -155,6 +155,18 @@ const translations = {
     login_with: 'Đăng nhập bằng',
     terms: 'Điều khoản dịch vụ',
     error_required: 'Vui lòng điền đầy đủ các trường',
+
+    // New Home & Pagoda Strings
+    welcome_hello: 'Chào mừng 👋',
+    explore_categories: 'Danh mục khám phá',
+    suggestions_for_you: 'Gợi ý cho bạn',
+    oc_om_boc_time: 'Diễn ra vào tháng 10 hằng năm',
+    bun_nuoc_leo_desc: 'Đặc sản nổi tiếng, đậm tình Khmer Nam Bộ',
+    reviews_label: 'đánh giá',
+    no_results: 'Không tìm thấy kết quả',
+    nguyet_hoa_vinh_long: 'phường Nguyệt Hóa, tỉnh Trà Vinh',
+    loading_preparing: 'Đang chuẩn bị cho hành trình khám phá',
+    loading_text: 'Đang tải...',
   },
   km: {
     // Common
@@ -303,6 +315,18 @@ const translations = {
     login_with: 'ចូលតាមរយៈ',
     terms: 'លក្ខខណ្ឌសេវាកម្ម',
     error_required: 'សូមបំពេញព័ត៌មានឱ្យគ្រប់គ្រាន់',
+
+    // New Home & Pagoda Strings
+    welcome_hello: 'សូមស្វាគមន៍ 👋',
+    explore_categories: 'ប្រភេទរុករក',
+    suggestions_for_you: 'សំណូមពរសម្រាប់អ្នក',
+    oc_om_boc_time: 'ប្រារព្ធឡើងក្នុងខែតុលារៀងរាល់ឆ្នាំ',
+    bun_nuoc_leo_desc: 'ម្ហូបពិសេសល្បីឈ្មោះ រសជាតិខ្មែរណាមបូ',
+    reviews_label: 'ការវាយតម្លៃ',
+    no_results: 'រកមិនឃើញលទ្ធផល',
+    nguyet_hoa_vinh_long: 'សង្កាត់ Nguyet Hoa ខេត្ត Tra Vinh',
+    loading_preparing: 'កំពុងរៀបចំសម្រាប់ការធ្វើដំណើររុករក',
+    loading_text: 'កំពុងទាញយក...',
   }
 };
 

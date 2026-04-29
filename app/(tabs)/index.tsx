@@ -1,10 +1,12 @@
 import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { collection, onSnapshot, query } from 'firebase/firestore';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -23,49 +25,40 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { db } from '@/utils/firebaseConfig';
-import { collection, onSnapshot, query, doc } from 'firebase/firestore';
 
 const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [favorites, setFavorites] = useState<number[]>([]);
-  const [destData, setDestData] = useState([
+  const DEST_METADATA = [
     {
       id: 1,
       title: 'Chùa Âng',
-      location: 'Tỉnh Vĩnh Long',
+      locationKey: 'nguyet_hoa_vinh_long',
       image: require('@/assets/images/chuaang.jpg'),
-      tag: t('temple'),
-      reviews: 0,
-      accent: '#FF7A00',
       route: '/pagoda'
     },
     {
       id: 2,
-      title: t('oc_om_boc_festival'),
-      location: 'Hằng năm vào tháng 10',
+      title: 'Lễ hội Oóc Om Bóc',
+      locationKey: 'oc_om_boc_time',
       image: require('@/assets/images/lehoi.jpg'),
-      tag: t('culture'),
-      reviews: 0,
-      accent: '#BF5AF2',
       route: '/(tabs)/index'
     },
     {
       id: 3,
       title: 'Bún Nước Lèo',
-      location: 'Đặc sản nổi tiếng',
+      locationKey: 'bun_nuoc_leo_desc',
       image: require('@/assets/images/cuisine.jpg'),
-      tag: t('food'),
-      reviews: 0,
-      accent: '#FF375F',
       route: '/(tabs)/index'
     }
-  ]);
+  ];
+
+  const [reviewsData, setReviewsData] = useState<Record<number, number>>({});
 
   // Animation for the notification bell
   const bellRotation = useSharedValue(0);
@@ -74,19 +67,24 @@ export default function HomeScreen() {
     // Lắng nghe thay đổi reviews từ Firestore cho các địa điểm
     const q = query(collection(db, 'destinations'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const liveData = snapshot.docs.map(doc => ({
-        id: doc.data().id,
-        reviews: doc.data().reviews || 0,
-      }));
-      
-      setDestData(prev => prev.map(item => {
-        const liveItem = liveData.find(ld => ld.id === item.id);
-        return liveItem ? { ...item, reviews: liveItem.reviews } : item;
-      }));
+      const liveData: Record<number, number> = {};
+      snapshot.docs.forEach(doc => {
+        const data = doc.data();
+        liveData[data.id] = data.reviews || 0;
+      });
+      setReviewsData(liveData);
     });
 
     return () => unsubscribe();
   }, []);
+
+  const featuredDestinations = useMemo(() => {
+    return DEST_METADATA.map(item => ({
+      ...item,
+      location: t(item.locationKey),
+      reviews: reviewsData[item.id] || 0
+    }));
+  }, [language, reviewsData, t]);
 
   useEffect(() => {
     bellRotation.value = withRepeat(
@@ -116,7 +114,7 @@ export default function HomeScreen() {
     { id: 4, label: t('language_study'), icon: require('@/assets/images/hoctap.jpg'), color: '#00C850', route: '/(tabs)/index' },
   ];
 
-  const featuredDestinations = destData;
+
 
   const toggleFavorite = (id: number) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -147,7 +145,7 @@ export default function HomeScreen() {
             )}
           </TouchableOpacity>
           <View style={styles.welcomeText}>
-            <ThemedText style={styles.helloText}>Chào mừng bạn 👋</ThemedText>
+            <ThemedText style={styles.helloText}>{t('welcome_hello')}</ThemedText>
             <ThemedText style={styles.userName}>{user?.name || t('guest')}</ThemedText>
           </View>
         </View>
@@ -180,7 +178,7 @@ export default function HomeScreen() {
 
         {/* Categories Grid */}
         <Animated.View entering={FadeInDown.delay(300)} style={styles.sectionHeader}>
-          <ThemedText style={styles.sectionTitle}>Danh mục khám phá</ThemedText>
+          <ThemedText style={styles.sectionTitle}>{t('explore_categories')}</ThemedText>
         </Animated.View>
 
         <View style={styles.gridContainer}>
@@ -205,7 +203,7 @@ export default function HomeScreen() {
 
         {/* Featured List */}
         <Animated.View entering={FadeInDown.delay(500)} style={styles.sectionHeader}>
-          <ThemedText style={[styles.sectionTitle, { flex: 1 }]}>Gợi ý cho bạn</ThemedText>
+          <ThemedText style={[styles.sectionTitle, { flex: 1 }]}>{t('suggestions_for_you')}</ThemedText>
           <TouchableOpacity onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
             <ThemedText style={styles.viewAllText}>{t('see_all')}</ThemedText>
           </TouchableOpacity>
@@ -224,9 +222,6 @@ export default function HomeScreen() {
               <View style={styles.cardImageContainer}>
                 <Image source={item.image} style={styles.cardImage} />
                 <View style={styles.cardOverlay}>
-                  <View style={[styles.tagBadge, { backgroundColor: item.accent + 'CC' }]}>
-                    <ThemedText style={styles.tagText}>{item.tag}</ThemedText>
-                  </View>
                   <TouchableOpacity
                     style={styles.heartBtn}
                     onPress={(e) => {
@@ -237,7 +232,7 @@ export default function HomeScreen() {
                     <Ionicons
                       name={favorites.includes(item.id) ? "heart" : "heart-outline"}
                       size={25}
-                      color={favorites.includes(item.id) ? "#ff0000ff" : "#ffffffff"}
+                      color={favorites.includes(item.id) ? "#ff0000ff" : "#000000ff"}
                     />
                   </TouchableOpacity>
                 </View>
@@ -252,9 +247,11 @@ export default function HomeScreen() {
                   <View style={styles.locationInfo}>
                     <ThemedText style={styles.locationText}>{item.location}</ThemedText>
                   </View>
-                  <View style={styles.reviewInfo}>
-                    <ThemedText style={styles.reviewText}>({item.reviews} đánh giá)</ThemedText>
-                  </View>
+                  {(item.reviews ?? 0) > 0 && (
+                    <View style={styles.reviewInfo}>
+                      <ThemedText style={styles.reviewText}>{item.reviews} {t('reviews_label')}</ThemedText>
+                    </View>
+                  )}
                 </View>
               </View>
             </TouchableOpacity>
@@ -572,7 +569,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     padding: 16,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'flex-start',
   },
   tagBadge: {
@@ -590,7 +587,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: '#475569',
+    backgroundColor: '#ffffffff',
     justifyContent: 'center',
     alignItems: 'center',
   },

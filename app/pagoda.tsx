@@ -12,12 +12,10 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Animated, { 
-  FadeIn, 
-  FadeInDown, 
-  Layout 
+import Animated, {
+  FadeInDown
 } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -27,7 +25,7 @@ export default function PagodaScreen() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const pagodaData = [
-    { id: 1, name: 'Chùa Âng', location: t('Tỉnh Vĩnh Long'), image: require('@/assets/images/chuaang.jpg') },
+    { id: 1, name: 'Chùa Âng', location: t('nguyet_hoa_vinh_long'), image: require('@/assets/images/chuaang.jpg') },
   ];
 
   const filteredData = pagodaData.filter(item =>
@@ -90,7 +88,7 @@ export default function PagodaScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <ThemedText style={styles.emptyText}>Không tìm thấy kết quả</ThemedText>
+            <ThemedText style={styles.emptyText}>{t('no_results')}</ThemedText>
           </View>
         }
       />

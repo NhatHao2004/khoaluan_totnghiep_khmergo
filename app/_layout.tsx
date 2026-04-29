@@ -34,24 +34,24 @@ export default function RootLayout() {
     prepare();
   }, []);
 
-  if (!isAppReady) {
-    return <LoadingScreen onFinish={() => setIsAppReady(true)} />;
-  }
-
   return (
     <AuthProvider>
       <LanguageProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack screenOptions={{ 
-            headerShown: false,
-            contentStyle: { backgroundColor: '#FFFFFF' }
-          }}>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="login" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="register" options={{ presentation: 'modal' }} />
-          </Stack>
-          <StatusBar style="auto" />
-        </ThemeProvider>
+        {!isAppReady ? (
+          <LoadingScreen onFinish={() => setIsAppReady(true)} />
+        ) : (
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <Stack screenOptions={{ 
+              headerShown: false,
+              contentStyle: { backgroundColor: '#FFFFFF' }
+            }}>
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="login" options={{ presentation: 'modal' }} />
+              <Stack.Screen name="register" options={{ presentation: 'modal' }} />
+            </Stack>
+            <StatusBar style="auto" />
+          </ThemeProvider>
+        )}
       </LanguageProvider>
     </AuthProvider>
   );

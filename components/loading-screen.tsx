@@ -3,10 +3,12 @@ import { Animated, Dimensions, Image, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const { width } = Dimensions.get('window');
 
 export function LoadingScreen({ onFinish }: { onFinish?: () => void }) {
+  const { t } = useLanguage();
   // Sử dụng Animated chuẩn của React Native
   const progress = useRef(new Animated.Value(0)).current;
 
@@ -39,7 +41,7 @@ export function LoadingScreen({ onFinish }: { onFinish?: () => void }) {
           KhmerGo
         </ThemedText>
         <ThemedText style={styles.subtitle}>
-          Đang chuẩn bị hành trang khám phá
+          {t('loading_preparing')}
         </ThemedText>
       </View>
 
@@ -58,7 +60,7 @@ export function LoadingScreen({ onFinish }: { onFinish?: () => void }) {
           />
         </View>
         <ThemedText style={styles.loadingText}>
-          Đang tải...
+          {t('loading_text')}
         </ThemedText>
       </View>
     </ThemedView>
