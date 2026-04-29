@@ -77,12 +77,12 @@ export default function HomeScreen() {
     },
     {
       id: 2,
-      title: 'Bún Nước Lèo',
-      location: t('soc_trang_vn'),
-      image: require('@/assets/images/amthuc.jpg'),
-      tag: t('food'),
-      reviews: 98,
-      accent: '#3B82F6',
+      title: t('oc_om_boc_festival'),
+      location: 'Sóc Trăng, VN',
+      image: require('@/assets/images/festival.jpg'),
+      tag: t('culture'),
+      reviews: 124,
+      accent: '#BF5AF2',
       route: '/(tabs)/index'
     },
     {
@@ -91,8 +91,8 @@ export default function HomeScreen() {
       location: t('soc_trang_vn'),
       image: require('@/assets/images/amthuc.jpg'),
       tag: t('food'),
-      reviews: 98,
-      accent: '#3B82F6',
+      reviews: 156,
+      accent: '#FF375F',
       route: '/(tabs)/index'
     }
   ];
