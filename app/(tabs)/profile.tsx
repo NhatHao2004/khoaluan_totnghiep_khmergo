@@ -41,13 +41,21 @@ export default function ProfileScreen() {
   const [userRank, setUserRank] = useState<string | number>('---');
 
   const fetchRank = async () => {
-    if (!user) return;
-    const users = await getLeaderboardUsers(100);
-    const index = users.findIndex(u => u.uid === user.uid);
-    if (index !== -1) {
-      setUserRank(index + 1);
-    } else {
-      setUserRank('>100');
+    if (!user) {
+      setUserRank('---');
+      return;
+    }
+    try {
+      const users = await getLeaderboardUsers(100);
+      const index = users.findIndex(u => u.uid === user.uid);
+      if (index !== -1) {
+        setUserRank(index + 1);
+      } else {
+        setUserRank('>100');
+      }
+    } catch (error) {
+      console.log('Error fetching rank:', error);
+      setUserRank('---');
     }
   };
 
@@ -73,8 +81,8 @@ export default function ProfileScreen() {
   };
 
   const handleMenuPress = (id: string) => {
-    // Nếu chưa đăng nhập, hiển thị thông báo yêu cầu đăng nhập
-    if (!user && id !== 'support' && id !== 'settings' && id !== 'login') {
+    // Nếu chưa đăng nhập, chỉ cho phép nhấn vào 'login'
+    if (!user && id !== 'login') {
       Alert.alert(
         t('login_required'),
         t('login_to_use'),
@@ -129,18 +137,16 @@ export default function ProfileScreen() {
             {/* Stats */}
             <View style={styles.statsRow}>
               <View style={styles.statItem}>
-                <Text style={styles.statValue}>{(user?.points ?? '---')}</Text>
+                <Text style={styles.statValue}>{(user?.points ?? 0)}</Text>
                 <Text style={styles.statLabel}>{t('points')}</Text>
               </View>
               <View style={styles.statDivider} />
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>
-                  {userRank !== '---' ? `Hạng ${userRank}` : '---'}
+                  {userRank !== '---' ? `${userRank}` : '---'}
                 </Text>
-
                 <Text style={styles.statLabel}>{t('current_rank')}</Text>
               </View>
-
             </View>
           </View>
         </View>
@@ -155,7 +161,7 @@ export default function ProfileScreen() {
               style={[
                 styles.menuItem,
                 index < filteredMenuItems.length - 1 && styles.menuItemBorder,
-                !user && (item.id !== 'support' && item.id !== 'settings' && item.id !== 'login') && { opacity: 0.5 }
+                !user && item.id !== 'login' && { opacity: 0.5 }
               ]}
               onPress={() => handleMenuPress(item.id)}
               activeOpacity={0.6}
@@ -196,9 +202,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingTop: 0,
-    paddingBottom: 18,
+    paddingBottom: 15,
     minHeight: 60,
   },
 

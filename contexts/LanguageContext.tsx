@@ -52,7 +52,7 @@ const translations = {
     guest: 'Khách',
     login_to_view: 'Đăng nhập để xem thông tin',
     login_to_use: 'Đăng nhập để sử dụng tính năng này',
-    logout_confirm_msg: 'Bạn có chắc chắn muốn đăng xuất?',
+    logout_confirm_msg: 'Bạn có chắc chắn muốn đăng xuất',
     login_required: 'Yêu cầu đăng nhập',
     // Ranks
     rank_bronze: 'Đồng',
@@ -69,7 +69,6 @@ const translations = {
     current_rank: 'Hạng hiện tại',
     categories: 'Chủ đề',
     history: 'Lịch sử',
-    culture: 'Văn hóa',
     geography: 'Địa lý',
     questions: 'Bộ câu hỏi',
     performance: 'Thành tích',
@@ -119,6 +118,38 @@ const translations = {
     faq_use_content: 'Chào mừng bạn đến với KhmerGo! Để sử dụng ứng dụng, bạn có thể bắt đầu bằng cách khám phá các ngôi chùa tại mục Trang chủ, tham gia trả lời câu đố tại mục Thử thách để tích lũy điểm và thăng hạng.',
     faq_quiz_content: 'Mỗi bài trắc nghiệm sẽ có các câu hỏi về văn hóa và ngôn ngữ Khmer. Bạn cần chọn câu trả lời đúng trong thời gian quy định để nhận được điểm thưởng.',
     faq_learn_content: 'Để học hiệu quả, hãy luyện tập hàng ngày và sử dụng tính năng nhắc nhở học tập trong phần Cài đặt. Việc kết hợp giữa học từ vựng và tham gia thử thách sẽ giúp bạn ghi nhớ lâu hơn.',
+
+    // Home Screen
+    promotions: 'Khám phá ngay',
+    category: 'Danh mục',
+    see_all: 'Xem tất cả...',
+    get_coupon: 'Xem',
+    learn_now: 'Học ngay',
+    temple: 'Chùa Khmer',
+    culture: 'Văn hóa Khmer',
+    food: 'Ẩm thực Khmer',
+    language_study: 'Học tiếng Khmer',
+    som_rong_temple: 'Chùa Som Rong',
+    oc_om_boc_festival: 'Lễ hội Oóc Om Bóc',
+    tra_vinh_vn: 'Trà Vinh, VN',
+    soc_trang_vn: 'Sóc Trăng, VN',
+    promo_pagoda_title: 'Khám phá 3 ngôi chùa\nnhận ưu đãi 50%',
+    tagline: 'Khám phá nền văn hóa Khmer',
+    search_placeholder: 'Tìm kiếm địa điểm...',
+    you: 'Bạn',
+
+    // Auth Screens
+    login_title: 'Đăng nhập',
+    register_title: 'Đăng ký',
+    email_label: 'Email',
+    password_label: 'Mật khẩu',
+    confirm_password_label: 'Xác nhận mật khẩu',
+    fullname_placeholder: 'Họ và tên',
+    processing: 'Đang xử lý...',
+    registering: 'Đang tạo tài khoản...',
+    login_with: 'Đăng nhập bằng',
+    terms: 'Điều khoản dịch vụ',
+    error_required: 'Vui lòng điền đầy đủ các trường',
   },
   km: {
     // Common
@@ -179,7 +210,6 @@ const translations = {
     current_rank: 'ចំណាត់ថ្នាក់បច្ចុប្បន្ន',
     categories: 'ប្រធានបទ',
     history: 'ប្រវត្តិសាស្ត្រ',
-    culture: 'វប្បធម៌',
     geography: 'ភូមិសាស្ត្រ',
     questions: 'សំណួរ',
     performance: 'សមិទ្ធផល',
@@ -230,6 +260,39 @@ const translations = {
     faq_use_content: 'សូម chào មកកាន់ KhmerGo! ដើម្បីប្រើកម្មវិធី អ្នក có thể ចាប់ផ្តើមដោយការរុករកវត្តអារាមនានានៅក្នុងទំព័រដើម ចូលរួមឆ្លើយសំណួរក្នុងផ្នែកសាកល្បង ដើម្បីបង្កើនពិន្ទុ និងតម្លើងឋានៈ។',
     faq_quiz_content: 'រាល់ការសាកល្បងនីមួយៗនឹងមានសំណួរអំពីវប្បធម៌ និងភាសាខ្មែរ។ អ្នកត្រូវជ្រើសរើសចម្លើយដែលត្រឹមត្រូវក្នុងរយៈពេលកំណត់ ដើម្បីទទួលបានពិន្ទុបន្ថែម។',
     faq_learn_content: 'ដើម្បីរៀនបានយ៉ាងមានប្រសិទ្ធភាព សូមហាត់រៀនជារៀងរាល់ថ្ងៃ និងប្រើមុខងាររំលឹកការសិក្សានៅក្នុងការកំណត់។ ការរួមបញ្ចូលគ្នារវាងការរៀនពាក្យ និងការសាកល្បងនឹងជួយឱ្យអ្នកចងចាំបានយូរ។',
+
+    // Home Screen
+    promotions: 'ការផ្សព្វផ្សាយ',
+    category: 'ប្រភេទ',
+    see_all: 'មើលទាំងអស់',
+    get_coupon: 'ទទួលបានប័ណ្ណ',
+    learn_now: 'រៀនឥឡូវនេះ',
+    temple: 'វត្តអារាមខ្មែរ',
+    culture: 'វប្បធម៌ខ្មែរ',
+    food: 'ម្ហូបខ្មែរ',
+    language_study: 'រៀនភាសាខ្មែរ',
+    som_rong_temple: 'វត្តសំពៅរុង',
+    oc_om_boc_festival: 'ពិធីបុណ្យអកអំបុក',
+    tra_vinh_vn: 'ត្រាវិញ, វៀតណាម',
+    soc_trang_vn: 'សុកត្រាំង, វៀតណាម',
+    promo_pagoda_title: 'រុករកវត្ត ៣\nទទួលបានការបញ្ចុះតម្លៃ ៥០%',
+    promo_vocab_title: 'បញ្ចុះតម្លៃ ៣០%\nលើវគ្គសិក្សាភាសា',
+    tagline: 'ស្វែងយល់ពីវប្បធម៌ខ្មែរ',
+    search_placeholder: 'ស្វែងរកទីតាំង...',
+    you: 'អ្នក',
+
+    // Auth Screens
+    login_title: 'ចូលគណនី',
+    register_title: 'ចុះឈ្មោះ',
+    email_label: 'អ៊ីមែល',
+    password_label: 'ពាក្យសម្ងាត់',
+    confirm_password_label: 'បញ្ជាក់ពាក្យសម្ងាត់',
+    fullname_placeholder: 'ឈ្មោះពេញ',
+    processing: 'កំពុងដំណើរការ...',
+    registering: 'កំពុងបង្កើតគណនី...',
+    login_with: 'ចូលតាមរយៈ',
+    terms: 'លក្ខខណ្ឌសេវាកម្ម',
+    error_required: 'សូមបំពេញព័ត៌មានឱ្យគ្រប់គ្រាន់',
   }
 };
 
@@ -263,7 +326,12 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const t = (key: string) => {
-    return translations[language][key as keyof typeof translations['vi']] || key;
+    const translation = translations[language][key as keyof typeof translations['vi']];
+    if (!translation) {
+      console.warn(`Missing translation key: ${key} for language: ${language}`);
+      return translations['vi'][key as keyof typeof translations['vi']] || key;
+    }
+    return translation;
   };
 
   return (

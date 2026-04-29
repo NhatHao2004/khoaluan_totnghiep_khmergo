@@ -3,7 +3,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState, useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -26,10 +26,21 @@ export default function MedalScreen() {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchLeaderboard = async () => {
+    if (!user) {
+      setLeaderboardData([]);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
-    const users = await getLeaderboardUsers(50);
-    setLeaderboardData(users);
-    setIsLoading(false);
+    try {
+      const users = await getLeaderboardUsers(50);
+      setLeaderboardData(users);
+    } catch (error) {
+      console.log('Error fetching leaderboard:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useFocusEffect(
@@ -37,7 +48,7 @@ export default function MedalScreen() {
       setActiveTab('weekly');
       scrollRef.current?.scrollTo({ y: 0, animated: false });
       fetchLeaderboard();
-    }, [])
+    }, [user])
   );
 
 
@@ -107,9 +118,11 @@ export default function MedalScreen() {
 
               <Text style={styles.podiumName}>{topThree[1].name}</Text>
               <View style={styles.podiumPoints}>
-                <Text style={styles.podiumPointsText}>{topThree[1].points} {t('points')}</Text>
+                <Text style={styles.podiumPointsText} numberOfLines={1}>
+                  {`${topThree[1].points} ${t('points')}`}
+                </Text>
               </View>
-              <View style={[styles.podiumBase, { height: 150, backgroundColor: '#FFD700' }]}>
+              <View style={[styles.podiumBase, { height: 135, backgroundColor: '#FFD700' }]}>
                 <Text style={styles.podiumRank}>1</Text>
               </View>
             </View>
@@ -126,9 +139,11 @@ export default function MedalScreen() {
               </View>
 
 
-              <Text style={styles.podiumName}>{topThree[0].name}</Text>
+              <Text style={styles.podiumName} numberOfLines={1}>{topThree[0].name}</Text>
               <View style={styles.podiumPoints}>
-                <Text style={styles.podiumPointsText}>{topThree[0].points} {t('points')}</Text>
+                <Text style={styles.podiumPointsText} numberOfLines={1}>
+                  {`${topThree[0].points} ${t('points')}`}
+                </Text>
               </View>
               <View style={[styles.podiumBase, { height: 100, backgroundColor: '#C0C0C0' }]}>
                 <Text style={styles.podiumRank}>2</Text>
@@ -147,11 +162,13 @@ export default function MedalScreen() {
               </View>
 
 
-              <Text style={styles.podiumName}>{topThree[2].name}</Text>
+              <Text style={styles.podiumName} numberOfLines={1}>{topThree[2].name}</Text>
               <View style={styles.podiumPoints}>
-                <Text style={styles.podiumPointsText}>{topThree[2].points} {t('points')}</Text>
+                <Text style={styles.podiumPointsText} numberOfLines={1}>
+                  {`${topThree[2].points} ${t('points')}`}
+                </Text>
               </View>
-              <View style={[styles.podiumBase, { height: 50, backgroundColor: '#CD7F32' }]}>
+              <View style={[styles.podiumBase, { height: 65, backgroundColor: '#CD7F32' }]}>
                 <Text style={styles.podiumRank}>3</Text>
               </View>
             </View>
@@ -183,24 +200,29 @@ export default function MedalScreen() {
               )}
               <View style={styles.listItemInfo}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <Text style={[styles.listItemName, isMe && styles.myListItemName]}>{item.name}</Text>
-                  {isMe && <View style={styles.meTag}><Text style={styles.meTagText}>YOU</Text></View>}
+                  <Text style={[styles.listItemName, isMe && styles.myListItemName]} numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  {isMe && <View style={styles.meTag}><Text style={styles.meTagText}>{t('you')}</Text></View>}
                 </View>
-                <Text style={styles.listItemPoints}>{item.points} {t('points')}</Text>
+                <Text style={styles.listItemPoints}>
+                  {`${item.points} ${t('points')}`}
+                </Text>
               </View>
             </View>
           );
         })}
+
       </ScrollView>
 
       {user && (leaderboardData.findIndex(u => u.uid === user.uid) + 1) >= 4 && (
-        <TouchableOpacity 
-          style={styles.myRankIndicator} 
+        <TouchableOpacity
+          style={styles.myRankIndicator}
           onPress={() => {
             // Optional: Scroll to the user's rank in the list
           }}
         >
-          <Text style={styles.myRankIndicatorText}>Bạn</Text>
+          <Text style={styles.myRankIndicatorText}>{t('you')}</Text>
         </TouchableOpacity>
       )}
 
@@ -348,19 +370,24 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 5,
     textAlign: 'center',
+    lineHeight: 18,
   },
   podiumPoints: {
-    backgroundColor: '#F0F0F0',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
+    backgroundColor: '#F3F4F6',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
     marginBottom: 10,
+    minWidth: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   podiumPointsText: {
-    color: '#000000ff',
-    fontSize: 10,
+    color: '#000000',
+    fontSize: 12,
     fontWeight: '700',
-    lineHeight: 14,
+    lineHeight: 16,
+    textAlign: 'center',
   },
 
 
@@ -393,19 +420,20 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F5F5F5',
   },
   listItemRankContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 38, // Increased from 32
+    height: 38, // Increased from 32
+    borderRadius: 19,
     borderWidth: 1,
-    borderColor: '#EEE',
+    borderColor: '#F0F0F0',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 12,
   },
   listItemRank: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#000000ff',
+    color: '#1A1A1A',
+    lineHeight: 18,
   },
 
   listItemAvatar: {
@@ -469,5 +497,3 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
 });
-
-

@@ -1,4 +1,6 @@
+import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { auth } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -7,6 +9,7 @@ import React, { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function LoginScreen() {
+  const { t } = useLanguage();
   const { refreshUser } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -16,7 +19,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Lỗi', 'Vui lòng nhập Email và Mật khẩu');
+      Alert.alert(t('error'), t('error_fill_fields') || 'Vui lòng nhập Email và Mật khẩu');
       return;
     }
 
@@ -27,11 +30,11 @@ export default function LoginScreen() {
       await refreshUser();
       router.replace('/(tabs)');
     } catch (error: any) {
-      let msg = 'Đăng nhập thất bại. Vui lòng thử lại!';
+      let msg = t('update_failed');
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-        msg = 'Email hoặc mật khẩu không chính xác.';
+        msg = t('wrong_old_pass'); // Reusing some keys or just fallback
       }
-      Alert.alert('Lỗi', msg);
+      Alert.alert(t('error'), msg);
     } finally {
       setLoading(false);
     }
@@ -42,13 +45,17 @@ export default function LoginScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
         <View style={styles.innerContent}>
           {/* Top Navigation */}
           <View style={styles.topNav}>
-            <Text style={styles.navActive}>Đăng nhập</Text>
+            <Text style={styles.navActive} numberOfLines={1}>{t('login_title')}</Text>
             <TouchableOpacity onPress={() => router.replace('/register')}>
-              <Text style={styles.navInactive}>Đăng ký</Text>
+              <Text style={styles.navInactive} numberOfLines={1}>{t('register_title')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -61,7 +68,7 @@ export default function LoginScreen() {
           <View style={styles.formContainer}>
             <TextInput
               style={styles.input}
-              placeholder="Email"
+              placeholder={t('email_label')}
               placeholderTextColor="#C1C1C1"
               value={email}
               onChangeText={setEmail}
@@ -72,7 +79,7 @@ export default function LoginScreen() {
             <View style={styles.passwordContainer}>
               <TextInput
                 style={styles.passwordInput}
-                placeholder="Mật khẩu"
+                placeholder={t('password_label')}
                 placeholderTextColor="#C1C1C1"
                 value={password}
                 onChangeText={setPassword}
@@ -90,16 +97,14 @@ export default function LoginScreen() {
             onPress={handleLogin}
             disabled={loading}
           >
-            {loading ? (
-              <Text style={styles.loginButtonText}>Đang xử lý...</Text>
-            ) : (
-              <Text style={styles.loginButtonText}>ĐĂNG NHẬP</Text>
-            )}
+            <Text style={styles.loginButtonText}>
+              {loading ? t('processing').toUpperCase() : t('login').toUpperCase()}
+            </Text>
           </TouchableOpacity>
         </View>
         {/* Social Login - Bottom Gray Section */}
         <View style={styles.bottomSection}>
-          <Text style={styles.socialText}>Đăng nhập bằng</Text>
+          <ThemedText style={styles.socialText}>{t('login_with')}</ThemedText>
           <View style={styles.socialRow}>
             <View style={[styles.socialIcon, { backgroundColor: '#EA4335' }]}>
               <Ionicons name="logo-google" size={18} color="#FFF" />
@@ -133,7 +138,7 @@ const styles = StyleSheet.create({
   },
   innerContent: {
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 40,
+    paddingHorizontal: 30,
     paddingTop: 80,
     paddingBottom: 40,
   },
@@ -143,19 +148,19 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'space-between',
     marginBottom: 50,
+    gap: 10,
   },
   navActive: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '700',
     color: '#000',
-    lineHeight: 48,
+    lineHeight: 36,
   },
   navInactive: {
     fontSize: 18,
     fontWeight: '500',
     color: '#B0B0B0',
-    marginTop: 6,
-    lineHeight: 32,
+    lineHeight: 28,
   },
 
   avatarWrapper: {
@@ -216,8 +221,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#00CFA3',
     width: '100%',
-    paddingVertical: 12,
-    minHeight: 56,
+    paddingVertical: 14,
+    minHeight: 60,
     borderRadius: 30,
     shadowColor: '#00CFA3',
     shadowOffset: { width: 0, height: 4 },
@@ -225,7 +230,6 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 3,
     marginBottom: 50,
-    flexShrink: 0,
   },
 
   loginButtonText: {
@@ -233,7 +237,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
     letterSpacing: 1,
-    lineHeight: 28,
+    textAlign: 'center',
+    lineHeight: 26, // Increased slightly
   },
 
   bottomSection: {
@@ -242,7 +247,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 100, // Khoảng cách cố định, không nhảy theo bàn phím
+    marginTop: 'auto',
   },
   socialText: {
     fontSize: 14,

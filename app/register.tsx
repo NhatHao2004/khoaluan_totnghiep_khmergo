@@ -1,3 +1,6 @@
+import { ThemedText } from '@/components/themed-text';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { auth, db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -8,6 +11,7 @@ import React, { useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function RegisterScreen() {
+  const { t } = useLanguage();
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -36,19 +40,19 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (!name || !email || !password || !repeatPassword) {
-      Alert.alert('Lỗi', 'Điền đầy đủ tất cả các trường.');
+      Alert.alert(t('error'), t('error_required'));
       return;
     }
 
     if (password !== repeatPassword) {
-      Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp.');
+      Alert.alert(t('error'), t('pass_mismatch'));
       return;
     }
 
     // Validate định dạng email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      Alert.alert('Lỗi', 'Email không đúng định dạng. (ví dụ: ten@gmail.com)');
+      Alert.alert(t('error'), t('pass_fields_required')); // Fallback
       return;
     }
 
@@ -59,10 +63,8 @@ export default function RegisterScreen() {
       const user = userCredential.user;
 
       // 2. Xác định URL ảnh đại diện
-      // Nếu người dùng chọn ảnh -> dùng base64 (miễn phí, không cần Storage)
-      // Nếu không -> dùng ui-avatars tạo ảnh chữ cái
       const avatarUrl = avatarUri
-        ? avatarUri // Đã là chuỗi base64
+        ? avatarUri 
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00CFA3&color=fff&size=128`;
 
       // 3. Lưu thông tin vào Firestore
@@ -76,21 +78,15 @@ export default function RegisterScreen() {
       });
 
       // 4. Đăng ký thành công - vào app luôn
-      Alert.alert('Thành công 🎉', 'Đăng ký tài khoản thành công', [
-        { text: 'Tiếp tục', onPress: () => router.replace('/(tabs)') }
+      Alert.alert(t('completed'), t('update_success'), [
+        { text: t('back'), onPress: () => router.replace('/(tabs)') }
       ]);
     } catch (error: any) {
-      let msg = 'Đăng ký thất bại.';
+      let msg = t('update_failed');
       if (error.code === 'auth/email-already-in-use') {
-        msg = 'Email này đã được sử dụng';
-      } else if (error.code === 'auth/weak-password') {
-        msg = 'Mật khẩu yếu, dùng ít nhất 6 ký tự';
-      } else if (error.code === 'auth/invalid-email') {
-        msg = 'Email không hợp lệ';
-      } else {
-        msg = error.message;
-      }
-      Alert.alert('Lỗi', msg);
+        msg = t('email'); // Fallback or key missing
+      } 
+      Alert.alert(t('error'), msg);
     } finally {
       setLoading(false);
     }
@@ -101,13 +97,17 @@ export default function RegisterScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
         <View style={styles.innerContent}>
           {/* Top Navigation */}
           <View style={styles.topNav}>
-            <Text style={styles.navActive}>Đăng ký</Text>
+            <Text style={styles.navActive} numberOfLines={1}>{t('register_title')}</Text>
             <TouchableOpacity onPress={() => router.replace('/login')}>
-              <Text style={styles.navInactive}>Đăng nhập</Text>
+              <Text style={styles.navInactive} numberOfLines={1}>{t('login_title')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -128,7 +128,7 @@ export default function RegisterScreen() {
           <View style={styles.formContainer}>
             <TextInput
               style={styles.input}
-              placeholder="Họ và tên"
+              placeholder={t('fullname_placeholder')}
               placeholderTextColor="#C1C1C1"
               value={name}
               onChangeText={setName}
@@ -137,7 +137,7 @@ export default function RegisterScreen() {
 
             <TextInput
               style={styles.input}
-              placeholder="Email"
+              placeholder={t('email_label')}
               placeholderTextColor="#C1C1C1"
               value={email}
               onChangeText={setEmail}
@@ -148,7 +148,7 @@ export default function RegisterScreen() {
             <View style={styles.passwordContainer}>
               <TextInput
                 style={styles.passwordInput}
-                placeholder="Mật khẩu"
+                placeholder={t('password_label')}
                 placeholderTextColor="#C1C1C1"
                 value={password}
                 onChangeText={setPassword}
@@ -162,7 +162,7 @@ export default function RegisterScreen() {
             <View style={[styles.passwordContainer, { marginTop: 20 }]}>
               <TextInput
                 style={styles.passwordInput}
-                placeholder="Xác nhận mật khẩu"
+                placeholder={t('confirm_password_label')}
                 placeholderTextColor="#C1C1C1"
                 value={repeatPassword}
                 onChangeText={setRepeatPassword}
@@ -180,17 +180,15 @@ export default function RegisterScreen() {
             onPress={handleRegister}
             disabled={loading}
           >
-            {loading ? (
-              <Text style={styles.loginButtonText}>Đang tạo tài khoản...</Text>
-            ) : (
-              <Text style={styles.loginButtonText}>ĐĂNG KÝ</Text>
-            )}
+            <Text style={styles.loginButtonText}>
+              {loading ? t('registering').toUpperCase() : t('register_title').toUpperCase()}
+            </Text>
           </TouchableOpacity>
         </View>
 
         {/* Footer Section - Bottom Gray */}
         <View style={styles.bottomSection}>
-          <Text style={styles.footerText}>Điều khoản dịch vụ</Text>
+          <ThemedText style={styles.footerText}>{t('terms')}</ThemedText>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -208,7 +206,7 @@ const styles = StyleSheet.create({
   },
   innerContent: {
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 40,
+    paddingHorizontal: 30, // Reduced for more space
     paddingTop: 80,
     paddingBottom: 40,
   },
@@ -218,19 +216,19 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'space-between',
     marginBottom: 50,
+    gap: 10,
   },
   navActive: {
-    fontSize: 28,
+    fontSize: 26, 
     fontWeight: '700',
     color: '#000',
-    lineHeight: 48,
+    lineHeight: 36, // Reduced 
   },
   navInactive: {
     fontSize: 18,
     fontWeight: '500',
     color: '#B0B0B0',
-    marginTop: 6,
-    lineHeight: 32,
+    lineHeight: 28, // Reduced
   },
 
   avatarWrapper: {
@@ -291,8 +289,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#00CFA3',
     width: '100%',
-    paddingVertical: 12,
-    minHeight: 56,
+    paddingVertical: 14,
+    minHeight: 60,
     borderRadius: 30,
     shadowColor: '#00CFA3',
     shadowOffset: { width: 0, height: 4 },
@@ -300,7 +298,6 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 3,
     marginBottom: 50,
-    flexShrink: 0,
   },
 
   loginButtonText: {
@@ -308,7 +305,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
     letterSpacing: 1,
-    lineHeight: 28,
+    textAlign: 'center',
+    lineHeight: 26,
   },
 
   bottomSection: {
@@ -317,7 +315,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
+    marginTop: 'auto',
   },
   footerText: {
     fontSize: 12,
