@@ -30,20 +30,18 @@ export default function RootLayout() {
           headerShown: false,
           tabBarButton: HapticTab,
           animation: 'none', // Disable tab switching animation
+          lazy: false, // Pre-render all screens to avoid mount-time jerking
           tabBarStyle: {
             height: 70,
             paddingBottom: 20,
             paddingTop: 15,
             backgroundColor: COLORS.background,
-            borderTopLeftRadius: 25,
-            borderTopRightRadius: 25,
-            borderTopWidth: 0,
-            shadowColor: COLORS.shadow,
-            shadowOffset: { width: 0, height: -5 },
-            shadowOpacity: 0.05,
-            shadowRadius: 20,
-            elevation: 10,
-            position: 'absolute',
+            borderTopLeftRadius: 0, // Simplified for stability
+            borderTopRightRadius: 0, // Simplified for stability
+            borderTopWidth: 1,
+            borderTopColor: '#F0F0F0',
+            elevation: 0,
+            shadowOpacity: 0,
           },
           tabBarShowLabel: false,
         }}>

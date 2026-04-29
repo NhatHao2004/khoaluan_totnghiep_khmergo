@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, {
   FadeInDown,
   FadeInRight,
@@ -129,9 +130,9 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
-      <Animated.View entering={FadeInDown.springify()} style={styles.header}>
+      <View style={styles.header}>
         <View style={styles.userInfo}>
           <TouchableOpacity
             onPress={() => router.push('/(tabs)/profile' as any)}
@@ -160,12 +161,12 @@ export default function HomeScreen() {
             </View>
           </Animated.View>
         </TouchableOpacity>
-      </Animated.View>
+      </View>
 
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 70 }}
+        contentContainerStyle={{ paddingBottom: 0 }}
       >
         {/* Promo Banner */}
         <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.promoBanner}>
@@ -258,15 +259,14 @@ export default function HomeScreen() {
           </Animated.View>
         ))}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
-    paddingTop: 50,
+    backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',

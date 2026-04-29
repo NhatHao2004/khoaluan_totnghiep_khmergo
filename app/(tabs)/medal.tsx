@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
 
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
@@ -27,15 +28,17 @@ export default function MedalScreen() {
 
   const fetchLeaderboard = async () => {
     if (!user) {
-      setLeaderboardData([]);
+      if (leaderboardData.length > 0) setLeaderboardData([]);
       setIsLoading(false);
       return;
     }
 
-    setIsLoading(true);
     try {
       const users = await getLeaderboardUsers(50);
-      setLeaderboardData(users);
+      // Simple shallow comparison or just check length for now
+      if (JSON.stringify(users) !== JSON.stringify(leaderboardData)) {
+        setLeaderboardData(users);
+      }
     } catch (error) {
       console.log('Error fetching leaderboard:', error);
     } finally {
@@ -48,7 +51,7 @@ export default function MedalScreen() {
       setActiveTab('weekly');
       scrollRef.current?.scrollTo({ y: 0, animated: false });
       fetchLeaderboard();
-    }, [user])
+    }, [user?.uid])
   );
 
 
@@ -82,141 +85,142 @@ export default function MedalScreen() {
         <View style={{ width: 24 }} />
       </View>
 
-      <View style={{ flex: 0 }}>
-        {/* Tab Switcher */}
-        <View style={styles.tabContainer}>
-          <View style={styles.tabBackground}>
-            <TouchableOpacity
-              style={[styles.tab, activeTab === 'weekly' && styles.activeTab]}
-              onPress={() => setActiveTab('weekly')}
-            >
-              <Text style={[styles.tabText, activeTab === 'weekly' && styles.activeTabText]}>{t('weekly')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tab, activeTab === 'all' && styles.activeTab]}
-              onPress={() => setActiveTab('all')}
-            >
-              <Text style={[styles.tabText, activeTab === 'all' && styles.activeTabText]}>{t('all_time')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Podium Section */}
-        <View style={styles.podiumWrapper}>
-          <View style={styles.podiumContainer}>
-
-            {/* 1st Place */}
-            <View style={[styles.podiumItem, { marginTop: -45 }]}>
-              <View style={styles.crownContainer}>
-              </View>
-              <View style={[styles.avatarContainer, { width: 80, height: 80, borderRadius: 40, borderWidth: 1, borderColor: '#000000ff' }]}>
-                {topThree[1].avatar ? (
-                  <Image source={{ uri: topThree[1].avatar }} style={styles.avatar} />
-                ) : (
-                  <Ionicons name="person-circle-outline" size={70} color="#CCC" />
-                )}
-
-              </View>
-
-
-              <Text style={styles.podiumName}>{topThree[1].name}</Text>
-              <View style={styles.podiumPoints}>
-                <Text style={styles.podiumPointsText} numberOfLines={1}>
-                  {`${topThree[1].points} ${t('points')}`}
-                </Text>
-              </View>
-              <View style={[styles.podiumBase, { height: 135, backgroundColor: '#FFD700' }]}>
-                <Text style={styles.podiumRank}>1</Text>
-              </View>
-            </View>
-
-            {/* 2nd Place */}
-            <View style={styles.podiumItem}>
-              <View style={[styles.avatarContainer, { width: 80, height: 80, borderRadius: 40, borderWidth: 1, borderColor: '#000000ff' }]}>
-                {topThree[0].avatar ? (
-                  <Image source={{ uri: topThree[0].avatar }} style={styles.avatar} />
-                ) : (
-                  <Ionicons name="person-circle-outline" size={70} color="#CCC" />
-                )}
-
-              </View>
-
-
-              <Text style={styles.podiumName} numberOfLines={1}>{topThree[0].name}</Text>
-              <View style={styles.podiumPoints}>
-                <Text style={styles.podiumPointsText} numberOfLines={1}>
-                  {`${topThree[0].points} ${t('points')}`}
-                </Text>
-              </View>
-              <View style={[styles.podiumBase, { height: 100, backgroundColor: '#C0C0C0' }]}>
-                <Text style={styles.podiumRank}>2</Text>
-              </View>
-            </View>
-
-            {/* 3rd Place */}
-            <View style={styles.podiumItem}>
-              <View style={[styles.avatarContainer, { width: 80, height: 80, borderRadius: 40, borderWidth: 1, borderColor: '#000000ff' }]}>
-                {topThree[2].avatar ? (
-                  <Image source={{ uri: topThree[2].avatar }} style={styles.avatar} />
-                ) : (
-                  <Ionicons name="person-circle-outline" size={70} color="#CCC" />
-                )}
-
-              </View>
-
-
-              <Text style={styles.podiumName} numberOfLines={1}>{topThree[2].name}</Text>
-              <View style={styles.podiumPoints}>
-                <Text style={styles.podiumPointsText} numberOfLines={1}>
-                  {`${topThree[2].points} ${t('points')}`}
-                </Text>
-              </View>
-              <View style={[styles.podiumBase, { height: 65, backgroundColor: '#CD7F32' }]}>
-                <Text style={styles.podiumRank}>3</Text>
-              </View>
-            </View>
-          </View>
+      <View style={styles.tabContainer}>
+        <View style={styles.tabBackground}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'weekly' && styles.activeTab]}
+            onPress={() => setActiveTab('weekly')}
+          >
+            <Text style={[styles.tabText, activeTab === 'weekly' && styles.activeTabText]}>{t('weekly')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'all' && styles.activeTab]}
+            onPress={() => setActiveTab('all')}
+          >
+            <Text style={[styles.tabText, activeTab === 'all' && styles.activeTabText]}>{t('all_time')}</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
-      {/* Other Players List - Only this part is scrollable */}
-      <ScrollView
-        ref={scrollRef}
-        style={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 30, paddingBottom: 68 }}
-      >
+      <View style={{ flex: 1 }}>
+        <View style={{ flex: 0 }}>
+          {/* Podium Section */}
+          <View style={styles.podiumWrapper}>
+            <View style={styles.podiumContainer}>
 
-        {restOfPlayers.map((item) => {
-          const playerRank = displayedData.findIndex(u => u.uid === item.uid) + 1;
-          const isMe = user && item.uid === user.uid;
-
-          return (
-            <View key={item.uid} style={[styles.listItem, isMe && styles.myListItem]}>
-              <View style={styles.listItemRankContainer}>
-                <Text style={styles.listItemRank}>{playerRank}</Text>
-              </View>
-              {item.avatar ? (
-                <Image source={{ uri: item.avatar }} style={styles.listItemAvatar} />
-              ) : (
-                <Ionicons name="person-circle-outline" size={50} color="#CCC" style={styles.listItemAvatar} />
-              )}
-              <View style={styles.listItemInfo}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <Text style={[styles.listItemName, isMe && styles.myListItemName]} numberOfLines={1}>
-                    {item.name}
-                  </Text>
-                  {isMe && <View style={styles.meTag}><Text style={styles.meTagText}>{t('you')}</Text></View>}
+              {/* 1st Place */}
+              <View style={[styles.podiumItem, { marginTop: -45 }]}>
+                <View style={styles.crownContainer}>
                 </View>
-                <Text style={styles.listItemPoints}>
-                  {`${item.points} ${t('points')}`}
-                </Text>
+                <View style={[styles.avatarContainer, { width: 80, height: 80, borderRadius: 40, borderWidth: 1, borderColor: '#000000ff' }]}>
+                  {topThree[1].avatar ? (
+                    <Image source={{ uri: topThree[1].avatar }} style={styles.avatar} />
+                  ) : (
+                    <Ionicons name="person-circle-outline" size={70} color="#CCC" />
+                  )}
+
+                </View>
+
+
+                <Text style={styles.podiumName}>{topThree[1].name}</Text>
+                <View style={styles.podiumPoints}>
+                  <Text style={styles.podiumPointsText} numberOfLines={1}>
+                    {`${topThree[1].points} ${t('points')}`}
+                  </Text>
+                </View>
+                <View style={[styles.podiumBase, { height: 135, backgroundColor: '#FFD700' }]}>
+                  <Text style={styles.podiumRank}>1</Text>
+                </View>
+              </View>
+
+              {/* 2nd Place */}
+              <View style={styles.podiumItem}>
+                <View style={[styles.avatarContainer, { width: 80, height: 80, borderRadius: 40, borderWidth: 1, borderColor: '#000000ff' }]}>
+                  {topThree[0].avatar ? (
+                    <Image source={{ uri: topThree[0].avatar }} style={styles.avatar} />
+                  ) : (
+                    <Ionicons name="person-circle-outline" size={70} color="#CCC" />
+                  )}
+
+                </View>
+
+
+                <Text style={styles.podiumName} numberOfLines={1}>{topThree[0].name}</Text>
+                <View style={styles.podiumPoints}>
+                  <Text style={styles.podiumPointsText} numberOfLines={1}>
+                    {`${topThree[0].points} ${t('points')}`}
+                  </Text>
+                </View>
+                <View style={[styles.podiumBase, { height: 100, backgroundColor: '#C0C0C0' }]}>
+                  <Text style={styles.podiumRank}>2</Text>
+                </View>
+              </View>
+
+              {/* 3rd Place */}
+              <View style={styles.podiumItem}>
+                <View style={[styles.avatarContainer, { width: 80, height: 80, borderRadius: 40, borderWidth: 1, borderColor: '#000000ff' }]}>
+                  {topThree[2].avatar ? (
+                    <Image source={{ uri: topThree[2].avatar }} style={styles.avatar} />
+                  ) : (
+                    <Ionicons name="person-circle-outline" size={70} color="#CCC" />
+                  )}
+
+                </View>
+
+
+                <Text style={styles.podiumName} numberOfLines={1}>{topThree[2].name}</Text>
+                <View style={styles.podiumPoints}>
+                  <Text style={styles.podiumPointsText} numberOfLines={1}>
+                    {`${topThree[2].points} ${t('points')}`}
+                  </Text>
+                </View>
+                <View style={[styles.podiumBase, { height: 65, backgroundColor: '#CD7F32' }]}>
+                  <Text style={styles.podiumRank}>3</Text>
+                </View>
               </View>
             </View>
-          );
-        })}
+          </View>
+        </View>
 
-      </ScrollView>
+        {/* Other Players List - Only this part is scrollable */}
+        <ScrollView
+          ref={scrollRef}
+          style={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 30, paddingBottom: 68 }}
+        >
+
+          {restOfPlayers.map((item) => {
+            const playerRank = displayedData.findIndex(u => u.uid === item.uid) + 1;
+            const isMe = user && item.uid === user.uid;
+
+            return (
+              <View key={item.uid} style={[styles.listItem, isMe && styles.myListItem]}>
+                <View style={styles.listItemRankContainer}>
+                  <Text style={styles.listItemRank}>{playerRank}</Text>
+                </View>
+                {item.avatar ? (
+                  <Image source={{ uri: item.avatar }} style={styles.listItemAvatar} />
+                ) : (
+                  <Ionicons name="person-circle-outline" size={50} color="#CCC" style={styles.listItemAvatar} />
+                )}
+                <View style={styles.listItemInfo}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Text style={[styles.listItemName, isMe && styles.myListItemName]} numberOfLines={1}>
+                      {item.name}
+                    </Text>
+                    {isMe && <View style={styles.meTag}><Text style={styles.meTagText}>{t('you')}</Text></View>}
+                  </View>
+                  <Text style={styles.listItemPoints}>
+                    {`${item.points} ${t('points')}`}
+                  </Text>
+                </View>
+              </View>
+            );
+          })}
+
+        </ScrollView>
+      </View>
 
       {user && (leaderboardData.findIndex(u => u.uid === user.uid) + 1) >= 4 && (
         <TouchableOpacity

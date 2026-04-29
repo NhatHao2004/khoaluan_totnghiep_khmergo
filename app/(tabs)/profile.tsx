@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
@@ -42,27 +43,26 @@ export default function ProfileScreen() {
 
   const fetchRank = async () => {
     if (!user) {
-      setUserRank('---');
+      if (userRank !== '---') setUserRank('---');
       return;
     }
     try {
       const users = await getLeaderboardUsers(100);
       const index = users.findIndex(u => u.uid === user.uid);
-      if (index !== -1) {
-        setUserRank(index + 1);
-      } else {
-        setUserRank('>100');
+      const newRank = index !== -1 ? index + 1 : '>100';
+      if (newRank !== userRank) {
+        setUserRank(newRank);
       }
     } catch (error) {
       console.log('Error fetching rank:', error);
-      setUserRank('---');
+      if (userRank !== '---') setUserRank('---');
     }
   };
 
   useFocusEffect(
     React.useCallback(() => {
       fetchRank();
-    }, [user])
+    }, [user?.uid])
   );
 
 
@@ -118,24 +118,26 @@ export default function ProfileScreen() {
 
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Profile Card */}
-        <View style={styles.profileCard}>
-          {/* Avatar */}
-          <View style={styles.avatarWrapper}>
-            {user?.avatar ?
-              (
-                <Image source={{ uri: user.avatar }} style={styles.avatar} />
-              ) : (
-                <Ionicons name="person-circle-outline" size={115} color="#000000ff" />
-              )}
-          </View>
+        <Animated.View entering={FadeInUp.springify().damping(20).duration(600)}>
+          {/* Profile Card */}
+          <View style={styles.profileCard}>
+            {/* Avatar */}
+            <View style={styles.avatarWrapper}>
+              {user?.avatar ?
+                (
+                  <Image source={{ uri: user.avatar }} style={styles.avatar} />
+                ) : (
+                  <Ionicons name="person-circle-outline" size={115} color="#000000ff" />
+                )}
+            </View>
 
-          {/* Info */}
-          <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>{user?.name || t('guest')}</Text>
-            <Text style={styles.profileEmail}>{user?.email || t('login_to_view')}</Text>
+            {/* Info */}
+            <View style={styles.profileInfo}>
+              <Text style={styles.profileName}>{user?.name || t('guest')}</Text>
+              <Text style={styles.profileEmail}>{user?.email || t('login_to_view')}</Text>
+            </View>
           </View>
-        </View>
+        </Animated.View>
 
         {/* Menu List */}
         <View style={styles.menuList}>

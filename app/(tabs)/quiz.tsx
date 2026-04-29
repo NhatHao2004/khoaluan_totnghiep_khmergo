@@ -6,7 +6,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -19,31 +18,30 @@ export default function QuizScreen() {
 
   const fetchRank = async () => {
     if (!user) {
-      setUserRank('---');
+      if (userRank !== '---') setUserRank('---');
       return;
     }
     try {
       const users = await getLeaderboardUsers(100);
       const index = users.findIndex(u => u.uid === user.uid);
-      if (index !== -1) {
-        setUserRank(index + 1);
-      } else {
-        setUserRank('>100');
+      const newRank = index !== -1 ? index + 1 : '>100';
+      if (newRank !== userRank) {
+        setUserRank(newRank);
       }
     } catch (error) {
       console.log('Error fetching rank:', error);
-      setUserRank('---');
+      if (userRank !== '---') setUserRank('---');
     }
   };
 
   useEffect(() => {
     fetchRank();
-  }, [user]);
+  }, [user?.uid]);
 
   useFocusEffect(
     React.useCallback(() => {
       fetchRank();
-    }, [user])
+    }, [user?.uid])
   );
 
   return (
