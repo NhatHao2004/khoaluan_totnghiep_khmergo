@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import { useEffect, useMemo, useState } from 'react';
 import {
+  ActivityIndicator,
   Dimensions,
   Image,
   ScrollView,
@@ -34,81 +35,81 @@ export default function HomeScreen() {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [favorites, setFavorites] = useState<number[]>([]);
-  const DEST_METADATA = [
-    {
-      id: 1,
-      title: 'Chùa Âng',
-      locationKey: 'nguyet_hoa_vinh_long',
-      image: require('@/assets/images/chuaang.jpg'),
-      route: {
-        pathname: '/pagoda-detail',
-        params: {
-          id: 'pagoda_1',
-          name: 'Chùa Âng',
-          location: 'phường Nguyệt Hóa, tỉnh Vĩnh Long',
-          source: 'pagoda',
-        }
-      } as any
-    },
-    {
-      id: 2,
-      title: 'Lễ hội truyền thống',
-      locationKey: 'oc_om_boc_time',
-      image: require('@/assets/images/lehoi.jpg'),
-      route: {
-        pathname: '/culture-detail',
-        params: {
-          id: 'culture_1',
-          name: 'Lễ hội truyền thống',
-          location: 'Lễ hội truyền thống của người Khmer Nam Bộ',
-          source: 'culture',
-        }
-      } as any
-    },
-    {
-      id: 3,
-      title: 'Mắm bò hóc',
-      locationKey: 'bun_nuoc_leo_desc',
-      image: require('@/assets/images/cuisine.jpg'),
-      route: {
-        pathname: '/food-detail',
-        params: {
-          id: 'food_1',
-          name: 'Mắm bò hóc',
-          location: 'Gia vị đặc trưng tạo nên hương vị Khmer',
-          source: 'food',
-        }
-      } as any
-    }
-  ];
-
-  const [reviewsData, setReviewsData] = useState<Record<number, number>>({});
+  const [featuredDestinations, setFeaturedDestinations] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Animation for the notification bell
   const bellRotation = useSharedValue(0);
 
+  // Helper functions to get local images if needed
+  const getAppImage = (item: any) => {
+    const { id, name, category, imageUrl } = item;
+    if (imageUrl && imageUrl.startsWith('http')) return { uri: imageUrl };
+    
+    // Fallback logic by category
+    if (category === 'Chùa') {
+      const pagodaImages: any = {
+        'pagoda_1': require('@/assets/images/chuaang.jpg'),
+        'pagoda_2': require('@/assets/images/chuahang.jpg'),
+        'pagoda_3': require('@/assets/images/kampong.jpg'),
+        'pagoda_4': require('@/assets/images/salengcu.jpg'),
+        'pagoda_5': require('@/assets/images/veluvana.jpg'),
+      };
+      return pagodaImages[id] || require('@/assets/images/pagoda.jpg');
+    }
+    if (category === 'Văn hóa') return require('@/assets/images/lehoi.jpg');
+    if (category === 'Ẩm thực') return require('@/assets/images/amthuc.jpg');
+    return require('@/assets/images/pagoda.jpg');
+  };
+
   useEffect(() => {
-    // Lắng nghe thay đổi reviews từ Firestore cho các địa điểm
+    // Lắng nghe dữ liệu từ Firestore
+    setIsLoading(true);
     const q = query(collection(db, 'destinations'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const liveData: Record<number, number> = {};
-      snapshot.docs.forEach(doc => {
+      const allItems = snapshot.docs.map(doc => {
         const data = doc.data();
-        liveData[data.id] = data.reviews || 0;
+        let detailRoute = '/(tabs)/index';
+        if (data.category === 'Chùa') detailRoute = '/pagoda-detail';
+        else if (data.category === 'Văn hóa') detailRoute = '/culture-detail';
+        else if (data.category === 'Ẩm thực') detailRoute = '/food-detail';
+
+        return {
+          ...data,
+          id_num: data.id,
+          category: data.category, // Added to fix type error
+          image: getAppImage(data),
+          route: {
+            pathname: detailRoute,
+            params: {
+              id: data.id,
+              name: data.name,
+              location: data.location,
+              description: data.description,
+              imageUrl: data.imageUrl,
+              source: data.category === 'Chùa' ? 'pagoda' : data.category === 'Văn hóa' ? 'culture' : 'food',
+            }
+          }
+        };
       });
-      setReviewsData(liveData);
+
+      // Group by category
+      const pagodas = allItems.filter(i => i.category === 'Chùa');
+      const cultures = allItems.filter(i => i.category === 'Văn hóa');
+      const foods = allItems.filter(i => i.category === 'Ẩm thực');
+
+      // Randomly pick one from each category
+      const featured: any[] = [];
+      if (pagodas.length > 0) featured.push(pagodas[Math.floor(Math.random() * pagodas.length)]);
+      if (cultures.length > 0) featured.push(cultures[Math.floor(Math.random() * cultures.length)]);
+      if (foods.length > 0) featured.push(foods[Math.floor(Math.random() * foods.length)]);
+
+      setFeaturedDestinations(featured);
+      setIsLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
-
-  const featuredDestinations = useMemo(() => {
-    return DEST_METADATA.map(item => ({
-      ...item,
-      location: t(item.locationKey),
-      reviews: reviewsData[item.id] || 0
-    }));
-  }, [language, reviewsData, t]);
+  }, [language, t]);
 
   useEffect(() => {
     bellRotation.value = withRepeat(
@@ -140,7 +141,7 @@ export default function HomeScreen() {
 
 
 
-  const toggleFavorite = (id: number) => {
+  const toggleFavorite = (id: any) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setFavorites(prev =>
       prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
@@ -233,54 +234,61 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 0 }}
       >
-        {featuredDestinations.map((item, index) => (
-          <Animated.View
-            key={item.id}
-            entering={FadeInRight.delay(600 + index * 100).springify()}
-            style={styles.featuredCard}
-          >
-            <TouchableOpacity
-              activeOpacity={0.9}
-              onPress={() => handleCategoryPress(item.route)}
+        {isLoading ? (
+          <View style={styles.featuredLoader}>
+            <ActivityIndicator size="large" color="#FF0050" />
+            <ThemedText style={styles.loaderText}>{t('loading_content')}</ThemedText>
+          </View>
+        ) : (
+          featuredDestinations.map((item, index) => (
+            <Animated.View
+              key={item.id}
+              entering={FadeInRight.delay(600 + index * 100).springify()}
+              style={styles.featuredCard}
             >
-              <View style={styles.cardImageContainer}>
-                <Image source={item.image} style={styles.cardImage} />
-                <View style={styles.cardOverlay}>
-                  <TouchableOpacity
-                    style={styles.heartBtn}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      toggleFavorite(item.id);
-                    }}
-                  >
-                    <Ionicons
-                      name={favorites.includes(item.id) ? "heart" : "heart-outline"}
-                      size={25}
-                      color={favorites.includes(item.id) ? "#ff0000ff" : "#000000ff"}
-                    />
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              <View style={styles.cardContent}>
-                <View style={styles.cardHeaderRow}>
-                  <ThemedText style={styles.cardTitle} numberOfLines={1}>{item.title}</ThemedText>
-                </View>
-
-                <View style={styles.cardFooter}>
-                  <View style={styles.locationInfo}>
-                    <ThemedText style={styles.locationText}>{item.location}</ThemedText>
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => handleCategoryPress(item.route)}
+              >
+                <View style={styles.cardImageContainer}>
+                  <Image source={item.image} style={styles.cardImage} />
+                  <View style={styles.cardOverlay}>
+                    <TouchableOpacity
+                      style={styles.heartBtn}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(item.id);
+                      }}
+                    >
+                      <Ionicons
+                        name={favorites.includes(item.id) ? "heart" : "heart-outline"}
+                        size={25}
+                        color={favorites.includes(item.id) ? "#ff0000" : "#000"}
+                      />
+                    </TouchableOpacity>
                   </View>
-                  {(item.reviews ?? 0) > 0 && (
-                    <View style={styles.reviewInfo}>
-                      <ThemedText style={styles.reviewText}>{item.reviews} {t('reviews_label')}</ThemedText>
-                    </View>
-                  )}
                 </View>
-              </View>
-            </TouchableOpacity>
-          </Animated.View>
-        ))}
+
+                <View style={styles.cardContent}>
+                  <View style={styles.cardHeaderRow}>
+                    <ThemedText style={styles.cardTitle} numberOfLines={1}>{item.name || item.title}</ThemedText>
+                  </View>
+
+                  <View style={styles.cardFooter}>
+                    <View style={styles.locationInfo}>
+                      <ThemedText style={styles.locationText}>{item.location}</ThemedText>
+                    </View>
+                    {(item.reviews ?? 0) > 0 && (
+                      <View style={styles.reviewInfo}>
+                        <ThemedText style={styles.reviewText}>{item.reviews} {t('reviews_label')}</ThemedText>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </Animated.View>
+          ))
+        )}
       </ScrollView>
     </View>
   );
@@ -658,5 +666,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '900',
     color: '#FFF',
+  },
+  featuredLoader: {
+    paddingVertical: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loaderText: {
+    marginTop: 10,
+    color: '#888',
+    fontSize: 14,
   },
 });
