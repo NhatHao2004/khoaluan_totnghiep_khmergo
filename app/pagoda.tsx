@@ -142,13 +142,11 @@ export default function PagodaScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {loading ? (
-          <ActivityIndicator size="large" color="#FF0050" style={styles.loader} />
-        ) : error ? (
+        {error ? (
           <ThemedText style={styles.errorText}>
             {t('error_loading_temples') || 'Không thể tải dữ liệu chùa Khmer'}
           </ThemedText>
-        ) : filteredPagodas.length === 0 ? (
+        ) : filteredPagodas.length === 0 && !loading ? (
           <ThemedText style={styles.emptyText}>
             {t('no_temple_data') || 'Chưa có dữ liệu chùa Khmer'}
           </ThemedText>
@@ -201,6 +199,13 @@ export default function PagodaScreen() {
           </View>
         )}
       </ScrollView>
+
+      {loading && (
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color="#FF0050" />
+          <ThemedText style={{ marginTop: 10, color: '#888' }}>{t('loading_content')}</ThemedText>
+        </View>
+      )}
     </View>
   );
 }
@@ -220,7 +225,13 @@ const styles = StyleSheet.create({
   pagodaContent: { padding: 15 },
   pagodaName: { fontSize: 18, fontWeight: '800', color: '#1A1A1A', marginBottom: 5 },
   pagodaLocation: { fontSize: 13, color: '#666' },
-  loader: { marginTop: 50 },
+  loader: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10
+  },
   errorText: { textAlign: 'center', marginTop: 50, color: 'red' },
   emptyText: { textAlign: 'center', marginTop: 50, color: '#999' },
 });

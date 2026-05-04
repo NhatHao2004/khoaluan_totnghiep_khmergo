@@ -98,11 +98,9 @@ export default function CultureScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {loading ? (
-          <ActivityIndicator size="large" color={tintColor} style={styles.loader} />
-        ) : error ? (
+        {error ? (
           <ThemedText style={styles.errorText}>{error}</ThemedText>
-        ) : sortedCultures.length === 0 ? (
+        ) : sortedCultures.length === 0 && !loading ? (
           <ThemedText style={styles.emptyText}>Chưa có dữ liệu văn hóa Khmer</ThemedText>
         ) : (
           <View style={styles.cultureList}>
@@ -147,6 +145,13 @@ export default function CultureScreen() {
           </View>
         )}
       </ScrollView>
+
+      {loading && (
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color="#FF0050" />
+          <ThemedText style={{ marginTop: 10, color: '#888' }}>{t('loading_content')}</ThemedText>
+        </View>
+      )}
     </View>
   );
 }
@@ -229,7 +234,11 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   loader: {
-    marginTop: 50,
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10
   },
   errorText: {
     textAlign: 'center',

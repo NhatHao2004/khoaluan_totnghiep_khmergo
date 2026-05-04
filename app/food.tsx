@@ -92,11 +92,9 @@ export default function FoodScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {loading ? (
-          <ActivityIndicator size="large" color={tintColor} style={styles.loader} />
-        ) : error ? (
+        {error ? (
           <ThemedText style={styles.errorText}>{error}</ThemedText>
-        ) : sortedFoods.length === 0 ? (
+        ) : sortedFoods.length === 0 && !loading ? (
           <ThemedText style={styles.emptyText}>Chưa có dữ liệu ẩm thực Khmer</ThemedText>
         ) : (
           <View style={styles.foodList}>
@@ -138,6 +136,13 @@ export default function FoodScreen() {
           </View>
         )}
       </ScrollView>
+
+      {loading && (
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color="#FF0050" />
+          <ThemedText style={{ marginTop: 10, color: '#888' }}>{t('loading_content')}</ThemedText>
+        </View>
+      )}
     </View>
   );
 }
@@ -157,7 +162,13 @@ const styles = StyleSheet.create({
   foodContent: { padding: 15 },
   foodName: { fontSize: 18, fontWeight: '800', color: '#1A1A1A', marginBottom: 5 },
   foodLocation: { fontSize: 13, color: '#666' },
-  loader: { marginTop: 50 },
+  loader: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10
+  },
   errorText: { textAlign: 'center', marginTop: 50, color: 'red' },
   emptyText: { textAlign: 'center', marginTop: 50, color: '#999' },
 });

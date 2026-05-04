@@ -52,17 +52,33 @@ export default function HomeScreen() {
     },
     {
       id: 2,
-      title: 'Lễ hội Oóc Om Bóc',
+      title: 'Lễ hội truyền thống',
       locationKey: 'oc_om_boc_time',
       image: require('@/assets/images/lehoi.jpg'),
-      route: '/(tabs)/index'
+      route: {
+        pathname: '/culture-detail',
+        params: {
+          id: 'culture_1',
+          name: 'Lễ hội truyền thống',
+          location: 'Lễ hội truyền thống của người Khmer Nam Bộ',
+          source: 'culture',
+        }
+      } as any
     },
     {
       id: 3,
-      title: 'Bún Nước Lèo',
+      title: 'Mắm bò hóc',
       locationKey: 'bun_nuoc_leo_desc',
       image: require('@/assets/images/cuisine.jpg'),
-      route: '/(tabs)/index'
+      route: {
+        pathname: '/food-detail',
+        params: {
+          id: 'food_1',
+          name: 'Mắm bò hóc',
+          location: 'Gia vị đặc trưng tạo nên hương vị Khmer',
+          source: 'food',
+        }
+      } as any
     }
   ];
 
