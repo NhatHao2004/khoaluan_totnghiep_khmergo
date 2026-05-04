@@ -15,7 +15,6 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, {
   FadeInDown,
   FadeInRight,
@@ -41,7 +40,15 @@ export default function HomeScreen() {
       title: 'Chùa Âng',
       locationKey: 'nguyet_hoa_vinh_long',
       image: require('@/assets/images/chuaang.jpg'),
-      route: '/pagoda'
+      route: {
+        pathname: '/pagoda-detail',
+        params: {
+          id: 'pagoda_1',
+          name: 'Chùa Âng',
+          location: 'phường Nguyệt Hóa, tỉnh Vĩnh Long',
+          source: 'pagoda',
+        }
+      } as any
     },
     {
       id: 2,
@@ -109,7 +116,7 @@ export default function HomeScreen() {
   });
 
   const services = [
-    { id: 1, label: t('temple'), icon: require('@/assets/images/pagoda.jpg'), color: '#FF7000', route: '/(tabs)/pagoda' },
+    { id: 1, label: t('temple'), icon: require('@/assets/images/pagoda.jpg'), color: '#FF7000', route: '/pagoda' },
     { id: 3, label: t('culture'), icon: require('@/assets/images/festival.jpg'), color: '#A000FF', route: '/(tabs)/culture' },
     { id: 2, label: t('food'), icon: require('@/assets/images/amthuc.jpg'), color: '#FF0050', route: '/(tabs)/food' },
     { id: 4, label: t('language_study'), icon: require('@/assets/images/hoctap.jpg'), color: '#00C850', route: '/(tabs)/language_study' },
@@ -124,13 +131,13 @@ export default function HomeScreen() {
     );
   };
 
-  const handleCategoryPress = (route: string) => {
+  const handleCategoryPress = (route: any) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    router.push(route as any);
+    router.push(route);
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.userInfo}>
@@ -259,7 +266,7 @@ export default function HomeScreen() {
           </Animated.View>
         ))}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -267,6 +274,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+    paddingTop: 40,
   },
   header: {
     flexDirection: 'row',

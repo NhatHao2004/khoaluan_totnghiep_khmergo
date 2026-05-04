@@ -4,7 +4,7 @@ import { getLeaderboardUsers } from '@/services/firebase-service';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Alert,
   Image,
@@ -15,7 +15,6 @@ import {
   View,
 } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 type MenuItem = {
@@ -40,8 +39,15 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { t } = useLanguage();
   const [userRank, setUserRank] = useState<string | number>('---');
+  const lastFetchTime = useRef<number>(0);
 
-  const fetchRank = async () => {
+  const fetchRank = async (force = false) => {
+    // Only fetch if forced or it's been more than 30 seconds
+    const now = Date.now();
+    if (!force && lastFetchTime.current && now - lastFetchTime.current < 30000) {
+      return;
+    }
+
     if (!user) {
       if (userRank !== '---') setUserRank('---');
       return;
@@ -53,6 +59,7 @@ export default function ProfileScreen() {
       if (newRank !== userRank) {
         setUserRank(newRank);
       }
+      lastFetchTime.current = Date.now();
     } catch (error) {
       console.log('Error fetching rank:', error);
       if (userRank !== '---') setUserRank('---');
@@ -111,7 +118,7 @@ export default function ProfileScreen() {
 
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle} numberOfLines={1}>{t('my_profile')}</Text>
       </View>
@@ -175,7 +182,7 @@ export default function ProfileScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -183,6 +190,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+    paddingTop: 40,
   },
   header: {
     flexDirection: 'row',

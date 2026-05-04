@@ -48,7 +48,7 @@ const translations = {
     logout: 'Đăng xuất',
     logout_full: 'Đăng xuất tài khoản',
     points: 'Điểm',
-    rank: 'Thành tích',
+    rank: 'Top',
     guest: 'Khách',
     login_to_view: 'Đăng nhập để xem thông tin',
     login_to_use: 'Đăng nhập để sử dụng tính năng này',
@@ -147,6 +147,7 @@ const translations = {
     login_with: 'Đăng nhập bằng',
     terms: 'Điều khoản dịch vụ',
     error_required: 'Vui lòng điền đầy đủ các trường',
+    email_in_use: 'Email đã tồn tại hoặc đã được sử dụng bởi tài khoản khác',
 
     // New Home & Pagoda Strings
     welcome_hello: 'Chào mừng 👋',
@@ -159,6 +160,13 @@ const translations = {
     nguyet_hoa_vinh_long: 'phường Nguyệt Hóa, tỉnh Trà Vinh',
     loading_preparing: 'Đang chuẩn bị cho hành trình khám phá',
     loading_text: 'Đang tải...',
+    register_success: 'Đăng ký thành công',
+    error_loading_temples: 'Không thể tải dữ liệu chùa Khmer',
+    no_temple_data: 'Chưa có dữ liệu chùa Khmer',
+    pagoda_detail_title: 'Chi tiết chùa',
+    address_not_updated: 'Chưa cập nhật địa chỉ',
+    navigate_btn: 'Chỉ đường',
+    loading_content: 'Đang tải nội dung...',
   },
   km: {
     // Common
@@ -198,7 +206,7 @@ const translations = {
     logout: 'ចាកចេញ',
     logout_full: 'ចាកចេញពីគណនី',
     points: 'ពិន្ទុ',
-    rank: 'សមិទ្ធផល',
+    rank: 'ចំណាត់ថ្នាក់',
     guest: 'ភ្ញៀវ',
     login_to_view: 'ចូលដើម្បីមើលព័ត៌មាន',
     login_to_use: 'ចូលដើម្បីប្រើប្រាស់មុខងារនេះ',
@@ -302,6 +310,7 @@ const translations = {
     login_with: 'ចូលតាមរយៈ',
     terms: 'លក្ខខណ្ឌសេវាកម្ម',
     error_required: 'សូមបំពេញព័ត៌មានឱ្យគ្រប់គ្រាន់',
+    email_in_use: 'អ៊ីមែលនេះមានរួចហើយ ឬត្រូវបានប្រើប្រាស់ដោយគណនីផ្សេងទៀត',
 
     // New Home & Pagoda Strings
     welcome_hello: 'សូមស្វាគមន៍ 👋',
@@ -314,6 +323,13 @@ const translations = {
     nguyet_hoa_vinh_long: 'សង្កាត់ Nguyet Hoa ខេត្ត Tra Vinh',
     loading_preparing: 'កំពុងរៀបចំសម្រាប់ការធ្វើដំណើររុករក',
     loading_text: 'កំពុងទាញយក...',
+    register_success: 'ការចុះឈ្មោះបានជោគជ័យ',
+    error_loading_temples: 'មិនអាចទាញយកទិន្នន័យវត្តអារាមខ្មែរ',
+    no_temple_data: 'មិនមានទិន្នន័យវត្តអារាមខ្មែរ',
+    pagoda_detail_title: 'ព័ត៌មានលម្អិត vềវត្ត',
+    address_not_updated: 'មិនទាន់មានអាសយដ្ឋាន',
+    navigate_btn: 'នាំផ្លូវ',
+    loading_content: 'កំពុងទាញយកមាតិកា...',
   }
 };
 

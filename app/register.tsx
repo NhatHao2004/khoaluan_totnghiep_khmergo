@@ -73,18 +73,17 @@ export default function RegisterScreen() {
         email: email.trim().toLowerCase(),
         avatar: avatarUrl,
         points: 0,
-        rank: 'Đồng',
         createdAt: new Date().toISOString(),
       });
 
       // 4. Đăng ký thành công - vào app luôn
-      Alert.alert(t('completed'), t('update_success'), [
+      Alert.alert(t('completed'), t('register_success'), [
         { text: t('back'), onPress: () => router.replace('/(tabs)') }
       ]);
     } catch (error: any) {
       let msg = t('update_failed');
       if (error.code === 'auth/email-already-in-use') {
-        msg = t('email'); // Fallback or key missing
+        msg = t('email_in_use');
       } 
       Alert.alert(t('error'), msg);
     } finally {

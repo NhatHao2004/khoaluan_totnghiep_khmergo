@@ -19,7 +19,16 @@ export interface Temple {
   rental?: string;
   description?: string;
   category?: string;
+  isFavorite?: boolean;
+  detailedDescription?: any;
+  additionalImages?: string[];
 }
+
+export const toggleFavorite = async (templeId: string, isFavorite: boolean): Promise<void> => {
+  // Placeholder implementation
+  console.log('Toggling favorite for', templeId, 'to', isFavorite);
+  return Promise.resolve();
+};
 
 export const getNearbyTemples = async (lat: number, lng: number, radius: number): Promise<Temple[]> => {
   // Return some dummy data so the UI doesn't look empty

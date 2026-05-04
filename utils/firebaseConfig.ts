@@ -5,13 +5,13 @@ import { getStorage } from "firebase/storage";
 // import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA-9MFk8D-A-AqoY91KJYy6kZJ2QYAo60w",
-  authDomain: "khmergo-f13d4.firebaseapp.com",
-  projectId: "khmergo-f13d4",
-  storageBucket: "khmergo-f13d4.firebasestorage.app",
-  messagingSenderId: "183798011559",
-  appId: "1:183798011559:web:91cf96a9e7465ea63dad82",
-  measurementId: "G-8BZ12B94SQ"
+  apiKey: "AIzaSyDInHeTU4IWo4kVVsho62WcK6Vg9f83vfg",
+  authDomain: "khmergo-ba0b0.firebaseapp.com",
+  projectId: "khmergo-ba0b0",
+  storageBucket: "khmergo-ba0b0.firebasestorage.app",
+  messagingSenderId: "563133852511",
+  appId: "1:563133852511:web:f5b7f2aebeab097a3064ea",
+  measurementId: "G-LTBGS11WXY"
 };
 
 // Initialize Firebase (chỉ khởi tạo nếu chưa có app nào để tránh lỗi khi reload)

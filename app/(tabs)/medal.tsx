@@ -6,8 +6,6 @@ import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
 
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeInUp } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -25,8 +23,16 @@ export default function MedalScreen() {
 
   const [leaderboardData, setLeaderboardData] = useState<UserProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const lastFetchTime = useRef<number>(0);
 
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = async (force = false) => {
+    // Only fetch if forced or it's been more than 30 seconds
+    const now = Date.now();
+    if (!force && lastFetchTime.current && now - lastFetchTime.current < 30000) {
+      setIsLoading(false);
+      return;
+    }
+
     if (!user) {
       if (leaderboardData.length > 0) setLeaderboardData([]);
       setIsLoading(false);
@@ -39,6 +45,7 @@ export default function MedalScreen() {
       if (JSON.stringify(users) !== JSON.stringify(leaderboardData)) {
         setLeaderboardData(users);
       }
+      lastFetchTime.current = Date.now();
     } catch (error) {
       console.log('Error fetching leaderboard:', error);
     } finally {
@@ -72,7 +79,7 @@ export default function MedalScreen() {
   const restOfPlayers = displayedData.slice(3);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={styles.container}>
       {/* Background Cement Gray */}
       <View style={styles.headerBackground} />
 
@@ -187,7 +194,7 @@ export default function MedalScreen() {
           ref={scrollRef}
           style={styles.listContainer}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 30, paddingBottom: 68 }}
+          contentContainerStyle={{ paddingHorizontal: 35, paddingBottom: 0 }}
         >
 
           {restOfPlayers.map((item) => {
@@ -195,7 +202,13 @@ export default function MedalScreen() {
             const isMe = user && item.uid === user.uid;
 
             return (
-              <View key={item.uid} style={[styles.listItem, isMe && styles.myListItem]}>
+              <View
+                key={item.uid}
+                style={[
+                  styles.listItem,
+                  isMe && styles.myListItem
+                ]}
+              >
                 <View style={styles.listItemRankContainer}>
                   <Text style={styles.listItemRank}>{playerRank}</Text>
                 </View>
@@ -221,20 +234,7 @@ export default function MedalScreen() {
 
         </ScrollView>
       </View>
-
-      {user && (leaderboardData.findIndex(u => u.uid === user.uid) + 1) >= 4 && (
-        <TouchableOpacity
-          style={styles.myRankIndicator}
-          onPress={() => {
-            // Optional: Scroll to the user's rank in the list
-          }}
-        >
-          <Text style={styles.myRankIndicatorText}>{t('you')}</Text>
-        </TouchableOpacity>
-      )}
-
-    </SafeAreaView>
-
+    </View>
   );
 }
 
@@ -242,6 +242,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF', // White background
+    paddingTop: 40,
   },
   headerBackground: {
     position: 'absolute',
@@ -469,32 +470,30 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   myListItem: {
-    backgroundColor: '#F8F5FF',
-    borderColor: '#9C77D5',
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    marginHorizontal: -10,
+    backgroundColor: '#ffffffff',
+    paddingVertical: 13,
+    marginHorizontal: 0,
+    marginVertical: 0,
   },
   myListItemName: {
-    color: '#9C77D5',
+    color: '#000000ff',
   },
   meTag: {
-    backgroundColor: '#9C77D5',
+    backgroundColor: '#764eb4ff',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
   },
   meTagText: {
     color: '#FFF',
-    fontSize: 8,
+    fontSize: 10,
     fontWeight: '900',
   },
   myRankIndicator: {
     position: 'absolute',
     bottom: 80,
     right: 30,
-    backgroundColor: '#9C77D5',
+    backgroundColor: '#9368d2ff',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,

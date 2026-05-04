@@ -1,217 +1,309 @@
 import { ThemedText } from '@/components/themed-text';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTemples } from '@/hooks/use-temples';
+import { useThemeColor } from '@/hooks/use-theme-color';
+import { toggleFavorite } from '@/services/firebase-service';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
 import {
-  Dimensions,
-  FlatList,
-  ImageBackground,
+  ActivityIndicator,
+  Alert,
+  Image,
+  ScrollView,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
-import Animated, {
-  FadeInDown
-} from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-const { width } = Dimensions.get('window');
+// Placeholder for images - User will add later
+const PAGODA_IMAGES: { [key: string]: any } = {
+  default: require('@/assets/images/pagoda.jpg'),
+  // by ID
+  'pagoda_1': require('@/assets/images/chuaang.jpg'),
+  'pagoda_2': require('@/assets/images/chuahang.jpg'),
+  'pagoda_3': require('@/assets/images/kampong.jpg'),
+  'pagoda_4': require('@/assets/images/salengcu.jpg'),
+  'pagoda_5': require('@/assets/images/veluvana.jpg'),
+  // by name key (fallback)
+  'chua-ang': require('@/assets/images/chuaang.jpg'),
+  'chua-hang': require('@/assets/images/chuahang.jpg'),
+  'chua-kampong': require('@/assets/images/kampong.jpg'),
+  'chua-sleng-cu': require('@/assets/images/salengcu.jpg'),
+  'chua-veluvana': require('@/assets/images/veluvana.jpg'),
+};
+
+// Function to get pagoda image
+const getPagodaImage = (templeId: string, templeName: string) => {
+  // Try to match by ID first
+  if (PAGODA_IMAGES[templeId as keyof typeof PAGODA_IMAGES]) {
+    return PAGODA_IMAGES[templeId as keyof typeof PAGODA_IMAGES];
+  }
+
+  // Try to match by name
+  const nameKey = templeName.toLowerCase()
+    .replace(/chùa\s*/g, 'chua-')
+    .replace(/\s+/g, '-')
+    .replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, 'a')
+    .replace(/[èéẹẻẽêềếệểễ]/g, 'e')
+    .replace(/[ìíịỉĩ]/g, 'i')
+    .replace(/[òóọỏõôồốộổỗơờớợởỡ]/g, 'o')
+    .replace(/[ùúụủũưừứựửữ]/g, 'u')
+    .replace(/[ỳýỵỷỹ]/g, 'y')
+    .replace(/đ/g, 'd');
+
+  if (PAGODA_IMAGES[nameKey as keyof typeof PAGODA_IMAGES]) {
+    return PAGODA_IMAGES[nameKey as keyof typeof PAGODA_IMAGES];
+  }
+
+  return PAGODA_IMAGES.default;
+};
 
 export default function PagodaScreen() {
   const router = useRouter();
+  const { user } = useAuth();
   const { t } = useLanguage();
-  const [searchQuery, setSearchQuery] = useState('');
+  const tintColor = useThemeColor({}, 'tint');
+  const { temples, loading, error, refresh } = useTemples();
 
-  const pagodaData = [
-    { id: 1, name: 'Chùa Âng', location: t('nguyet_hoa_vinh_long'), image: require('@/assets/images/chuaang.jpg') },
-  ];
+  // Navigation helper
+  const handleBackPress = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)');
+    }
+  };
 
-  const filteredData = pagodaData.filter(item =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.location.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const normalizeText = (text: string) => {
+    return text.toLowerCase()
+      .replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, 'a')
+      .replace(/[èéẹẻẽêềếệểễ]/g, 'e')
+      .replace(/[ìíịỉĩ]/g, 'i')
+      .replace(/[òóọỏõôồốộổỗơờớợởỡ]/g, 'o')
+      .replace(/[ùúụủũưừứựửữ]/g, 'u')
+      .replace(/[ỳýỵỷỹ]/g, 'y')
+      .replace(/đ/g, 'd');
+  };
 
-  const renderItem = ({ item, index }: { item: typeof pagodaData[0], index: number }) => (
-    <Animated.View entering={FadeInDown.delay(200 + index * 100)}>
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() => console.log('Detail for', item.name)}
-      >
-        <ImageBackground source={item.image} style={styles.cardImage} imageStyle={{ borderRadius: 20 }}>
-          <View style={styles.cardOverlay}>
-            <View style={styles.cardInfo}>
-              <ThemedText style={styles.cardName}>{item.name}</ThemedText>
-              <View style={styles.cardLocation}>
-                <ThemedText style={styles.pinIcon}>📍</ThemedText>
-                <ThemedText style={styles.locationText}>{item.location}</ThemedText>
-              </View>
-            </View>
-          </View>
-        </ImageBackground>
-      </TouchableOpacity>
-    </Animated.View>
-  );
+  const handleToggleFavorite = async (id: string, currentStatus: boolean) => {
+    if (!user) {
+      Alert.alert(
+        t('login_required'),
+        t('login_to_use'),
+        [
+          { text: t('back'), style: 'cancel' },
+          { text: t('login'), onPress: () => router.push('/login') }
+        ]
+      );
+      return;
+    }
+
+    try {
+      await toggleFavorite(id, !currentStatus);
+      refresh();
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
+  };
+
+
+  // Sort alphabetically
+  const filteredPagodas = [...temples]
+    .sort((a, b) => {
+      // Sort by temple name alphabetically (A-Z)
+      const nameA = normalizeText(a.name);
+      const nameB = normalizeText(b.name);
+      return nameA.localeCompare(nameB, 'vi', { sensitivity: 'base' });
+    });
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={styles.container}>
       {/* Header */}
-      <Animated.View entering={FadeInDown} style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={28} color="#1A1A1A" />
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={handleBackPress}
+        >
+          <Ionicons name="arrow-back" size={28} color="#000000" />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>{t('temple')}</ThemedText>
-        <View style={{ width: 40 }} />
-      </Animated.View>
 
-      {/* Search Bar */}
-      <Animated.View entering={FadeInDown.delay(100)} style={styles.searchSection}>
-        <View style={styles.searchContainer}>
-          <Ionicons name="search-outline" size={20} color="#666" style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder={t('search_placeholder')}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholderTextColor="#999"
-          />
+        <View style={styles.headerTitleContainer}>
+          <ThemedText style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>{t('temple').replace('\n', '')}</ThemedText>
         </View>
-      </Animated.View>
 
-      {/* List */}
-      <FlatList
-        data={filteredData}
-        renderItem={renderItem}
-        keyExtractor={item => item.id.toString()}
-        contentContainerStyle={styles.listContent}
+        {/* Empty view to balance the header (matching backBtn width) */}
+        <View style={{ width: 40 }} />
+      </View>
+
+      {/* Content */}
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <ThemedText style={styles.emptyText}>{t('no_results')}</ThemedText>
+      >
+        {loading ? (
+          <ActivityIndicator size="large" color={tintColor} style={styles.loader} />
+        ) : error ? (
+          <ThemedText style={styles.errorText}>
+            {t('error_loading_temples') || 'Không thể tải dữ liệu chùa Khmer'}
+          </ThemedText>
+        ) : filteredPagodas.length === 0 ? (
+          <ThemedText style={styles.emptyText}>
+            {t('no_temple_data') || 'Chưa có dữ liệu chùa Khmer'}
+          </ThemedText>
+        ) : (
+          <View style={styles.pagodaList}>
+            {filteredPagodas.map((pagoda) => (
+              <TouchableOpacity
+                key={pagoda.id}
+                style={styles.pagodaCard}
+                onPress={() => router.push({
+                  pathname: '/pagoda-detail',
+                  params: {
+                    id: pagoda.id,
+                    name: pagoda.name,
+                    location: pagoda.location,
+                    rental: pagoda.rental,
+                    description: pagoda.description,
+                    imageUrl: pagoda.imageUrl,
+                    category: pagoda.category,
+                    isFavorite: pagoda.isFavorite?.toString(),
+                    latitude: pagoda.latitude?.toString(),
+                    longitude: pagoda.longitude?.toString(),
+                    source: 'pagoda',
+                  }
+                })}
+              >
+                <View style={styles.pagodaImageContainer}>
+                  <Image
+                    source={
+                      typeof pagoda.imageUrl === 'string' && pagoda.imageUrl !== ''
+                        ? { uri: pagoda.imageUrl }
+                        : pagoda.imageUrl
+                          ? pagoda.imageUrl
+                          : getPagodaImage(pagoda.id || '', pagoda.name)
+                    }
+                    style={styles.pagodaImage}
+                    resizeMode="cover"
+                    fadeDuration={0}
+                  />
+                </View>
+
+                <View style={styles.pagodaContent}>
+                  <ThemedText style={styles.pagodaName}>{pagoda.name}</ThemedText>
+                  <ThemedText style={styles.pagodaLocation}>
+                    {pagoda.location}
+                  </ThemedText>
+                </View>
+              </TouchableOpacity>
+            ))}
           </View>
-        }
-      />
-    </SafeAreaView>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#f8f9fa',
   },
   header: {
+    backgroundColor: '#ffffff',
+    paddingTop: 45,
+    paddingBottom: 15,
+    paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    gap: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
+    zIndex: 100,
   },
-  backButton: {
+  backBtn: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F5F5F5',
     justifyContent: 'center',
     alignItems: 'center',
   },
+  headerTitleContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   headerTitle: {
+    color: '#000000',
     fontSize: 20,
     fontWeight: '800',
-    color: '#1A1A1A',
+    textAlign: 'center',
   },
-  searchSection: {
-    paddingHorizontal: 25,
-    marginVertical: 15,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F3F4F6',
-    borderRadius: 15,
-    paddingHorizontal: 15,
-    height: 50,
-  },
-  searchIcon: {
-    marginRight: 10,
-  },
-  searchInput: {
+  content: {
     flex: 1,
-    fontSize: 15,
-    color: '#1A1A1A',
-    fontWeight: '500',
   },
-  listContent: {
-    paddingHorizontal: 25,
-    paddingBottom: 30,
-    gap: 20,
+  scrollContent: {
+    paddingBottom: 16,
+    flexGrow: 1,
   },
-  card: {
-    width: '100%',
-    height: 200,
+  pagodaList: {
+    gap: 15,
+    marginTop: 15,
+    paddingHorizontal: 15,
+  },
+  pagodaCard: {
+    backgroundColor: '#ffffff',
     borderRadius: 20,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: 'rgba(0,0,0,0.1)',
   },
-  cardImage: {
-    flex: 1,
-    justifyContent: 'flex-end',
+  pagodaImageContainer: {
+    width: '100%',
+    aspectRatio: 4 / 3,
+    padding: 10,
+    overflow: 'hidden',
   },
-  cardOverlay: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    padding: 15,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+  pagodaImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 15,
+    overflow: 'hidden',
   },
-  cardInfo: {
-    flex: 1,
+  pagodaContent: {
+    paddingHorizontal: 15,
+    paddingBottom: 15,
+    paddingTop: 3,
   },
-  cardName: {
+  pagodaName: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#FFF',
-    marginBottom: 4,
+    marginBottom: 5,
+    color: '#1A1A1A',
   },
-  cardLocation: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+  pagodaLocation: {
+    fontSize: 13,
+    color: '#666',
+    fontWeight: '500',
   },
-  pinIcon: {
-    fontSize: 12,
+  loader: {
+    marginVertical: 40,
   },
-  locationText: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.9)',
-    fontWeight: '600',
-  },
-  cardRating: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
-    gap: 4,
-  },
-  starIcon: {
-    fontSize: 12,
-  },
-  ratingText: {
+  errorText: {
+    color: '#ff4d4d',
+    textAlign: 'center',
+    padding: 20,
     fontSize: 14,
-    fontWeight: '800',
-    color: '#FFF',
-  },
-  emptyContainer: {
-    paddingTop: 100,
-    alignItems: 'center',
+    fontWeight: '600',
   },
   emptyText: {
-    fontSize: 16,
-    color: '#666',
-    fontWeight: '600',
+    color: '#999',
+    textAlign: 'center',
+    padding: 40,
+    fontSize: 15,
+    fontWeight: '500',
   },
 });

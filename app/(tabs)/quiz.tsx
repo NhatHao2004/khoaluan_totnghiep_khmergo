@@ -4,9 +4,8 @@ import { getLeaderboardUsers } from '@/services/firebase-service';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -15,8 +14,15 @@ export default function QuizScreen() {
   const { user } = useAuth();
   const router = useRouter();
   const [userRank, setUserRank] = useState<string | number>('---');
+  const lastFetchTime = useRef<number>(0);
 
-  const fetchRank = async () => {
+  const fetchRank = async (force = false) => {
+    // Only fetch if forced or it's been more than 30 seconds
+    const now = Date.now();
+    if (!force && lastFetchTime.current && now - lastFetchTime.current < 30000) {
+      return;
+    }
+
     if (!user) {
       if (userRank !== '---') setUserRank('---');
       return;
@@ -28,6 +34,7 @@ export default function QuizScreen() {
       if (newRank !== userRank) {
         setUserRank(newRank);
       }
+      lastFetchTime.current = Date.now();
     } catch (error) {
       console.log('Error fetching rank:', error);
       if (userRank !== '---') setUserRank('---');
@@ -45,7 +52,7 @@ export default function QuizScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={styles.container}>
 
 
       {/* Header */}
@@ -53,8 +60,7 @@ export default function QuizScreen() {
         <Text style={styles.headerTitle}>{t('quiz_title')}</Text>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-
+      <View style={styles.scrollContent}>
         {/* Profile Card - Floating */}
         <View style={styles.profileCard}>
           <View style={styles.cardHeader}>
@@ -174,9 +180,9 @@ export default function QuizScreen() {
           </View>
         </View>
 
-        <View style={{ height: 40 }} />
-      </ScrollView>
-    </SafeAreaView>
+        <View style={{ height: 10 }} />
+      </View>
+    </View>
   );
 }
 
@@ -184,8 +190,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+    paddingTop: 40,
   },
   scrollContent: {
+    flex: 1,
     paddingHorizontal: 20,
     paddingTop: 10,
   },

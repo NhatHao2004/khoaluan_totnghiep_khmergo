@@ -31,6 +31,7 @@ export default function RootLayout() {
           tabBarButton: HapticTab,
           animation: 'none', // Disable tab switching animation
           lazy: false, // Pre-render all screens to avoid mount-time jerking
+          freezeOnBlur: true, // Freezes JS execution on inactive screens for speed
           tabBarStyle: {
             height: 70,
             paddingBottom: 20,
@@ -64,7 +65,7 @@ export default function RootLayout() {
             title: 'Thử thách',
             tabBarIcon: ({ color, focused, size }) => (
               <Ionicons
-                name={focused ? 'newspaper' : 'newspaper-outline'}
+                name={focused ? 'game-controller' : 'game-controller-outline'}
                 size={27}
                 color={color}
               />
