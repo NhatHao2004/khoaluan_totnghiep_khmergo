@@ -3,12 +3,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCultures } from '@/hooks/use-cultures';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { toggleFavorite } from '@/services/firebase-service';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import {
   ActivityIndicator,
-  Alert,
   Image,
   ScrollView,
   StyleSheet,
@@ -27,7 +25,7 @@ const getCultureImage = (id: string, name: string) => {
   if (CULTURE_IMAGES[id as keyof typeof CULTURE_IMAGES]) {
     return CULTURE_IMAGES[id as keyof typeof CULTURE_IMAGES];
   }
-  
+
   const nameKey = name.toLowerCase()
     .replace(/\s+/g, '-')
     .replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, 'a')
@@ -141,7 +139,7 @@ export default function CultureScreen() {
                 <View style={styles.cultureContent}>
                   <ThemedText style={styles.cultureName}>{item.name}</ThemedText>
                   <ThemedText style={styles.cultureLocation} numberOfLines={1}>
-                    <Ionicons name="location-outline" size={12} color="#666" /> {item.location || t('address_not_updated')}
+                    {item.location || t('address_not_updated')}
                   </ThemedText>
                 </View>
               </TouchableOpacity>

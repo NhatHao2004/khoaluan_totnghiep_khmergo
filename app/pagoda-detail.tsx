@@ -245,11 +245,10 @@ export default function PagodaDetailScreen() {
         )}
       </ScrollView>
 
-      {/* Full-screen loading overlay (absolute) - che toàn màn hình kể cả Hero Image */}
       {loadingContent && (
-        <View style={styles.fullScreenLoader}>
-          <ActivityIndicator size="large" color="#1E293B" />
-          <Text style={styles.loadingText}>{t('loading_content')}</Text>
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color="#FF0050" />
+          <Text style={{ marginTop: 10, color: '#888' }}>{t('loading_content')}</Text>
         </View>
       )}
     </View>
@@ -260,29 +259,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  loadingContainer: {
-    paddingVertical: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 16,
-  },
-  fullScreenLoader: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 16,
-    zIndex: 999,
-  },
-  loadingText: {
-    fontSize: 14,
-    color: '#888',
-    fontWeight: '500',
   },
   scrollContainer: {
     flex: 1,
@@ -295,10 +271,8 @@ const styles = StyleSheet.create({
   heroImage: {
     width: '100%',
     height: '100%',
-    ...Platform.select({
-      ios: { borderBottomLeftRadius: 30, borderBottomRightRadius: 30 },
-      android: { borderBottomLeftRadius: 30, borderBottomRightRadius: 30 },
-    }),
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
   headerBar: {
     position: 'absolute',
@@ -316,10 +290,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
     elevation: 5,
   },
   heartBtn: {
@@ -329,16 +299,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
     elevation: 5,
   },
   contentContainer: {
     paddingHorizontal: 25,
     paddingTop: 25,
-    paddingBottom: 2,
+    paddingBottom: 20,
   },
   titleSection: {
     marginBottom: 15,
@@ -359,7 +325,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginLeft: 6,
     flexShrink: 1,
-    lineHeight: 22,
   },
   actionRow: {
     flexDirection: 'row',
@@ -414,5 +379,12 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 16,
     marginVertical: 18,
+  },
+  loader: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
   },
 });

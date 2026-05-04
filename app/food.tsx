@@ -3,12 +3,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFoods } from '@/hooks/use-foods';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { toggleFavorite } from '@/services/firebase-service';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import {
   ActivityIndicator,
-  Alert,
   Image,
   ScrollView,
   StyleSheet,
@@ -25,7 +23,7 @@ const getFoodImage = (id: string, name: string) => {
   if (FOOD_IMAGES[id as keyof typeof FOOD_IMAGES]) {
     return FOOD_IMAGES[id as keyof typeof FOOD_IMAGES];
   }
-  
+
   const nameKey = name.toLowerCase()
     .replace(/\s+/g, '-')
     .replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, 'a')
@@ -132,7 +130,7 @@ export default function FoodScreen() {
                 <View style={styles.foodContent}>
                   <ThemedText style={styles.foodName}>{item.name}</ThemedText>
                   <ThemedText style={styles.foodLocation} numberOfLines={1}>
-                    <Ionicons name="restaurant-outline" size={12} color="#666" /> {item.location || 'Đặc sản Khmer'}
+                    {item.location || 'Đặc sản Khmer'}
                   </ThemedText>
                 </View>
               </TouchableOpacity>

@@ -143,7 +143,7 @@ export default function PagodaScreen() {
         showsVerticalScrollIndicator={false}
       >
         {loading ? (
-          <ActivityIndicator size="large" color={tintColor} style={styles.loader} />
+          <ActivityIndicator size="large" color="#FF0050" style={styles.loader} />
         ) : error ? (
           <ThemedText style={styles.errorText}>
             {t('error_loading_temples') || 'Không thể tải dữ liệu chùa Khmer'}
@@ -206,104 +206,21 @@ export default function PagodaScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
-  header: {
-    backgroundColor: '#ffffff',
-    paddingTop: 45,
-    paddingBottom: 15,
-    paddingHorizontal: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
-    zIndex: 100,
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitleContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    color: '#000000',
-    fontSize: 20,
-    fontWeight: '800',
-    textAlign: 'center',
-  },
-  content: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 16,
-    flexGrow: 1,
-  },
-  pagodaList: {
-    gap: 15,
-    marginTop: 15,
-    paddingHorizontal: 15,
-  },
-  pagodaCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.1)',
-  },
-  pagodaImageContainer: {
-    width: '100%',
-    aspectRatio: 4 / 3,
-    padding: 10,
-    overflow: 'hidden',
-  },
-  pagodaImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 15,
-    overflow: 'hidden',
-  },
-  pagodaContent: {
-    paddingHorizontal: 15,
-    paddingBottom: 15,
-    paddingTop: 3,
-  },
-  pagodaName: {
-    fontSize: 18,
-    fontWeight: '800',
-    marginBottom: 5,
-    color: '#1A1A1A',
-  },
-  pagodaLocation: {
-    fontSize: 13,
-    color: '#666',
-    fontWeight: '500',
-  },
-  loader: {
-    marginVertical: 40,
-  },
-  errorText: {
-    color: '#ff4d4d',
-    textAlign: 'center',
-    padding: 20,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  emptyText: {
-    color: '#999',
-    textAlign: 'center',
-    padding: 40,
-    fontSize: 15,
-    fontWeight: '500',
-  },
+  container: { flex: 1, backgroundColor: '#f8f9fa' },
+  header: { backgroundColor: '#ffffff', paddingTop: 45, paddingBottom: 15, paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', elevation: 5, zIndex: 100 },
+  backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
+  headerTitleContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  headerTitle: { color: '#000000', fontSize: 20, fontWeight: '800' },
+  content: { flex: 1 },
+  scrollContent: { paddingBottom: 20, flexGrow: 1 },
+  pagodaList: { padding: 15, gap: 15 },
+  pagodaCard: { backgroundColor: '#ffffff', borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)', elevation: 2 },
+  pagodaImageContainer: { width: '100%', aspectRatio: 16 / 10 },
+  pagodaImage: { width: '100%', height: '100%' },
+  pagodaContent: { padding: 15 },
+  pagodaName: { fontSize: 18, fontWeight: '800', color: '#1A1A1A', marginBottom: 5 },
+  pagodaLocation: { fontSize: 13, color: '#666' },
+  loader: { marginTop: 50 },
+  errorText: { textAlign: 'center', marginTop: 50, color: 'red' },
+  emptyText: { textAlign: 'center', marginTop: 50, color: '#999' },
 });

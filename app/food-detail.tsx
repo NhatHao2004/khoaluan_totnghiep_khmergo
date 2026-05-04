@@ -52,7 +52,7 @@ export default function FoodDetailScreen() {
     fetchFoodDetails();
   }, [params.id, language]);
 
-  const source = heroSource || (params.imageUrl?.startsWith('http') ? { uri: params.imageUrl } : getFoodImage(params.id as string, params.name as string));
+  const source = heroSource || (typeof params.imageUrl === 'string' && params.imageUrl.startsWith('http') ? { uri: params.imageUrl } : getFoodImage(params.id as string, params.name as string));
 
   return (
     <View style={styles.container}>
