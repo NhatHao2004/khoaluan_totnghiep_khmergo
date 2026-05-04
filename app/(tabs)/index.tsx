@@ -186,53 +186,53 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Promo Banner */}
+      <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.promoBanner}>
+        <Image
+          source={require('@/assets/images/banner.png')}
+          style={styles.promoImage}
+          resizeMode="cover"
+        />
+      </Animated.View>
+
+      {/* Categories Grid */}
+      <Animated.View entering={FadeInDown.delay(300)} style={styles.sectionHeader}>
+        <ThemedText style={styles.sectionTitle}>{t('explore_categories')}</ThemedText>
+      </Animated.View>
+
+      <View style={styles.gridContainer}>
+        {services.map((item, index) => (
+          <Animated.View
+            key={item.id}
+            entering={FadeInDown.delay(400 + index * 50).springify()}
+            style={styles.gridItemQuarter}
+          >
+            <TouchableOpacity
+              onPress={() => handleCategoryPress(item.route)}
+              style={styles.serviceCardMini}
+            >
+              <View style={styles.iconGlassMini}>
+                <Image source={item.icon} style={styles.serviceIconImage} />
+              </View>
+              <ThemedText style={styles.serviceLabelMini} numberOfLines={2}>{item.label}</ThemedText>
+            </TouchableOpacity>
+          </Animated.View>
+        ))}
+      </View>
+
+      {/* Featured List Header (Fixed) */}
+      <Animated.View entering={FadeInDown.delay(500)} style={styles.sectionHeader}>
+        <ThemedText style={[styles.sectionTitle, { flex: 1 }]}>{t('suggestions_for_you')}</ThemedText>
+        <TouchableOpacity onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
+          <ThemedText style={styles.viewAllText}>{t('see_all')}</ThemedText>
+        </TouchableOpacity>
+      </Animated.View>
+
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 0 }}
       >
-        {/* Promo Banner */}
-        <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.promoBanner}>
-          <Image
-            source={require('@/assets/images/banner.png')}
-            style={styles.promoImage}
-            resizeMode="cover"
-          />
-        </Animated.View>
-
-        {/* Categories Grid */}
-        <Animated.View entering={FadeInDown.delay(300)} style={styles.sectionHeader}>
-          <ThemedText style={styles.sectionTitle}>{t('explore_categories')}</ThemedText>
-        </Animated.View>
-
-        <View style={styles.gridContainer}>
-          {services.map((item, index) => (
-            <Animated.View
-              key={item.id}
-              entering={FadeInDown.delay(400 + index * 50).springify()}
-              style={styles.gridItemQuarter}
-            >
-              <TouchableOpacity
-                onPress={() => handleCategoryPress(item.route)}
-                style={styles.serviceCardMini}
-              >
-                <View style={styles.iconGlassMini}>
-                  <Image source={item.icon} style={styles.serviceIconImage} />
-                </View>
-                <ThemedText style={styles.serviceLabelMini} numberOfLines={2}>{item.label}</ThemedText>
-              </TouchableOpacity>
-            </Animated.View>
-          ))}
-        </View>
-
-        {/* Featured List */}
-        <Animated.View entering={FadeInDown.delay(500)} style={styles.sectionHeader}>
-          <ThemedText style={[styles.sectionTitle, { flex: 1 }]}>{t('suggestions_for_you')}</ThemedText>
-          <TouchableOpacity onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
-            <ThemedText style={styles.viewAllText}>{t('see_all')}</ThemedText>
-          </TouchableOpacity>
-        </Animated.View>
-
         {featuredDestinations.map((item, index) => (
           <Animated.View
             key={item.id}
