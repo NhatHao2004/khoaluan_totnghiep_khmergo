@@ -257,7 +257,7 @@ export default function HomeScreen() {
 
         {isLoading && !refreshing ? (
           <View style={styles.featuredLoader}>
-            <ActivityIndicator size="small" color="#FF0050" />
+            <ActivityIndicator size="large" color="#FF0050" />
           </View>
         ) : (
           featuredDestinations.map((item, index) => (
