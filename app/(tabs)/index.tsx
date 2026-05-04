@@ -6,11 +6,12 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { collection, onSnapshot, query } from 'firebase/firestore';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Dimensions,
   Image,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -37,6 +38,8 @@ export default function HomeScreen() {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [featuredDestinations, setFeaturedDestinations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const scrollY = useSharedValue(0);
 
   // Animation for the notification bell
   const bellRotation = useSharedValue(0);
@@ -45,7 +48,7 @@ export default function HomeScreen() {
   const getAppImage = (item: any) => {
     const { id, name, category, imageUrl } = item;
     if (imageUrl && imageUrl.startsWith('http')) return { uri: imageUrl };
-    
+
     // Fallback logic by category
     if (category === 'Chùa') {
       const pagodaImages: any = {
@@ -62,8 +65,7 @@ export default function HomeScreen() {
     return require('@/assets/images/pagoda.jpg');
   };
 
-  useEffect(() => {
-    // Lắng nghe dữ liệu từ Firestore
+  const loadFeaturedData = () => {
     setIsLoading(true);
     const q = query(collection(db, 'destinations'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -77,7 +79,7 @@ export default function HomeScreen() {
         return {
           ...data,
           id_num: data.id,
-          category: data.category, // Added to fix type error
+          category: data.category,
           image: getAppImage(data),
           route: {
             pathname: detailRoute,
@@ -106,10 +108,21 @@ export default function HomeScreen() {
 
       setFeaturedDestinations(featured);
       setIsLoading(false);
+      setRefreshing(false);
     });
+    return unsubscribe;
+  };
 
+  useEffect(() => {
+    const unsubscribe = loadFeaturedData();
     return () => unsubscribe();
   }, [language, t]);
+
+  const onRefresh = React.useCallback(() => {
+    if (refreshing) return;
+    setRefreshing(true);
+    loadFeaturedData();
+  }, [language, t, refreshing]);
 
   useEffect(() => {
     bellRotation.value = withRepeat(
@@ -138,8 +151,6 @@ export default function HomeScreen() {
     { id: 2, label: t('food'), icon: require('@/assets/images/amthuc.jpg'), color: '#FF0050', route: '/food' },
     { id: 4, label: t('language_study'), icon: require('@/assets/images/hoctap.jpg'), color: '#00C850', route: '/language_study' },
   ];
-
-
 
   const toggleFavorite = (id: any) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -187,57 +198,66 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Promo Banner */}
-      <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.promoBanner}>
-        <Image
-          source={require('@/assets/images/banner.png')}
-          style={styles.promoImage}
-          resizeMode="cover"
-        />
-      </Animated.View>
-
-      {/* Categories Grid */}
-      <Animated.View entering={FadeInDown.delay(300)} style={styles.sectionHeader}>
-        <ThemedText style={styles.sectionTitle}>{t('explore_categories')}</ThemedText>
-      </Animated.View>
-
-      <View style={styles.gridContainer}>
-        {services.map((item, index) => (
-          <Animated.View
-            key={item.id}
-            entering={FadeInDown.delay(400 + index * 50).springify()}
-            style={styles.gridItemQuarter}
-          >
-            <TouchableOpacity
-              onPress={() => handleCategoryPress(item.route)}
-              style={styles.serviceCardMini}
-            >
-              <View style={styles.iconGlassMini}>
-                <Image source={item.icon} style={styles.serviceIconImage} />
-              </View>
-              <ThemedText style={styles.serviceLabelMini} numberOfLines={2}>{item.label}</ThemedText>
-            </TouchableOpacity>
-          </Animated.View>
-        ))}
-      </View>
-
-      {/* Featured List Header (Fixed) */}
-      <Animated.View entering={FadeInDown.delay(500)} style={styles.sectionHeader}>
-        <ThemedText style={[styles.sectionTitle, { flex: 1 }]}>{t('suggestions_for_you')}</ThemedText>
-        <TouchableOpacity onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
-          <ThemedText style={styles.viewAllText}>{t('see_all')}</ThemedText>
-        </TouchableOpacity>
-      </Animated.View>
 
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 0 }}
+        contentContainerStyle={{ paddingBottom: 2 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            progressViewOffset={50}
+            colors={['#FF0050']}
+            tintColor="#FF0050"
+          />
+        }
       >
-        {isLoading ? (
+        {/* Promo Banner */}
+        <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.promoBanner}>
+          <Image
+            source={require('@/assets/images/banner.png')}
+            style={styles.promoImage}
+            resizeMode="cover"
+          />
+        </Animated.View>
+
+        {/* Categories Grid */}
+        <Animated.View entering={FadeInDown.delay(300)} style={styles.sectionHeader}>
+          <ThemedText style={styles.sectionTitle}>{t('explore_categories')}</ThemedText>
+        </Animated.View>
+
+        <View style={styles.gridContainer}>
+          {services.map((item, index) => (
+            <Animated.View
+              key={item.id}
+              entering={FadeInDown.delay(400 + index * 50).springify()}
+              style={styles.gridItemQuarter}
+            >
+              <TouchableOpacity
+                onPress={() => handleCategoryPress(item.route)}
+                style={styles.serviceCardMini}
+              >
+                <View style={styles.iconGlassMini}>
+                  <Image source={item.icon} style={styles.serviceIconImage} />
+                </View>
+                <ThemedText style={styles.serviceLabelMini} numberOfLines={2}>{item.label}</ThemedText>
+              </TouchableOpacity>
+            </Animated.View>
+          ))}
+        </View>
+
+        {/* Featured List Header */}
+        <Animated.View entering={FadeInDown.delay(500)} style={styles.sectionHeader}>
+          <ThemedText style={[styles.sectionTitle, { flex: 1 }]}>{t('suggestions_for_you')}</ThemedText>
+          <TouchableOpacity onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
+            <ThemedText style={styles.viewAllText}>{t('see_all')}</ThemedText>
+          </TouchableOpacity>
+        </Animated.View>
+
+        {isLoading && !refreshing ? (
           <View style={styles.featuredLoader}>
-            <ActivityIndicator size="large" color="#FF0050" />
-            <ThemedText style={styles.loaderText}>{t('loading_content')}</ThemedText>
+            <ActivityIndicator size="small" color="#FF0050" />
           </View>
         ) : (
           featuredDestinations.map((item, index) => (
@@ -275,9 +295,6 @@ export default function HomeScreen() {
                   </View>
 
                   <View style={styles.cardFooter}>
-                    <View style={styles.locationInfo}>
-                      <ThemedText style={styles.locationText}>{item.location}</ThemedText>
-                    </View>
                     {(item.reviews ?? 0) > 0 && (
                       <View style={styles.reviewInfo}>
                         <ThemedText style={styles.reviewText}>{item.reviews} {t('reviews_label')}</ThemedText>
@@ -339,20 +356,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '900',
     color: '#1E293B',
-  },
-  headerActionBtn: {
-    width: 52,
-    height: 52,
-    backgroundColor: '#FFF',
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
-    overflow: 'hidden',
   },
   notificationBtnSimple: {
     width: 52,
@@ -572,25 +575,31 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 2,
   },
+  comingSoonSub: {
+    fontSize: 16,
+    color: '#64748b',
+    textAlign: 'center',
+    marginTop: 10,
+  },
   featuredCard: {
-    marginHorizontal: 25,
+    marginHorizontal: 16,
     backgroundColor: '#FFF',
-    borderRadius: 28,
-    marginBottom: 20,
+    borderRadius: 20,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: '#F1F5F9',
     shadowColor: '#1E293B',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.1,
-    shadowRadius: 20,
-    elevation: 8,
+    shadowRadius: 12,
+    elevation: 4,
   },
   cardImageContainer: {
-    height: 180,
+    height: 165,
     position: 'relative',
     overflow: 'hidden',
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   cardImage: {
     width: '100%',

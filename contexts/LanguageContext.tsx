@@ -167,6 +167,8 @@ const translations = {
     address_not_updated: 'Chưa cập nhật địa chỉ',
     navigate_btn: 'Chỉ đường',
     loading_content: 'Đang tải nội dung...',
+    content_updating: 'Đang cập nhật nội dung',
+    check_back_later: 'Vui lòng quay lại sau',
   },
   km: {
     // Common
@@ -330,6 +332,8 @@ const translations = {
     address_not_updated: 'មិនទាន់មានអាសយដ្ឋាន',
     navigate_btn: 'នាំផ្លូវ',
     loading_content: 'កំពុងទាញយកមាតិកា...',
+    content_updating: 'មាតិកាកំពុងត្រូវបានធ្វើបច្ចុប្បន្នភាព',
+    check_back_later: 'សូមត្រលប់មកវិញនៅពេលក្រោយ!',
   }
 };
 
