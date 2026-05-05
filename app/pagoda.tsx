@@ -165,6 +165,7 @@ export default function PagodaScreen() {
                     rental: pagoda.rental,
                     description: pagoda.description,
                     imageUrl: pagoda.imageUrl,
+                    imageUrl1: pagoda.imageUrl1,
                     category: pagoda.category,
                     isFavorite: pagoda.isFavorite?.toString(),
                     latitude: pagoda.latitude?.toString(),
