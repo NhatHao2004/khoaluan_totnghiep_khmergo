@@ -169,6 +169,10 @@ const translations = {
     loading_content: 'Đang tải nội dung...',
     content_updating: 'Đang cập nhật nội dung',
     check_back_later: 'Vui lòng quay lại sau',
+    rental_available: 'Cho thuê trang phục',
+    description: 'Mô tả',
+    no_description: 'Chưa có mô tả cho ngôi chùa này.',
+    view_map: 'Xem bản đồ',
   },
   km: {
     // Common
@@ -334,6 +338,10 @@ const translations = {
     loading_content: 'កំពុងទាញយកមាតិកា...',
     content_updating: 'មាតិកាកំពុងត្រូវបានធ្វើបច្ចុប្បន្នភាព',
     check_back_later: 'សូមត្រលប់មកវិញនៅពេលក្រោយ!',
+    rental_available: 'ជួលសម្លៀកបំពាក់',
+    description: 'ការពិពណ៌នា',
+    no_description: 'មិនទាន់មានការពិពណ៌នាសម្រាប់វត្តនេះនៅឡើយទេ។',
+    view_map: 'មើលផែនទី',
   }
 };
 
