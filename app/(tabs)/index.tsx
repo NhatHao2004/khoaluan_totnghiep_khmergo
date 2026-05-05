@@ -516,37 +516,38 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   serviceCardMini: {
-    height: 105,
+    height: 115, // Tăng chiều cao để thoải mái hơn
     borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 12,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
     backgroundColor: '#FFF',
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.1)',
+    borderColor: 'rgba(0,0,0,0.05)',
   },
   iconGlassMini: {
-    width: 38,
-    height: 38,
+    width: 52, // Tăng nhẹ kích thước khung icon
+    height: 52,
     borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
+    overflow: 'hidden',
   },
   serviceIconImage: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain', // Hiển thị trọn vẹn 100% nội dung icon
   },
   serviceLabelMini: {
-    fontSize: 8.5,
+    fontSize: 10,
     fontWeight: '800',
     color: '#1E293B',
     textAlign: 'center',
     marginTop: 2,
-    lineHeight: 11,
+    lineHeight: 16, // Tăng lên 14 thay vì 12 để không bị cắt dấu
   },
   iconContainer: {
     alignItems: 'center',

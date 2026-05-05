@@ -349,13 +349,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '800',
     color: '#1E293B',
-    lineHeight: 24,
+    lineHeight: 26, // Tăng lên để không cắt dấu
     textAlign: 'center',
   },
   bentoTitleSmall: {
     fontSize: 14,
     fontWeight: '800',
     color: '#1E293B',
+    lineHeight: 20, // Thêm lineHeight
     textAlign: 'center',
   },
   bentoSubtitle: {
