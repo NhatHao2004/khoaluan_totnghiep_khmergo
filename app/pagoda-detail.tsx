@@ -136,7 +136,7 @@ export default function PagodaDetailScreen() {
           {/* Description Section */}
           {description ? (
             <View style={{ marginBottom: 0 }}>
-              <Text style={styles.piecePara}>{description}</Text>
+              <Text style={[styles.piecePara, { textAlign: isKm ? 'left' : 'justify' }]}>{description}</Text>
             </View>
           ) : null}
 
@@ -150,7 +150,7 @@ export default function PagodaDetailScreen() {
                 {block.type === 'title' ? (
                   <Text style={styles.pieceTitle}>{isKm ? (block.value_khmer || block.value) : block.value}</Text>
                 ) : (
-                  <Text style={styles.piecePara}>{isKm ? (block.value_khmer || block.value) : block.value}</Text>
+                  <Text style={[styles.piecePara, { textAlign: isKm ? 'left' : 'justify' }]}>{isKm ? (block.value_khmer || block.value) : block.value}</Text>
                 )}
               </View>
             </View>

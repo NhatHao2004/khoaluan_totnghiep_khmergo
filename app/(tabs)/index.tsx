@@ -39,6 +39,7 @@ export default function HomeScreen() {
   const [featuredDestinations, setFeaturedDestinations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [routeIndex, setRouteIndex] = useState(0);
   const scrollY = useSharedValue(0);
 
   // Animation for the notification bell
@@ -248,11 +249,20 @@ export default function HomeScreen() {
         </View>
 
         {/* Featured List Header */}
-        <Animated.View entering={FadeInDown.delay(500)} style={styles.sectionHeader}>
+        <Animated.View entering={FadeInDown.delay(500)} style={[styles.sectionHeader, { paddingBottom: 10 }]}>
           <ThemedText style={[styles.sectionTitle, { flex: 1, marginRight: 10 }]} numberOfLines={1}>
             {t('suggestions_for_you')}
           </ThemedText>
-          <TouchableOpacity style={{ flexShrink: 0 }} onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
+          <TouchableOpacity 
+            style={{ flexShrink: 0 }} 
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              const cyclicRoutes: any[] = ['/pagoda', '/culture', '/food'];
+              const route = cyclicRoutes[routeIndex % cyclicRoutes.length];
+              setRouteIndex(prev => prev + 1);
+              router.push(route);
+            }}
+          >
             <ThemedText style={styles.viewAllText} numberOfLines={1}>{t('see_all')}</ThemedText>
           </TouchableOpacity>
         </Animated.View>
@@ -291,12 +301,12 @@ export default function HomeScreen() {
                   </View>
                 </View>
 
-                  <View style={styles.cardContent}>
-                    <View style={styles.cardHeaderRow}>
-                      <ThemedText style={styles.cardTitle} numberOfLines={1}>
-                        {language === 'km' ? (item.name_khmer || item.name || item.title) : (item.name || item.title)}
-                      </ThemedText>
-                    </View>
+                <View style={styles.cardContent}>
+                  <View style={styles.cardHeaderRow}>
+                    <ThemedText style={styles.cardTitle} numberOfLines={1}>
+                      {language === 'km' ? (item.name_khmer || item.name || item.title) : (item.name || item.title)}
+                    </ThemedText>
+                  </View>
 
                   <View style={styles.cardFooter}>
                     {(item.reviews ?? 0) > 0 && (
@@ -496,15 +506,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     marginTop: 0,
-    marginBottom: 6,
-    paddingVertical: 8,
+    marginBottom: 0,
+    paddingTop: 8,
+    paddingBottom: 0,
   },
   sectionTitle: {
     fontSize: 22,
     fontWeight: '900',
     color: '#1E293B',
     lineHeight: 30,
-    paddingBottom: 4,
+    paddingBottom: 0,
   },
   viewAllText: {
     color: '#64748B',
@@ -515,7 +526,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingHorizontal: 16,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   gridItemQuarter: {
     width: '25%',
