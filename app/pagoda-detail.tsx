@@ -6,11 +6,12 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Dimensions, Image, ScrollView,
+  Dimensions, Image, Linking, ScrollView,
   Share,
   StatusBar,
   StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 const { width, height } = Dimensions.get('window');
 const HERO_HEIGHT = height * 0.40;
@@ -81,7 +82,6 @@ export default function PagodaDetailScreen() {
   const isFavorite = templeData?.favorite ?? initialIsFavorite;
 
   const handleToggleFavorite = async () => {
-    // Only import if not already. Actually I should import toggleFavorite at the top.
     try {
       const { toggleFavorite } = require('@/services/firebase-service');
       await toggleFavorite(id, !isFavorite);
@@ -90,13 +90,48 @@ export default function PagodaDetailScreen() {
     }
   };
 
+  const lat = (templeData?.latitude || params.latitude || '9.9231') as string;
+  const lng = (templeData?.longitude || params.longitude || '106.3406') as string;
+
+  const handleOpenDirections = () => {
+    Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
+  };
+
+  const leafletHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body, #map { width: 100%; height: 100%; background-color: #000; }
+    .leaflet-container { image-rendering: -webkit-optimize-contrast; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    var map = L.map('map', { zoomControl: false, attributionControl: false, maxZoom: 18 }).setView([${lat}, ${lng}], 16);
+    L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20, detectRetina: true }).addTo(map);
+    var icon = L.divIcon({
+      html: '<div style="width:28px;height:28px;background:#FF4B4B;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>',
+      iconSize: [28, 28], iconAnchor: [14, 28], className: ''
+    });
+    L.marker([${lat}, ${lng}], { icon: icon }).addTo(map);
+  </script>
+</body>
+</html>
+  `;
+
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
         <StatusBar barStyle="dark-content" />
         <View style={styles.loaderContent}>
           <ActivityIndicator size="large" color="#FF0050" />
-          <Text style={styles.loaderText}>{t('loading_content') || 'Đang tải nội dung...'}</Text>
+          <Text style={[styles.loaderText, isKm && { letterSpacing: 0 }]}>{t('loading_content') || 'Đang tải nội dung...'}</Text>
         </View>
       </View>
     );
@@ -110,9 +145,9 @@ export default function PagodaDetailScreen() {
         {/* --- Hero Image --- */}
         <View style={[styles.imageBlock, { backgroundColor: '#fff' }]}>
           {imageSource ? (
-            <Image 
-              source={imageSource} 
-              style={[styles.fullImg, { backgroundColor: '#fff' }]} 
+            <Image
+              source={imageSource}
+              style={[styles.fullImg, { backgroundColor: '#fff' }]}
               fadeDuration={0}
             />
           ) : (
@@ -169,15 +204,17 @@ export default function PagodaDetailScreen() {
 
           {/* Map Section */}
           <View style={styles.mapWrap}>
-            <Text style={styles.headerLabel}>VỊ TRÍ TRÊN BẢN ĐỒ</Text>
+            <Text style={[styles.headerLabel, isKm && { letterSpacing: 0 }]}>{t('map_location')}</Text>
             <View style={styles.mapBox}>
-              <Image
-                style={styles.mapPreview}
-                source={{ uri: 'https://maps.googleapis.com/maps/api/staticmap?center=' + (params.latitude || '9.9231') + ',' + (params.longitude || '106.3406') + '&zoom=15&size=800x400&scale=2&maptype=roadmap&key=API' }}
+              <WebView
+                style={styles.mapWebView}
+                source={{ html: leafletHtml }}
+                scrollEnabled={false}
+                javaScriptEnabled={true}
+                originWhitelist={['*']}
               />
-              <TouchableOpacity style={styles.mapOpenBtn}>
-                <Text style={styles.mapOpenText}>Xem lộ trình</Text>
-                <Ionicons name="open-outline" size={16} color="#fff" />
+              <TouchableOpacity style={styles.mapOpenBtn} onPress={handleOpenDirections}>
+                <Text style={styles.mapOpenText}>{t('view_directions')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -294,7 +331,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   mapBox: {
-    height: 220,
+    height: 350,
     borderRadius: 28,
     overflow: 'hidden',
     backgroundColor: '#F8FAFC',
@@ -305,11 +342,16 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  mapWebView: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'transparent',
+  },
   mapOpenBtn: {
     position: 'absolute',
     bottom: 15,
     right: 15,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#004cffff',
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 12,

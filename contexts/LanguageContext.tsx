@@ -173,6 +173,8 @@ const translations = {
     description: 'Mô tả',
     no_description: 'Chưa có mô tả cho ngôi chùa này.',
     view_map: 'Xem bản đồ',
+    map_location: 'VỊ TRÍ TRÊN BẢN ĐỒ',
+    view_directions: 'Xem đường đi',
   },
   km: {
     // Common
@@ -341,6 +343,8 @@ const translations = {
     description: 'ការពិពណ៌នា',
     no_description: 'មិនទាន់មានការពិពណ៌នាសម្រាប់វត្តនេះនៅឡើយទេ។',
     view_map: 'មើលផែនទី',
+    map_location: 'ទីតាំងនៅលើផែនទី',
+    view_directions: 'មើលផ្លូវធ្វើដំណើរ',
   }
 };
 
