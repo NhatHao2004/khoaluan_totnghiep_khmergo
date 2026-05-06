@@ -175,6 +175,7 @@ const translations = {
     view_map: 'Xem bản đồ',
     map_location: 'VỊ TRÍ TRÊN BẢN ĐỒ',
     view_directions: 'Xem đường đi',
+    daily_knowledge: 'Kiến thức mỗi ngày',
   },
   km: {
     // Common
@@ -345,6 +346,7 @@ const translations = {
     view_map: 'មើលផែនទី',
     map_location: 'ទីតាំងនៅលើផែនទី',
     view_directions: 'មើលផ្លូវធ្វើដំណើរ',
+    daily_knowledge: 'ចំណេះដឹងប្រចាំថ្ងៃ',
   }
 };
 

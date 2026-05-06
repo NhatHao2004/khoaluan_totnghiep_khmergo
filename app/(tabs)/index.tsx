@@ -42,6 +42,7 @@ export default function HomeScreen() {
   const [routeIndex, setRouteIndex] = useState(0);
   const scrollY = useSharedValue(0);
 
+
   // Animation for the notification bell
   const bellRotation = useSharedValue(0);
 
@@ -215,7 +216,7 @@ export default function HomeScreen() {
         }
       >
         {/* Promo Banner */}
-        <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.promoBanner}>
+        <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.promoBanner}>
           <Image
             source={require('@/assets/images/banner.png')}
             style={styles.promoImage}
@@ -321,7 +322,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
-    marginBottom: 10,
+    marginBottom: 5,
   },
   userInfo: {
     flexDirection: 'row',
@@ -435,7 +436,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     flexDirection: 'row',
     overflow: 'hidden',
-    marginBottom: 10,
+    marginBottom: 15,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.5)',
   },
@@ -492,7 +493,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: 0,
     marginBottom: 0,
-    paddingTop: 8,
+    paddingTop: 5,
     paddingBottom: 0,
   },
   sectionTitle: {
