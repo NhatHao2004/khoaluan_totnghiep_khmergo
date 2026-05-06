@@ -3,7 +3,7 @@ import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, onSnapshot } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Dimensions, Image, Linking, ScrollView,
@@ -31,6 +31,7 @@ export default function PagodaDetailScreen() {
 
   const [templeData, setTempleData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [scrollEnabled, setScrollEnabled] = useState(true);
 
   useEffect(() => {
     if (!id) return;
@@ -97,6 +98,15 @@ export default function PagodaDetailScreen() {
     Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
   };
 
+  const webViewRef = useRef<any>(null);
+
+  const reCenterMap = () => {
+    webViewRef.current?.injectJavaScript(`
+      map.setView([${lat}, ${lng}], 16);
+      true;
+    `);
+  };
+
   const leafletHtml = `
 <!DOCTYPE html>
 <html>
@@ -141,7 +151,11 @@ export default function PagodaDetailScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
 
-      <ScrollView showsVerticalScrollIndicator={false} bounces={true}>
+      <ScrollView 
+        scrollEnabled={scrollEnabled}
+        showsVerticalScrollIndicator={false} 
+        bounces={true}
+      >
         {/* --- Hero Image --- */}
         <View style={[styles.imageBlock, { backgroundColor: '#fff' }]}>
           {imageSource ? (
@@ -205,14 +219,30 @@ export default function PagodaDetailScreen() {
           {/* Map Section */}
           <View style={styles.mapWrap}>
             <Text style={[styles.headerLabel, isKm && { letterSpacing: 0 }]}>{t('map_location')}</Text>
-            <View style={styles.mapBox}>
+            <View 
+              style={styles.mapBox}
+              onTouchStart={() => setScrollEnabled(false)}
+              onTouchEnd={() => setScrollEnabled(true)}
+              onTouchCancel={() => setScrollEnabled(true)}
+            >
               <WebView
+                ref={webViewRef}
                 style={styles.mapWebView}
                 source={{ html: leafletHtml }}
-                scrollEnabled={false}
+                scrollEnabled={true}
                 javaScriptEnabled={true}
+                domStorageEnabled={true}
+                androidLayerType="hardware"
                 originWhitelist={['*']}
               />
+              
+              {/* Map Floating Controls */}
+              <View style={styles.mapControls}>
+                <TouchableOpacity style={styles.mapControlBtn} onPress={reCenterMap}>
+                  <Ionicons name="locate" size={20} color="#0F172A" />
+                </TouchableOpacity>
+              </View>
+
               <TouchableOpacity style={styles.mapOpenBtn} onPress={handleOpenDirections}>
                 <Text style={styles.mapOpenText}>{t('view_directions')}</Text>
               </TouchableOpacity>
@@ -363,6 +393,25 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '800',
+  },
+  mapControls: {
+    position: 'absolute',
+    top: 15,
+    right: 15,
+    gap: 10,
+  },
+  mapControlBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
   },
   loaderContainer: {
     flex: 1,
