@@ -17,7 +17,8 @@ const HERO_HEIGHT = height * 0.40;
 
 export default function PagodaDetailScreen() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isKm = language === 'km';
   const params = useLocalSearchParams();
 
   const id = params.id as string;
@@ -62,9 +63,9 @@ export default function PagodaDetailScreen() {
     return () => unsubscribe();
   }, [id]);
 
-  const name = templeData?.name || initialName;
-  const location = templeData?.location || initialLocation;
-  const description = templeData?.description || templeData?.detailedDescription || initialDescription;
+  const name = isKm ? (templeData?.name_khmer || templeData?.name || initialName) : (templeData?.name || initialName);
+  const location = isKm ? (templeData?.location_khmer || templeData?.location || initialLocation) : (templeData?.location || initialLocation);
+  const description = isKm ? (templeData?.description_khmer || templeData?.description || templeData?.detailedDescription || initialDescription) : (templeData?.description || templeData?.detailedDescription || initialDescription);
   const contentBlocks = templeData?.contentBlocks || [];
   const imageUrl = templeData?.imageUrl1 || (params.imageUrl1 as string);
 
@@ -147,9 +148,9 @@ export default function PagodaDetailScreen() {
               )}
               <View style={styles.blockTextWrap}>
                 {block.type === 'title' ? (
-                  <Text style={styles.pieceTitle}>{block.value}</Text>
+                  <Text style={styles.pieceTitle}>{isKm ? (block.value_khmer || block.value) : block.value}</Text>
                 ) : (
-                  <Text style={styles.piecePara}>{block.value}</Text>
+                  <Text style={styles.piecePara}>{isKm ? (block.value_khmer || block.value) : block.value}</Text>
                 )}
               </View>
             </View>
@@ -269,7 +270,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 26,
     color: '#475569',
-    textAlign: 'justify',
+    textAlign: 'left',
   },
   mapWrap: {
     marginTop: 10,

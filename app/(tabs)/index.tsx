@@ -289,10 +289,12 @@ export default function HomeScreen() {
                   </View>
                 </View>
 
-                <View style={styles.cardContent}>
-                  <View style={styles.cardHeaderRow}>
-                    <ThemedText style={styles.cardTitle} numberOfLines={1}>{item.name || item.title}</ThemedText>
-                  </View>
+                  <View style={styles.cardContent}>
+                    <View style={styles.cardHeaderRow}>
+                      <ThemedText style={styles.cardTitle} numberOfLines={1}>
+                        {language === 'km' ? (item.name_khmer || item.name || item.title) : (item.name || item.title)}
+                      </ThemedText>
+                    </View>
 
                   <View style={styles.cardFooter}>
                     {(item.reviews ?? 0) > 0 && (

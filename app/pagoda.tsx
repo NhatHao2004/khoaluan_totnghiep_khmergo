@@ -62,7 +62,8 @@ const getPagodaImage = (templeId: string, templeName: string) => {
 export default function PagodaScreen() {
   const router = useRouter();
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isKm = language === 'km';
   const tintColor = useThemeColor({}, 'tint');
   const { temples, loading, error, refresh } = useTemples();
 
@@ -112,9 +113,9 @@ export default function PagodaScreen() {
   const filteredPagodas = [...temples]
     .sort((a, b) => {
       // Sort by temple name alphabetically (A-Z)
-      const nameA = normalizeText(a.name);
-      const nameB = normalizeText(b.name);
-      return nameA.localeCompare(nameB, 'vi', { sensitivity: 'base' });
+      const normA = isKm ? (a.name_khmer || a.name) : normalizeText(a.name);
+      const normB = isKm ? (b.name_khmer || b.name) : normalizeText(b.name);
+      return normA.localeCompare(normB, isKm ? 'km' : 'vi', { sensitivity: 'base' });
     });
 
   return (
@@ -160,8 +161,8 @@ export default function PagodaScreen() {
                   pathname: '/pagoda-detail',
                   params: {
                     id: pagoda.id,
-                    name: pagoda.name,
-                    location: pagoda.location,
+                    name: isKm ? (pagoda.name_khmer || pagoda.name) : pagoda.name,
+                    location: isKm ? (pagoda.location_khmer || pagoda.location) : pagoda.location,
                     rental: pagoda.rental,
                     description: pagoda.description,
                     imageUrl: pagoda.imageUrl,
@@ -190,9 +191,9 @@ export default function PagodaScreen() {
                 </View>
 
                 <View style={styles.pagodaContent}>
-                  <ThemedText style={styles.pagodaName}>{pagoda.name}</ThemedText>
+                  <ThemedText style={styles.pagodaName}>{isKm ? (pagoda.name_khmer || pagoda.name) : pagoda.name}</ThemedText>
                   <ThemedText style={styles.pagodaLocation}>
-                    {pagoda.location}
+                    {isKm ? (pagoda.location_khmer || pagoda.location) : pagoda.location}
                   </ThemedText>
                 </View>
               </TouchableOpacity>
