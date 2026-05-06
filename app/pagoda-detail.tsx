@@ -26,9 +26,8 @@ export default function PagodaDetailScreen() {
   const initialLocation = (params.location as string) || '';
   const initialDescription = (params.description as string) || '';
   const initialImageUrl = (params.imageUrl1 as string) || (params.imageUrl as string);
-  const initialIsFavorite = params.isFavorite === 'true';
+  const initialIsFavorite = params.favorite === 'true';
 
-  const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [templeData, setTempleData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -79,6 +78,18 @@ export default function PagodaDetailScreen() {
     try { await Share.share({ message: `${name}\n${location}` }); } catch (e) { }
   };
 
+  const isFavorite = templeData?.favorite ?? initialIsFavorite;
+
+  const handleToggleFavorite = async () => {
+    // Only import if not already. Actually I should import toggleFavorite at the top.
+    try {
+      const { toggleFavorite } = require('@/services/firebase-service');
+      await toggleFavorite(id, !isFavorite);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
@@ -116,7 +127,7 @@ export default function PagodaDetailScreen() {
               <Ionicons name="arrow-back" size={24} color="#000" />
             </TouchableOpacity>
             <View style={{ flexDirection: 'row', gap: 12 }}>
-              <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)} style={styles.iconBtn}>
+              <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
                 <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={22} color={isFavorite ? "#FF4B4B" : "#000"} />
               </TouchableOpacity>
             </View>

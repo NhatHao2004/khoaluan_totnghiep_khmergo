@@ -1,5 +1,5 @@
-import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { auth, db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -126,7 +126,7 @@ export default function PersonalInfoScreen() {
     <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={25} color="#1A1A1A" />
+          <Ionicons name="arrow-back" size={25} color="#000000ff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>{t('edit_profile')}</Text>
         <View style={{ width: 25 }} />
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   },
   avatarSection: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 30,
   },
   avatarWrapper: {
     position: 'relative',

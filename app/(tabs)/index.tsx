@@ -253,8 +253,8 @@ export default function HomeScreen() {
           <ThemedText style={[styles.sectionTitle, { flex: 1, marginRight: 10 }]} numberOfLines={1}>
             {t('suggestions_for_you')}
           </ThemedText>
-          <TouchableOpacity 
-            style={{ flexShrink: 0 }} 
+          <TouchableOpacity
+            style={{ flexShrink: 0 }}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               const cyclicRoutes: any[] = ['/pagoda', '/culture', '/food'];
@@ -284,21 +284,6 @@ export default function HomeScreen() {
               >
                 <View style={styles.cardImageContainer}>
                   <Image source={item.image} style={styles.cardImage} />
-                  <View style={styles.cardOverlay}>
-                    <TouchableOpacity
-                      style={styles.heartBtn}
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        toggleFavorite(item.id);
-                      }}
-                    >
-                      <Ionicons
-                        name={favorites.includes(item.id) ? "heart" : "heart-outline"}
-                        size={25}
-                        color={favorites.includes(item.id) ? "#ff0000" : "#000"}
-                      />
-                    </TouchableOpacity>
-                  </View>
                 </View>
 
                 <View style={styles.cardContent}>

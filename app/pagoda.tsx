@@ -168,7 +168,7 @@ export default function PagodaScreen() {
                     imageUrl: pagoda.imageUrl,
                     imageUrl1: pagoda.imageUrl1,
                     category: pagoda.category,
-                    isFavorite: pagoda.isFavorite?.toString(),
+                    favorite: pagoda.favorite?.toString(),
                     latitude: pagoda.latitude?.toString(),
                     longitude: pagoda.longitude?.toString(),
                     source: 'pagoda',

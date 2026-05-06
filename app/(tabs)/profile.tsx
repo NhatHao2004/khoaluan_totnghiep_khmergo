@@ -104,6 +104,7 @@ export default function ProfileScreen() {
     if (id === 'logout') handleLogout();
     else if (id === 'login') router.push('/login');
     else if (id === 'personal-info') router.push('/(tabs)/personal-info');
+    else if (id === 'favorites') router.push('/(tabs)/favorites');
     else if (id === 'support') router.push('/(tabs)/support');
     else if (id === 'settings') router.push('/(tabs)/settings');
   };

@@ -147,6 +147,12 @@ export default function RootLayout() {
           }}
         />
         <Tabs.Screen
+          name="favorites"
+          options={{
+            href: null, // Hide from tab bar
+          }}
+        />
+        <Tabs.Screen
           name="learning-progress"
           options={{
             href: null, // Hide from tab bar

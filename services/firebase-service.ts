@@ -1,4 +1,4 @@
-import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
+import { collection, getDocs, limit, orderBy, query, doc, updateDoc } from "firebase/firestore";
 import { db } from "../utils/firebaseConfig";
 
 export interface UserProfile {
@@ -25,9 +25,14 @@ export interface Temple {
 }
 
 export const toggleFavorite = async (templeId: string, isFavorite: boolean): Promise<void> => {
-  // Placeholder implementation
-  console.log('Toggling favorite for', templeId, 'to', isFavorite);
-  return Promise.resolve();
+  try {
+    const templeRef = doc(db, 'destinations', templeId);
+    await updateDoc(templeRef, { favorite: isFavorite });
+    console.log('Toggled favorite for', templeId, 'to', isFavorite);
+  } catch (error) {
+    console.error('Error toggling favorite:', error);
+    throw error;
+  }
 };
 
 export const getNearbyTemples = async (lat: number, lng: number, radius: number): Promise<Temple[]> => {
