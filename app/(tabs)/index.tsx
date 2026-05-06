@@ -249,9 +249,11 @@ export default function HomeScreen() {
 
         {/* Featured List Header */}
         <Animated.View entering={FadeInDown.delay(500)} style={styles.sectionHeader}>
-          <ThemedText style={[styles.sectionTitle, { flex: 1 }]}>{t('suggestions_for_you')}</ThemedText>
-          <TouchableOpacity onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
-            <ThemedText style={styles.viewAllText}>{t('see_all')}</ThemedText>
+          <ThemedText style={[styles.sectionTitle, { flex: 1, marginRight: 10 }]} numberOfLines={1}>
+            {t('suggestions_for_you')}
+          </ThemedText>
+          <TouchableOpacity style={{ flexShrink: 0 }} onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
+            <ThemedText style={styles.viewAllText} numberOfLines={1}>{t('see_all')}</ThemedText>
           </TouchableOpacity>
         </Animated.View>
 
