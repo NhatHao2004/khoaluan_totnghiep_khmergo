@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   contentPiece: {
-    marginTop: 25,
+    marginTop: 15,
   },
   blockPic: {
     width: '100%',
