@@ -112,10 +112,10 @@ export default function PagodaScreen() {
   // Sort alphabetically
   const filteredPagodas = [...temples]
     .sort((a, b) => {
-      // Sort by temple name alphabetically (A-Z)
-      const normA = isKm ? (a.name_khmer || a.name) : normalizeText(a.name);
-      const normB = isKm ? (b.name_khmer || b.name) : normalizeText(b.name);
-      return normA.localeCompare(normB, isKm ? 'km' : 'vi', { sensitivity: 'base' });
+      // Always sort by Vietnamese name to maintain consistent order across languages
+      const normA = normalizeText(a.name || '');
+      const normB = normalizeText(b.name || '');
+      return normA.localeCompare(normB, 'vi', { sensitivity: 'base' });
     });
 
   return (
