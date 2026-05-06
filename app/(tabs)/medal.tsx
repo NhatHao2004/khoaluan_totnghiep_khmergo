@@ -131,7 +131,7 @@ export default function MedalScreen() {
 
                 <Text style={styles.podiumName}>{topThree[1].name}</Text>
                 <View style={styles.podiumPoints}>
-                  <Text style={styles.podiumPointsText} numberOfLines={1}>
+                  <Text style={styles.podiumPointsText} numberOfLines={1} adjustsFontSizeToFit>
                     {`${topThree[1].points} ${t('points')}`}
                   </Text>
                 </View>
@@ -154,7 +154,7 @@ export default function MedalScreen() {
 
                 <Text style={styles.podiumName} numberOfLines={1}>{topThree[0].name}</Text>
                 <View style={styles.podiumPoints}>
-                  <Text style={styles.podiumPointsText} numberOfLines={1}>
+                  <Text style={styles.podiumPointsText} numberOfLines={1} adjustsFontSizeToFit>
                     {`${topThree[0].points} ${t('points')}`}
                   </Text>
                 </View>
@@ -177,7 +177,7 @@ export default function MedalScreen() {
 
                 <Text style={styles.podiumName} numberOfLines={1}>{topThree[2].name}</Text>
                 <View style={styles.podiumPoints}>
-                  <Text style={styles.podiumPointsText} numberOfLines={1}>
+                  <Text style={styles.podiumPointsText} numberOfLines={1} adjustsFontSizeToFit>
                     {`${topThree[2].points} ${t('points')}`}
                   </Text>
                 </View>
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
   },
   podiumPoints: {
     backgroundColor: '#F3F4F6',
-    paddingHorizontal: 12,
+    paddingHorizontal: 4,
     paddingVertical: 4,
     borderRadius: 12,
     marginBottom: 10,
