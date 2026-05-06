@@ -272,7 +272,10 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
   },
   statItem: {
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 5,
   },
   statDivider: {
     width: 1,
@@ -291,6 +294,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginTop: 0,
     textTransform: 'uppercase',
+    textAlign: 'center',
   },
   sectionHeader: {
     marginBottom: 20,
