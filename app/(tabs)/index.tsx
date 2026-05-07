@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
   viewAllText: {
     color: '#64748B',
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   gridContainer: {
     flexDirection: 'row',

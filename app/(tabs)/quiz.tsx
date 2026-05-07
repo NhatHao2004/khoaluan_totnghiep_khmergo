@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -52,15 +52,17 @@ export default function QuizScreen() {
   );
 
   return (
-    <View style={styles.container}>
-
-
+    <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t('quiz_title')}</Text>
       </View>
 
-      <View style={styles.scrollContent}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 40 }}
+        style={styles.scrollContent}
+      >
         {/* Profile Card - Floating */}
         <View style={styles.profileCard}>
           <View style={styles.cardHeader}>
@@ -85,7 +87,7 @@ export default function QuizScreen() {
           <View style={styles.cardStats}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{user?.points || 0}</Text>
-              <Text style={styles.statLabel}>{t('total_score')}</Text>
+              <Text style={styles.statLabel}>{t('points')}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
@@ -105,84 +107,100 @@ export default function QuizScreen() {
 
         <View style={styles.bentoContainer}>
           <View style={styles.bentoRow}>
-            {/* Pagoda Quiz - Featured */}
+            {/* Pagoda Quiz - Featured & ACTIVE */}
             <View style={{ flex: 1.2 }}>
               <TouchableOpacity
-                activeOpacity={1}
+                activeOpacity={0.85}
                 style={[styles.bentoCard, { height: 220 }]}
+                onPress={() => {
+                  if (!user) {
+                    Alert.alert(
+                      t('login_required'),
+                      t('login_to_use'),
+                      [
+                        { text: 'Huỷ', style: 'cancel' },
+                        { text: 'Đăng nhập', onPress: () => router.push('/login') },
+                      ]
+                    );
+                    return;
+                  }
+                  router.push('/quiz-pagoda');
+                }}
               >
                 <Text style={styles.bentoTitle} numberOfLines={2}>{t('pagoda_quiz')}</Text>
-                <Text style={styles.bentoSubtitle}>10 {t('questions')}</Text>
                 <View style={styles.bentoImageContainer}>
-                  <Image
-                    source={require('@/assets/images/pagoda.jpg')}
-                    style={styles.bentoImage}
-                  />
+                  <Image source={require('@/assets/images/pagoda.jpg')} style={styles.bentoImage} />
+                </View>
+                <View style={[styles.activeBadge, { right: 8, bottom: 8 }]}>
+                  <Text style={styles.activeBadgeText}>Chơi ngay nhé</Text>
                 </View>
               </TouchableOpacity>
             </View>
 
-            {/* Right Column */}
+            {/* Right Column – Coming soon items */}
             <View style={{ flex: 1, gap: 15 }}>
-              {/* Culture Quiz */}
-              <View>
-                <TouchableOpacity
-                  activeOpacity={1}
-                  style={[styles.bentoCard, { height: 102.5 }]}
-                >
-                  <Text style={styles.bentoTitleSmall} numberOfLines={1}>{t('culture_quiz')}</Text>
-                  <View style={styles.bentoImageContainerSmall}>
-                    <Image
-                      source={require('@/assets/images/festival.jpg')}
-                      style={styles.bentoImage}
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={[styles.bentoCard, { height: 102.5 }]}
+                onPress={() => Alert.alert('Sắp ra mắt')}
+              >
+                <Text style={styles.bentoTitleSmall} numberOfLines={1}>{t('culture_quiz')}</Text>
+                <View style={styles.bentoImageContainerSmall}>
+                  <Image source={require('@/assets/images/festival.jpg')} style={styles.bentoImage} />
+                </View>
+              </TouchableOpacity>
 
-              {/* Food Quiz */}
-              <View>
-                <TouchableOpacity
-                  activeOpacity={1}
-                  style={[styles.bentoCard, { height: 102.5 }]}
-                >
-                  <Text style={styles.bentoTitleSmall} numberOfLines={1}>{t('food_quiz')}</Text>
-                  <View style={styles.bentoImageContainerSmall}>
-                    <Image
-                      source={require('@/assets/images/amthuc.jpg')}
-                      style={styles.bentoImage}
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={[styles.bentoCard, { height: 102.5 }]}
+                onPress={() => Alert.alert('Sắp ra mắt')}
+              >
+                <Text style={styles.bentoTitleSmall} numberOfLines={1}>{t('food_quiz')}</Text>
+                <View style={styles.bentoImageContainerSmall}>
+                  <Image source={require('@/assets/images/amthuc.jpg')} style={styles.bentoImage} />
+                </View>
+              </TouchableOpacity>
             </View>
           </View>
 
-          {/* Bottom Full Width Card - Vocab */}
-          <View>
-            <TouchableOpacity
-              activeOpacity={1}
-              style={[styles.bentoCardFull, { marginTop: 15 }]}
-            >
-              <View style={styles.bentoFullContent}>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.bentoTitle, { textAlign: 'left' }]}>{t('vocab_quiz')}</Text>
-                  <Text style={[styles.bentoSubtitle, { textAlign: 'left' }]}>20 {t('questions')}</Text>
-                </View>
-                <View style={styles.bentoImageContainerFull}>
-                  <Image
-                    source={require('@/assets/images/hoctap.jpg')}
-                    style={styles.bentoImage}
-                  />
-                </View>
+          {/* Bottom Full Width Card - Vocab Coming soon */}
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={[styles.bentoCardFull, { marginTop: 15 }]}
+            onPress={() => Alert.alert('Sắp ra mắt')}
+          >
+            <View style={styles.bentoFullContent}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.bentoTitle, { textAlign: 'left' }]}>{t('vocab_quiz')}</Text>
+                <Text style={[styles.bentoSubtitle, { textAlign: 'left' }]}>Học từ vựng qua hình ảnh</Text>
               </View>
+              <View style={styles.bentoImageContainerFull}>
+                <Image source={require('@/assets/images/hoctap.jpg')} style={styles.bentoImage} />
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          {/* Migration Trigger (Dev Only Tool) */}
+          <View style={{ marginTop: 30, alignItems: 'center' }}>
+            <TouchableOpacity
+              onPress={async () => {
+                const { seedQuizzes } = await import('@/services/firebase-service');
+                const { PAGODA_QUIZZES } = await import('@/utils/quizData');
+                try {
+                  await seedQuizzes(PAGODA_QUIZZES);
+                  alert('Thành công: Đã đồng bộ câu hỏi lên Firebase!');
+                } catch (e) {
+                  alert('Lỗi: ' + e);
+                }
+              }}
+              style={{ padding: 10 }}
+            >
+              <Text style={{ fontSize: 10, color: '#CBD5E1' }}>Đồng bộ dữ liệu (Dev)</Text>
             </TouchableOpacity>
           </View>
         </View>
-
-        <View style={{ height: 10 }} />
-      </View>
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -289,11 +307,10 @@ const styles = StyleSheet.create({
     color: '#1E293B',
   },
   statLabel: {
-    fontSize: 10,
+    fontSize: 12,
     color: '#64748B',
-    fontWeight: '700',
-    marginTop: 0,
-    textTransform: 'uppercase',
+    fontWeight: '600',
+    marginTop: 2,
     textAlign: 'center',
   },
   sectionHeader: {
@@ -410,5 +427,44 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
+  },
+  activeBadge: {
+    position: 'absolute',
+    bottom: 12,
+    right: 12,
+    backgroundColor: '#FF6B2C',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  activeBadgeText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  comingSoonTag: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  comingSoonTagText: {
+    color: '#94A3B8',
+    fontSize: 9,
+    fontWeight: '700',
+  },
+  comingSoonText: {
+    color: '#94A3B8',
+    fontSize: 9,
+    fontWeight: '700',
+  },
+  bentoDesc: {
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: 4,
+    textAlign: 'left',
   },
 });

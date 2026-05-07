@@ -1,4 +1,4 @@
-import { collection, getDocs, limit, orderBy, query, doc, updateDoc } from "firebase/firestore";
+import { collection, getDocs, limit, orderBy, query, doc, updateDoc, increment, getDoc } from "firebase/firestore";
 import { db } from "../utils/firebaseConfig";
 
 export interface UserProfile {
@@ -82,5 +82,72 @@ export const getLeaderboardUsers = async (count: number = 20): Promise<UserProfi
   } catch (error) {
     console.error("Error fetching leaderboard:", error);
     return [];
+  }
+};
+
+export const addUserPoints = async (userId: string, points: number): Promise<void> => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, {
+      points: increment(points),
+    });
+  } catch (error) {
+    console.error('Error adding points:', error);
+    throw error;
+  }
+};
+export const updateQuizScore = async (userId: string, pagodaId: string, newScore: number): Promise<number> => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    const userSnap = await getDoc(userRef);
+    
+    if (!userSnap.exists()) return 0;
+    
+    const userData = userSnap.data();
+    const bestScores = userData.quizBestScores || {};
+    const previousBest = bestScores[pagodaId] || 0;
+    
+    if (newScore > previousBest) {
+      const difference = newScore - previousBest;
+      await updateDoc(userRef, {
+        points: increment(difference),
+        [`quizBestScores.${pagodaId}`]: newScore
+      });
+      return difference;
+    }
+    
+    return 0; // No points added because score didn't improve
+  } catch (error) {
+    console.error('Error updating quiz score:', error);
+    throw error;
+  }
+};
+
+export const getQuizData = async (pagodaId: string): Promise<any | null> => {
+  try {
+    const quizRef = doc(db, 'quizzes', pagodaId);
+    const quizSnap = await getDoc(quizRef);
+    if (quizSnap.exists()) {
+      return quizSnap.data();
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching quiz data:', error);
+    return null;
+  }
+};
+
+export const seedQuizzes = async (quizzes: any[]): Promise<void> => {
+  const { setDoc } = await import("firebase/firestore");
+  try {
+    for (const quiz of quizzes) {
+      // Remove image require for Firestore (use imageUrl instead or handle separately)
+      const { image, ...quizToUpload } = quiz;
+      await setDoc(doc(db, 'quizzes', quiz.pagodaId), quizToUpload);
+    }
+    console.log('Quizzes seeded successfully');
+  } catch (error) {
+    console.error('Error seeding quizzes:', error);
+    throw error;
   }
 };

@@ -109,14 +109,9 @@ export default function PagodaScreen() {
   };
 
 
-  // Sort alphabetically
+  // Sắp xếp theo ID (pagoda_1 → pagoda_2 → ... → pagoda_5)
   const filteredPagodas = [...temples]
-    .sort((a, b) => {
-      // Always sort by Vietnamese name to maintain consistent order across languages
-      const normA = normalizeText(a.name || '');
-      const normB = normalizeText(b.name || '');
-      return normA.localeCompare(normB, 'vi', { sensitivity: 'base' });
-    });
+    .sort((a, b) => (a.id || '').localeCompare(b.id || ''));
 
   return (
     <View style={styles.container}>
