@@ -131,9 +131,6 @@ export default function QuizScreen() {
                 <View style={styles.bentoImageContainer}>
                   <Image source={require('@/assets/images/pagoda.jpg')} style={styles.bentoImage} />
                 </View>
-                <View style={[styles.activeBadge, { right: 8, bottom: 8 }]}>
-                  <Text style={styles.activeBadgeText}>Chơi ngay nhé</Text>
-                </View>
               </TouchableOpacity>
             </View>
 
