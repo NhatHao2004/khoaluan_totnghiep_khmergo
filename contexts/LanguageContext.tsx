@@ -176,6 +176,17 @@ const translations = {
     map_location: 'VỊ TRÍ TRÊN BẢN ĐỒ',
     view_directions: 'Xem đường đi',
     daily_knowledge: 'Kiến thức mỗi ngày',
+    vocab_translation: 'Dịch văn bản',
+    let_learn_khmer: 'Cùng học tiếng Khmer',
+    let_learn_khmer_desc: 'Cùng tìm hiểu và học một số từ vựng cơ bản để tự tin giao tiếp hơn khi tìm hiểu văn hóa trải nghiệm thực tế nhé!',
+    learn_by_topic: 'Học theo chủ đề',
+    vocab_words: 'từ vựng',
+    enter_text: 'Nhập văn bản',
+    no_vocab_data: 'Không tìm thấy dữ liệu từ vựng chủ đề này.',
+    cat_greetings: 'Chào hỏi',
+    cat_numbers: 'Số đếm',
+    cat_family: 'Gia đình',
+    cat_food: 'Ẩm thực',
   },
   km: {
     // Common
@@ -347,6 +358,17 @@ const translations = {
     map_location: 'ទីតាំងនៅលើផែនទី',
     view_directions: 'មើលផ្លូវធ្វើដំណើរ',
     daily_knowledge: 'ចំណេះដឹងប្រចាំថ្ងៃ',
+    vocab_translation: 'បកប្រែវាក្យសព្ទ',
+    let_learn_khmer: 'រៀនភាសាខ្មែររាប់បញ្ចូល',
+    let_learn_khmer_desc: 'រៀននិងស្វែងយល់ពាក្យមូលដ្ឋានដើម្បីអាចនិយាយប្រាស្រ័យទាក់ទងដោយភាពជឿជាក់នៅពេលជួបបទពិសោធន៍ផ្ទាល់!',
+    learn_by_topic: 'រៀនតាមប្រធានបទ',
+    vocab_words: 'ពាក្យ',
+    enter_text: 'វាយអត្ថបទរបស់អ្នកនៅទីនេះ',
+    no_vocab_data: 'រកមិនឃើញទិន្នន័យវាក្យសព្ទសម្រាប់ប្រធានបទនេះទេ។',
+    cat_greetings: 'ការសួរសុខទុក្ខបឋម',
+    cat_numbers: 'លេខ និងការរាប់',
+    cat_family: 'គ្រួសារ និងការហៅទូរសព្ទ',
+    cat_food: 'អាហារនិងភេសជ្ជៈ',
   }
 };
 

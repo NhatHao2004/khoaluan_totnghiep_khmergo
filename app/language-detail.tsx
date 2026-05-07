@@ -1,8 +1,10 @@
 import { ThemedText } from '@/components/themed-text';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { VOCABULARY_CATEGORIES } from '@/utils/vocabularyData';
 import { Ionicons } from '@expo/vector-icons';
+import { Audio } from 'expo-av';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Dimensions,
   ScrollView,
@@ -16,10 +18,50 @@ const { width } = Dimensions.get('window');
 export default function LanguageDetailScreen() {
   const router = useRouter();
   const { categoryId, title } = useLocalSearchParams();
+  const { t } = useLanguage();
 
   const category = useMemo(() => {
     return VOCABULARY_CATEGORIES.find(c => c.id === categoryId);
   }, [categoryId]);
+
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+
+  useEffect(() => {
+    return sound
+      ? () => {
+        sound.unloadAsync();
+      }
+      : undefined;
+  }, [sound]);
+
+  const playSound = async (text: string, langCode: string, id: string) => {
+    if (!text || playingId === id) return;
+
+    try {
+      setPlayingId(id);
+      if (sound) {
+        await sound.unloadAsync();
+      }
+
+      const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${langCode}&client=tw-ob`;
+
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri: url },
+        { shouldPlay: true }
+      );
+      setSound(newSound);
+
+      newSound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          setPlayingId(null);
+        }
+      });
+    } catch (error) {
+      console.error('Lỗi khi phát âm thanh:', error);
+      setPlayingId(null);
+    }
+  };
 
   const handleBackPress = () => {
     if (router.canGoBack()) {
@@ -38,7 +80,7 @@ export default function LanguageDetailScreen() {
           </TouchableOpacity>
         </View>
         <View style={styles.errorContainer}>
-          <ThemedText style={styles.errorText}>Không tìm thấy dữ liệu từ vựng chủ đề này.</ThemedText>
+          <ThemedText style={styles.errorText}>{t('no_vocab_data')}</ThemedText>
         </View>
       </View>
     );
@@ -54,7 +96,7 @@ export default function LanguageDetailScreen() {
 
         <View style={styles.headerTitleContainer}>
           <ThemedText style={styles.headerTitle} numberOfLines={1}>
-            {title || category.title}
+            {title ? t(title as string) : t(category.title)}
           </ThemedText>
         </View>
 
@@ -66,12 +108,6 @@ export default function LanguageDetailScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.banner, { backgroundColor: category.color }]}>
-          <Ionicons name={category.iconName as any} size={48} color="#FFFFFF" style={styles.bannerIcon} />
-          <ThemedText style={styles.bannerTitle}>{category.title}</ThemedText>
-          <ThemedText style={styles.bannerSubtitle}>{category.words.length} thẻ từ vựng</ThemedText>
-        </View>
-
         <View style={styles.listContainer}>
           {category.words.map((word, index) => (
             <View key={word.id} style={styles.flashcard}>
@@ -79,15 +115,21 @@ export default function LanguageDetailScreen() {
                 <View style={[styles.indexBadge, { backgroundColor: category.color + '20' }]}>
                   <ThemedText style={[styles.indexText, { color: category.color }]}>{index + 1}</ThemedText>
                 </View>
-                <Ionicons name="volume-medium-outline" size={24} color="#CBD5E1" />
+                <TouchableOpacity onPress={() => playSound(word.khm, 'km', word.id)}>
+                  <Ionicons
+                    name={playingId === word.id ? "volume-high" : "volume-medium-outline"}
+                    size={28}
+                    color={playingId === word.id ? category.color : "#0060d6ff"}
+                  />
+                </TouchableOpacity>
               </View>
-              
+
               <View style={styles.wordContent}>
                 <ThemedText style={styles.khmerText} selectable={true}>{word.khm}</ThemedText>
                 <ThemedText style={styles.pronunciationText}>"{word.pronunciation}"</ThemedText>
-                
+
                 <View style={styles.divider} />
-                
+
                 <ThemedText style={styles.vieText}>{word.vie}</ThemedText>
               </View>
             </View>
@@ -133,51 +175,24 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '800',
     textAlign: 'center',
+    lineHeight: 32, // Padding lines
+    paddingTop: 5,
   },
   content: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 40,
-  },
-  banner: {
-    paddingVertical: 30,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    marginBottom: 20,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-  },
-  bannerIcon: {
-    marginBottom: 10,
-  },
-  bannerTitle: {
-    fontSize: 24,
-    lineHeight: 36, // Tăng không gian dòng để tránh mất dấu ? trên chữ Ẩ
-    paddingTop: 5, // Cấp thêm không gian chết ở phía trên đỉnh để đẩy dấu xuống
-    fontWeight: '900',
-    color: '#FFFFFF',
-    marginBottom: 2,
-  },
-  bannerSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontWeight: '600',
+    paddingBottom: 20,
   },
   listContainer: {
     paddingHorizontal: 16,
+    paddingTop: 20,
     gap: 16,
   },
   flashcard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
-    padding: 20,
+    padding: 24,
     shadowColor: '#64748B',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.08,

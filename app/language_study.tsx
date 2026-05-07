@@ -3,8 +3,8 @@ import { VOCABULARY_CATEGORIES } from '@/utils/vocabularyData';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -12,6 +12,7 @@ import {
 
 export default function LanguageStudyScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const handleBackPress = () => {
     if (router.canGoBack()) {
@@ -42,22 +43,18 @@ export default function LanguageStudyScreen() {
 
         <View style={styles.headerTitleContainer}>
           <ThemedText style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
-            Học tiếng Khmer
+            {t('language_study')}
           </ThemedText>
         </View>
 
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView
-        style={styles.content}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <View style={[styles.content, styles.scrollContent]}>
         <View style={styles.introduction}>
-          <ThemedText style={styles.introTitle}>Cùng học tiếng Khmer</ThemedText>
+          <ThemedText style={styles.introTitle}>{t('let_learn_khmer')}</ThemedText>
           <ThemedText style={styles.introDesc}>
-            Cùng tìm hiểu và học một số từ vựng cơ bản để tự tin giao tiếp hơn khi tìm hiểu văn hóa trải nghiệm thực tế nhé!
+            {t('let_learn_khmer_desc')}
           </ThemedText>
         </View>
 
@@ -72,14 +69,14 @@ export default function LanguageStudyScreen() {
               <Ionicons name="language" size={36} color="#FFF" />
             </View>
             <View style={styles.translateActionContent}>
-              <ThemedText style={styles.translateActionTitle}>Dịch từ vựng</ThemedText>
+              <ThemedText style={styles.translateActionTitle}>{t('vocab_translation')}</ThemedText>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#ffffffff" />
           </TouchableOpacity>
         </View>
 
         <View style={styles.sectionDivider}>
-          <ThemedText style={styles.sectionTitle}>Học theo Chủ đề</ThemedText>
+          <ThemedText style={styles.sectionTitle}>{t('learn_by_topic')}</ThemedText>
         </View>
 
         <View style={styles.gridContainer}>
@@ -95,15 +92,15 @@ export default function LanguageStudyScreen() {
               </View>
 
               <View style={styles.cardContent}>
-                <ThemedText style={styles.categoryTitle}>{category.title}</ThemedText>
-                <ThemedText style={styles.categoryCount}>{category.words.length} từ vựng</ThemedText>
+                <ThemedText style={styles.categoryTitle}>{t(category.title)}</ThemedText>
+                <ThemedText style={styles.categoryCount}>{category.words.length} {t('vocab_words')}</ThemedText>
               </View>
 
               <Ionicons name="chevron-forward" size={20} color="#94A3B8" />
             </TouchableOpacity>
           ))}
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -143,6 +140,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '800',
     textAlign: 'center',
+    lineHeight: 32,
+    paddingTop: 5,
   },
   content: {
     flex: 1,
@@ -250,11 +249,11 @@ const styles = StyleSheet.create({
   },
   categoryTitle: {
     fontSize: 18,
-    lineHeight: 28, // Thêm khoảng dòng để không bị cắt dấu phía trên (Â, Ẩ...)
-    paddingTop: 5,  // Cấp thêm không gian chết ở phía trên đỉnh để đẩy dấu xuống
+    lineHeight: 32,
+    paddingTop: 10,
     fontWeight: '800',
     color: '#1E293B',
-    marginBottom: 1,
+    marginBottom: 0,
   },
   categoryCount: {
     fontSize: 13,

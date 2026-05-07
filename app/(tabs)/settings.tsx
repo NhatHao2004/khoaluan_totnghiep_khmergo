@@ -20,18 +20,6 @@ export default function SettingsScreen() {
   const { user } = useContext(AuthContext);
 
 
-  // Settings States
-  const [isStudyReminder, setIsStudyReminder] = useState(false);
-  const [reminderTime, setReminderTime] = useState('19:00');
-  const [showTimePicker, setShowTimePicker] = useState(false);
-
-  const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
-  const minutes = ['00', '15', '30', '45'];
-
-  const handleTimeSelect = (h: string, m: string) => {
-    setReminderTime(`${h}:${m}`);
-  };
-
   return (
     <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
       {/* Header */}
@@ -45,49 +33,6 @@ export default function SettingsScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
-        {/* Nhắc nhở học tập */}
-        <View style={styles.section}>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>{t('notif_settings')}</Text>
-            <View style={styles.switchItem}>
-              <Text style={styles.switchLabel}>{t('study_reminder')}</Text>
-              <TouchableOpacity
-                activeOpacity={user ? 0.8 : 1}
-                onPress={() => user && setIsStudyReminder(!isStudyReminder)}
-                style={[
-                  styles.customSwitch,
-                  { alignItems: (user && isStudyReminder) ? 'flex-end' : 'flex-start' },
-                  !user && { opacity: 0.5 }
-                ]}
-              >
-                <View style={[
-                  styles.customThumb,
-                  { backgroundColor: (user && isStudyReminder) ? '#FF0000' : '#000' }
-                ]} />
-              </TouchableOpacity>
-            </View>
-            {!user && (
-              <Text style={{ fontSize: 14, color: '#FF0000', marginTop: 0, marginBottom: 10 }}>
-                {t('login_to_use')}
-              </Text>
-            )}
-
-            {user && isStudyReminder && (
-              <>
-                <View style={styles.divider} />
-                <TouchableOpacity
-                  style={styles.switchItem}
-                  onPress={() => setShowTimePicker(true)}
-                >
-                  <Text style={[styles.switchLabel, { paddingLeft: 10 }]}>{t('reminder_time')}</Text>
-                  <View style={styles.timeBadge}>
-                    <Text style={styles.timeText}>{reminderTime}</Text>
-                  </View>
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        </View>
 
         {/* Ngôn ngữ */}
         <View style={styles.section}>
@@ -130,56 +75,7 @@ export default function SettingsScreen() {
         <View style={{ height: 40 }} />
       </ScrollView>
 
-      {/* Time Picker Modal */}
-      <Modal
-        visible={showTimePicker}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowTimePicker(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{t('reminder_time')}</Text>
-            <View style={styles.timePickerContainer}>
-              <ScrollView
-                style={styles.timeList}
-                showsVerticalScrollIndicator={false}
-              >
-                {hours.map(h => (
-                  <TouchableOpacity
-                    key={h}
-                    style={styles.timeItem}
-                    onPress={() => handleTimeSelect(h, reminderTime.split(':')[1])}
-                  >
-                    <Text style={[styles.timeItemText, reminderTime.startsWith(h) && styles.activeTimeText]}>{h}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-              <Text style={styles.timeSeparator}>:</Text>
-              <ScrollView
-                style={styles.timeList}
-                showsVerticalScrollIndicator={false}
-              >
-                {minutes.map(m => (
-                  <TouchableOpacity
-                    key={m}
-                    style={styles.timeItem}
-                    onPress={() => handleTimeSelect(reminderTime.split(':')[0], m)}
-                  >
-                    <Text style={[styles.timeItemText, reminderTime.endsWith(m) && styles.activeTimeText]}>{m}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-            <TouchableOpacity
-              style={styles.closeModalBtn}
-              onPress={() => setShowTimePicker(false)}
-            >
-              <Text style={styles.closeModalText}>{t('confirm')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+
     </SafeAreaView>
   );
 }

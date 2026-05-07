@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   ActivityIndicator,
   Keyboard,
@@ -16,6 +17,7 @@ import {
 
 export default function TranslatorScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   // Trạng thái ngôn ngữ: true = Việt -> Khmer, false = Khmer -> Việt
   const [isViToKm, setIsViToKm] = useState(true);
@@ -160,8 +162,8 @@ export default function TranslatorScreen() {
     setTargetPronunciation('');
   };
 
-  const sourceLabel = isViToKm ? "Tiếng Việt" : "Tiếng Khmer";
-  const targetLabel = isViToKm ? "Tiếng Khmer" : "Tiếng Việt";
+  const sourceLabel = isViToKm ? t('vietnamese') : t('khmer');
+  const targetLabel = isViToKm ? t('khmer') : t('vietnamese');
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -174,7 +176,7 @@ export default function TranslatorScreen() {
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
             <ThemedText style={styles.headerTitle} numberOfLines={1}>
-              Dịch từ vựng
+              {t('vocab_translation')}
             </ThemedText>
           </View>
           <View style={{ width: 40 }} />
@@ -211,7 +213,7 @@ export default function TranslatorScreen() {
                 <TextInput
                   style={styles.textInput}
                   multiline
-                  placeholder="Nhập văn bản"
+                  placeholder={t('enter_text')}
                   placeholderTextColor="#9AA0A6"
                   value={inputText}
                   onChangeText={setInputText}
@@ -302,6 +304,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
+    lineHeight: 32,
+    paddingTop: 5,
   },
   langBarRow: {
     flexDirection: 'row',
