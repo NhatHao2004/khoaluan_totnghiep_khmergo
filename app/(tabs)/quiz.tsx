@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -58,9 +58,7 @@ export default function QuizScreen() {
         <Text style={styles.headerTitle}>{t('quiz_title')}</Text>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 40 }}
+      <View
         style={styles.scrollContent}
       >
         {/* Profile Card - Floating */}
@@ -163,7 +161,7 @@ export default function QuizScreen() {
           {/* Bottom Full Width Card - Vocab Coming soon */}
           <TouchableOpacity
             activeOpacity={0.7}
-            style={[styles.bentoCardFull, { marginTop: 15 }]}
+            style={[styles.bentoCardFull, { marginTop: 10 }]}
             onPress={() => Alert.alert('Sắp ra mắt')}
           >
             <View style={styles.bentoFullContent}>
@@ -177,26 +175,8 @@ export default function QuizScreen() {
             </View>
           </TouchableOpacity>
 
-          {/* Migration Trigger (Dev Only Tool) */}
-          <View style={{ marginTop: 30, alignItems: 'center' }}>
-            <TouchableOpacity
-              onPress={async () => {
-                const { seedQuizzes } = await import('@/services/firebase-service');
-                const { PAGODA_QUIZZES } = await import('@/utils/quizData');
-                try {
-                  await seedQuizzes(PAGODA_QUIZZES);
-                  alert('Thành công: Đã đồng bộ câu hỏi lên Firebase!');
-                } catch (e) {
-                  alert('Lỗi: ' + e);
-                }
-              }}
-              style={{ padding: 10 }}
-            >
-              <Text style={{ fontSize: 10, color: '#CBD5E1' }}>Đồng bộ dữ liệu (Dev)</Text>
-            </TouchableOpacity>
-          </View>
         </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -231,10 +211,10 @@ const styles = StyleSheet.create({
   profileCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
-    padding: 20,
+    padding: 25,
     marginBottom: 15,
-    borderWidth: 1, // Added subtle gray border
-    borderColor: '#F0F0F0',
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
   },
   cardHeader: {
     flexDirection: 'row',
