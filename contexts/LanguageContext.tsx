@@ -69,7 +69,7 @@ const translations = {
     completed: 'Hoàn thành',
     recent_performance: 'Dựa trên các bài thi gần đây',
     choose_topic: 'Hôm nay bạn muốn thử thách về chủ đề gì nào',
-    pagoda_quiz: 'Chùa Khmer',
+    pagoda_quiz: 'Ngôi chùa Khmer',
     culture_quiz: 'Văn hóa Khmer',
     food_quiz: 'Ẩm thực Khmer',
     vocab_quiz: 'Học tiếng Khmer',
