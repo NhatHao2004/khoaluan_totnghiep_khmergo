@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
-    marginBottom: 5,
+    marginBottom: 10,
   },
   userInfo: {
     flexDirection: 'row',
@@ -387,32 +387,6 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
     lineHeight: 14,
   },
-  searchRow: {
-    flexDirection: 'row',
-    paddingHorizontal: 24,
-    gap: 10,
-    marginBottom: 20,
-  },
-  searchBox: {
-    flex: 1,
-    height: 50,
-    backgroundColor: '#FFF',
-    borderRadius: 22,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    shadowColor: '#64748B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#1E293B',
-    fontWeight: '500',
-  },
   filterBtn: {
     width: 58,
     height: 58,
@@ -436,7 +410,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     flexDirection: 'row',
     overflow: 'hidden',
-    marginBottom: 15,
+    marginBottom: 7,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.5)',
   },
@@ -497,7 +471,7 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '900',
     color: '#1E293B',
     lineHeight: 30,
@@ -505,7 +479,7 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     color: '#64748B',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
   },
   gridContainer: {
