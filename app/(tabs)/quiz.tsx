@@ -158,11 +158,11 @@ export default function QuizScreen() {
             </View>
           </View>
 
-          {/* Bottom Full Width Card - Vocab Coming soon */}
+          {/* Bottom Full Width Card - Vocab Quiz */}
           <TouchableOpacity
             activeOpacity={0.7}
-            style={[styles.bentoCardFull, { marginTop: 10 }]}
-            onPress={() => Alert.alert('Sắp ra mắt')}
+            style={[styles.bentoCardFull, { marginTop: 15 }]}
+            onPress={() => router.push('/vocab_quiz')}
           >
             <View style={styles.bentoFullContent}>
               <View style={{ flex: 1 }}>

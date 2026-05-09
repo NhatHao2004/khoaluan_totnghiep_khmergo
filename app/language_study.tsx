@@ -1,9 +1,9 @@
 import { ThemedText } from '@/components/themed-text';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { VOCABULARY_CATEGORIES } from '@/utils/vocabularyData';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { useLanguage } from '@/contexts/LanguageContext';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -161,6 +161,8 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#1E293B',
     marginBottom: 8,
+    lineHeight: 30,
+    paddingBottom: 4,
   },
   introDesc: {
     fontSize: 15,

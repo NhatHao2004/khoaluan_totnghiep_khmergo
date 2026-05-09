@@ -151,3 +151,27 @@ export const seedQuizzes = async (quizzes: any[]): Promise<void> => {
     throw error;
   }
 };
+export const seedVocabQuizzes = async (categories: any[]): Promise<void> => {
+  const { setDoc } = await import("firebase/firestore");
+  try {
+    for (const cat of categories) {
+      // Add sample image URLs for each word if they don't have one
+      const wordsWithImages = cat.words.map((w: any) => ({
+        ...w,
+        imageUrl: w.imageUrl || 'https://raw.githubusercontent.com/NhatHao2004/khoaluan_totnghiep_khmergo/main/assets/images/hoctap.jpg'
+      }));
+      
+      const catToUpload = {
+        ...cat,
+        words: wordsWithImages,
+        updatedAt: new Date().toISOString()
+      };
+      
+      await setDoc(doc(db, 'vocab_categories', cat.id), catToUpload);
+    }
+    console.log('Vocab quizzes seeded successfully');
+  } catch (error) {
+    console.error('Error seeding vocab quizzes:', error);
+    throw error;
+  }
+};
