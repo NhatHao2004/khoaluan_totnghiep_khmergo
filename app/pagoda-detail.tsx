@@ -32,6 +32,7 @@ export default function PagodaDetailScreen() {
   const [templeData, setTempleData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [scrollEnabled, setScrollEnabled] = useState(true);
+  const [activeTab, setActiveTab] = useState<'map' | 'quiz'>('map');
 
   useEffect(() => {
     if (!id) return;
@@ -151,9 +152,9 @@ export default function PagodaDetailScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
 
-      <ScrollView 
+      <ScrollView
         scrollEnabled={scrollEnabled}
-        showsVerticalScrollIndicator={false} 
+        showsVerticalScrollIndicator={false}
         bounces={true}
       >
         {/* --- Hero Image --- */}
@@ -216,37 +217,86 @@ export default function PagodaDetailScreen() {
             </View>
           ))}
 
-          {/* Map Section */}
+          {/* Map & Quiz Section */}
           <View style={styles.mapWrap}>
-            <Text style={[styles.headerLabel, isKm && { letterSpacing: 0 }]}>{t('map_location')}</Text>
-            <View 
-              style={styles.mapBox}
-              onTouchStart={() => setScrollEnabled(false)}
-              onTouchEnd={() => setScrollEnabled(true)}
-              onTouchCancel={() => setScrollEnabled(true)}
-            >
-              <WebView
-                ref={webViewRef}
-                style={styles.mapWebView}
-                source={{ html: leafletHtml }}
-                scrollEnabled={true}
-                javaScriptEnabled={true}
-                domStorageEnabled={true}
-                androidLayerType="hardware"
-                originWhitelist={['*']}
-              />
-              
-              {/* Map Floating Controls */}
-              <View style={styles.mapControls}>
-                <TouchableOpacity style={styles.mapControlBtn} onPress={reCenterMap}>
-                  <Ionicons name="locate" size={20} color="#0F172A" />
-                </TouchableOpacity>
-              </View>
+            <View style={styles.sectionTabRow}>
+              <TouchableOpacity
+                onPress={() => setActiveTab('map')}
+                style={[
+                  styles.tabBtn,
+                  activeTab === 'map' && { backgroundColor: '#3B82F6', borderColor: '#3B82F6' }
+                ]}
+              >
+                <Text style={[styles.tabBtnText, activeTab === 'map' && styles.tabBtnTextActive]}>{t('map_location')}</Text>
+              </TouchableOpacity>
 
-              <TouchableOpacity style={styles.mapOpenBtn} onPress={handleOpenDirections}>
-                <Text style={styles.mapOpenText}>{t('view_directions')}</Text>
+              <TouchableOpacity
+                onPress={() => setActiveTab('quiz')}
+                style={[
+                  styles.tabBtn,
+                  activeTab === 'quiz' && { backgroundColor: '#FF6B2C', borderColor: '#FF6B2C' }
+                ]}
+              >
+                <Text style={[styles.tabBtnText, activeTab === 'quiz' && styles.tabBtnTextActive]}>THỬ THÁCH</Text>
               </TouchableOpacity>
             </View>
+
+            {activeTab === 'map' ? (
+              <View
+                style={styles.mapBox}
+                onTouchStart={() => setScrollEnabled(false)}
+                onTouchEnd={() => setScrollEnabled(true)}
+                onTouchCancel={() => setScrollEnabled(true)}
+              >
+                <WebView
+                  ref={webViewRef}
+                  style={styles.mapWebView}
+                  source={{ html: leafletHtml }}
+                  scrollEnabled={true}
+                  javaScriptEnabled={true}
+                  domStorageEnabled={true}
+                  androidLayerType="hardware"
+                  originWhitelist={['*']}
+                />
+
+                {/* Map Floating Controls */}
+                <View style={styles.mapControls}>
+                  <TouchableOpacity style={styles.mapControlBtn} onPress={reCenterMap}>
+                    <Ionicons name="locate" size={20} color="#0F172A" />
+                  </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity style={styles.mapOpenBtn} onPress={handleOpenDirections}>
+                  <Text style={styles.mapOpenText}>{t('view_directions')}</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={styles.quizCard}>
+                <View style={styles.quizIconBg}>
+                  <Ionicons name="bulb-outline" size={32} color="#FF6B2C" />
+                </View>
+                <Text style={styles.quizTitle}>Kiểm tra kiến thức</Text>
+                <Text style={styles.quizDesc}>
+                  Hiểu rõ về <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> như thế nào{"\n"}
+                  Thử thách ngay để tích lũy điểm
+                </Text>
+                <TouchableOpacity
+                  style={styles.quizStartBtn}
+                  onPress={() => {
+                    router.push({
+                      pathname: '/game-mcq',
+                      params: {
+                        pagodaId: id,
+                        imageUrl: imageUrl,
+                        pagodaLocation: location
+                      }
+                    });
+                  }}
+                >
+                  <Text style={styles.quizStartBtnText}>Bắt đầu thử thách</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
 
           <View style={{ height: 20 }} />
@@ -381,7 +431,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 15,
     right: 15,
-    backgroundColor: '#004cffff',
+    backgroundColor: '#3B82F6',
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 12,
@@ -428,5 +478,82 @@ const styles = StyleSheet.create({
     color: '#64748B',
     fontWeight: '600',
     letterSpacing: 0.5,
+  },
+  sectionTabRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 20,
+  },
+  tabBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  tabBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#64748B',
+    textTransform: 'uppercase',
+  },
+  tabBtnTextActive: {
+    color: '#FFF',
+  },
+  quizCard: {
+    height: 350,
+    backgroundColor: '#FFF7ED',
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: '#FFEDD5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 30,
+  },
+  quizIconBg: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#FFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  quizTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#1E293B',
+    marginBottom: 8,
+  },
+  quizDesc: {
+    fontSize: 14,
+    color: '#64748B',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  quizStartBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#FF6B2C',
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 16,
+    shadowColor: '#FF6B2C',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  quizStartBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '800',
   },
 });
