@@ -162,7 +162,20 @@ export default function QuizScreen() {
           <TouchableOpacity
             activeOpacity={0.7}
             style={[styles.bentoCardFull, { marginTop: 15 }]}
-            onPress={() => router.push('/vocab_quiz')}
+            onPress={() => {
+              if (!user) {
+                Alert.alert(
+                  t('login_required'),
+                  t('login_to_use'),
+                  [
+                    { text: 'Huỷ', style: 'cancel' },
+                    { text: 'Đăng nhập', onPress: () => router.push('/login') },
+                  ]
+                );
+                return;
+              }
+              router.push('/vocab_quiz');
+            }}
           >
             <View style={styles.bentoFullContent}>
               <View style={{ flex: 1 }}>

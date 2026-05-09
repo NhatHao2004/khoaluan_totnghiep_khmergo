@@ -2,17 +2,124 @@ import { ThemedText } from '@/components/themed-text';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { VOCABULARY_CATEGORIES } from '@/utils/vocabularyData';
 import { Ionicons } from '@expo/vector-icons';
+import { Audio } from 'expo-av';
+import { Image as ExpoImage } from 'expo-image';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
+  Keyboard,
+  ScrollView,
   StyleSheet,
+  TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 
 export default function LanguageStudyScreen() {
   const router = useRouter();
   const { t } = useLanguage();
+  const [activeTab, setActiveTab] = useState<'topics' | 'translator'>('topics');
+
+  // --- Translator Logic ---
+  const [isViToKm, setIsViToKm] = useState(true);
+  const [inputText, setInputText] = useState('');
+  const [translatedText, setTranslatedText] = useState('');
+  const [sourcePronunciation, setSourcePronunciation] = useState('');
+  const [targetPronunciation, setTargetPronunciation] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+
+  useEffect(() => {
+    return sound
+      ? () => {
+        sound.unloadAsync();
+      }
+      : undefined;
+  }, [sound]);
+
+  useEffect(() => {
+    if (!inputText.trim()) {
+      setTranslatedText('');
+      setSourcePronunciation('');
+      setTargetPronunciation('');
+      setIsLoading(false);
+      return;
+    }
+
+    const timerId = setTimeout(() => {
+      handleTranslate();
+    }, 600);
+
+    return () => clearTimeout(timerId);
+  }, [inputText]);
+
+  const handleSwap = () => {
+    setIsViToKm((prev) => !prev);
+    const oldInput = inputText;
+    const oldSourcePron = sourcePronunciation;
+    setInputText(translatedText || '');
+    setTranslatedText(oldInput || '');
+    setSourcePronunciation(targetPronunciation || '');
+    setTargetPronunciation(oldSourcePron || '');
+  };
+
+  const handleTranslate = async () => {
+    if (!inputText.trim()) return;
+    setIsLoading(true);
+    try {
+      const encodedText = encodeURIComponent(inputText.trim());
+      const sourceLang = isViToKm ? 'vi' : 'km';
+      const targetLang = isViToKm ? 'km' : 'vi';
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&dt=rm&q=${encodedText}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data && data[0] && Array.isArray(data[0])) {
+        const resultText = data[0][0][0];
+        setTranslatedText(resultText);
+        let srcPhon = '';
+        let tgtPhon = '';
+        const lastElement = data[0][data[0].length - 1];
+        if (lastElement && lastElement.length >= 3) {
+          tgtPhon = lastElement[2] || '';
+          srcPhon = lastElement[3] || '';
+        } else {
+          for (let item of data[0]) {
+            if (item[2] && typeof item[2] === 'string' && item[2].length > 0) tgtPhon = item[2];
+            if (item[3] && typeof item[3] === 'string' && item[3].length > 0) srcPhon = item[3];
+          }
+        }
+        setSourcePronunciation(srcPhon);
+        setTargetPronunciation(tgtPhon);
+      }
+    } catch (error) {
+      console.error("Lỗi khi gọi API Dịch:", error);
+      setTranslatedText('Đã có lỗi xảy ra.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const playSound = async (textToPlay: string, langCode: string) => {
+    if (!textToPlay || isPlaying) return;
+    try {
+      setIsPlaying(true);
+      if (sound) await sound.unloadAsync();
+      const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(textToPlay)}&tl=${langCode}&client=tw-ob`;
+      const { sound: newSound } = await Audio.Sound.createAsync({ uri: url }, { shouldPlay: true });
+      setSound(newSound);
+      newSound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) setIsPlaying(false);
+      });
+    } catch (error) {
+      console.error('Lỗi khi phát âm thanh:', error);
+      setIsPlaying(false);
+    }
+  };
+  // --- End Translator Logic ---
 
   const handleBackPress = () => {
     if (router.canGoBack()) {
@@ -23,7 +130,6 @@ export default function LanguageStudyScreen() {
   };
 
   const handleCategoryPress = (categoryId: string, title: string) => {
-    // Navigate to the detail screen, passing category ID
     router.push({
       pathname: '/language-detail' as any,
       params: {
@@ -34,94 +140,165 @@ export default function LanguageStudyScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={handleBackPress}>
-          <Ionicons name="arrow-back" size={28} color="#000000" />
-        </TouchableOpacity>
-
-        <View style={styles.headerTitleContainer}>
-          <ThemedText style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
-            {t('language_study')}
-          </ThemedText>
-        </View>
-
-        <View style={{ width: 40 }} />
-      </View>
-
-      <View style={[styles.content, styles.scrollContent]}>
-        <View style={styles.introduction}>
-          <ThemedText style={styles.introTitle}>{t('let_learn_khmer')}</ThemedText>
-          <ThemedText style={styles.introDesc}>
-            {t('let_learn_khmer_desc')}
-          </ThemedText>
-        </View>
-
-        {/* Thẻ Dịch AI Mới */}
-        <View style={styles.translateActionContainer}>
-          <TouchableOpacity
-            style={styles.translateActionCard}
-            activeOpacity={0.8}
-            onPress={() => router.push('/translator' as any)}
-          >
-            <View style={styles.translateIconBox}>
-              <Ionicons name="language" size={36} color="#FFF" />
-            </View>
-            <View style={styles.translateActionContent}>
-              <ThemedText style={styles.translateActionTitle}>{t('vocab_translation')}</ThemedText>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#ffffffff" />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backBtn} onPress={handleBackPress}>
+            <Ionicons name="arrow-back" size={28} color="#000000" />
           </TouchableOpacity>
+          <View style={styles.headerTitleContainer}>
+            <ThemedText style={styles.headerTitle} numberOfLines={1}>
+              {t('language_study')}
+            </ThemedText>
+          </View>
+          <View style={{ width: 40 }} />
         </View>
 
-        <View style={styles.sectionDivider}>
-          <ThemedText style={styles.sectionTitle}>{t('learn_by_topic')}</ThemedText>
-        </View>
-
-        <View style={styles.gridContainer}>
-          {VOCABULARY_CATEGORIES.map((category) => (
+        {/* Tabs */}
+        <View style={styles.tabsWrapper}>
+          <View style={styles.tabsContainer}>
             <TouchableOpacity
-              key={category.id}
-              style={[styles.categoryCard, { borderColor: category.color + '40' }]} // Thêm 40 để làm mờ viền
-              activeOpacity={0.7}
-              onPress={() => handleCategoryPress(category.id, category.title)}
+              style={styles.tabItem}
+              onPress={() => setActiveTab('topics')}
             >
-              <View style={[styles.iconContainer, { backgroundColor: category.color + '15' }]}>
-                <Ionicons name={category.iconName as any} size={32} color={category.color} />
-              </View>
-
-              <View style={styles.cardContent}>
-                <ThemedText style={styles.categoryTitle}>{t(category.title)}</ThemedText>
-                <ThemedText style={styles.categoryCount}>{category.words.length} {t('vocab_words')}</ThemedText>
-              </View>
-
-              <Ionicons name="chevron-forward" size={20} color="#94A3B8" />
+              <ThemedText style={[styles.tabText, activeTab === 'topics' && styles.activeTabText]}>
+                {t('learn_by_topic')}
+              </ThemedText>
             </TouchableOpacity>
-          ))}
+
+            <TouchableOpacity
+              style={styles.tabItem}
+              onPress={() => setActiveTab('translator')}
+            >
+              <ThemedText style={[styles.tabText, activeTab === 'translator' && styles.activeTabText]}>
+                {t('vocab_translation')}
+              </ThemedText>
+            </TouchableOpacity>
+          </View>
         </View>
+
+        <ScrollView
+          style={styles.content}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {activeTab === 'topics' ? (
+            <View style={styles.categoryList}>
+              {VOCABULARY_CATEGORIES.map((category, index) => (
+                <TouchableOpacity
+                  key={category.id}
+                  style={styles.categoryMainCard}
+                  activeOpacity={0.8}
+                  onPress={() => handleCategoryPress(category.id, category.title)}
+                >
+                  <View style={styles.categoryImageContainer}>
+                    <ExpoImage
+                      source={[
+                        require('@/assets/images/giadinh.jpg'),
+                        require('@/assets/images/monan.jpg'),
+                        require('@/assets/images/chaohoi.jpg'),
+                        require('@/assets/images/sodem.jpg'),
+                      ][index % 4]}
+                      style={styles.categoryCardImage}
+                      contentFit="contain"
+                    />
+                  </View>
+                  <View style={styles.categoryCardBody}>
+                    <View style={styles.cardInfoRow}>
+                      <View style={styles.textContainer}>
+                        <ThemedText style={styles.categoryCardTitle}>{t(category.title)}</ThemedText>
+                        <ThemedText style={styles.categoryCardSub}>
+                          {category.words.length} {t('vocab_words')}
+                        </ThemedText>
+                      </View>
+                      <View style={[styles.arrowCircle, { backgroundColor: category.color + '15' }]}>
+                        <Ionicons name="arrow-forward" size={18} color={category.color} />
+                      </View>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : (
+            <View style={styles.translatorWrapper}>
+              <View style={styles.langBarRow}>
+                <TouchableOpacity style={styles.langButtonContainer}>
+                  <ThemedText style={styles.langButtonText}>{isViToKm ? t('vietnamese') : t('khmer')}</ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleSwap} style={styles.swapButton}>
+                  <Ionicons name="swap-horizontal" size={24} color="#1A73E8" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.langButtonContainer}>
+                  <ThemedText style={styles.langButtonText}>{isViToKm ? t('khmer') : t('vietnamese')}</ThemedText>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.inputArea}>
+                <TextInput
+                  style={styles.textInput}
+                  multiline
+                  placeholder={t('enter_text')}
+                  placeholderTextColor="#848789ff"
+                  value={inputText}
+                  onChangeText={setInputText}
+                />
+                {sourcePronunciation ? (
+                  <ThemedText style={styles.phoneticText}>{sourcePronunciation}</ThemedText>
+                ) : null}
+                <View style={styles.inputFooter}>
+                  <TouchableOpacity onPress={() => playSound(inputText, isViToKm ? 'vi' : 'km')} disabled={!inputText.trim() || isPlaying}>
+                    <Ionicons name={isPlaying ? "volume-high" : "volume-medium"} size={24} color="#1A73E8" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.resultArea}>
+                {translatedText ? (
+                  <View style={[{ flex: 1, justifyContent: 'space-between' }, isLoading ? { opacity: 0.5 } : {}]}>
+                    <View>
+                      <ThemedText style={styles.resultText} selectable>{translatedText}</ThemedText>
+                      {targetPronunciation ? (
+                        <ThemedText style={styles.phoneticText}>{targetPronunciation}</ThemedText>
+                      ) : null}
+                    </View>
+                    <View style={styles.resultFooter}>
+                      <TouchableOpacity onPress={() => playSound(translatedText, isViToKm ? 'km' : 'vi')} disabled={isPlaying}>
+                        <Ionicons name={isPlaying ? "volume-high" : "volume-medium"} size={24} color="#1A73E8" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ) : isLoading ? (
+                  <ActivityIndicator size="small" color="#1A73E8" style={{ marginTop: 25 }} />
+                ) : (
+                  <ThemedText style={styles.emptyResultText}>Kết quả dịch sẽ xuất hiện ở đây</ThemedText>
+                )}
+              </View>
+            </View>
+          )}
+        </ScrollView>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC', // Slate 50
+    backgroundColor: '#F8FAFC',
   },
   header: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFFFF',
     paddingTop: 45,
     paddingBottom: 15,
     paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
+    elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
     zIndex: 100,
   },
   backBtn: {
@@ -133,133 +310,169 @@ const styles = StyleSheet.create({
   headerTitleContainer: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   headerTitle: {
-    color: '#000000',
     fontSize: 20,
     fontWeight: '800',
-    textAlign: 'center',
-    lineHeight: 32,
-    paddingTop: 5,
+    color: '#000',
+  },
+  tabsWrapper: {
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+  },
+  tabItem: {
+    flex: 1,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  tabText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#64748B',
+  },
+  activeTabText: {
+    color: '#3B82F6',
   },
   content: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 40,
+    paddingBottom: 20,
   },
-  introduction: {
-    padding: 24,
-    backgroundColor: '#FFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-    marginBottom: 16,
+  categoryList: {
+    padding: 15,
+    gap: 15,
   },
-  introTitle: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: '#1E293B',
-    marginBottom: 8,
-    lineHeight: 30,
-    paddingBottom: 4,
-  },
-  introDesc: {
-    fontSize: 15,
-    color: '#64748B',
-    lineHeight: 22,
-    textAlign: 'justify',
-  },
-  translateActionContainer: {
-    paddingHorizontal: 16,
-    marginBottom: 20,
-  },
-  translateActionCard: {
-    backgroundColor: '#3B82F6',
+  categoryMainCard: {
+    backgroundColor: '#ffffff',
     borderRadius: 20,
-    padding: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 6,
-  },
-  translateIconBox: {
-    width: 56,
-    height: 56,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  translateActionContent: {
-    flex: 1,
-    marginRight: 5,
-  },
-  translateActionTitle: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: '900',
-    marginBottom: 4,
-  },
-  translateActionSubtitle: {
-    color: 'rgba(255,255,255,0.9)',
-    fontSize: 13,
-    lineHeight: 18,
-    textAlign: 'justify',
-    width: '100%',
-  },
-  sectionDivider: {
-    paddingHorizontal: 16,
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#1E293B',
-  },
-  gridContainer: {
-    paddingHorizontal: 16,
-    gap: 12,
-  },
-  categoryCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
-    padding: 16,
-    borderRadius: 20,
+    overflow: 'hidden',
     borderWidth: 1,
-    shadowColor: '#64748B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
+    borderColor: 'rgba(0,0,0,0.05)',
     elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
   },
-  iconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 16,
-    justifyContent: 'center',
+  categoryImageContainer: {
+    width: '100%',
+    aspectRatio: 16 / 10,
+    padding: 12,
+    backgroundColor: '#FFFFFF',
+  },
+  categoryCardImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 12,
+  },
+  categoryCardBody: {
+    paddingHorizontal: 15,
+    paddingBottom: 15,
+    paddingTop: 6,
+  },
+  cardInfoRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 16,
+    justifyContent: 'space-between',
   },
-  cardContent: {
+  textContainer: {
     flex: 1,
   },
-  categoryTitle: {
+  categoryCardTitle: {
     fontSize: 18,
-    lineHeight: 32,
-    paddingTop: 10,
     fontWeight: '800',
-    color: '#1E293B',
-    marginBottom: 0,
+    color: '#1A1A1A',
   },
-  categoryCount: {
+  categoryCardSub: {
     fontSize: 13,
-    color: '#64748B',
-    fontWeight: '500',
+    color: '#666',
+    marginTop: 2,
   },
+  arrowCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  translatorWrapper: {
+    padding: 15,
+  },
+  langBarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    marginBottom: 15,
+    paddingHorizontal: 10,
+    elevation: 1,
+  },
+  langButtonContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  langButtonText: {
+    color: '#1A73E8',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  swapButton: {
+    padding: 10,
+  },
+  inputArea: {
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: 15,
+    minHeight: 180,
+    marginBottom: 15,
+    elevation: 1,
+  },
+  textInput: {
+    fontSize: 22,
+    color: '#3C4043',
+    textAlignVertical: 'top',
+    minHeight: 120,
+  },
+  phoneticText: {
+    fontSize: 14,
+    color: '#5F6368',
+    fontStyle: 'italic',
+    marginTop: 5,
+  },
+  inputFooter: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 10,
+  },
+  resultArea: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 15,
+    minHeight: 180,
+    elevation: 1,
+  },
+  resultText: {
+    fontSize: 25,
+    color: '#1A73E8',
+    fontWeight: '600',
+    lineHeight: 36,
+    paddingVertical: 5,
+  },
+  resultFooter: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 15,
+  },
+  emptyResultText: {
+    color: '#94A3B8',
+    textAlign: 'center',
+    marginTop: 50,
+    fontStyle: 'italic',
+  }
 });
