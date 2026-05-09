@@ -183,10 +183,10 @@ const translations = {
     vocab_words: 'từ vựng',
     enter_text: 'Nhập văn bản',
     no_vocab_data: 'Không tìm thấy dữ liệu từ vựng chủ đề này.',
-    cat_greetings: 'Chào hỏi',
-    cat_numbers: 'Số đếm',
-    cat_family: 'Gia đình',
-    cat_food: 'Ẩm thực',
+    cat_greetings: 'Lời chào và Giao tiếp',
+    cat_numbers: 'Số và cách đếm số',
+    cat_family: 'Gia đình thân yêu',
+    cat_food: 'Ẩm thực đặc sắc',
   },
   km: {
     // Common

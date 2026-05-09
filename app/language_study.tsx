@@ -209,12 +209,9 @@ export default function LanguageStudyScreen() {
                     <View style={styles.cardInfoRow}>
                       <View style={styles.textContainer}>
                         <ThemedText style={styles.categoryCardTitle}>{t(category.title)}</ThemedText>
-                        <ThemedText style={styles.categoryCardSub}>
-                          {category.words.length} {t('vocab_words')}
-                        </ThemedText>
                       </View>
-                      <View style={[styles.arrowCircle, { backgroundColor: category.color + '15' }]}>
-                        <Ionicons name="arrow-forward" size={18} color={category.color} />
+                      <View style={styles.startStudyBtn}>
+                        <ThemedText style={styles.startStudyBtnText}>Bắt đầu học</ThemedText>
                       </View>
                     </View>
                   </View>
@@ -236,20 +233,23 @@ export default function LanguageStudyScreen() {
               </View>
 
               <View style={styles.inputArea}>
-                <TextInput
-                  style={styles.textInput}
-                  multiline
-                  placeholder={t('enter_text')}
-                  placeholderTextColor="#848789ff"
-                  value={inputText}
-                  onChangeText={setInputText}
-                />
-                {sourcePronunciation ? (
-                  <ThemedText style={styles.phoneticText}>{sourcePronunciation}</ThemedText>
-                ) : null}
+                <View style={{ flex: 1 }}>
+                  <TextInput
+                    style={styles.textInput}
+                    multiline
+                    placeholder={t('enter_text')}
+                    placeholderTextColor="#848789ff"
+                    value={inputText}
+                    onChangeText={setInputText}
+                  />
+                  {sourcePronunciation ? (
+                    <ThemedText style={styles.phoneticText}>{sourcePronunciation}</ThemedText>
+                  ) : null}
+                </View>
+
                 <View style={styles.inputFooter}>
                   <TouchableOpacity onPress={() => playSound(inputText, isViToKm ? 'vi' : 'km')} disabled={!inputText.trim() || isPlaying}>
-                    <Ionicons name={isPlaying ? "volume-high" : "volume-medium"} size={24} color="#1A73E8" />
+                    <Ionicons name={isPlaying ? "volume-high" : "volume-medium"} size={28} color="#1A73E8" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -265,14 +265,14 @@ export default function LanguageStudyScreen() {
                     </View>
                     <View style={styles.resultFooter}>
                       <TouchableOpacity onPress={() => playSound(translatedText, isViToKm ? 'km' : 'vi')} disabled={isPlaying}>
-                        <Ionicons name={isPlaying ? "volume-high" : "volume-medium"} size={24} color="#1A73E8" />
+                        <Ionicons name={isPlaying ? "volume-high" : "volume-medium"} size={28} color="#1A73E8" />
                       </TouchableOpacity>
                     </View>
                   </View>
                 ) : isLoading ? (
-                  <ActivityIndicator size="small" color="#1A73E8" style={{ marginTop: 25 }} />
+                  <ActivityIndicator size="small" color="#1A73E8" style={{ marginTop: 30 }} />
                 ) : (
-                  <ThemedText style={styles.emptyResultText}>Kết quả dịch sẽ xuất hiện ở đây</ThemedText>
+                  <ThemedText style={styles.emptyResultText}></ThemedText>
                 )}
               </View>
             </View>
@@ -383,21 +383,33 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   categoryCardTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '800',
     color: '#1A1A1A',
+    paddingLeft: 10,
   },
   categoryCardSub: {
     fontSize: 13,
     color: '#666',
     marginTop: 2,
   },
-  arrowCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  startStudyBtn: {
+    backgroundColor: '#0179e9',
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#0179e9',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  startStudyBtnText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
   },
   translatorWrapper: {
     padding: 15,
@@ -429,7 +441,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderRadius: 16,
     padding: 15,
-    minHeight: 180,
+    minHeight: 220,
     marginBottom: 15,
     elevation: 1,
   },
@@ -454,7 +466,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 15,
-    minHeight: 180,
+    minHeight: 250,
     elevation: 1,
   },
   resultText: {

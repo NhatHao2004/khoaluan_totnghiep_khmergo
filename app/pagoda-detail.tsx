@@ -278,7 +278,7 @@ export default function PagodaDetailScreen() {
                 <Text style={styles.quizTitle}>Kiểm tra kiến thức</Text>
                 <Text style={styles.quizDesc}>
                   Hiểu rõ về <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> như thế nào{"\n"}
-                  Thử thách ngay để tích lũy điểm
+                  Thử thách ngay để nhận điểm thưởng
                 </Text>
                 <TouchableOpacity
                   style={styles.quizStartBtn}
