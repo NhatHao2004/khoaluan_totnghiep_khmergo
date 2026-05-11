@@ -28,6 +28,7 @@ export default function CultureDetailScreen() {
   const [cultureData, setCultureData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'gallery' | 'quiz'>('gallery');
+  const [mainScrollEnabled, setMainScrollEnabled] = useState(true);
 
   useEffect(() => {
     if (!id) return;
@@ -72,7 +73,11 @@ export default function CultureDetailScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
 
-      <ScrollView showsVerticalScrollIndicator={false} bounces={true}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false} 
+        bounces={true}
+        scrollEnabled={mainScrollEnabled}
+      >
         {/* --- Hero Image --- */}
         <View style={styles.imageBlock}>
           {imageUrl ? (
@@ -152,6 +157,9 @@ export default function CultureDetailScreen() {
                   snapToInterval={width * 0.75 + 15}
                   snapToAlignment="center"
                   decelerationRate="fast"
+                  onScrollBeginDrag={() => setMainScrollEnabled(false)}
+                  onScrollEndDrag={() => setMainScrollEnabled(true)}
+                  onMomentumScrollEnd={() => setMainScrollEnabled(true)}
                 >
                   {[
                     cultureData?.imageUrl1 || cultureData?.imageUrl,
@@ -226,11 +234,11 @@ const styles = StyleSheet.create({
     minHeight: height - HERO_HEIGHT + 30,
   },
   titleBox: { marginBottom: 20 },
-  mainTitle: { fontSize: 26, fontWeight: '900', color: '#0F172A', lineHeight: 34 },
+  mainTitle: { fontSize: 23, fontWeight: '900', color: '#0F172A', lineHeight: 34 },
   contentPiece: { marginTop: 20 },
   blockPic: { width: '100%', height: 220, borderRadius: 24, marginBottom: 15 },
   blockTextWrap: {},
-  pieceTitle: { fontSize: 20, fontWeight: '900', color: '#0F172A', marginBottom: 10 },
+  pieceTitle: { fontSize: 16, fontWeight: '900', color: '#0F172A', marginBottom: 10 },
   piecePara: { fontSize: 16, lineHeight: 26, color: '#445566' },
   mediaWrap: {
     marginTop: 25,

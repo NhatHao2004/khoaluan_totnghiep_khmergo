@@ -1,5 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { QuizSkeleton } from '@/components/quiz-skeleton';
 import { getLeaderboardUsers } from '@/services/firebase-service';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
@@ -14,7 +15,15 @@ export default function QuizScreen() {
   const { user } = useAuth();
   const router = useRouter();
   const [userRank, setUserRank] = useState<string | number>('---');
+  const [quizLoading, setQuizLoading] = useState(true);
   const lastFetchTime = useRef<number>(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setQuizLoading(false);
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const fetchRank = async (force = false) => {
     // Only fetch if forced or it's been more than 30 seconds
@@ -50,6 +59,10 @@ export default function QuizScreen() {
       fetchRank();
     }, [user?.uid])
   );
+
+  if (quizLoading) {
+    return <QuizSkeleton />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>

@@ -1,3 +1,4 @@
+import { HomeSkeleton } from '@/components/home-skeleton';
 import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -40,7 +41,15 @@ export default function HomeScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [routeIndex, setRouteIndex] = useState(0);
+  const [indexLoading, setIndexLoading] = useState(true);
   const scrollY = useSharedValue(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIndexLoading(false);
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, []);
 
 
   // Animation for the notification bell
@@ -111,6 +120,10 @@ export default function HomeScreen() {
       setFeaturedDestinations(featured);
       setIsLoading(false);
       setRefreshing(false);
+    }, (error) => {
+      console.error("Firestore Error in loadFeaturedData:", error);
+      setIsLoading(false);
+      setRefreshing(false);
     });
     return unsubscribe;
   };
@@ -166,6 +179,10 @@ export default function HomeScreen() {
     router.push(route);
   };
 
+  if (indexLoading && !refreshing) {
+    return <HomeSkeleton />;
+  }
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -175,7 +192,7 @@ export default function HomeScreen() {
             onPress={() => router.push('/(tabs)/profile' as any)}
           >
             {user?.avatar ? (
-              <Image source={{ uri: user.avatar }} style={styles.avatar} />
+              <Image source={{ uri: user.avatar as string }} style={styles.avatar} />
             ) : (
               <View style={styles.avatarPlaceholder}>
                 <Ionicons name="person-circle-outline" size={53} color="#000000ff" />
