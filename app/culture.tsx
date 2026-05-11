@@ -46,7 +46,8 @@ const getCultureImage = (id: string, name: string) => {
 export default function CultureScreen() {
   const router = useRouter();
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isKm = language === 'km';
   const tintColor = useThemeColor({}, 'tint');
   const { cultures, loading, error, refresh } = useCultures();
 
@@ -135,9 +136,11 @@ export default function CultureScreen() {
                 </View>
 
                 <View style={styles.cultureContent}>
-                  <ThemedText style={styles.cultureName}>{item.name}</ThemedText>
+                  <ThemedText style={styles.cultureName}>
+                    {isKm ? (item.name_khmer || item.name) : item.name}
+                  </ThemedText>
                   <ThemedText style={styles.cultureLocation} numberOfLines={1}>
-                    {item.location || t('address_not_updated')}
+                    {(isKm ? (item.location_khmer || item.location) : item.location) || t('address_not_updated')}
                   </ThemedText>
                 </View>
               </TouchableOpacity>

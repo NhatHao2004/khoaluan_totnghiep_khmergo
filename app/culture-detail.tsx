@@ -56,9 +56,10 @@ export default function CultureDetailScreen() {
   }, [id]);
 
   const name = isKm ? (cultureData?.name_khmer || cultureData?.name || initialName) : (cultureData?.name || initialName);
+  const location = isKm ? (cultureData?.location_khmer || cultureData?.location || params.location) : (cultureData?.location || params.location);
   const description = isKm ? (cultureData?.description_khmer || cultureData?.description || initialDescription) : (cultureData?.description || initialDescription);
   const contentBlocks = cultureData?.contentBlocks || [];
-  const imageUrl = cultureData?.imageUrl || initialImageUrl;
+  const imageUrl = cultureData?.imageUrl6 || cultureData?.imageUrl || initialImageUrl;
 
   if (loading) {
     return (
@@ -73,8 +74,8 @@ export default function CultureDetailScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
 
-      <ScrollView 
-        showsVerticalScrollIndicator={false} 
+      <ScrollView
+        showsVerticalScrollIndicator={false}
         bounces={true}
         scrollEnabled={mainScrollEnabled}
       >
@@ -142,76 +143,76 @@ export default function CultureDetailScreen() {
               </TouchableOpacity>
             </View>
 
-            {activeTab === 'gallery' ? (
-              <View style={styles.galleryContainer}>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={[
-                    styles.galleryScroll,
-                    {
-                      paddingLeft: 25,
-                      paddingRight: 10
-                    }
-                  ]}
-                  snapToInterval={width * 0.75 + 15}
-                  snapToAlignment="center"
-                  decelerationRate="fast"
-                  onScrollBeginDrag={() => setMainScrollEnabled(false)}
-                  onScrollEndDrag={() => setMainScrollEnabled(true)}
-                  onMomentumScrollEnd={() => setMainScrollEnabled(true)}
-                >
-                  {[
-                    cultureData?.imageUrl1 || cultureData?.imageUrl,
-                    cultureData?.imageUrl2,
-                    cultureData?.imageUrl3,
-                    cultureData?.imageUrl4,
-                    cultureData?.imageUrl5
-                  ].filter(url => !!url).map((url, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      activeOpacity={0.9}
-                      style={styles.galleryItem}
-                    >
-                      <Image source={{ uri: url }} style={styles.galleryPic} />
-                    </TouchableOpacity>
-                  ))}
-                  {/* Placeholder nếu chỉ có 1 ảnh */}
-                  {(!cultureData?.imageUrl2) && (
-                    <View style={[styles.galleryItem, styles.galleryPlaceholder]}>
-                      <Ionicons name="images-outline" size={32} color="#CBD5E1" />
-                      <Text style={styles.placeholderText}>Mở rộng xem thêm...</Text>
-                    </View>
-                  )}
-                </ScrollView>
-              </View>
-            ) : (
-              <View style={styles.quizCard}>
-                <View style={styles.quizIconBg}>
-                  <Ionicons name="bulb-outline" size={32} color="#FF6B2C" />
+            <View style={{ minHeight: 250 }}>
+              {activeTab === 'gallery' ? (
+                <View style={styles.galleryContainer}>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={[
+                      styles.galleryScroll,
+                      {
+                        paddingLeft: 25,
+                        paddingRight: 10
+                      }
+                    ]}
+                    snapToInterval={width * 0.75 + 15}
+                    snapToAlignment="center"
+                    decelerationRate="fast"
+                    onScrollBeginDrag={() => setMainScrollEnabled(false)}
+                    onScrollEndDrag={() => setMainScrollEnabled(true)}
+                    onMomentumScrollEnd={() => setMainScrollEnabled(true)}
+                  >
+                    {[
+                      cultureData?.imageUrl1 || cultureData?.imageUrl,
+                      cultureData?.imageUrl2,
+                      cultureData?.imageUrl3,
+                      cultureData?.imageUrl4,
+                      cultureData?.imageUrl5
+                    ].filter(url => !!url).map((url, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        activeOpacity={0.9}
+                        style={styles.galleryItem}
+                      >
+                        <Image source={{ uri: url }} style={styles.galleryPic} />
+                      </TouchableOpacity>
+                    ))}
+                    {/* Placeholder nếu chỉ có 1 ảnh */}
+                    {(!cultureData?.imageUrl2) && (
+                      <View style={[styles.galleryItem, styles.galleryPlaceholder]}>
+                        <Ionicons name="images-outline" size={32} color="#CBD5E1" />
+                        <Text style={styles.placeholderText}>Mở rộng xem thêm...</Text>
+                      </View>
+                    )}
+                  </ScrollView>
                 </View>
-                <Text style={styles.quizTitle}>Kiểm tra kiến thức</Text>
-                <Text style={styles.quizDesc}>
-                  Hiểu về <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> thì{"\n"}
-                  Thử thách ngay để nhận điểm thưởng
-                </Text>
-                <TouchableOpacity style={styles.quizStartBtn} onPress={() => {
-                  router.push({
-                    pathname: '/game-mcq',
-                    params: {
-                      pagodaId: id,
-                      imageUrl: imageUrl,
-                      pagodaName: name
-                    }
-                  } as any);
-                }}>
-                  <Text style={styles.quizStartBtnText}>Bắt đầu thử thách</Text>
-                </TouchableOpacity>
-              </View>
-            )}
+              ) : (
+                <View style={styles.quizCard}>
+                  <View style={styles.quizIconBg}>
+                    <Ionicons name="bulb-outline" size={45} color="#FF6B2C" />
+                  </View>
+                  <TouchableOpacity
+                    style={styles.quizStartBtn}
+                    onPress={() => {
+                      router.push({
+                        pathname: '/game-mcq',
+                        params: {
+                          pagodaId: id,
+                          imageUrl: imageUrl,
+                          pagodaName: name
+                        }
+                      } as any);
+                    }}
+                  >
+                    <Text style={styles.quizStartBtnText}>Bắt đầu thử thách</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
           </View>
 
-          <View style={{ height: 5 }} />
+          <View style={{ height: 10 }} />
         </View>
       </ScrollView>
     </View>
@@ -234,12 +235,13 @@ const styles = StyleSheet.create({
     minHeight: height - HERO_HEIGHT + 30,
   },
   titleBox: { marginBottom: 20 },
-  mainTitle: { fontSize: 23, fontWeight: '900', color: '#0F172A', lineHeight: 34 },
-  contentPiece: { marginTop: 20 },
+  mainTitle: { fontSize: 28, fontWeight: '900', color: '#0F172A', lineHeight: 36 },
+  locationTitle: { fontSize: 16, color: '#64748B', fontWeight: '500', marginTop: 5 },
+  contentPiece: { marginTop: 15 },
   blockPic: { width: '100%', height: 220, borderRadius: 24, marginBottom: 15 },
   blockTextWrap: {},
-  pieceTitle: { fontSize: 16, fontWeight: '900', color: '#0F172A', marginBottom: 10 },
-  piecePara: { fontSize: 16, lineHeight: 26, color: '#445566' },
+  pieceTitle: { fontSize: 20, fontWeight: '900', color: '#0F172A', marginBottom: 8 },
+  piecePara: { fontSize: 16, lineHeight: 26, color: '#475569' },
   mediaWrap: {
     marginTop: 25,
   },
@@ -271,22 +273,26 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   quizCard: {
-    height: 200, backgroundColor: '#FFF7ED', borderRadius: 28,
+    height: 220, backgroundColor: '#FFF7ED', borderRadius: 28,
     borderWidth: 1, borderColor: '#FFEDD5', alignItems: 'center',
-    justifyContent: 'center', paddingHorizontal: 20,
-    marginHorizontal: 25,
+    justifyContent: 'center', paddingHorizontal: 30,
+    marginHorizontal: 0,
   },
   quizIconBg: {
-    width: 44, height: 44, borderRadius: 22, backgroundColor: '#FFF',
-    alignItems: 'center', justifyContent: 'center', marginBottom: 10,
+    width: 64, height: 64, borderRadius: 32, backgroundColor: '#FFF',
+    alignItems: 'center', justifyContent: 'center', marginBottom: 16,
   },
-  quizTitle: { fontSize: 15, fontWeight: '900', color: '#1E293B', marginBottom: 2 },
-  quizDesc: { fontSize: 12, color: '#64748B', textAlign: 'center', lineHeight: 16, marginBottom: 10 },
+  quizTitle: { fontSize: 20, fontWeight: '900', color: '#1E293B', marginBottom: 8 },
+  quizDesc: { fontSize: 14, color: '#64748B', textAlign: 'center', lineHeight: 22, marginBottom: 24 },
   quizStartBtn: {
-    backgroundColor: '#FF6B2C', paddingHorizontal: 18, paddingVertical: 8,
-    borderRadius: 10, elevation: 2,
+    backgroundColor: '#FF6B2C', paddingHorizontal: 24, paddingVertical: 14,
+    borderRadius: 16, elevation: 4,
+    shadowColor: '#FF6B2C',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
   },
-  quizStartBtnText: { color: '#FFF', fontSize: 14, fontWeight: '800' },
+  quizStartBtnText: { color: '#FFF', fontSize: 16, fontWeight: '800' },
   sectionLabel: {
     fontSize: 13,
     fontWeight: '900',
