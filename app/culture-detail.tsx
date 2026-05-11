@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     minHeight: height - HERO_HEIGHT + 30,
   },
   titleBox: { marginBottom: 20 },
-  mainTitle: { fontSize: 28, fontWeight: '900', color: '#0F172A', lineHeight: 36 },
+  mainTitle: { fontSize: 22, fontWeight: '900', color: '#0F172A', lineHeight: 36 },
   locationTitle: { fontSize: 16, color: '#64748B', fontWeight: '500', marginTop: 5 },
   contentPiece: { marginTop: 15 },
   blockPic: { width: '100%', height: 220, borderRadius: 24, marginBottom: 15 },
