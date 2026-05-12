@@ -126,7 +126,7 @@ export default function PersonalInfoScreen() {
     <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={25} color="#000000ff" />
+          <Ionicons name="arrow-back" size={26} color="#000000ff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>{t('edit_profile')}</Text>
         <View style={{ width: 25 }} />
@@ -276,20 +276,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 45,
-    paddingBottom: 10,
-    backgroundColor: '#ffffff',
+    paddingTop: 50,
+    paddingBottom: 15,
+    backgroundColor: '#ffffffff',
   },
   backBtn: {
     width: 25,
   },
   headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 22,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '800',
     color: '#1A1A1A',
-    lineHeight: 30,
+    textAlign: 'center',
   },
   scroll: {
     paddingHorizontal: 25,

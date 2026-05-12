@@ -60,12 +60,33 @@ export default function FavoritesScreen() {
     }
   };
 
+  const handlePressItem = (item: any) => {
+    let detailRoute = '/(tabs)/index';
+    if (item.category === 'Chùa') detailRoute = '/pagoda-detail';
+    else if (item.category === 'Văn hóa') detailRoute = '/culture-detail';
+    else if (item.category === 'Ẩm thực') detailRoute = '/food-detail';
+
+    router.push({
+      pathname: detailRoute as any,
+      params: {
+        id: item.id,
+        name: item.name,
+        location: item.location,
+        description: item.description,
+        imageUrl: item.imageUrl,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        favorite: 'true',
+      }
+    });
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={25} color="#1A1A1A" />
+          <Ionicons name="arrow-back" size={26} color="#1A1A1A" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('favorites')}</Text>
         <View style={{ width: 40 }} />
@@ -92,7 +113,11 @@ export default function FavoritesScreen() {
           <View style={styles.listContainer}>
             {favorites.map((item, index) => (
               <View key={item.id}>
-                <TouchableOpacity style={styles.card} activeOpacity={0.8}>
+                <TouchableOpacity
+                  style={styles.card}
+                  activeOpacity={0.8}
+                  onPress={() => handlePressItem(item)}
+                >
                   <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
 
                   <View style={styles.cardContent}>
@@ -100,19 +125,11 @@ export default function FavoritesScreen() {
                       {language === 'km' ? (item.name_khmer || item.name) : item.name}
                     </Text>
                     <View style={styles.cardLocationBox}>
-                      <Ionicons name="location" size={14} color="#FF6B6B" />
-                      <Text style={styles.cardLocation} numberOfLines={1}>
+                      <Text style={styles.cardLocation} numberOfLines={3}>
                         {language === 'km' ? (item.location_khmer || item.location) : item.location}
                       </Text>
                     </View>
                   </View>
-
-                  <TouchableOpacity
-                    style={styles.heartButton}
-                    onPress={() => removeFavorite(item.id)}
-                  >
-                    <Ionicons name="heart" size={24} color="#FF4D4D" />
-                  </TouchableOpacity>
                 </TouchableOpacity>
               </View>
             ))}
@@ -227,13 +244,15 @@ const styles = StyleSheet.create({
     height: 65,
     borderRadius: 15,
     marginRight: 15,
+    resizeMode: 'contain',
+    overflow: 'hidden',
   },
   cardContent: {
     flex: 1,
     justifyContent: 'center',
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '800',
     color: '#1A1A1A',
     marginBottom: 6,
@@ -249,8 +268,8 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   heartButton: {
-    width: 36,
-    height: 36,
+    width: 30,
+    height: 30,
     borderRadius: 18,
     borderWidth: 1.5,
     borderColor: '#f6f1f1ff',

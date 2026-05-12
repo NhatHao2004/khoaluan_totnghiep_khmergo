@@ -1,5 +1,5 @@
-import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -81,7 +81,7 @@ export default function SupportScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={25} color="#1A1A1A" />
+          <Ionicons name="arrow-back" size={26} color="#1A1A1A" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>{t('support_feedback')}</Text>
         <View style={{ width: 25 }} />
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 45,
+    paddingTop: 50,
     paddingBottom: 10,
     backgroundColor: '#ffffff',
   },
@@ -205,13 +205,10 @@ const styles = StyleSheet.create({
     width: 25,
   },
   headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 22,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '800',
     color: '#1A1A1A',
-    lineHeight: 34,
-    paddingVertical: 2,
+    textAlign: 'center',
   },
   scroll: {
     paddingHorizontal: 25,

@@ -1,6 +1,4 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { getQuizData, updateQuizScore } from '../services/firebase-service';
-import { PagodaQuizData, PAGODA_QUIZZES } from '../utils/quizData';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -16,6 +14,8 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { getQuizData, updateQuizScore } from '../services/firebase-service';
+import { PAGODA_QUIZZES, PagodaQuizData } from '../utils/quizData';
 
 const { width } = Dimensions.get('window');
 const TOTAL_QUESTIONS = 5;
@@ -201,8 +201,8 @@ export default function GameMCQScreen() {
     if (answerState === 'idle') return styles.optionLetterBox;
     if (index === currentQuestion.correctIndex)
       return [styles.optionLetterBox, { backgroundColor: '#22C55E' }];
-    if (index === selectedOption && !(index === currentQuestion.correctIndex))
-      return [styles.optionLetterBox, { backgroundColor: '#ffffffff' }];
+    if (index === selectedOption && index !== currentQuestion.correctIndex)
+      return [styles.optionLetterBox, { backgroundColor: '#EF4444' }];
     return [styles.optionLetterBox, { backgroundColor: '#E2E8F0' }];
   };
 
@@ -303,21 +303,21 @@ export default function GameMCQScreen() {
           <View style={styles.headerTopRow}>
             <Text style={styles.headerTitle}>Câu {questionIndex + 1} / {TOTAL_QUESTIONS}</Text>
             <View style={[
-              styles.scoreContainer, 
+              styles.scoreContainer,
               isShowingFeedback && (answerState === 'correct' ? styles.scoreFeedbackCorrect : styles.scoreFeedbackWrong)
             ]}>
               {isShowingFeedback ? (
-                <Animated.View style={{ 
-                  flexDirection: 'row', 
-                  alignItems: 'center', 
+                <Animated.View style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
                   gap: 4,
                   opacity: feedbackOpacity,
                   transform: [{ scale: feedbackScale }]
                 }}>
-                  <Ionicons 
-                    name={answerState === 'correct' ? 'checkmark-circle' : 'close-circle'} 
-                    size={16} 
-                    color="#FFF" 
+                  <Ionicons
+                    name={answerState === 'correct' ? 'checkmark-circle' : 'close-circle'}
+                    size={16}
+                    color="#FFF"
                   />
                   <Text style={styles.scoreFeedbackText}>
                     {answerState === 'correct' ? 'Chính xác' : 'Sai rồi'}
@@ -372,19 +372,9 @@ export default function GameMCQScreen() {
         <Animated.View
           style={[styles.mainCard, { transform: [{ translateX: cardShake }] }]}
         >
-          {!showExplanation ? (
-            <Text style={styles.mainQuestionText}>
-              {currentQuestion?.question}
-            </Text>
-          ) : (
-            <View style={[
-              styles.modernExplBox,
-              answerState === 'correct' ? styles.modernExplCorrect : styles.modernExplWrong,
-              { marginTop: 0 }
-            ]}>
-              <Text style={styles.modernExplText}>{currentQuestion?.explanation}</Text>
-            </View>
-          )}
+          <Text style={styles.mainQuestionText}>
+            {currentQuestion?.question}
+          </Text>
         </Animated.View>
 
         {/* Options Area */}
@@ -401,7 +391,7 @@ export default function GameMCQScreen() {
                 {answerState !== 'idle' && index === currentQuestion?.correctIndex ? (
                   <Ionicons name="checkmark" size={16} color="#FFF" />
                 ) : answerState !== 'idle' && index === selectedOption && index !== currentQuestion.correctIndex ? (
-                  <Ionicons name="close" size={16} color="#EF4444" />
+                  <Ionicons name="close" size={16} color="#FFF" />
                 ) : (
                   <Text style={[
                     styles.optLetter,
@@ -412,18 +402,38 @@ export default function GameMCQScreen() {
                 )}
               </View>
               <Text style={styles.optText}>{option}</Text>
-
-              {answerState !== 'idle' && index === currentQuestion.correctIndex && (
-                <View style={styles.correctMarker}>
-                  <Ionicons name="checkmark-circle" size={24} color="#22C55E" />
-                </View>
-              )}
             </TouchableOpacity>
           ))}
         </View>
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      {/* Modern Absolute Feedback Overlay */}
+      {isShowingFeedback && (
+        <Animated.View style={[
+          styles.modernFeedback,
+          answerState === 'wrong' && styles.modernFeedbackWrong,
+          {
+            opacity: feedbackOpacity,
+            transform: [{ scale: feedbackScale }]
+          }
+        ]}>
+          <Ionicons
+            name={answerState === 'correct' ? 'checkmark-circle' : 'close-circle'}
+            size={60}
+            color="#FFF"
+          />
+          <Text style={styles.modernFeedbackText}>
+            {answerState === 'correct' ? 'Chính xác' : 'Sai rồi'}
+          </Text>
+          {currentQuestion?.explanation && (
+            <Text style={[styles.modernFeedbackText, { fontSize: 16, fontWeight: '500', marginTop: 12, lineHeight: 20 }]}>
+              {currentQuestion.explanation}
+            </Text>
+          )}
+        </Animated.View>
+      )}
 
       {/* Floating Close Button at Bottom Right */}
       <TouchableOpacity

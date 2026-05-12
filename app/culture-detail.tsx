@@ -24,6 +24,7 @@ export default function CultureDetailScreen() {
   const initialName = (params.name as string) || '';
   const initialDescription = (params.description as string) || '';
   const initialImageUrl = (params.imageUrl as string);
+  const initialIsFavorite = params.favorite === 'true';
 
   const [cultureData, setCultureData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -61,6 +62,17 @@ export default function CultureDetailScreen() {
   const contentBlocks = cultureData?.contentBlocks || [];
   const imageUrl = cultureData?.imageUrl6 || cultureData?.imageUrl || initialImageUrl;
 
+  const isFavorite = cultureData?.favorite ?? initialIsFavorite;
+
+  const handleToggleFavorite = async () => {
+    try {
+      const { toggleFavorite } = require('@/services/firebase-service');
+      await toggleFavorite(id, !isFavorite);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
@@ -91,6 +103,11 @@ export default function CultureDetailScreen() {
             <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
               <Ionicons name="arrow-back" size={24} color="#000" />
             </TouchableOpacity>
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
+                <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={22} color={isFavorite ? "#FF4B4B" : "#000"} />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
@@ -220,8 +237,8 @@ export default function CultureDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  topNav: { position: 'absolute', top: 50, left: 20, right: 20, zIndex: 100 },
+  container: { flex: 1, backgroundColor: '#ffffffff' },
+  topNav: { position: 'absolute', top: 50, left: 20, right: 20, zIndex: 100, flexDirection: 'row', justifyContent: 'space-between' },
   iconBtn: {
     width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.9)',
     justifyContent: 'center', alignItems: 'center', elevation: 4,
