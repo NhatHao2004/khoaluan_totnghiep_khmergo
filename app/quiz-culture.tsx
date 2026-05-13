@@ -1,4 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useCultures } from '@/hooks/use-culture';
 import { PAGODA_QUIZZES } from '@/utils/quizData';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,7 +18,9 @@ import {
 export default function QuizCultureSelectScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { language, t } = useLanguage();
   const { cultures, loading } = useCultures();
+  const isKm = language === 'km';
 
   // Sắp xếp theo thứ tự yêu cầu: culture_2, culture_3, culture_4, culture_1, culture_5
   const order = ['culture_2', 'culture_3', 'culture_4', 'culture_1', 'culture_5'];
@@ -31,14 +34,27 @@ export default function QuizCultureSelectScreen() {
         : quiz.image;
       
       // Đổi tên culture_1 nếu cần theo yêu cầu
-      let displayName = culture.name || quiz.pagodaName;
-      if (culture.id === 'culture_1') displayName = 'Tôn giáo và đời sống';
-      if (culture.id === 'culture_3') displayName = 'Nghệ thuật ca và múa';
+      let displayName = isKm ? (culture.name_khmer || quiz.pagodaNameKm) : (culture.name || quiz.pagodaName);
+      if (culture.id === 'culture_1') {
+        displayName = isKm ? 'សាសនា និងជីវិត' : 'Tôn giáo và đời sống';
+      }
+      if (culture.id === 'culture_2') {
+        displayName = isKm ? 'ពិធីបុណ្យប្រពៃណី' : 'Lễ hội truyền thống';
+      }
+      if (culture.id === 'culture_3') {
+        displayName = isKm ? 'សិល្បៈ ចម្រៀង និងរបាំ' : 'Nghệ thuật ca và múa';
+      }
+      if (culture.id === 'culture_4') {
+        displayName = isKm ? 'ភាសា និងអក្សរសាស្ត្រ' : 'Ngôn ngữ và chữ viết';
+      }
+      if (culture.id === 'culture_5') {
+        displayName = isKm ? 'សម្លៀកបំពាក់ប្រពៃណី' : 'Trang phục truyền thống';
+      }
 
       return {
         id: culture.id,
         name: displayName,
-        location: culture.location || quiz.location,
+        location: isKm ? (culture.location_khmer || culture.location || quiz.location) : (culture.location || quiz.location),
         imageSource,
         imageUrl: culture.imageUrl || '',
         color: quiz.color,
@@ -49,11 +65,11 @@ export default function QuizCultureSelectScreen() {
   const handleSelect = (pagodaId: string, imageUrl: string, pagodaLocation: string) => {
     if (!user) {
       Alert.alert(
-        'Yêu cầu đăng nhập',
-        'Bạn cần đăng nhập để tham gia thử thách và tích luỵ điểm xếp hạng',
+        isKm ? 'តម្រូវឱ្យចូល' : 'Yêu cầu đăng nhập',
+        isKm ? 'អ្នកត្រូវចូលដើម្បីចូលរួមក្នុងបញ្ហាប្រឈមនេះ' : 'Bạn cần đăng nhập để tham gia thử thách và tích luỵ điểm xếp hạng',
         [
-          { text: 'Huỷ', style: 'cancel' },
-          { text: 'Đăng nhập', onPress: () => router.push('/login') },
+          { text: isKm ? 'បោះបង់' : 'Huỷ', style: 'cancel' },
+          { text: isKm ? 'ចូល' : 'Đăng nhập', onPress: () => router.push('/login') },
         ]
       );
       return;
@@ -70,7 +86,7 @@ export default function QuizCultureSelectScreen() {
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
           <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
-            Văn hóa Khmer
+            {isKm ? 'វប្បធម៌ខ្មែរ' : 'Văn hóa Khmer'}
           </Text>
         </View>
         <View style={{ width: 40 }} />
@@ -80,7 +96,9 @@ export default function QuizCultureSelectScreen() {
       {loading && (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color="#FF0050" />
-          <Text style={{ marginTop: 10, color: '#888' }}>Đang tải dữ liệu...</Text>
+          <Text style={{ marginTop: 10, color: '#888' }}>
+            {isKm ? 'កំពុងផ្ទុកទិន្នន័យ...' : 'Đang tải dữ liệu...'}
+          </Text>
         </View>
       )}
 
@@ -112,7 +130,9 @@ export default function QuizCultureSelectScreen() {
                   {/* Quiz footer thêm */}
                   <View style={styles.footer}>
                     <View style={styles.info}>
-                      <Text style={styles.infoText}>5 câu hỏi - cộng 5 điểm cho mỗi câu đúng</Text>
+                      <Text style={styles.infoText}>
+                        {isKm ? '៥ សំណួរ - បូក ៥ ពិន្ទុសម្រាប់រាល់ចម្លើយដែលត្រឹមត្រូវ' : '5 câu hỏi - cộng 5 điểm cho mỗi câu đúng'}
+                      </Text>
                     </View>
 
                     <TouchableOpacity
@@ -120,7 +140,7 @@ export default function QuizCultureSelectScreen() {
                       activeOpacity={0.8}
                       onPress={() => handleSelect(item.id, item.imageUrl, item.location)}
                     >
-                      <Text style={styles.startBtnText}>Bắt đầu</Text>
+                      <Text style={styles.startBtnText}>{isKm ? 'ចាប់ផ្តើម' : 'Bắt đầu'}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>

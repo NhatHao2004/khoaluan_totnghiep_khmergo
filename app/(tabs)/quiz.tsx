@@ -86,9 +86,9 @@ export default function QuizScreen() {
             </View>
 
             <View style={styles.nameContainer}>
-              <Text style={styles.cardName} numberOfLines={1}>{user?.name || t('guest')}</Text>
+              <Text style={styles.cardName} numberOfLines={1} adjustsFontSizeToFit>{user?.name || t('guest')}</Text>
               <View style={styles.rankBadge}>
-                <Text style={styles.cardRankText}>
+                <Text style={styles.cardRankText} numberOfLines={1} adjustsFontSizeToFit>
                   {`${t('current_rank')}: ${userRank}`}
                 </Text>
               </View>
@@ -98,12 +98,12 @@ export default function QuizScreen() {
           <View style={styles.cardStats}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{user?.points || 0}</Text>
-              <Text style={styles.statLabel}>{t('points')}</Text>
+              <Text style={styles.statLabel} numberOfLines={1}>{t('points')}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>0</Text>
-              <Text style={styles.statLabel}>{t('completed')}</Text>
+              <Text style={styles.statLabel} numberOfLines={1}>{t('completed')}</Text>
             </View>
           </View>
         </View>
@@ -111,8 +111,8 @@ export default function QuizScreen() {
         {/* Categories Section */}
         <View style={styles.sectionHeader}>
           <View>
-            <Text style={styles.sectionTitle}>{t('categories')}</Text>
-            <Text style={styles.sectionSubtitle}>{t('choose_topic')}</Text>
+            <Text style={styles.sectionTitle} numberOfLines={1} adjustsFontSizeToFit>{t('categories')}</Text>
+            <Text style={styles.sectionSubtitle} numberOfLines={1} adjustsFontSizeToFit>{t('choose_topic')}</Text>
           </View>
         </View>
 
@@ -138,7 +138,9 @@ export default function QuizScreen() {
                   router.push('/quiz-pagoda');
                 }}
               >
-                <Text style={styles.bentoTitle} numberOfLines={2}>{t('pagoda_quiz')}</Text>
+                <View style={styles.bentoTitleContainer}>
+                  <Text style={styles.bentoTitle} numberOfLines={2} adjustsFontSizeToFit>{t('pagoda_quiz')}</Text>
+                </View>
                 <View style={styles.bentoImageContainer}>
                   <Image source={require('@/assets/images/pagoda.jpg')} style={styles.bentoImage} />
                 </View>
@@ -165,7 +167,9 @@ export default function QuizScreen() {
                   router.push('/quiz-culture');
                 }}
               >
-                <Text style={styles.bentoTitleSmall} numberOfLines={1}>{t('culture_quiz')}</Text>
+                <View style={[styles.bentoTitleContainer, { height: '30%' }]}>
+                  <Text style={styles.bentoTitleSmall} numberOfLines={1} adjustsFontSizeToFit>{t('culture_quiz')}</Text>
+                </View>
                 <View style={styles.bentoImageContainerSmall}>
                   <Image source={require('@/assets/images/festival.jpg')} style={styles.bentoImage} />
                 </View>
@@ -176,7 +180,9 @@ export default function QuizScreen() {
                 style={[styles.bentoCard, { height: 102.5 }]}
                 onPress={() => Alert.alert('Sắp ra mắt')}
               >
-                <Text style={styles.bentoTitleSmall} numberOfLines={1}>{t('food_quiz')}</Text>
+                <View style={[styles.bentoTitleContainer, { height: '30%' }]}>
+                  <Text style={styles.bentoTitleSmall} numberOfLines={1} adjustsFontSizeToFit>{t('food_quiz')}</Text>
+                </View>
                 <View style={styles.bentoImageContainerSmall}>
                   <Image source={require('@/assets/images/amthuc.jpg')} style={styles.bentoImage} />
                 </View>
@@ -205,8 +211,8 @@ export default function QuizScreen() {
           >
             <View style={styles.bentoFullContent}>
               <View style={{ flex: 1 }}>
-                <Text style={[styles.bentoTitle, { textAlign: 'left' }]}>{t('vocab_quiz')}</Text>
-                <Text style={[styles.bentoSubtitle, { textAlign: 'left' }]}>Học từ vựng qua hình ảnh</Text>
+                <Text style={[styles.bentoTitle, { textAlign: 'left' }]} numberOfLines={1} adjustsFontSizeToFit>{t('vocab_quiz')}</Text>
+                <Text style={[styles.bentoSubtitle, { textAlign: 'left' }]} numberOfLines={1} adjustsFontSizeToFit>Học từ vựng qua hình ảnh</Text>
               </View>
               <View style={styles.bentoImageContainerFull}>
                 <Image source={require('@/assets/images/hoctap.jpg')} style={styles.bentoImage} />
@@ -282,6 +288,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#000000ff',
     marginBottom: 4,
+    lineHeight: 30, // Fixed line height for Khmer
   },
   rankBadge: {
     flexDirection: 'row',
@@ -292,11 +299,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignSelf: 'flex-start',
     gap: 6,
+    height: 25, // Fixed height
   },
   cardRankText: {
     fontSize: 15,
     fontWeight: '800',
     color: '#000000ff',
+    lineHeight: 20,
   },
   cardStats: {
     flexDirection: 'row',
@@ -321,6 +330,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '900',
     color: '#1E293B',
+    lineHeight: 24,
   },
   statLabel: {
     fontSize: 12,
@@ -328,22 +338,27 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 2,
     textAlign: 'center',
+    height: 18, // Fixed height to prevent shift
   },
   sectionHeader: {
     marginBottom: 20,
     alignItems: 'flex-start',
+    height: 60, // Fixed height
+    justifyContent: 'center',
   },
   sectionTitle: {
     fontSize: 22,
     fontWeight: '900',
     color: '#1E293B',
     textAlign: 'left',
+    lineHeight: 30,
   },
   sectionSubtitle: {
     fontSize: 14,
     color: '#64748B',
-    marginTop: 5,
+    marginTop: 2,
     textAlign: 'left',
+    lineHeight: 20,
   },
   bentoContainer: {
     width: '100%',
@@ -358,13 +373,20 @@ const styles = StyleSheet.create({
     overflow: 'visible',
     position: 'relative',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start', // Use flex-start to control layout
     backgroundColor: '#FFFFFF',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 5,
-    elevation: 2, // Reduced elevation to avoid gray artifacts
+    elevation: 2,
+  },
+  bentoTitleContainer: {
+    width: '100%',
+    height: '25%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 5,
   },
   bentoCardFull: {
     width: '100%',
@@ -379,21 +401,21 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 5,
-    elevation: 2, // Reduced elevation to avoid gray artifacts
+    elevation: 2,
   },
 
   bentoTitle: {
     fontSize: 18,
     fontWeight: '800',
     color: '#1E293B',
-    lineHeight: 26, // Tăng lên để không cắt dấu
+    lineHeight: 26,
     textAlign: 'center',
   },
   bentoTitleSmall: {
     fontSize: 14,
     fontWeight: '800',
     color: '#1E293B',
-    lineHeight: 20, // Thêm lineHeight
+    lineHeight: 20,
     textAlign: 'center',
   },
   bentoSubtitle: {
@@ -402,6 +424,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 2,
     textAlign: 'center',
+    lineHeight: 18,
   },
   bentoImageContainer: {
     width: 110,
@@ -410,7 +433,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 0,
     borderRadius: 20,
     overflow: 'hidden',
   },
@@ -421,7 +444,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 5,
+    marginTop: 0,
     borderRadius: 10,
     overflow: 'hidden',
   },
@@ -429,14 +452,14 @@ const styles = StyleSheet.create({
     width: 110,
     height: 110,
     opacity: 1,
-    backgroundColor: 'transparent', // Ensure transparency
+    backgroundColor: 'transparent',
     borderRadius: 20,
     overflow: 'hidden',
   },
   bentoImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'contain', // Changed back to show the full image
+    resizeMode: 'contain',
   },
   bentoFullContent: {
     flexDirection: 'row',

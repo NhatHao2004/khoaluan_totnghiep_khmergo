@@ -1,4 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useTemples } from '@/hooks/use-temples';
 import { PAGODA_QUIZZES } from '@/utils/quizData';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,7 +18,9 @@ import {
 export default function QuizPagodaSelectScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { language, t } = useLanguage();
   const { temples, loading } = useTemples();
+  const isKm = language === 'km';
 
   // Merge Firebase data với quiz metadata (màu, câu hỏi) từ quizData.ts
   const pagodas = temples
@@ -29,9 +32,8 @@ export default function QuizPagodaSelectScreen() {
         : quiz.image;
       return {
         pagodaId: temple.id,
-        pagodaName: temple.name || quiz.pagodaName,
-        pagodaNameKm: temple.name_khmer || quiz.pagodaNameKm,
-        location: temple.location || quiz.location,
+        pagodaName: isKm ? (temple.name_khmer || quiz.pagodaNameKm) : (temple.name || quiz.pagodaName),
+        pagodaLocation: isKm ? (temple.location_khmer || temple.location || quiz.location) : (temple.location || quiz.location),
         imageSource,
         imageUrl: temple.imageUrl || '',
         color: quiz.color,
@@ -42,11 +44,11 @@ export default function QuizPagodaSelectScreen() {
   const handleSelect = (pagodaId: string, imageUrl: string, pagodaLocation: string) => {
     if (!user) {
       Alert.alert(
-        'Yêu cầu đăng nhập',
-        'Bạn cần đăng nhập để tham gia thử thách và tích luỵ điểm xếp hạng',
+        isKm ? 'តម្រូវឱ្យចូល' : 'Yêu cầu đăng nhập',
+        isKm ? 'អ្នកត្រូវចូលដើម្បីចូលរួមក្នុងបញ្ហាប្រឈមនេះ' : 'Bạn cần đăng nhập để tham gia thử thách và tích luỵ điểm xếp hạng',
         [
-          { text: 'Huỷ', style: 'cancel' },
-          { text: 'Đăng nhập', onPress: () => router.push('/login') },
+          { text: isKm ? 'បោះបង់' : 'Huỷ', style: 'cancel' },
+          { text: isKm ? 'ចូល' : 'Đăng nhập', onPress: () => router.push('/login') },
         ]
       );
       return;
@@ -63,7 +65,7 @@ export default function QuizPagodaSelectScreen() {
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
           <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
-            Ngôi chùa Khmer
+            {isKm ? 'វត្តខ្មែរ' : 'Ngôi chùa Khmer'}
           </Text>
         </View>
         <View style={{ width: 40 }} />
@@ -73,7 +75,9 @@ export default function QuizPagodaSelectScreen() {
       {loading && (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color="#FF0050" />
-          <Text style={{ marginTop: 10, color: '#888' }}>Đang tải dữ liệu...</Text>
+          <Text style={{ marginTop: 10, color: '#888' }}>
+            {isKm ? 'កំពុងផ្ទុកទិន្នន័យ...' : 'Đang tải dữ liệu...'}
+          </Text>
         </View>
       )}
 
@@ -100,20 +104,22 @@ export default function QuizPagodaSelectScreen() {
                 {/* Nội dung */}
                 <View style={styles.pagodaContent}>
                   <Text style={styles.pagodaName}>{pagoda.pagodaName}</Text>
-                  <Text style={styles.pagodaLocation}>{pagoda.location}</Text>
+                  <Text style={styles.pagodaLocation}>{pagoda.pagodaLocation}</Text>
 
                   {/* Quiz footer thêm */}
                   <View style={styles.quizFooter}>
                     <View style={styles.quizInfo}>
-                      <Text style={styles.quizInfoText}>5 câu hỏi - cộng 5 điểm cho mỗi câu đúng</Text>
+                      <Text style={styles.quizInfoText}>
+                        {isKm ? '៥ សំណួរ - បូក ៥ ពិន្ទុសម្រាប់រាល់ចម្លើយដែលត្រឹមត្រូវ' : '5 câu hỏi - cộng 5 điểm cho mỗi câu đúng'}
+                      </Text>
                     </View>
 
                     <TouchableOpacity
                       style={styles.startBtn}
                       activeOpacity={0.8}
-                      onPress={() => handleSelect(pagoda.pagodaId, pagoda.imageUrl, pagoda.location)}
+                      onPress={() => handleSelect(pagoda.pagodaId, pagoda.imageUrl, pagoda.pagodaLocation)}
                     >
-                      <Text style={styles.startBtnText}>Bắt đầu</Text>
+                      <Text style={styles.startBtnText}>{isKm ? 'ចាប់ផ្តើម' : 'Bắt đầu'}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
