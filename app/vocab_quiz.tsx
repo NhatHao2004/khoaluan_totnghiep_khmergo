@@ -71,10 +71,10 @@ export default function VocabQuizScreen() {
     const quizWords = useMemo(() => {
         if (!selectedCategory || categories.length === 0) return [];
         const category = categories.find(c => c.id === selectedCategory);
-        if (!category) return [];
+        if (!category || !category.words) return [];
 
-        // Return all words from the category (or limit to a higher number like 10/20 if desired)
-        return [...category.words].sort(() => 0.5 - Math.random());
+        // Return the first 8 words as requested
+        return [...category.words].slice(0, 8);
     }, [selectedCategory, categories]);
 
     const totalQuestions = quizWords.length || 0;
@@ -82,14 +82,19 @@ export default function VocabQuizScreen() {
 
     // Options for current question
     const currentOptions = useMemo(() => {
-        if (!currentWord || categories.length === 0) return [];
-        const allOtherWords = categories.flatMap(cat => cat.words).filter(w => w.id !== currentWord.id);
-        const distractors = allOtherWords.sort(() => 0.5 - Math.random()).slice(0, 3);
+        if (!currentWord || !selectedCategory || categories.length === 0) return [];
+        const category = categories.find(c => c.id === selectedCategory);
+        if (!category || !category.words) return [];
+
+        // Take distractors only from the SAME category to maintain context
+        const allOtherWordsInCat = category.words.filter((w: any) => w.id !== currentWord.id);
+        const distractors = [...allOtherWordsInCat].sort(() => 0.5 - Math.random()).slice(0, 3);
+
+        // Shuffle only the 4 options for the current question
         return [...distractors, currentWord].sort(() => 0.5 - Math.random());
-    }, [currentWord, categories]);
+    }, [currentWord, selectedCategory, categories]);
 
     // Animations
-    const progressAnim = useRef(new Animated.Value(0)).current;
     const fadeAnim = useRef(new Animated.Value(1)).current;
     const slideAnim = useRef(new Animated.Value(0)).current; // For sliding questions
     const feedbackScale = useRef(new Animated.Value(0)).current;
@@ -109,16 +114,6 @@ export default function VocabQuizScreen() {
     const optionFeedbackAnims = useRef([
         new Animated.Value(0), new Animated.Value(0), new Animated.Value(0), new Animated.Value(0)
     ]).current;
-
-    useEffect(() => {
-        if (totalQuestions > 0) {
-            Animated.timing(progressAnim, {
-                toValue: (questionIndex + 1) / totalQuestions,
-                duration: 500,
-                useNativeDriver: false,
-            }).start();
-        }
-    }, [questionIndex, totalQuestions]);
 
     const handleAnswer = (index: number) => {
         if (answerState !== 'idle') return;
@@ -201,7 +196,6 @@ export default function VocabQuizScreen() {
         setQuestionResults([]);
         setAnswerState('idle');
         setSelectedOption(null);
-        progressAnim.setValue(0);
         feedbackScale.setValue(0);
         optionFeedbackAnims.forEach(anim => anim.setValue(0));
     };
@@ -214,7 +208,6 @@ export default function VocabQuizScreen() {
         setQuestionResults([]);
         setAnswerState('idle');
         setSelectedOption(null);
-        progressAnim.setValue(0);
         feedbackScale.setValue(0);
         optionFeedbackAnims.forEach(anim => anim.setValue(0));
     };
@@ -236,10 +229,6 @@ export default function VocabQuizScreen() {
         router.back();
     };
 
-    const progressWidth = progressAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: ['0%', '100%'],
-    });
 
     if (gameState === 'selection') {
         return (
@@ -257,7 +246,7 @@ export default function VocabQuizScreen() {
                             </ThemedText>
                         </View>
 
-                        <View style={{ width: 40 }} />
+                        <View style={{ width: 50 }} />
                     </View>
 
                     <ScrollView
@@ -268,7 +257,7 @@ export default function VocabQuizScreen() {
 
                         <View style={styles.categoryList}>
                             {categories.map((category, index) => (
-                                <View key={category.id} style={styles.categoryMainCard}>
+                                <View key={category.id || index} style={styles.categoryMainCard}>
                                     {/* Proxy Image Container */}
                                     <View style={styles.categoryImageContainer}>
                                         <Image
@@ -286,7 +275,7 @@ export default function VocabQuizScreen() {
                                     {/* Content */}
                                     <View style={styles.categoryCardBody}>
                                         <Text style={styles.categoryCardTitle}>{t(category.title)}</Text>
-                                        <Text style={styles.categoryCardSub}>{category.words?.length || 0} {t('vocab_challenge_questions')}</Text>
+                                        <Text style={styles.categoryCardSub}>{Math.min(8, category.words?.length || 0)} {t('vocab_challenge_questions')}</Text>
 
                                         {/* Quiz footer */}
                                         <View style={styles.quizSelectionFooter}>
@@ -397,11 +386,14 @@ export default function VocabQuizScreen() {
 
     return (
         <View style={styles.container}>
-            <SafeAreaView style={{ flex: 1 }}>
-                {/* Premium Gaming Header */}
-                <View style={styles.premiumHeader}>
-                    <View style={styles.gameInfoBox}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            {/* Decorative background circle */}
+            <View style={[styles.bgCircle, { backgroundColor: '#7C3AED05' }]} />
+
+            {/* Modern Header Style */}
+            <View style={styles.headerContainer}>
+                <View style={styles.headerInfo}>
+                    <View style={styles.headerTopRow}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                             <TouchableOpacity
                                 onPress={() =>
                                     Alert.alert(t('exit_game_title'), t('exit_game_msg'), [
@@ -411,12 +403,9 @@ export default function VocabQuizScreen() {
                                 }
                                 style={styles.headerCloseBtn}
                             >
-                                <Ionicons name="arrow-back" size={28} color="#000000" />
+                                <Ionicons name="arrow-back" size={28} color="#1E293B" />
                             </TouchableOpacity>
-
-                            <View style={styles.stepBadge}>
-                                <Text style={styles.stepBadgeText}>{t('question').toUpperCase()} {questionIndex + 1} / {totalQuestions}</Text>
-                            </View>
+                            <Text style={styles.gameHeaderTitle}>{t('question').toUpperCase()} {questionIndex + 1} / {totalQuestions}</Text>
                         </View>
 
                         <View style={styles.scorePill}>
@@ -424,126 +413,119 @@ export default function VocabQuizScreen() {
                             <Text style={styles.scorePillText}>{score}</Text>
                         </View>
                     </View>
-                    <View style={styles.progressWrapper}>
-                        <View style={styles.progressTrack}>
-                            <Animated.View style={[styles.progressBar, { width: progressWidth }]} />
-                        </View>
-                    </View>
+                </View>
+            </View>
+
+            <ScrollView
+                style={styles.gameBody}
+                contentContainerStyle={{ paddingBottom: 100 }}
+                showsVerticalScrollIndicator={false}
+            >
+                {/* Premium Card Stage */}
+                <Animated.View style={[
+                    styles.mainCard,
+                    {
+                        opacity: fadeAnim,
+                        transform: [
+                            { translateY: slideAnim },
+                            { translateX: cardShake }
+                        ]
+                    }
+                ]}>
+                    <Image
+                        source={currentWord?.imageUrl ? { uri: currentWord.imageUrl } : (WORD_IMAGES[currentWord?.id] || WORD_IMAGES['default'])}
+                        style={styles.mainCardImage}
+                        contentFit="contain"
+                    />
+                </Animated.View>
+
+                {/* Options Area */}
+                <View style={styles.optionsArea}>
+                    {currentOptions.map((option, i) => {
+                        const isSelected = selectedOption === i;
+                        const isCorrect = option.id === currentWord.id;
+                        const letter = ['A', 'B', 'C', 'D'][i];
+
+                        // Dynamic Style Logic
+                        const getOptionStyle = () => {
+                            if (answerState === 'idle') return styles.optBtn;
+                            if (isCorrect) return [styles.optBtn, styles.optBtnCorrect];
+                            if (isSelected && !isCorrect) return [styles.optBtn, styles.optBtnWrong];
+                            return [styles.optBtn, { opacity: 0.5 }];
+                        };
+
+                        const getLetterStyle = () => {
+                            if (answerState === 'idle') return styles.optLetterBox;
+                            if (isCorrect || isSelected) return [styles.optLetterBox, { backgroundColor: '#FFF' }];
+                            return styles.optLetterBox;
+                        };
+
+                        return (
+                            <TouchableOpacity
+                                key={i}
+                                activeOpacity={0.8}
+                                onPress={() => handleAnswer(i)}
+                                disabled={answerState !== 'idle'}
+                                style={getOptionStyle()}
+                            >
+                                <View style={getLetterStyle()}>
+                                    {answerState !== 'idle' && isCorrect ? (
+                                        <Ionicons name="checkmark" size={18} color="#22C55E" />
+                                    ) : answerState !== 'idle' && isSelected && !isCorrect ? (
+                                        <Ionicons name="close" size={18} color="#EF4444" />
+                                    ) : (
+                                        <Text style={[
+                                            styles.optLetterText,
+                                            (answerState !== 'idle' && (isCorrect || isSelected)) && { color: isCorrect ? '#22C55E' : '#EF4444' }
+                                        ]}>
+                                            {letter}
+                                        </Text>
+                                    )}
+                                </View>
+
+                                <View style={styles.optContent}>
+                                    <Text style={[
+                                        styles.optTextKhm,
+                                        (answerState !== 'idle' && isCorrect) && { color: '#FFF' },
+                                        (answerState !== 'idle' && isSelected && !isCorrect) && { color: '#EF4444' }
+                                    ]}>
+                                        {option.khm} <Text style={[
+                                            styles.optTextVie,
+                                            (answerState !== 'idle' && isCorrect) && { color: 'rgba(255,255,255,0.9)' },
+                                            (answerState !== 'idle' && isSelected && !isCorrect) && { color: 'rgba(239, 68, 68, 0.8)' }
+                                        ]}>({option.vie})</Text>
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
+                        );
+                    })}
                 </View>
 
-                <ScrollView
-                    style={styles.gameBody}
-                    contentContainerStyle={{ paddingBottom: 40 }}
-                    showsVerticalScrollIndicator={false}
-                >
-                    {/* Premium Card Stage */}
-                    <Animated.View style={[
-                        styles.mainCard,
-                        {
-                            opacity: fadeAnim,
-                            transform: [
-                                { translateY: slideAnim },
-                                { translateX: cardShake }
-                            ]
-                        }
-                    ]}>
-                        <Image
-                            source={currentWord?.imageUrl ? { uri: currentWord.imageUrl } : (WORD_IMAGES[currentWord?.id] || WORD_IMAGES['default'])}
-                            style={styles.mainCardImage}
-                            contentFit="contain"
+                <View style={{ height: 40 }} />
+            </ScrollView>
+
+            {/* Modern Absolute Feedback Overlay */}
+            {answerState !== 'idle' && (
+                <Animated.View style={[
+                    styles.modernFeedback,
+                    answerState === 'wrong' && styles.modernFeedbackWrong,
+                    {
+                        transform: [{ scale: feedbackScale }],
+                        opacity: feedbackScale // Simple fade with scale
+                    }
+                ]}>
+                    <View style={styles.feedbackIconCircle}>
+                        <Ionicons
+                            name={answerState === 'correct' ? 'checkmark-circle' : 'close-circle'}
+                            size={80}
+                            color="#FFF"
                         />
-                        <View style={styles.mainCardOverlay}>
-                            <Text style={styles.mainCardBadge}>{t('vocab_quiz')}</Text>
-                        </View>
-                    </Animated.View>
-
-                    {/* Options Area */}
-                    <View style={styles.optionsArea}>
-                        {currentOptions.map((option, i) => {
-                            const isSelected = selectedOption === i;
-                            const isCorrect = option.id === currentWord.id;
-                            const letter = ['A', 'B', 'C', 'D'][i];
-
-                            // Dynamic Style Logic
-                            const getOptionStyle = () => {
-                                if (answerState === 'idle') return styles.optBtn;
-                                if (isCorrect) return [styles.optBtn, styles.optBtnCorrect];
-                                if (isSelected && !isCorrect) return [styles.optBtn, styles.optBtnWrong];
-                                return [styles.optBtn, { opacity: 0.5 }];
-                            };
-
-                            const getLetterStyle = () => {
-                                if (answerState === 'idle') return styles.optLetterBox;
-                                if (isCorrect || isSelected) return [styles.optLetterBox, { backgroundColor: '#FFF' }];
-                                return styles.optLetterBox;
-                            };
-
-                            return (
-                                <TouchableOpacity
-                                    key={option.id}
-                                    activeOpacity={0.8}
-                                    onPress={() => handleAnswer(i)}
-                                    disabled={answerState !== 'idle'}
-                                    style={getOptionStyle()}
-                                >
-                                    <View style={getLetterStyle()}>
-                                        {answerState !== 'idle' && isCorrect ? (
-                                            <Ionicons name="checkmark" size={18} color="#22C55E" />
-                                        ) : answerState !== 'idle' && isSelected && !isCorrect ? (
-                                            <Ionicons name="close" size={18} color="#EF4444" />
-                                        ) : (
-                                            <Text style={[
-                                                styles.optLetterText,
-                                                (answerState !== 'idle' && (isCorrect || isSelected)) && { color: isCorrect ? '#22C55E' : '#EF4444' }
-                                            ]}>
-                                                {letter}
-                                            </Text>
-                                        )}
-                                    </View>
-
-                                    <View style={styles.optContent}>
-                                        <Text style={[
-                                            styles.optTextKhm,
-                                            (answerState !== 'idle' && isCorrect) && { color: '#FFF' },
-                                            (answerState !== 'idle' && isSelected && !isCorrect) && { color: '#EF4444' }
-                                        ]}>{option.khm}</Text>
-                                        <Text style={[
-                                            styles.optTextVie,
-                                            (answerState !== 'idle' && isCorrect) && { color: 'rgba(255,255,255,0.8)' },
-                                            (answerState !== 'idle' && isSelected && !isCorrect) && { color: '#EF4444' }
-                                        ]}>{option.pronunciation}</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            );
-                        })}
                     </View>
-
-                    <View style={{ height: 40 }} />
-                </ScrollView>
-
-                {/* Modern Absolute Feedback Overlay */}
-                {answerState !== 'idle' && (
-                    <Animated.View style={[
-                        styles.modernFeedback,
-                        answerState === 'wrong' && styles.modernFeedbackWrong,
-                        {
-                            transform: [{ scale: feedbackScale }],
-                            opacity: feedbackScale // Simple fade with scale
-                        }
-                    ]}>
-                        <View style={styles.feedbackIconCircle}>
-                            <Ionicons
-                                name={answerState === 'correct' ? 'checkmark-circle' : 'close-circle'}
-                                size={80}
-                                color="#FFF"
-                            />
-                        </View>
-                        <Text style={styles.modernFeedbackText}>
-                            {answerState === 'correct' ? t('correct') : t('wrong_answer')}
-                        </Text>
-                    </Animated.View>
-                )}
-            </SafeAreaView>
+                    <Text style={styles.modernFeedbackText}>
+                        {answerState === 'correct' ? t('correct') : t('wrong_answer')}
+                    </Text>
+                </Animated.View>
+            )}
         </View>
     );
 }
@@ -676,7 +658,7 @@ const styles = StyleSheet.create({
     categoryCardBody: {
         paddingHorizontal: 15,
         paddingBottom: 15,
-        paddingTop: 6,
+        paddingTop: 8,
     },
     categoryCardTitle: { fontSize: 18, fontWeight: '800', color: '#1A1A1A', marginBottom: 4 },
     categoryCardSub: { fontSize: 13, color: '#666', marginBottom: 12 },
@@ -702,7 +684,8 @@ const styles = StyleSheet.create({
     startQuizBtnText: { color: '#FFF', fontSize: 12, fontWeight: '800' },
     gameBody: {
         flex: 1,
-        padding: 20,
+        paddingHorizontal: 20,
+        paddingTop: 20,
     },
     visualCard: {
         width: '100%',
@@ -858,31 +841,46 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '700',
     },
-    // Premium Gaming Styles
-    premiumHeader: {
-        paddingHorizontal: 20,
-        paddingTop: 15,
-        paddingBottom: 15,
+    // Modern Gaming Styles
+    bgCircle: {
+        position: 'absolute',
+        top: -100,
+        right: -100,
+        width: 300,
+        height: 300,
+        borderRadius: 150,
+        zIndex: 0,
     },
-    gameInfoBox: {
+    headerContainer: {
+        paddingTop: 40,
+        paddingHorizontal: 20,
+        paddingBottom: 20,
+        height: 100,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFF',
+        borderBottomLeftRadius: 30,
+        borderBottomRightRadius: 30,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.03,
+        shadowRadius: 20,
+        elevation: 5,
+        zIndex: 10,
+    },
+    headerInfo: {
+        flex: 1,
+        alignItems: 'stretch',
+    },
+    headerTopRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 15,
     },
-    stepBadge: {
-        backgroundColor: '#F5F3FF',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 10,
-        borderWidth: 1,
-        borderColor: '#DDD6FE',
-    },
-    stepBadgeText: {
-        fontSize: 12,
-        fontWeight: '900',
-        color: '#7C3AED',
-        letterSpacing: 1,
+    gameHeaderTitle: {
+        fontSize: 16,
+        fontWeight: '800',
+        color: '#334155',
     },
     scorePill: {
         flexDirection: 'row',
@@ -900,22 +898,6 @@ const styles = StyleSheet.create({
         fontWeight: '900',
         color: '#D97706',
     },
-    progressWrapper: {
-        height: 10,
-        width: '100%',
-        backgroundColor: '#F1F5F9',
-        borderRadius: 5,
-        overflow: 'hidden',
-    },
-    progressTrack: {
-        flex: 1,
-    },
-    progressBar: {
-        height: '100%',
-        backgroundColor: '#7C3AED',
-        borderRadius: 5,
-    },
-    // Modern Gaming Styles
     mainCard: {
         width: '100%',
         aspectRatio: 1.1,

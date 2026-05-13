@@ -311,33 +311,9 @@ export default function GameMCQScreen() {
         <View style={styles.headerInfo}>
           <View style={styles.headerTopRow}>
             <Text style={styles.headerTitle}>Câu {questionIndex + 1} / {TOTAL_QUESTIONS}</Text>
-            <View style={[
-              styles.scoreContainer,
-              isShowingFeedback && (answerState === 'correct' ? styles.scoreFeedbackCorrect : styles.scoreFeedbackWrong)
-            ]}>
-              {isShowingFeedback ? (
-                <Animated.View style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 4,
-                  opacity: feedbackOpacity,
-                  transform: [{ scale: feedbackScale }]
-                }}>
-                  <Ionicons
-                    name={answerState === 'correct' ? 'checkmark-circle' : 'close-circle'}
-                    size={16}
-                    color="#FFF"
-                  />
-                  <Text style={styles.scoreFeedbackText}>
-                    {answerState === 'correct' ? 'Chính xác' : 'Sai rồi'}
-                  </Text>
-                </Animated.View>
-              ) : (
-                <>
-                  <Text style={[styles.scoreValue, { color: quizData.color }]}>{score}</Text>
-                  <Text style={styles.scoreLabel}>Điểm</Text>
-                </>
-              )}
+            <View style={styles.scorePill}>
+              <Ionicons name="flash" size={16} color="#F59E0B" />
+              <Text style={styles.scorePillText}>{score}</Text>
             </View>
           </View>
 
@@ -537,41 +513,21 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 5,
   },
-  scoreContainer: {
+  scorePill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    paddingHorizontal: 8,
+    backgroundColor: '#FFFBEB',
+    paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: 20,
+    gap: 6,
     borderWidth: 1,
-    borderColor: '#F1F5F9',
-    gap: 4,
-    width: 110, // Fixed width to prevent jumping
-    height: 40, // Fixed height
-    justifyContent: 'center',
+    borderColor: '#FEF3C7',
   },
-  scoreFeedbackCorrect: {
-    backgroundColor: '#22C55E',
-    borderColor: '#22C55E',
-  },
-  scoreFeedbackWrong: {
-    backgroundColor: '#EF4444',
-    borderColor: '#EF4444',
-  },
-  scoreFeedbackText: {
-    color: '#FFF',
-    fontSize: 14,
+  scorePillText: {
+    fontSize: 16,
     fontWeight: '900',
-  },
-  scoreLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#94A3B8',
-  },
-  scoreValue: {
-    fontSize: 18,
-    fontWeight: '900',
+    color: '#D97706',
   },
 
   // ── SCROLL CONTENT ──

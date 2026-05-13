@@ -60,6 +60,7 @@ const translations = {
 
     // Quiz Screen
     quiz_title: 'Thử thách',
+    question: 'Câu',
     start_quiz: 'Bắt đầu',
     daily_challenge: 'Thử thách hằng ngày',
     correct: 'Chính xác',
@@ -257,6 +258,7 @@ const translations = {
 
     // Quiz Screen
     quiz_title: 'ការសាកល្បង',
+    question: 'សំណួរ',
     start_quiz: 'ចាប់ផ្តើម',
     daily_challenge: 'ការសាកល្បងប្រចាំថ្ងៃ',
     correct: 'ត្រឹមត្រូវ',
