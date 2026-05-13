@@ -1,4 +1,5 @@
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -6,6 +7,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Dimensions, Image, Linking, ScrollView,
   Share,
   StatusBar,
@@ -19,6 +21,7 @@ const HERO_HEIGHT = height * 0.40;
 export default function PagodaDetailScreen() {
   const router = useRouter();
   const { t, language } = useLanguage();
+  const { user } = useAuth();
   const isKm = language === 'km';
   const params = useLocalSearchParams();
 
@@ -272,9 +275,6 @@ export default function PagodaDetailScreen() {
               </View>
             ) : (
               <View style={styles.quizCard}>
-                <View style={styles.quizIconBg}>
-                  <Ionicons name="bulb-outline" size={32} color="#FF6B2C" />
-                </View>
                 <Text style={styles.quizTitle}>Kiểm tra kiến thức</Text>
                 <Text style={styles.quizDesc}>
                   Hiểu rõ về <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> như thế nào{"\n"}
@@ -283,6 +283,24 @@ export default function PagodaDetailScreen() {
                 <TouchableOpacity
                   style={styles.quizStartBtn}
                   onPress={() => {
+                    if (!user) {
+                      Alert.alert(
+                        t('login_required') || 'Yêu cầu đăng nhập',
+                        t('login_to_use') || 'Bạn cần đăng nhập để tham gia thử thách này',
+                        [
+                          { text: isKm ? 'បោះបង់' : 'Hủy', style: 'cancel' },
+                          { 
+                            text: isKm ? 'ចូល' : 'Đăng nhập', 
+                            onPress: () => router.push({
+                              pathname: '/login',
+                              params: { returnTo: '/pagoda-detail', returnId: id }
+                            }) 
+                          }
+                        ]
+                      );
+                      return;
+                    }
+
                     router.push({
                       pathname: '/game-mcq',
                       params: {
@@ -535,7 +553,7 @@ const styles = StyleSheet.create({
     color: '#64748B',
     textAlign: 'center',
     lineHeight: 22,
-    marginBottom: 24,
+    marginBottom: 12,
   },
   quizStartBtn: {
     flexDirection: 'row',

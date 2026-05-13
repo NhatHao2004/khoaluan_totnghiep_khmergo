@@ -29,7 +29,7 @@ export default function GameMCQScreen() {
   const { pagodaId, imageUrl, pagodaLocation } = useLocalSearchParams<{ pagodaId: string; imageUrl?: string; pagodaLocation?: string }>();
   const { user, refreshUser } = useAuth();
 
-  const [pagoda, setPagoda] = useState<PagodaQuizData | null>(null);
+  const [quizData, setQuizData] = useState<PagodaQuizData | null>(null);
   const [dataLoading, setDataLoading] = useState(true);
   const [phase, setPhase] = useState<Phase>('question');
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -50,16 +50,16 @@ export default function GameMCQScreen() {
       try {
         const firestoreData = await getQuizData(pagodaId as string);
         if (firestoreData) {
-          setPagoda(firestoreData as PagodaQuizData);
+          setQuizData(firestoreData as PagodaQuizData);
         } else {
           // Fallback to local
           const local = PAGODA_QUIZZES.find(p => p.pagodaId === pagodaId) ?? PAGODA_QUIZZES[0];
-          setPagoda(local);
+          setQuizData(local);
         }
       } catch (e) {
         console.error("Error loading quiz data:", e);
         const local = PAGODA_QUIZZES.find(p => p.pagodaId === pagodaId) ?? PAGODA_QUIZZES[0];
-        setPagoda(local);
+        setQuizData(local);
       } finally {
         setDataLoading(false);
       }
@@ -77,7 +77,7 @@ export default function GameMCQScreen() {
     return localQuiz?.image;
   }, [imageUrl, pagodaId]);
 
-  const currentQuestion = pagoda?.questions[questionIndex];
+  const currentQuestion = quizData?.questions[questionIndex];
   const isLastQuestion = questionIndex === TOTAL_QUESTIONS - 1;
 
   // Animations
@@ -206,7 +206,7 @@ export default function GameMCQScreen() {
     return [styles.optionLetterBox, { backgroundColor: '#E2E8F0' }];
   };
 
-  if (dataLoading || !pagoda) {
+  if (dataLoading || !quizData) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator size="large" color="#FF6B2C" />
@@ -248,9 +248,9 @@ export default function GameMCQScreen() {
         </Text>
 
         {/* Score card */}
-        <View style={[styles.resultScoreCard, { borderColor: pagoda?.color + '40' }]}>
+        <View style={[styles.resultScoreCard, { borderColor: quizData?.color + '40' }]}>
           <View style={styles.resultScoreRow}>
-            <Text style={[styles.resultScoreNum, { color: pagoda?.color }]}>+{displayPoints}</Text>
+            <Text style={[styles.resultScoreNum, { color: quizData?.color }]}>+{displayPoints}</Text>
             <Text style={styles.resultScoreLabel}>điểm vừa tích luỹ</Text>
           </View>
 
@@ -275,7 +275,7 @@ export default function GameMCQScreen() {
         </View>
 
         <TouchableOpacity
-          style={[styles.resultPrimaryBtn, { backgroundColor: pagoda.color }]}
+          style={[styles.resultPrimaryBtn, { backgroundColor: quizData.color }]}
           onPress={handleReplay}
         >
           <Ionicons name="refresh" size={18} color="#FFF" />
@@ -295,7 +295,7 @@ export default function GameMCQScreen() {
       <StatusBar barStyle="dark-content" />
 
       {/* Decorative background circle */}
-      <View style={[styles.bgCircle, { backgroundColor: pagoda.color + '05' }]} />
+      <View style={[styles.bgCircle, { backgroundColor: quizData.color + '05' }]} />
 
       {/* Modern Header - Remove Close button here */}
       <View style={styles.headerContainer}>
@@ -325,7 +325,7 @@ export default function GameMCQScreen() {
                 </Animated.View>
               ) : (
                 <>
-                  <Text style={[styles.scoreValue, { color: pagoda.color }]}>{score}</Text>
+                  <Text style={[styles.scoreValue, { color: quizData.color }]}>{score}</Text>
                   <Text style={styles.scoreLabel}>Điểm</Text>
                 </>
               )}
@@ -337,7 +337,7 @@ export default function GameMCQScreen() {
               <Animated.View
                 style={[
                   styles.progressFill,
-                  { width: progressBarWidth, backgroundColor: pagoda.color },
+                  { width: progressBarWidth, backgroundColor: quizData.color },
                 ]}
               />
             </View>
@@ -351,7 +351,7 @@ export default function GameMCQScreen() {
       >
         {/* Dot Indicators - Floating style */}
         <View style={styles.modernDotRow}>
-          {pagoda.questions.map((_, i) => (
+          {quizData.questions.map((_, i) => (
             <View
               key={i}
               style={[
@@ -361,7 +361,7 @@ export default function GameMCQScreen() {
                     ? styles.modernDotCorrect
                     : styles.modernDotWrong
                   : i === questionIndex
-                    ? [styles.modernDotActive, { backgroundColor: pagoda.color }]
+                    ? [styles.modernDotActive, { backgroundColor: quizData.color }]
                     : styles.modernDotEmpty,
               ]}
             />

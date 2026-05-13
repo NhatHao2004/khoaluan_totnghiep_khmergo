@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { auth } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -12,6 +12,9 @@ export default function LoginScreen() {
   const { t } = useLanguage();
   const { refreshUser } = useAuth();
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const returnTo = params.returnTo as string;
+  const returnId = params.returnId as string;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -28,7 +31,15 @@ export default function LoginScreen() {
       await signInWithEmailAndPassword(auth, email, password);
       // Load dữ liệu người dùng lập tức từ Firestore trước khi chuyển trang
       await refreshUser();
-      router.replace('/(tabs)');
+      
+      if (returnTo) {
+        router.replace({
+          pathname: returnTo as any,
+          params: returnId ? { id: returnId } : {}
+        });
+      } else {
+        router.replace('/(tabs)');
+      }
     } catch (error: any) {
       let msg = t('update_failed');
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
