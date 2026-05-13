@@ -196,6 +196,7 @@ export default function VocabQuizScreen() {
         setQuestionResults([]);
         setAnswerState('idle');
         setSelectedOption(null);
+        setHasSaved(false); // Reset saving state
         feedbackScale.setValue(0);
         optionFeedbackAnims.forEach(anim => anim.setValue(0));
     };
@@ -208,23 +209,38 @@ export default function VocabQuizScreen() {
         setQuestionResults([]);
         setAnswerState('idle');
         setSelectedOption(null);
+        setHasSaved(false); // Reset saving state
         feedbackScale.setValue(0);
         optionFeedbackAnims.forEach(anim => anim.setValue(0));
     };
 
+    // Auto-save when results screen appears
+    useEffect(() => {
+        if (gameState === 'results' && user && score > 0 && !hasSaved && !isSaving) {
+            saveResults();
+        }
+    }, [gameState]);
+
+    const saveResults = async () => {
+        if (!user || score <= 0 || hasSaved || isSaving) return;
+        
+        setIsSaving(true);
+        try {
+            const { updateQuizScore } = await import('@/services/firebase-service');
+            await updateQuizScore(user.uid, 'vocab_master', score);
+            await refreshUser();
+            setHasSaved(true);
+        } catch (error) {
+            console.error('Error saving vocab quiz score:', error);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     const handleFinish = async () => {
-        if (user && score > 0 && !hasSaved) {
-            setIsSaving(true);
-            try {
-                const { updateQuizScore } = await import('@/services/firebase-service');
-                await updateQuizScore(user.uid, 'vocab_master', score);
-                await refreshUser();
-                setHasSaved(true);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setIsSaving(false);
-            }
+        // If not saved yet, try one last time (though useEffect should handle it)
+        if (user && score > 0 && !hasSaved && !isSaving) {
+            await saveResults();
         }
         router.back();
     };
@@ -348,6 +364,7 @@ export default function VocabQuizScreen() {
                             <Text style={styles.resultScoreLabel}>{t('points_earned')}</Text>
                         </View>
                         {isSaving && <Text style={styles.savingText}>{t('saving_results')}</Text>}
+                        {hasSaved && <Text style={styles.savedText}>{t('results_saved')}</Text>}
                     </View>
 
                     <Text style={styles.resultCorrectLabel}>
@@ -779,12 +796,6 @@ const styles = StyleSheet.create({
         color: '#64748B',
         fontWeight: '600',
     },
-    savingText: {
-        marginTop: 10,
-        fontSize: 14,
-        color: '#94A3B8',
-        fontStyle: 'italic',
-    },
     resultCorrectLabel: {
         fontSize: 18,
         color: '#1E293B',
@@ -829,6 +840,17 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontSize: 18,
         fontWeight: '800',
+    },
+    savingText: {
+        fontSize: 12,
+        color: '#94A3B8',
+        marginTop: 6,
+    },
+    savedText: {
+        fontSize: 12,
+        color: '#22C55E',
+        fontWeight: '700',
+        marginTop: 6,
     },
     resultSecondaryBtn: {
         width: '100%',
