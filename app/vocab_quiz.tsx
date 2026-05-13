@@ -93,6 +93,17 @@ export default function VocabQuizScreen() {
     const fadeAnim = useRef(new Animated.Value(1)).current;
     const slideAnim = useRef(new Animated.Value(0)).current; // For sliding questions
     const feedbackScale = useRef(new Animated.Value(0)).current;
+    const cardShake = useRef(new Animated.Value(0)).current;
+
+    const shakeAnimation = () => {
+        Animated.sequence([
+            Animated.timing(cardShake, { toValue: 15, duration: 50, useNativeDriver: true }),
+            Animated.timing(cardShake, { toValue: -15, duration: 50, useNativeDriver: true }),
+            Animated.timing(cardShake, { toValue: 10, duration: 50, useNativeDriver: true }),
+            Animated.timing(cardShake, { toValue: -10, duration: 50, useNativeDriver: true }),
+            Animated.timing(cardShake, { toValue: 0, duration: 50, useNativeDriver: true }),
+        ]).start();
+    };
 
     // Smooth background color animations for each option (4 options max)
     const optionFeedbackAnims = useRef([
@@ -147,6 +158,7 @@ export default function VocabQuizScreen() {
             setCorrectAnswers(prev => prev + 1);
             Vibration.vibrate(50);
         } else {
+            shakeAnimation();
             Vibration.vibrate(100);
         }
 
@@ -274,12 +286,12 @@ export default function VocabQuizScreen() {
                                     {/* Content */}
                                     <View style={styles.categoryCardBody}>
                                         <Text style={styles.categoryCardTitle}>{t(category.title)}</Text>
-                                        <Text style={styles.categoryCardSub}>{category.words?.length || 0} câu hỏi thử thách từ vựng</Text>
+                                        <Text style={styles.categoryCardSub}>{category.words?.length || 0} {t('vocab_challenge_questions')}</Text>
 
                                         {/* Quiz footer */}
                                         <View style={styles.quizSelectionFooter}>
                                             <View style={styles.quizInfoBox}>
-                                                <Text style={styles.quizInfoLabel}>Cộng 5 điểm cho mỗi câu đúng</Text>
+                                                <Text style={styles.quizInfoLabel}>{t('correct_answer_points_msg')}</Text>
                                             </View>
 
                                             <TouchableOpacity
@@ -288,11 +300,11 @@ export default function VocabQuizScreen() {
                                                 onPress={() => {
                                                     if (!user) {
                                                         Alert.alert(
-                                                            'Yêu cầu đăng nhập',
-                                                            'Bạn cần đăng nhập để tham gia thử thách và tích luỵ điểm xếp hạng',
+                                                            t('login_required'),
+                                                            t('login_required_long_msg'),
                                                             [
-                                                                { text: 'Huỷ', style: 'cancel' },
-                                                                { text: 'Đăng nhập', onPress: () => router.push('/login') },
+                                                                { text: t('cancel'), style: 'cancel' },
+                                                                { text: t('login'), onPress: () => router.push('/login') },
                                                             ]
                                                         );
                                                         return;
@@ -301,7 +313,7 @@ export default function VocabQuizScreen() {
                                                     setGameState('playing');
                                                 }}
                                             >
-                                                <Text style={styles.startQuizBtnText}>Bắt đầu</Text>
+                                                <Text style={styles.startQuizBtnText}>{t('start_quiz')}</Text>
                                             </TouchableOpacity>
                                         </View>
                                     </View>
@@ -337,20 +349,20 @@ export default function VocabQuizScreen() {
                     </View>
 
                     <Text style={styles.resultTitle}>
-                        {percentage === 100 ? '🎉 Xuất sắc' : percentage >= 80 ? '👏 Tốt lắm' : '💪 Cố lên'}
+                        {percentage === 100 ? t('excellent') : percentage >= 80 ? t('well_done') : t('keep_it_up')}
                     </Text>
 
                     {/* Score card */}
                     <View style={styles.resultScoreCard}>
                         <View style={styles.resultScoreRow}>
                             <Text style={styles.resultScoreNum}>+{score}</Text>
-                            <Text style={styles.resultScoreLabel}>điểm vừa tích luỹ</Text>
+                            <Text style={styles.resultScoreLabel}>{t('points_earned')}</Text>
                         </View>
-                        {isSaving && <Text style={styles.savingText}>Đang lưu thành tích...</Text>}
+                        {isSaving && <Text style={styles.savingText}>{t('saving_results')}</Text>}
                     </View>
 
                     <Text style={styles.resultCorrectLabel}>
-                        Trả lời đúng {correctAnswers}/{totalQuestions} câu
+                        {t('answered_correctly')} {correctAnswers}/{totalQuestions} {t('questions_count')}
                     </Text>
 
                     {/* Result dot row */}
@@ -371,11 +383,11 @@ export default function VocabQuizScreen() {
                             onPress={handleReplay}
                         >
                             <Ionicons name="refresh" size={20} color="#FFF" />
-                            <Text style={styles.resultPrimaryBtnText}>Chơi lại</Text>
+                            <Text style={styles.resultPrimaryBtnText}>{t('replay')}</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.resultSecondaryBtn} onPress={resetGame}>
-                            <Text style={styles.resultSecondaryBtnText}>Chọn bộ câu hỏi khác</Text>
+                            <Text style={styles.resultSecondaryBtnText}>{t('choose_another_quiz')}</Text>
                         </TouchableOpacity>
                     </View>
                 </SafeAreaView>
@@ -392,9 +404,9 @@ export default function VocabQuizScreen() {
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                             <TouchableOpacity
                                 onPress={() =>
-                                    Alert.alert('Thoát khỏi trò chơi', 'Tiến trình của bạn sẽ không được lưu', [
-                                        { text: 'Tiếp tục', style: 'cancel' },
-                                        { text: 'Thoát', style: 'destructive', onPress: resetGame },
+                                    Alert.alert(t('exit_game_title'), t('exit_game_msg'), [
+                                        { text: t('continue'), style: 'cancel' },
+                                        { text: t('exit'), style: 'destructive', onPress: resetGame },
                                     ])
                                 }
                                 style={styles.headerCloseBtn}
@@ -403,7 +415,7 @@ export default function VocabQuizScreen() {
                             </TouchableOpacity>
 
                             <View style={styles.stepBadge}>
-                                <Text style={styles.stepBadgeText}>CÂU {questionIndex + 1} / {totalQuestions}</Text>
+                                <Text style={styles.stepBadgeText}>{t('question').toUpperCase()} {questionIndex + 1} / {totalQuestions}</Text>
                             </View>
                         </View>
 
@@ -419,113 +431,118 @@ export default function VocabQuizScreen() {
                     </View>
                 </View>
 
-                <Animated.View style={[
-                    styles.gameBody,
-                    {
-                        opacity: fadeAnim,
-                        transform: [{ translateY: slideAnim }]
-                    }
-                ]}>
-                    {/* Visual Stage - The main focus */}
-                    <View style={styles.stageCard}>
+                <ScrollView
+                    style={styles.gameBody}
+                    contentContainerStyle={{ paddingBottom: 40 }}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {/* Premium Card Stage */}
+                    <Animated.View style={[
+                        styles.mainCard,
+                        {
+                            opacity: fadeAnim,
+                            transform: [
+                                { translateY: slideAnim },
+                                { translateX: cardShake }
+                            ]
+                        }
+                    ]}>
                         <Image
                             source={currentWord?.imageUrl ? { uri: currentWord.imageUrl } : (WORD_IMAGES[currentWord?.id] || WORD_IMAGES['default'])}
-                            style={styles.stageImage}
+                            style={styles.mainCardImage}
                             contentFit="contain"
                         />
-
-                        <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.7)']} style={styles.stageOverlay} />
-
-                        <View style={styles.stagePrompt}>
-                            <ThemedText style={styles.promptLabel}>Hình ảnh này diễn tả điều gì</ThemedText>
+                        <View style={styles.mainCardOverlay}>
+                            <Text style={styles.mainCardBadge}>{t('vocab_quiz')}</Text>
                         </View>
+                    </Animated.View>
 
-                        {/* Refined Feedback Overlay */}
-                        {answerState !== 'idle' && (
-                            <Animated.View style={[
-                                styles.stageFeedback,
-                                {
-                                    transform: [{ scale: feedbackScale }],
-                                    backgroundColor: answerState === 'correct' ? 'rgba(34, 197, 94, 0.95)' : 'rgba(239, 68, 68, 0.95)'
-                                }
-                            ]}>
-                                <View style={styles.feedbackCircle}>
-                                    <Ionicons name={answerState === 'correct' ? "checkmark" : "close"} size={60} color={answerState === 'correct' ? "#22C55E" : "#EF4444"} />
-                                </View>
-                                <Text style={styles.feedbackStatusText}>
-                                    {answerState === 'correct' ? "Chính xác" : "Sai rồi"}
-                                </Text>
-                            </Animated.View>
-                        )}
-                    </View>
-
-                    {/* Premium Options Grid */}
-                    <View style={styles.optionsStack}>
+                    {/* Options Area */}
+                    <View style={styles.optionsArea}>
                         {currentOptions.map((option, i) => {
                             const isSelected = selectedOption === i;
                             const isCorrect = option.id === currentWord.id;
                             const letter = ['A', 'B', 'C', 'D'][i];
 
+                            // Dynamic Style Logic
+                            const getOptionStyle = () => {
+                                if (answerState === 'idle') return styles.optBtn;
+                                if (isCorrect) return [styles.optBtn, styles.optBtnCorrect];
+                                if (isSelected && !isCorrect) return [styles.optBtn, styles.optBtnWrong];
+                                return [styles.optBtn, { opacity: 0.5 }];
+                            };
+
+                            const getLetterStyle = () => {
+                                if (answerState === 'idle') return styles.optLetterBox;
+                                if (isCorrect || isSelected) return [styles.optLetterBox, { backgroundColor: '#FFF' }];
+                                return styles.optLetterBox;
+                            };
+
                             return (
                                 <TouchableOpacity
                                     key={option.id}
-                                    activeOpacity={0.7}
+                                    activeOpacity={0.8}
                                     onPress={() => handleAnswer(i)}
                                     disabled={answerState !== 'idle'}
-                                    style={styles.premiumOption}
+                                    style={getOptionStyle()}
                                 >
-                                    {/* Smooth Background Animation Overlays */}
-                                    <Animated.View
-                                        style={[
-                                            styles.optionBgFill,
-                                            {
-                                                backgroundColor: isCorrect ? '#22C55E' : '#FEF2F2',
-                                                opacity: optionFeedbackAnims[i]
-                                            }
-                                        ]}
-                                    />
-                                    {/* Static Wrong Border for selected wrong answer */}
-                                    {answerState !== 'idle' && isSelected && !isCorrect && (
-                                        <View style={[styles.optionBgFill, { borderWidth: 2, borderColor: '#EF4444', backgroundColor: '#FEF2F2' }]} />
-                                    )}
-
-                                    <View style={[
-                                        styles.optionLetter,
-                                        (answerState !== 'idle' && isCorrect) && { backgroundColor: '#FFF' },
-                                        (answerState !== 'idle' && isSelected && !isCorrect) && { backgroundColor: '#FFF' }
-                                    ]}>
-                                        <ThemedText style={[
-                                            styles.optionLetterText,
-                                            (answerState !== 'idle' && isCorrect) && { color: '#22C55E' },
-                                            (answerState !== 'idle' && isSelected && !isCorrect) && { color: '#EF4444' }
-                                        ]}>{letter}</ThemedText>
+                                    <View style={getLetterStyle()}>
+                                        {answerState !== 'idle' && isCorrect ? (
+                                            <Ionicons name="checkmark" size={18} color="#22C55E" />
+                                        ) : answerState !== 'idle' && isSelected && !isCorrect ? (
+                                            <Ionicons name="close" size={18} color="#EF4444" />
+                                        ) : (
+                                            <Text style={[
+                                                styles.optLetterText,
+                                                (answerState !== 'idle' && (isCorrect || isSelected)) && { color: isCorrect ? '#22C55E' : '#EF4444' }
+                                            ]}>
+                                                {letter}
+                                            </Text>
+                                        )}
                                     </View>
 
-                                    <View style={styles.optionContent}>
-                                        <ThemedText style={[
-                                            styles.optionKhm,
+                                    <View style={styles.optContent}>
+                                        <Text style={[
+                                            styles.optTextKhm,
                                             (answerState !== 'idle' && isCorrect) && { color: '#FFF' },
                                             (answerState !== 'idle' && isSelected && !isCorrect) && { color: '#EF4444' }
-                                        ]}>{option.khm}</ThemedText>
-                                        <ThemedText style={[
-                                            styles.optionVie,
+                                        ]}>{option.khm}</Text>
+                                        <Text style={[
+                                            styles.optTextVie,
                                             (answerState !== 'idle' && isCorrect) && { color: 'rgba(255,255,255,0.8)' },
                                             (answerState !== 'idle' && isSelected && !isCorrect) && { color: '#EF4444' }
-                                        ]}>{option.pronunciation}</ThemedText>
+                                        ]}>{option.pronunciation}</Text>
                                     </View>
-
-                                    {answerState !== 'idle' && (
-                                        <Ionicons
-                                            name={isCorrect ? "checkmark-circle" : (isSelected ? "close-circle" : undefined)}
-                                            size={24}
-                                            color={isCorrect ? "#FFF" : (isSelected ? "#EF4444" : "transparent")}
-                                        />
-                                    )}
                                 </TouchableOpacity>
                             );
                         })}
                     </View>
-                </Animated.View>
+
+                    <View style={{ height: 40 }} />
+                </ScrollView>
+
+                {/* Modern Absolute Feedback Overlay */}
+                {answerState !== 'idle' && (
+                    <Animated.View style={[
+                        styles.modernFeedback,
+                        answerState === 'wrong' && styles.modernFeedbackWrong,
+                        {
+                            transform: [{ scale: feedbackScale }],
+                            opacity: feedbackScale // Simple fade with scale
+                        }
+                    ]}>
+                        <View style={styles.feedbackIconCircle}>
+                            <Ionicons
+                                name={answerState === 'correct' ? 'checkmark-circle' : 'close-circle'}
+                                size={80}
+                                color="#FFF"
+                            />
+                        </View>
+                        <Text style={styles.modernFeedbackText}>
+                            {answerState === 'correct' ? t('correct') : t('wrong_answer')}
+                        </Text>
+                    </Animated.View>
+                )}
             </SafeAreaView>
         </View>
     );
@@ -844,7 +861,7 @@ const styles = StyleSheet.create({
     // Premium Gaming Styles
     premiumHeader: {
         paddingHorizontal: 20,
-        paddingTop: 45,
+        paddingTop: 15,
         paddingBottom: 15,
     },
     gameInfoBox: {
@@ -898,75 +915,62 @@ const styles = StyleSheet.create({
         backgroundColor: '#7C3AED',
         borderRadius: 5,
     },
-    stageCard: {
+    // Modern Gaming Styles
+    mainCard: {
         width: '100%',
-        aspectRatio: 16 / 10,
+        aspectRatio: 1.1,
+        backgroundColor: '#FFF',
         borderRadius: 32,
-        backgroundColor: '#F1F5F9',
+        padding: 15,
+        marginBottom: 25,
+        elevation: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.1,
+        shadowRadius: 20,
         overflow: 'hidden',
-        position: 'relative',
-        marginBottom: 24,
     },
-    stageImage: {
+    mainCardImage: {
         width: '100%',
         height: '100%',
-        backgroundColor: '#F1F5F9', // Placeholder color
+        borderRadius: 20,
     },
-    stageOverlay: {
+    mainCardOverlay: {
         position: 'absolute',
-        bottom: 0, left: 0, right: 0,
-        height: 120,
+        top: 25,
+        left: 25,
     },
-    stagePrompt: {
-        position: 'absolute',
-        bottom: 20,
-        left: 0, right: 0,
-        alignItems: 'center',
-    },
-    promptLabel: {
-        color: '#FFF',
-        fontSize: 16,
-        fontWeight: '800',
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 2 },
-        textShadowRadius: 4,
-    },
-    stageFeedback: {
-        ...StyleSheet.absoluteFillObject,
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 10,
-    },
-    feedbackCircle: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        backgroundColor: '#FFF',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 15,
-    },
-    feedbackStatusText: {
-        color: '#FFF',
-        fontSize: 32,
+    mainCardBadge: {
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 12,
+        fontSize: 12,
         fontWeight: '900',
-        letterSpacing: 2,
+        color: '#7C3AED',
     },
-    optionsStack: {
+    optionsArea: {
         gap: 12,
     },
-    premiumOption: {
+    optBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#FFF',
+        padding: 14,
         borderRadius: 24,
-        padding: 12,
-        paddingRight: 20,
         borderWidth: 2,
         borderColor: '#F1F5F9',
-        overflow: 'hidden',
+        elevation: 2,
     },
-    optionLetter: {
+    optBtnCorrect: {
+        backgroundColor: '#22C55E',
+        borderColor: '#22C55E',
+    },
+    optBtnWrong: {
+        backgroundColor: '#FEF2F2',
+        borderColor: '#EF4444',
+    },
+    optLetterBox: {
         width: 44,
         height: 44,
         borderRadius: 15,
@@ -975,38 +979,53 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 15,
     },
-    optionLetterText: {
+    optLetterText: {
         fontSize: 18,
         fontWeight: '900',
         color: '#64748B',
     },
-    optionContent: {
+    optContent: {
         flex: 1,
-        backgroundColor: 'transparent',
     },
-    optionKhm: {
+    optTextKhm: {
         fontSize: 22,
         fontWeight: '900',
         color: '#1E293B',
-        backgroundColor: 'transparent',
     },
-    optionVie: {
+    optTextVie: {
         fontSize: 13,
         color: '#94A3B8',
         fontWeight: '600',
-        backgroundColor: 'transparent',
     },
-    optionSuccess: {
-        backgroundColor: '#22C55E',
-        borderColor: '#22C55E',
+    modernFeedback: {
+        position: 'absolute',
+        top: '50%',
+        left: '10%',
+        right: '10%',
+        marginTop: -100,
+        backgroundColor: 'rgba(34, 197, 94, 0.95)',
+        borderRadius: 32,
+        padding: 30,
+        alignItems: 'center',
+        elevation: 20,
+        zIndex: 1000,
     },
-    optionError: {
-        backgroundColor: '#FEF2F2',
-        borderColor: '#EF4444',
+    modernFeedbackWrong: {
+        backgroundColor: 'rgba(239, 68, 68, 0.95)',
     },
-    optionBgFill: {
-        ...StyleSheet.absoluteFillObject,
-        borderRadius: 22,
+    feedbackIconCircle: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    modernFeedbackText: {
+        color: '#FFF',
+        fontSize: 32,
+        fontWeight: '900',
     },
     headerCloseBtn: {
         width: 40,
@@ -1014,17 +1033,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginLeft: -9,
-    },
-    transitionOverlay: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingBottom: 100,
-    },
-    transitionText: {
-        marginTop: 20,
-        fontSize: 16,
-        color: '#64748B',
-        fontWeight: '600',
     },
 });

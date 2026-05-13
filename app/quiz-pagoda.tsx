@@ -65,7 +65,7 @@ export default function QuizPagodaSelectScreen() {
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
           <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
-            {isKm ? 'វត្តខ្មែរ' : 'Ngôi chùa Khmer'}
+            {isKm ? 'វត្តអារាមខ្មែរ' : 'Ngôi chùa Khmer'}
           </Text>
         </View>
         <View style={{ width: 40 }} />

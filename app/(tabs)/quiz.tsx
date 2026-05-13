@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Dimensions, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -71,8 +71,10 @@ export default function QuizScreen() {
         <Text style={styles.headerTitle}>{t('quiz_title')}</Text>
       </View>
 
-      <View
+      <ScrollView
         style={styles.scrollContent}
+        contentContainerStyle={{ paddingBottom: 25 }}
+        showsVerticalScrollIndicator={false}
       >
         {/* Profile Card - Floating */}
         <View style={styles.profileCard}>
@@ -122,7 +124,7 @@ export default function QuizScreen() {
             <View style={{ flex: 1.2 }}>
               <TouchableOpacity
                 activeOpacity={0.85}
-                style={[styles.bentoCard, { height: 220 }]}
+                style={[styles.bentoCard, { height: 295 }]}
                 onPress={() => {
                   if (!user) {
                     Alert.alert(
@@ -139,9 +141,9 @@ export default function QuizScreen() {
                 }}
               >
                 <View style={styles.bentoTitleContainer}>
-                  <Text style={styles.bentoTitle} numberOfLines={2} adjustsFontSizeToFit>{t('pagoda_quiz')}</Text>
+                  <Text style={styles.bentoTitle} numberOfLines={2}>{t('pagoda_quiz')}</Text>
                 </View>
-                <View style={styles.bentoImageContainer}>
+                <View style={[styles.bentoImageContainer, { flex: 1, marginTop: 10 }]}>
                   <Image source={require('@/assets/images/pagoda.jpg')} style={styles.bentoImage} />
                 </View>
               </TouchableOpacity>
@@ -151,7 +153,7 @@ export default function QuizScreen() {
             <View style={{ flex: 1, gap: 15 }}>
               <TouchableOpacity
                 activeOpacity={0.7}
-                style={[styles.bentoCard, { height: 102.5 }]}
+                style={[styles.bentoCard, { height: 140 }]}
                 onPress={() => {
                   if (!user) {
                     Alert.alert(
@@ -167,23 +169,23 @@ export default function QuizScreen() {
                   router.push('/quiz-culture');
                 }}
               >
-                <View style={[styles.bentoTitleContainer, { height: '30%' }]}>
-                  <Text style={styles.bentoTitleSmall} numberOfLines={1} adjustsFontSizeToFit>{t('culture_quiz')}</Text>
+                <View style={[styles.bentoTitleContainer, { height: 55 }]}>
+                  <Text style={[styles.bentoTitleSmall, { lineHeight: 34 }]} numberOfLines={1}>{t('culture_quiz')}</Text>
                 </View>
-                <View style={styles.bentoImageContainerSmall}>
+                <View style={[styles.bentoImageContainerSmall, { flex: 1 }]}>
                   <Image source={require('@/assets/images/festival.jpg')} style={styles.bentoImage} />
                 </View>
               </TouchableOpacity>
 
               <TouchableOpacity
                 activeOpacity={0.7}
-                style={[styles.bentoCard, { height: 102.5 }]}
+                style={[styles.bentoCard, { height: 140 }]}
                 onPress={() => Alert.alert('Sắp ra mắt')}
               >
-                <View style={[styles.bentoTitleContainer, { height: '30%' }]}>
-                  <Text style={styles.bentoTitleSmall} numberOfLines={1} adjustsFontSizeToFit>{t('food_quiz')}</Text>
+                <View style={[styles.bentoTitleContainer, { height: 55 }]}>
+                  <Text style={[styles.bentoTitleSmall, { lineHeight: 34 }]} numberOfLines={1}>{t('food_quiz')}</Text>
                 </View>
-                <View style={styles.bentoImageContainerSmall}>
+                <View style={[styles.bentoImageContainerSmall, { flex: 1 }]}>
                   <Image source={require('@/assets/images/amthuc.jpg')} style={styles.bentoImage} />
                 </View>
               </TouchableOpacity>
@@ -193,7 +195,7 @@ export default function QuizScreen() {
           {/* Bottom Full Width Card - Vocab Quiz */}
           <TouchableOpacity
             activeOpacity={0.7}
-            style={[styles.bentoCardFull, { marginTop: 15 }]}
+            style={[styles.bentoCardFull, { marginTop: 10 }]}
             onPress={() => {
               if (!user) {
                 Alert.alert(
@@ -211,8 +213,8 @@ export default function QuizScreen() {
           >
             <View style={styles.bentoFullContent}>
               <View style={{ flex: 1 }}>
-                <Text style={[styles.bentoTitle, { textAlign: 'left' }]} numberOfLines={1} adjustsFontSizeToFit>{t('vocab_quiz')}</Text>
-                <Text style={[styles.bentoSubtitle, { textAlign: 'left' }]} numberOfLines={1} adjustsFontSizeToFit>Học từ vựng qua hình ảnh</Text>
+                <Text style={[styles.bentoTitle, { textAlign: 'left' }]} numberOfLines={1}>{t('vocab_quiz')}</Text>
+                <Text style={[styles.bentoSubtitle, { textAlign: 'left' }]} numberOfLines={1}>{t('vocab_quiz_subtitle')}</Text>
               </View>
               <View style={styles.bentoImageContainerFull}>
                 <Image source={require('@/assets/images/hoctap.jpg')} style={styles.bentoImage} />
@@ -221,7 +223,7 @@ export default function QuizScreen() {
           </TouchableOpacity>
 
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -408,17 +410,17 @@ const styles = StyleSheet.create({
   },
 
   bentoTitle: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '800',
     color: '#1E293B',
-    lineHeight: 26,
+    lineHeight: 32,
     textAlign: 'center',
   },
   bentoTitleSmall: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '800',
     color: '#1E293B',
-    lineHeight: 20,
+    lineHeight: 28, // Tăng lên để chứa đủ dấu tiếng Khmer
     textAlign: 'center',
   },
   bentoSubtitle: {
