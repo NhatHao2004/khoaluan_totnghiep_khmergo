@@ -282,7 +282,16 @@ export default function GameMCQScreen() {
           <Text style={styles.resultPrimaryBtnText}>Chơi lại</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.resultSecondaryBtn} onPress={() => router.back()}>
+        <TouchableOpacity
+          style={styles.resultSecondaryBtn}
+          onPress={() => {
+            if (pagodaId?.startsWith('culture_')) {
+              router.replace('/quiz-culture');
+            } else {
+              router.replace('/quiz-pagoda');
+            }
+          }}
+        >
           <Text style={styles.resultSecondaryBtnText}>Chọn bộ câu hỏi khác</Text>
         </TouchableOpacity>
       </View>
@@ -697,7 +706,7 @@ const styles = StyleSheet.create({
   },
   optText: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: '#334155',
   },

@@ -147,10 +147,23 @@ export default function QuizScreen() {
 
             {/* Right Column – Coming soon items */}
             <View style={{ flex: 1, gap: 15 }}>
-              <TouchableOpacity
+            <TouchableOpacity
                 activeOpacity={0.7}
                 style={[styles.bentoCard, { height: 102.5 }]}
-                onPress={() => Alert.alert('Sắp ra mắt')}
+                onPress={() => {
+                  if (!user) {
+                    Alert.alert(
+                      t('login_required'),
+                      t('login_to_use'),
+                      [
+                        { text: 'Huỷ', style: 'cancel' },
+                        { text: 'Đăng nhập', onPress: () => router.push('/login') },
+                      ]
+                    );
+                    return;
+                  }
+                  router.push('/quiz-culture');
+                }}
               >
                 <Text style={styles.bentoTitleSmall} numberOfLines={1}>{t('culture_quiz')}</Text>
                 <View style={styles.bentoImageContainerSmall}>

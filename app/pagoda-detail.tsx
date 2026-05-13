@@ -1,5 +1,5 @@
-import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -277,7 +277,7 @@ export default function PagodaDetailScreen() {
               <View style={styles.quizCard}>
                 <Text style={styles.quizTitle}>Kiểm tra kiến thức</Text>
                 <Text style={styles.quizDesc}>
-                  Hiểu rõ về <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> như thế nào{"\n"}
+                  Hiểu về <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> như thế nào{"\n"}
                   Thử thách ngay để nhận điểm thưởng
                 </Text>
                 <TouchableOpacity
@@ -289,12 +289,12 @@ export default function PagodaDetailScreen() {
                         t('login_to_use') || 'Bạn cần đăng nhập để tham gia thử thách này',
                         [
                           { text: isKm ? 'បោះបង់' : 'Hủy', style: 'cancel' },
-                          { 
-                            text: isKm ? 'ចូល' : 'Đăng nhập', 
+                          {
+                            text: isKm ? 'ចូល' : 'Đăng nhập',
                             onPress: () => router.push({
                               pathname: '/login',
                               params: { returnTo: '/pagoda-detail', returnId: id }
-                            }) 
+                            })
                           }
                         ]
                       );
