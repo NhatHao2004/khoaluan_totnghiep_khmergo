@@ -1,6 +1,6 @@
+import { QuizSkeleton } from '@/components/quiz-skeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { QuizSkeleton } from '@/components/quiz-skeleton';
 import { getLeaderboardUsers } from '@/services/firebase-service';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
@@ -149,7 +149,7 @@ export default function QuizScreen() {
 
             {/* Right Column – Coming soon items */}
             <View style={{ flex: 1, gap: 15 }}>
-            <TouchableOpacity
+              <TouchableOpacity
                 activeOpacity={0.7}
                 style={[styles.bentoCard, { height: 102.5 }]}
                 onPress={() => {
@@ -253,6 +253,7 @@ const styles = StyleSheet.create({
     lineHeight: 32,
   },
 
+  // Trong styles của quiz.tsx
   profileCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
@@ -260,7 +261,9 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderWidth: 1,
     borderColor: '#F1F5F9',
+    height: 200, // Thiết lập chiều cao cố định để không bị nhảy khi đổi ngôn ngữ
   },
+
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
