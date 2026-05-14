@@ -180,7 +180,20 @@ export default function QuizScreen() {
               <TouchableOpacity
                 activeOpacity={0.7}
                 style={[styles.bentoCard, { height: 140 }]}
-                onPress={() => Alert.alert('Sắp ra mắt')}
+                onPress={() => {
+                  if (!user) {
+                    Alert.alert(
+                      t('login_required'),
+                      t('login_to_use'),
+                      [
+                        { text: 'Huỷ', style: 'cancel' },
+                        { text: 'Đăng nhập', onPress: () => router.push('/login') },
+                      ]
+                    );
+                    return;
+                  }
+                  router.push('/quiz-food');
+                }}
               >
                 <View style={[styles.bentoTitleContainer, { height: 55 }]}>
                   <Text style={[styles.bentoTitleSmall, { lineHeight: 34 }]} numberOfLines={1}>{t('food_quiz')}</Text>

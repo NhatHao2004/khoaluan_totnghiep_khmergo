@@ -287,6 +287,8 @@ export default function GameMCQScreen() {
           onPress={() => {
             if (pagodaId?.startsWith('culture_')) {
               router.replace('/quiz-culture');
+            } else if (pagodaId?.startsWith('food_')) {
+              router.replace('/food');
             } else {
               router.replace('/quiz-pagoda');
             }
