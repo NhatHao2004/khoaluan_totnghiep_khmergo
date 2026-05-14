@@ -44,7 +44,8 @@ const getFoodImage = (id: string, name: string) => {
 export default function FoodScreen() {
   const router = useRouter();
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isKm = language === 'km';
   const tintColor = useThemeColor({}, 'tint');
   const { foods, loading, error, refresh } = useFoods();
 
@@ -95,7 +96,7 @@ export default function FoodScreen() {
         {error ? (
           <ThemedText style={styles.errorText}>{error}</ThemedText>
         ) : sortedFoods.length === 0 && !loading ? (
-          <ThemedText style={styles.emptyText}>Chưa có dữ liệu ẩm thực Khmer</ThemedText>
+          <ThemedText style={styles.emptyText}>{isKm ? 'មិនមានទិន្នន័យម្ហូបអាហារខ្មែរទេ' : 'Chưa có dữ liệu ẩm thực Khmer'}</ThemedText>
         ) : (
           <View style={styles.foodList}>
             {sortedFoods.map((item) => (
@@ -126,9 +127,9 @@ export default function FoodScreen() {
                   />
                 </View>
                 <View style={styles.foodContent}>
-                  <ThemedText style={styles.foodName}>{item.name}</ThemedText>
+                  <ThemedText style={styles.foodName}>{isKm ? (item.name_khmer || item.name) : item.name}</ThemedText>
                   <ThemedText style={styles.foodLocation} numberOfLines={1}>
-                    {item.location || 'Đặc sản Khmer'}
+                    {(isKm ? (item.location_khmer || item.location) : item.location) || (isKm ? 'ឯកទេសខ្មែរ' : 'Đặc sản Khmer')}
                   </ThemedText>
                 </View>
               </TouchableOpacity>

@@ -149,7 +149,7 @@ export default function CultureDetailScreen() {
                   activeTab === 'gallery' && { backgroundColor: '#3B82F6', borderColor: '#3B82F6' }
                 ]}
               >
-                <Text style={[styles.tabBtnText, activeTab === 'gallery' && styles.tabBtnTextActive]}>HÌNH ẢNH</Text>
+                <Text style={[styles.tabBtnText, activeTab === 'gallery' && styles.tabBtnTextActive]}>{isKm ? 'រូបភាព' : 'HÌNH ẢNH'}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -159,7 +159,7 @@ export default function CultureDetailScreen() {
                   activeTab === 'quiz' && { backgroundColor: '#FF6B2C', borderColor: '#FF6B2C' }
                 ]}
               >
-                <Text style={[styles.tabBtnText, activeTab === 'quiz' && styles.tabBtnTextActive]}>THỬ THÁCH</Text>
+                <Text style={[styles.tabBtnText, activeTab === 'quiz' && styles.tabBtnTextActive]}>{isKm ? 'ការប្រកួត' : 'THỬ THÁCH'}</Text>
               </TouchableOpacity>
             </View>
 
@@ -202,17 +202,20 @@ export default function CultureDetailScreen() {
                     {(!cultureData?.imageUrl2) && (
                       <View style={[styles.galleryItem, styles.galleryPlaceholder]}>
                         <Ionicons name="images-outline" size={32} color="#CBD5E1" />
-                        <Text style={styles.placeholderText}>Mở rộng xem thêm...</Text>
+                        <Text style={styles.placeholderText}>{isKm ? 'ពង្រីកដើម្បីមើលបន្ថែម...' : 'Mở rộng xem thêm...'}</Text>
                       </View>
                     )}
                   </ScrollView>
                 </View>
               ) : (
                 <View style={styles.quizCard}>
-                  <Text style={styles.quizTitle}>Kiểm tra kiến thức</Text>
+                  <Text style={styles.quizTitle}>{isKm ? 'សាកល្បងចំណេះដឹង' : 'Kiểm tra kiến thức'}</Text>
                   <Text style={styles.quizDesc}>
-                    Hiểu về <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> như thế nào{"\n"}
-                    Thử thách ngay để nhận điểm thưởng
+                    {isKm ? (
+                      <>តើអ្នកយល់ពី <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> យ៉ាងណា?{"\n"}ប្រកួតប្រជែងឥឡូវនេះដើម្បីទទួលបានពិន្ទុ</>
+                    ) : (
+                      <>Hiểu về <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> như thế nào{"\n"}Thử thách ngay để nhận điểm thưởng</>
+                    )}
                   </Text>
                   <TouchableOpacity
                     style={styles.quizStartBtn}
@@ -245,7 +248,7 @@ export default function CultureDetailScreen() {
                       });
                     }}
                   >
-                    <Text style={styles.quizStartBtnText}>Bắt đầu thử thách</Text>
+                    <Text style={styles.quizStartBtnText}>{isKm ? 'ចាប់ផ្តើមការប្រកួត' : 'Bắt đầu thử thách'}</Text>
                   </TouchableOpacity>
                 </View>
               )}

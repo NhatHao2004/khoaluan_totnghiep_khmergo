@@ -19,7 +19,8 @@ import {
 
 export default function LanguageStudyScreen() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isKm = language === 'km';
   const [activeTab, setActiveTab] = useState<'topics' | 'translator'>('topics');
 
   // --- Translator Logic ---
@@ -211,7 +212,7 @@ export default function LanguageStudyScreen() {
                         <ThemedText style={styles.categoryCardTitle}>{t(category.title)}</ThemedText>
                       </View>
                       <View style={styles.startStudyBtn}>
-                        <ThemedText style={styles.startStudyBtnText}>Bắt đầu học</ThemedText>
+                        <ThemedText style={styles.startStudyBtnText}>{isKm ? 'ចាប់ផ្តើមរៀន' : 'Bắt đầu học'}</ThemedText>
                       </View>
                     </View>
                   </View>

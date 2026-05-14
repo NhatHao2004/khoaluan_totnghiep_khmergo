@@ -240,7 +240,7 @@ export default function PagodaDetailScreen() {
                   activeTab === 'quiz' && { backgroundColor: '#FF6B2C', borderColor: '#FF6B2C' }
                 ]}
               >
-                <Text style={[styles.tabBtnText, activeTab === 'quiz' && styles.tabBtnTextActive]}>THỬ THÁCH</Text>
+                <Text style={[styles.tabBtnText, activeTab === 'quiz' && styles.tabBtnTextActive]}>{isKm ? 'ការប្រកួត' : 'THỬ THÁCH'}</Text>
               </TouchableOpacity>
             </View>
 
@@ -275,10 +275,13 @@ export default function PagodaDetailScreen() {
               </View>
             ) : (
               <View style={styles.quizCard}>
-                <Text style={styles.quizTitle}>Kiểm tra kiến thức</Text>
+                <Text style={styles.quizTitle}>{isKm ? 'សាកល្បងចំណេះដឹង' : 'Kiểm tra kiến thức'}</Text>
                 <Text style={styles.quizDesc}>
-                  Hiểu về <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> như thế nào{"\n"}
-                  Thử thách ngay để nhận điểm thưởng
+                  {isKm ? (
+                    <>តើអ្នកយល់ពី <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> យ៉ាងណា?{"\n"}ប្រកួតប្រជែងឥឡូវនេះដើម្បីទទួលបានពិន្ទុ</>
+                  ) : (
+                    <>Hiểu về <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> như thế nào{"\n"}Thử thách ngay để nhận điểm thưởng</>
+                  )}
                 </Text>
                 <TouchableOpacity
                   style={styles.quizStartBtn}
@@ -311,7 +314,7 @@ export default function PagodaDetailScreen() {
                     });
                   }}
                 >
-                  <Text style={styles.quizStartBtnText}>Bắt đầu thử thách</Text>
+                  <Text style={styles.quizStartBtnText}>{isKm ? 'ចាប់ផ្តើមការប្រកួត' : 'Bắt đầu thử thách'}</Text>
                 </TouchableOpacity>
               </View>
             )}
