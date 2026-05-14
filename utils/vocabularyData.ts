@@ -57,7 +57,7 @@ export const VOCABULARY_CATEGORIES: VocabularyCategory[] = [
     iconName: "chatbubbles-outline",
     color: "#3B82F6", // Blue
     words: [
-      { id: "g1", vie: "Xin chào", khm: "សួស្តី", pronunciation: "Suos-dei (Suốt-đây)" },
+      { id: "g1", vie: "Xin chào", khm: "សួស្តី", pronunciation: "Suos-dei" },
       { id: "g2", vie: "Chào buổi sáng", khm: "អរុណសួស្តី", pronunciation: "Arun suos-dei" },
       { id: "g3", vie: "Tạm biệt", khm: "លាហើយ", pronunciation: "Lea-her" },
       { id: "g4", vie: "Cảm ơn", khm: "អរគុណ", pronunciation: "Aw-kun" },
