@@ -6,7 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { HomeSkeleton } from '@/components/home-skeleton';
+import { LoadingScreen } from '@/components/loading-screen';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 
@@ -25,13 +25,8 @@ export default function RootLayout() {
     async function prepare() {
       try {
         await SplashScreen.hideAsync();
-        // Giả lập thời gian load app 3.5s bằng Skeleton
-        setTimeout(() => {
-          setIsAppReady(true);
-        }, 3500);
       } catch (e) {
         console.warn(e);
-        setIsAppReady(true);
       }
     }
 
@@ -42,7 +37,7 @@ export default function RootLayout() {
     <AuthProvider>
       <LanguageProvider>
         {!isAppReady ? (
-          <HomeSkeleton />
+          <LoadingScreen onFinish={() => setIsAppReady(true)} />
         ) : (
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
             <Stack screenOptions={{ 

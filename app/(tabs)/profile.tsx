@@ -142,7 +142,6 @@ export default function ProfileScreen() {
             {/* Info */}
             <View style={styles.profileInfo}>
               <Text style={styles.profileName}>{user?.name || t('guest')}</Text>
-              <Text style={styles.profileEmail}>{user?.email || t('login_to_view')}</Text>
             </View>
           </View>
         </Animated.View>

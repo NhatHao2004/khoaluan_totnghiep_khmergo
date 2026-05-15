@@ -41,15 +41,8 @@ export default function HomeScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [routeIndex, setRouteIndex] = useState(0);
-  const [indexLoading, setIndexLoading] = useState(true);
   const scrollY = useSharedValue(0);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIndexLoading(false);
-    }, 3500);
-    return () => clearTimeout(timer);
-  }, []);
 
 
   // Animation for the notification bell
@@ -179,9 +172,6 @@ export default function HomeScreen() {
     router.push(route);
   };
 
-  if (indexLoading && !refreshing) {
-    return <HomeSkeleton />;
-  }
 
   return (
     <View style={styles.container}>

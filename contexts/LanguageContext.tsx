@@ -26,7 +26,7 @@ const translations = {
     cancel: 'Huỷ',
     continue: 'Tiếp tục',
     exit: 'Thoát',
-    login: 'Đăng nhập',
+    login: 'Đăng nhập tài khoản',
 
     // Settings Screen
     notif_settings: 'Thông báo',
