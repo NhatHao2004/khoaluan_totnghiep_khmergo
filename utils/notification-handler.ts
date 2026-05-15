@@ -49,7 +49,7 @@ export async function scheduleDaily7AMReminder() {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: 'Bạn chưa học hôm nay 📚',
-        body: 'Dành 5 phút để học từ mới tiếng Khmer nhé',
+        body: 'Dành 5 phút để học từ vựng mới nhé',
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
@@ -66,7 +66,7 @@ export const MOCK_NOTIFICATIONS = [
   {
     id: '1',
     title: 'Bạn chưa học hôm nay 📚',
-    body: 'Dành 5 phút để học từ mới tiếng Khmer nhé',
+    body: 'Dành 5 phút để học từ vựng mới nhé',
     type: 'study',
   },
 ];

@@ -2,7 +2,7 @@ import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
-import { MOCK_NOTIFICATIONS, scheduleStudyReminder } from '@/utils/notification-handler';
+import { MOCK_NOTIFICATIONS } from '@/utils/notification-handler';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
@@ -28,7 +28,7 @@ import Animated, {
   withDelay,
   withRepeat,
   withSequence,
-  withTiming,
+  withTiming
 } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
@@ -45,7 +45,10 @@ export default function HomeScreen() {
   const [routeIndex, setRouteIndex] = useState(0);
   const [indexLoading, setIndexLoading] = useState(true);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(1); // Default to 1 unread
+  const [unreadCount, setUnreadCount] = useState(1);
+
+  // Slide animation for notifications
+  const slideX = useSharedValue(width);
   const scrollY = useSharedValue(0);
 
 
@@ -158,6 +161,17 @@ export default function HomeScreen() {
     };
   });
 
+  const animatedSlideStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: slideX.value }],
+    };
+  });
+
+  const closeNotifications = () => {
+    slideX.value = withTiming(width, { duration: 300 });
+    setTimeout(() => setShowNotifications(false), 300);
+  };
+
   const services = [
     { id: 1, label: t('temple'), icon: require('@/assets/images/pagoda.jpg'), color: '#FF7000', route: '/pagoda' },
     { id: 3, label: t('culture'), icon: require('@/assets/images/festival.jpg'), color: '#A000FF', route: '/culture' },
@@ -176,7 +190,6 @@ export default function HomeScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.push(route);
   };
-
 
   return (
     <View style={styles.container}>
@@ -204,7 +217,8 @@ export default function HomeScreen() {
           onPress={() => {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             setShowNotifications(true);
-            setUnreadCount(0); // Hide badge when opened
+            setUnreadCount(0);
+            slideX.value = withTiming(0, { duration: 300 });
           }}
         >
           <Animated.View style={animatedBellStyle}>
@@ -329,38 +343,29 @@ export default function HomeScreen() {
       {/* Notification Center Modal */}
       <Modal
         visible={showNotifications}
-        animationType="slide"
+        animationType="none"
         transparent={true}
         statusBarTranslucent={true}
-        onRequestClose={() => setShowNotifications(false)}
+        onRequestClose={closeNotifications}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.notificationContainer}>
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={closeNotifications}
+        >
+          <Animated.View style={[styles.notificationContainer, animatedSlideStyle]}>
             <View style={styles.nHeader}>
               <Text style={styles.nTitle}>Thông báo</Text>
-              <TouchableOpacity onPress={() => setShowNotifications(false)}>
-                <Ionicons name="close" size={28} color="#000" />
-              </TouchableOpacity>
             </View>
 
             <ScrollView style={styles.nList} showsVerticalScrollIndicator={false}>
-              {/* Promo Item / Action */}
-              <TouchableOpacity
-                style={styles.nPromo}
-                onPress={() => {
-                  scheduleStudyReminder("Học ngay thôi", "Bạn có 10 từ mới đang chờ khám phá đó ✍️", 3);
-                  setShowNotifications(false);
-                }}
-              >
-              </TouchableOpacity>
-
               {MOCK_NOTIFICATIONS.map((item) => (
                 <View key={item.id} style={styles.nItem}>
                   <View style={[styles.nIcon, { backgroundColor: item.type === 'study' ? '#E0F2FE' : item.type === 'quiz' ? '#FEF3C7' : '#F0FDF4' }]}>
                     <Ionicons
-                      name={item.type === 'study' ? 'book' : item.type === 'quiz' ? 'game-controller' : 'star'}
+                      name={item.type === 'study' ? 'notifications-outline' : item.type === 'quiz' ? 'game-controller' : 'star'}
                       size={20}
-                      color={item.type === 'study' ? '#3B82F6' : item.type === 'quiz' ? '#D97706' : '#10B981'}
+                      color={item.type === 'study' ? '#ff0000ff' : item.type === 'quiz' ? '#D97706' : '#10B981'}
                     />
                   </View>
                   <View style={styles.nContent}>
@@ -370,8 +375,8 @@ export default function HomeScreen() {
                 </View>
               ))}
             </ScrollView>
-          </View>
-        </View>
+          </Animated.View>
+        </TouchableOpacity>
       </Modal>
     </View>
   );
@@ -740,9 +745,16 @@ const styles = StyleSheet.create({
   notificationContainer: {
     backgroundColor: '#FFF',
     borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    height: '70%',
+    borderBottomLeftRadius: 30,
+    width: '85%',
+    height: '100%',
     padding: 24,
+    alignSelf: 'flex-end',
+    elevation: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: -5, height: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 15,
   },
   nHeader: {
     flexDirection: 'row',
@@ -754,6 +766,7 @@ const styles = StyleSheet.create({
     fontSize: 21,
     fontWeight: '900',
     color: '#1E293B',
+    marginTop: 20,
   },
   nList: {
     flex: 1,
@@ -783,9 +796,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F1F5F9',
   },
   nIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
+    width: 45,
+    height: 43,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
