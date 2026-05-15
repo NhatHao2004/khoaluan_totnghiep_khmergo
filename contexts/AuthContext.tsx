@@ -11,6 +11,7 @@ export interface UserProfile {
   points?: number;
   rank?: string;
   accuracy?: number;
+  completedQuizzes?: number;
 }
 
 
@@ -47,6 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           points: data.points ?? 0,
           rank: data.rank || 'Đồng',
           accuracy: data.accuracy ?? 0,
+          completedQuizzes: data.completedQuizzes ?? 0,
         });
 
       } else {

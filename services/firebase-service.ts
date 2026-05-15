@@ -1,4 +1,4 @@
-import { collection, getDocs, limit, orderBy, query, doc, updateDoc, increment, getDoc } from "firebase/firestore";
+import { collection, getDocs, limit, orderBy, query, doc, updateDoc, increment, getDoc, arrayUnion } from "firebase/firestore";
 import { db } from "../utils/firebaseConfig";
 
 export interface UserProfile {
@@ -96,7 +96,7 @@ export const addUserPoints = async (userId: string, points: number): Promise<voi
     throw error;
   }
 };
-export const updateQuizScore = async (userId: string, pagodaId: string, newScore: number): Promise<number> => {
+export const updateQuizScore = async (userId: string, pagodaId: string, newScore: number, isPerfect: boolean = false): Promise<number> => {
   try {
     const userRef = doc(db, 'users', userId);
     const userSnap = await getDoc(userRef);
@@ -104,19 +104,33 @@ export const updateQuizScore = async (userId: string, pagodaId: string, newScore
     if (!userSnap.exists()) return 0;
     
     const userData = userSnap.data();
+    const masteredQuizzes = userData.masteredQuizzes || [];
     const bestScores = userData.quizBestScores || {};
     const previousBest = bestScores[pagodaId] || 0;
-    
+
+    // Chuẩn bị dữ liệu cập nhật
+    const updateData: any = {};
+    let pointsToAdd = 0;
+
+    // 1. Kiểm tra cộng dồn lượt hoàn thành (chỉ tính 1 lần duy nhất cho mỗi bài đạt điểm tuyệt đối)
+    if (isPerfect && !masteredQuizzes.includes(pagodaId)) {
+      updateData.completedQuizzes = increment(1);
+      updateData.masteredQuizzes = arrayUnion(pagodaId);
+    }
+
+    // 2. Kiểm tra cập nhật điểm kỷ lục
     if (newScore > previousBest) {
-      const difference = newScore - previousBest;
-      await updateDoc(userRef, {
-        points: increment(difference),
-        [`quizBestScores.${pagodaId}`]: newScore
-      });
-      return difference;
+      pointsToAdd = newScore - previousBest;
+      updateData.points = increment(pointsToAdd);
+      updateData[`quizBestScores.${pagodaId}`] = newScore;
+    }
+
+    // thực hiện cập nhật nếu có bất kỳ thay đổi nào
+    if (Object.keys(updateData).length > 0) {
+      await updateDoc(userRef, updateData);
     }
     
-    return 0; // No points added because score didn't improve
+    return pointsToAdd;
   } catch (error) {
     console.error('Error updating quiz score:', error);
     throw error;

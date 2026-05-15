@@ -104,7 +104,7 @@ export default function QuizScreen() {
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>0</Text>
+              <Text style={styles.statValue}>{user?.completedQuizzes || 0}</Text>
               <Text style={styles.statLabel} numberOfLines={1}>{t('completed')}</Text>
             </View>
           </View>

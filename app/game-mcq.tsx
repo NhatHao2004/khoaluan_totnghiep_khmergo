@@ -163,7 +163,9 @@ export default function GameMCQScreen() {
     if (user && earnedTotal > 0) {
       setIsSaving(true);
       try {
-        const added = await updateQuizScore(user.uid, pagodaId as string, earnedTotal);
+        const actualCorrectCount = finalResults.filter(Boolean).length;
+        const isPerfect = actualCorrectCount === TOTAL_QUESTIONS;
+        const added = await updateQuizScore(user.uid, pagodaId as string, earnedTotal, isPerfect);
         setEarned(added);
         await refreshUser();
         setHasSaved(true);

@@ -7,6 +7,7 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { collection, onSnapshot, query } from 'firebase/firestore';
+import { updateQuizScore } from '@/services/firebase-service';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
     Alert,
@@ -226,8 +227,9 @@ export default function VocabQuizScreen() {
         
         setIsSaving(true);
         try {
-            const { updateQuizScore } = await import('@/services/firebase-service');
-            await updateQuizScore(user.uid, 'vocab_master', score);
+            const actualCorrectCount = questionResults.filter(Boolean).length;
+            const isPerfect = actualCorrectCount === totalQuestions;
+            await updateQuizScore(user.uid, selectedCategory as string, score, isPerfect);
             await refreshUser();
             setHasSaved(true);
         } catch (error) {
