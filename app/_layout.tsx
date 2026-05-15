@@ -1,4 +1,5 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
@@ -27,7 +28,12 @@ export default function RootLayout() {
       try {
         await SplashScreen.hideAsync();
         await registerForPushNotificationsAsync();
-        await scheduleDaily7AMReminder();
+        
+        // Check if notifications are enabled before scheduling
+        const saved = await AsyncStorage.getItem('notifications_enabled');
+        if (saved === null || saved === 'true') {
+          await scheduleDaily7AMReminder();
+        }
       } catch (e) {
         console.warn(e);
       }

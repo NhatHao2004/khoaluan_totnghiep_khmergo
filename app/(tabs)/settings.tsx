@@ -1,22 +1,69 @@
 import { AuthContext } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { scheduleDaily7AMReminder } from '@/utils/notification-handler';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import {
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View
 } from 'react-native';
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  withSpring
+} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { language, setLanguage, t } = useLanguage();
   const { user } = useContext(AuthContext);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
+  // Load notification setting
+  useEffect(() => {
+    const loadSetting = async () => {
+      const saved = await AsyncStorage.getItem('notifications_enabled');
+      if (saved !== null) {
+        setNotificationsEnabled(saved === 'true');
+      }
+    };
+    loadSetting();
+  }, []);
+
+  const toggleNotifications = async (value: boolean) => {
+    setNotificationsEnabled(value);
+    await AsyncStorage.setItem('notifications_enabled', value.toString());
+
+    if (value) {
+      await scheduleDaily7AMReminder();
+    } else {
+      await Notifications.cancelAllScheduledNotificationsAsync();
+    }
+  };
+
+  const animatedTrackStyle = useAnimatedStyle(() => {
+    const backgroundColor = interpolateColor(
+      notificationsEnabled ? 1 : 0,
+      [0, 1],
+      ['#CCCCCC', '#FF4B4B']
+    );
+    return { backgroundColor };
+  });
+
+  const animatedThumbStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: withSpring(notificationsEnabled ? 20 : 0, { damping: 20 }) }],
+    };
+  });
 
 
   return (
@@ -52,6 +99,27 @@ export default function SettingsScreen() {
               <Text style={[styles.optionText, language === 'km' && styles.activeOptionText]}>{t('khmer')}</Text>
               {language === 'km' && <Ionicons name="checkmark-circle" size={20} color="#ff0000ff" />}
             </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Thông báo */}
+        <View style={styles.section}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>{t('notif_settings')}</Text>
+            <View style={styles.switchItem}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.switchSubLabel}>{t('study_reminder')}</Text>
+              </View>
+
+              <TouchableOpacity 
+                activeOpacity={0.8}
+                onPress={() => toggleNotifications(!notificationsEnabled)}
+              >
+                <Animated.View style={[styles.customToggleTrack, animatedTrackStyle]}>
+                  <Animated.View style={[styles.customToggleThumb, animatedThumbStyle]} />
+                </Animated.View>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
@@ -122,21 +190,6 @@ const styles = StyleSheet.create({
     // Elevation for Android
     elevation: 2,
   },
-  customSwitch: {
-    width: 46,
-    height: 26,
-    borderRadius: 15,
-    backgroundColor: '#F2F2F2',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    paddingHorizontal: 3,
-    justifyContent: 'center',
-  },
-  customThumb: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-  },
   cardTitle: {
     fontSize: 14,
     fontWeight: '700',
@@ -174,9 +227,32 @@ const styles = StyleSheet.create({
   },
   switchLabel: {
     fontSize: 15,
-    color: '#444',
-    fontWeight: '500',
+    color: '#1E293B',
+    fontWeight: '700',
     lineHeight: 22,
+  },
+  switchSubLabel: {
+    fontSize: 15,
+    color: '#000000ff',
+    marginTop: 2,
+  },
+  customToggleTrack: {
+    width: 48,
+    height: 28,
+    borderRadius: 14,
+    padding: 3,
+    justifyContent: 'center',
+  },
+  customToggleThumb: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   timeBadge: {
     flexDirection: 'row',
