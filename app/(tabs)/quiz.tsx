@@ -524,4 +524,61 @@ const styles = StyleSheet.create({
     marginTop: 4,
     textAlign: 'left',
   },
+  // Pilgrimage Card Styles
+  pilgrimageCard: {
+    marginBottom: 20,
+    borderRadius: 24,
+    overflow: 'hidden',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 20,
+  },
+  pilgrimageGradient: {
+    padding: 24,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  pilgrimageInfo: {
+    flex: 1,
+  },
+  pLabel: {
+    color: '#3B82F6',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 2,
+    marginBottom: 4,
+  },
+  pTitle: {
+    color: '#FFF',
+    fontSize: 24,
+    fontWeight: '900',
+    marginBottom: 4,
+  },
+  pDesc: {
+    color: '#94A3B8',
+    fontSize: 13,
+    fontWeight: '500',
+    marginBottom: 15,
+  },
+  pBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#FFCC00',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    gap: 6,
+  },
+  pBadgeText: {
+    color: '#000',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  pIconBox: {
+    marginLeft: 15,
+  },
 });
