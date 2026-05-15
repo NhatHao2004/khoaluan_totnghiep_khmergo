@@ -9,6 +9,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { LoadingScreen } from '@/components/loading-screen';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { registerForPushNotificationsAsync, scheduleDaily7AMReminder } from '@/utils/notification-handler';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -25,6 +26,8 @@ export default function RootLayout() {
     async function prepare() {
       try {
         await SplashScreen.hideAsync();
+        await registerForPushNotificationsAsync();
+        await scheduleDaily7AMReminder();
       } catch (e) {
         console.warn(e);
       }

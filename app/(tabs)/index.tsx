@@ -1,8 +1,8 @@
-import { HomeSkeleton } from '@/components/home-skeleton';
 import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
+import { MOCK_NOTIFICATIONS, scheduleStudyReminder } from '@/utils/notification-handler';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
@@ -12,11 +12,13 @@ import {
   ActivityIndicator,
   Dimensions,
   Image,
+  Modal,
   RefreshControl,
   ScrollView,
   StyleSheet,
+  Text,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import Animated, {
   FadeInDown,
@@ -41,6 +43,9 @@ export default function HomeScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [routeIndex, setRouteIndex] = useState(0);
+  const [indexLoading, setIndexLoading] = useState(true);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(1); // Default to 1 unread
   const scrollY = useSharedValue(0);
 
 
@@ -196,13 +201,19 @@ export default function HomeScreen() {
         </View>
         <TouchableOpacity
           style={styles.notificationBtnSimple}
-          onPress={() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)}
+          onPress={() => {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            setShowNotifications(true);
+            setUnreadCount(0); // Hide badge when opened
+          }}
         >
           <Animated.View style={animatedBellStyle}>
             <Ionicons name="notifications-outline" size={30} color="#000" />
-            <View style={styles.notificationBadge}>
-              <ThemedText style={styles.badgeText}>2</ThemedText>
-            </View>
+            {unreadCount > 0 && (
+              <View style={styles.notificationBadge}>
+                <ThemedText style={styles.badgeText}>{unreadCount}</ThemedText>
+              </View>
+            )}
           </Animated.View>
         </TouchableOpacity>
       </View>
@@ -314,6 +325,54 @@ export default function HomeScreen() {
           ))
         )}
       </ScrollView>
+
+      {/* Notification Center Modal */}
+      <Modal
+        visible={showNotifications}
+        animationType="slide"
+        transparent={true}
+        statusBarTranslucent={true}
+        onRequestClose={() => setShowNotifications(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.notificationContainer}>
+            <View style={styles.nHeader}>
+              <Text style={styles.nTitle}>Thông báo</Text>
+              <TouchableOpacity onPress={() => setShowNotifications(false)}>
+                <Ionicons name="close" size={28} color="#000" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.nList} showsVerticalScrollIndicator={false}>
+              {/* Promo Item / Action */}
+              <TouchableOpacity
+                style={styles.nPromo}
+                onPress={() => {
+                  scheduleStudyReminder("Học ngay thôi", "Bạn có 10 từ mới đang chờ khám phá đó ✍️", 3);
+                  setShowNotifications(false);
+                }}
+              >
+              </TouchableOpacity>
+
+              {MOCK_NOTIFICATIONS.map((item) => (
+                <View key={item.id} style={styles.nItem}>
+                  <View style={[styles.nIcon, { backgroundColor: item.type === 'study' ? '#E0F2FE' : item.type === 'quiz' ? '#FEF3C7' : '#F0FDF4' }]}>
+                    <Ionicons
+                      name={item.type === 'study' ? 'book' : item.type === 'quiz' ? 'game-controller' : 'star'}
+                      size={20}
+                      color={item.type === 'study' ? '#3B82F6' : item.type === 'quiz' ? '#D97706' : '#10B981'}
+                    />
+                  </View>
+                  <View style={styles.nContent}>
+                    <Text style={styles.nItemTitle}>{item.title}</Text>
+                    <Text style={styles.nItemBody}>{item.body}</Text>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -671,5 +730,83 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: '#888',
     fontSize: 14,
+  },
+  // Notification Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  notificationContainer: {
+    backgroundColor: '#FFF',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    height: '70%',
+    padding: 24,
+  },
+  nHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  nTitle: {
+    fontSize: 21,
+    fontWeight: '900',
+    color: '#1E293B',
+  },
+  nList: {
+    flex: 1,
+  },
+  nPromo: {
+    marginBottom: 20,
+    borderRadius: 15,
+    overflow: 'hidden',
+  },
+  nPromoGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    gap: 10,
+  },
+  nPromoText: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  nItem: {
+    flexDirection: 'row',
+    gap: 15,
+    marginBottom: 20,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+  },
+  nIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  nContent: {
+    flex: 1,
+  },
+  nItemTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#1E293B',
+    marginBottom: 4,
+  },
+  nItemBody: {
+    fontSize: 13,
+    color: '#64748B',
+    marginBottom: 6,
+    lineHeight: 18,
+  },
+  nItemTime: {
+    fontSize: 11,
+    color: '#94A3B8',
+    fontWeight: '500',
   },
 });
