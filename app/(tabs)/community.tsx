@@ -208,7 +208,10 @@ export default function CommunityScreen() {
     } catch (error) {
       triggerToast("Thao tác thất bại", "error");
     } finally {
-      setIsSubmittingPost(false);
+      // Artificial delay to let the nice spinner be seen longer
+      setTimeout(() => {
+        setIsSubmittingPost(false);
+      }, 1500);
     }
   };
 
@@ -397,7 +400,6 @@ export default function CommunityScreen() {
             <Text style={styles.userName}>{item.user}</Text>
             <Text style={styles.postTime}>{item.time}</Text>
           </View>
-          <View style={{ flex: 1 }} />
           {isMyPost && (
             <TouchableOpacity onPress={() => handlePostOptions(item)} style={{ padding: 5 }}>
               <Ionicons name="ellipsis-horizontal" size={20} color="#666" />
@@ -489,10 +491,24 @@ export default function CommunityScreen() {
               <View style={styles.modalHandle} />
               <View style={styles.modalHeaderTitleBox}>
                 <Text style={styles.modalTitle}>{isEditingPost ? 'Sửa bài viết' : 'Tạo bài viết'}</Text>
-                <TouchableOpacity onPress={submitPost} disabled={!createPostText.trim() && !base64Image || isSubmittingPost}>
-                  <Text style={{ color: (createPostText.trim() || base64Image) ? '#1877F2' : '#CCC', fontSize: 16, fontWeight: '700' }}>
-                    {isSubmittingPost ? 'Đang xử lý...' : (isEditingPost ? 'Cập nhật' : 'Đăng')}
-                  </Text>
+                <TouchableOpacity
+                  onPress={submitPost}
+                  disabled={!createPostText.trim() && !base64Image || isSubmittingPost}
+                  style={{ minWidth: 80, alignItems: 'flex-end', paddingVertical: 10 }}
+                >
+                  <View style={{ minWidth: 30, alignItems: 'center', justifyContent: 'center', paddingRight: 10 }}>
+                    {isSubmittingPost ? (
+                      <ActivityIndicator size="small" color="#1877F2" />
+                    ) : (
+                      <Text style={{
+                        color: (createPostText.trim() || base64Image) ? '#1877F2' : '#CCC',
+                        fontSize: 16,
+                        fontWeight: '700',
+                      }}>
+                        {isEditingPost ? 'Cập nhật' : 'Đăng bài'}
+                      </Text>
+                    )}
+                  </View>
                 </TouchableOpacity>
               </View>
             </View>
@@ -709,7 +725,7 @@ const styles = StyleSheet.create({
   postContainer: { paddingHorizontal: 20, paddingVertical: 20, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
   avatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#F0F0F0' },
-  headerInfo: { marginLeft: 12 },
+  headerInfo: { marginLeft: 12, flex: 1, marginRight: 10 },
   userName: { fontSize: 17, fontWeight: '700', color: '#1A1A1A' },
   postTime: { fontSize: 14, color: '#666', marginTop: 2 },
   postContent: { fontSize: 16, color: '#1A1A1A', lineHeight: 22, marginBottom: 15 },
@@ -742,7 +758,7 @@ const styles = StyleSheet.create({
   commentTextBubble: { backgroundColor: '#F0F2F5', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 18, flex: 1 },
   commentMoreOption: { paddingLeft: 5, paddingVertical: 4 },
   commentUser: { fontSize: 14, fontWeight: '700', color: '#007dcae0', marginBottom: 2 },
-  commentText: { fontSize: 14, color: '#1A1A1A', lineHeight: 18 },
+  commentText: { fontSize: 14, color: '#1A1A1A' },
   commentTime: { fontSize: 12, color: '#666' },
   commentInputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 10, borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFFFFF' },
   commentInput: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: 20, paddingHorizontal: 15, paddingVertical: 8, fontSize: 15, maxHeight: 100 },
@@ -753,14 +769,14 @@ const styles = StyleSheet.create({
   emptyText: { marginTop: 35, fontSize: 16, color: '#999', fontWeight: '500' },
   createPostContent: { padding: 20, flex: 1 },
   userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
-  userNameInModal: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', marginLeft: 12 },
-  createPostInput: { fontSize: 18, color: '#1A1A1A', lineHeight: 26, textAlignVertical: 'top', flex: 1 },
+  userNameInModal: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', marginLeft: 12, flex: 1 },
+  createPostInput: { fontSize: 18, color: '#1A1A1A', textAlignVertical: 'top', flex: 1 },
   previewImageContainer: { marginTop: 15, position: 'relative' },
   previewImage: { width: '100%', borderRadius: 20, backgroundColor: '#F0F0F0' },
   removeImageBtn: { position: 'absolute', top: 10, right: 10, backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 15 },
   createPostActions: { flexDirection: 'row', padding: 15, borderTopWidth: 1, borderTopColor: '#F0F0F0', alignItems: 'center' },
-  attachAction: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0F7FF', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 22, gap: 8 },
-  attachActionText: { fontSize: 14, fontWeight: '700', color: '#1877F2' },
+  attachAction: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0F7FF', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 22, gap: 8 },
+  attachActionText: { fontSize: 14, fontWeight: '700', color: '#1877F2', marginRight: 2 },
   closeModalBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', borderRadius: 22, backgroundColor: '#FFF0F0' },
 
   // Options Modal (Bottom Sheet)

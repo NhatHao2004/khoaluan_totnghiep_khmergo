@@ -161,6 +161,7 @@ const translations = {
     // Auth Screens
     login_title: 'Đăng nhập',
     register_title: 'Đăng ký',
+    register_account: 'Đăng ký tài khoản',
     email_label: 'Email',
     password_label: 'Mật khẩu',
     confirm_password_label: 'Xác nhận mật khẩu',
@@ -365,6 +366,7 @@ const translations = {
     // Auth Screens
     login_title: 'ចូលគណនី',
     register_title: 'ចុះឈ្មោះ',
+    register_account: 'ចុះឈ្មោះគណនី',
     email_label: 'អ៊ីមែល',
     password_label: 'ពាក្យសម្ងាត់',
     confirm_password_label: 'បញ្ជាក់ពាក្យសម្ងាត់',

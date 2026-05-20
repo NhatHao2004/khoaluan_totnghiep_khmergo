@@ -21,6 +21,12 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring
+} from 'react-native-reanimated';
 
 export default function PersonalInfoScreen() {
   const { user, refreshUser } = useAuth();
@@ -39,6 +45,29 @@ export default function PersonalInfoScreen() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const [saving, setSaving] = useState(false);
+
+  // Toast States
+  const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
+  const toastY = useSharedValue(-100);
+
+  const triggerToast = (msg: string, type: 'success' | 'error' = 'success') => {
+    setToastMsg(msg);
+    setToastType(type);
+    setShowToast(true);
+    toastY.value = withSpring(Platform.OS === 'ios' ? 60 : 40, { damping: 15 });
+
+    setTimeout(() => {
+      toastY.value = withSpring(-100);
+      setTimeout(() => setShowToast(false), 500);
+    }, 2500);
+  };
+
+  const animatedToastStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: toastY.value }],
+    opacity: interpolate(toastY.value, [-100, 40], [0, 1]),
+  }));
 
   const pickAvatar = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -120,14 +149,18 @@ export default function PersonalInfoScreen() {
       }
 
       await refreshUser();
-      Alert.alert(t('confirm'), t('update_success'));
-      router.push('/(tabs)/profile');
+      triggerToast(t('update_success'), 'success');
+      
+      // Delay navigation to let toast be seen longer
+      setTimeout(() => {
+        router.push('/(tabs)/profile');
+      }, 2200);
     } catch (e: any) {
       let msg = e.message || t('update_failed');
       if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
         msg = t('wrong_old_pass');
       }
-      Alert.alert(t('error'), msg);
+      triggerToast(msg, 'error');
     } finally {
       setSaving(false);
     }
@@ -287,6 +320,13 @@ export default function PersonalInfoScreen() {
 
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {showToast && (
+        <Animated.View style={[styles.toastContainer, animatedToastStyle, { backgroundColor: toastType === 'success' ? '#10B981' : '#EF4444' }]}>
+          <Ionicons name={toastType === 'success' ? "checkmark-circle" : "alert-circle"} size={20} color="#FFF" />
+          <Text style={styles.toastText}>{toastMsg}</Text>
+        </Animated.View>
+      )}
     </SafeAreaView>
   );
 }
@@ -419,4 +459,21 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
   },
+  toastContainer: {
+    position: 'absolute',
+    left: 20,
+    right: 20,
+    zIndex: 9999,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  toastText: { color: '#FFF', fontSize: 15, fontWeight: '700', marginLeft: 12 },
 });

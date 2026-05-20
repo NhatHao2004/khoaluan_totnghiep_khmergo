@@ -8,6 +8,7 @@ import React, { useRef, useState } from 'react';
 import {
   Alert,
   Image,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -40,6 +41,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { t } = useLanguage();
   const [userRank, setUserRank] = useState<string | number>('---');
+  const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
   const lastFetchTime = useRef<number>(0);
 
   const fetchRank = async (force = false) => {
@@ -75,17 +77,13 @@ export default function ProfileScreen() {
 
 
   const handleLogout = () => {
-    Alert.alert(t('confirm'), t('logout_confirm_msg'), [
-      { text: t('back'), style: 'cancel' },
-      {
-        text: t('logout'),
-        style: 'destructive',
-        onPress: async () => {
-          await logout();
-          router.replace('/login');
-        },
-      },
-    ]);
+    setLogoutModalVisible(true);
+  };
+
+  const confirmLogout = async () => {
+    setLogoutModalVisible(false);
+    await logout();
+    router.replace('/login');
   };
 
   const handleMenuPress = (id: string) => {
@@ -184,6 +182,45 @@ export default function ProfileScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      {/* Logout Confirmation Bottom Sheet */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isLogoutModalVisible}
+        onRequestClose={() => setLogoutModalVisible(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay} 
+          activeOpacity={1} 
+          onPress={() => setLogoutModalVisible(false)}
+        >
+          <View style={styles.logoutContent}>
+            <View style={styles.modalHandle} />
+            
+            <View style={styles.logoutHeader}>
+              <Text style={styles.logoutTitle}>{t('logout')}</Text>
+              <Text style={styles.logoutMsg}>{t('logout_confirm_msg')}</Text>
+            </View>
+
+            <View style={styles.logoutActionRow}>
+              <TouchableOpacity 
+                style={styles.confirmLogoutBtn} 
+                onPress={confirmLogout}
+              >
+                <Text style={styles.confirmLogoutText}>{t('logout')}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.cancelLogoutBtn} 
+                onPress={() => setLogoutModalVisible(false)}
+              >
+                <Text style={styles.cancelLogoutText}>{t('back')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -313,5 +350,82 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#1A1A1A',
     lineHeight: 22,
+  },
+
+  // Logout Bottom Sheet Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  logoutContent: {
+    backgroundColor: '#1A1A1A',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 25,
+    paddingBottom: 40,
+    paddingTop: 10,
+  },
+  modalHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#333',
+    alignSelf: 'center',
+    marginBottom: 25,
+  },
+  logoutHeader: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  logoutIconCircle: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: 'rgba(255, 77, 77, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  logoutTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#FFF',
+    marginBottom: 8,
+  },
+  logoutMsg: {
+    fontSize: 15,
+    color: '#999',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  logoutActionRow: {
+    gap: 12,
+  },
+  confirmLogoutBtn: {
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: '#FF4D4D',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  confirmLogoutText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  cancelLogoutBtn: {
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  cancelLogoutText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

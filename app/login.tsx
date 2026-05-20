@@ -54,7 +54,7 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView 
         style={styles.scrollContent} 
@@ -151,13 +151,13 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: '700',
     color: '#000',
-    lineHeight: 38,
+    flexShrink: 1,
   },
   navInactive: {
     fontSize: 18,
     fontWeight: '500',
     color: '#B0B0B0',
-    lineHeight: 30,
+    flexShrink: 1,
   },
 
   avatarWrapper: {
@@ -176,11 +176,10 @@ const styles = StyleSheet.create({
     width: '100%',
     borderBottomWidth: 1,
     borderBottomColor: '#EAEAEA',
-    paddingVertical: 18,
+    paddingVertical: 14,
     fontSize: 16,
     color: '#333',
     marginBottom: 20,
-    lineHeight: 22,
   },
 
   passwordContainer: {
@@ -192,10 +191,9 @@ const styles = StyleSheet.create({
   },
   passwordInput: {
     flex: 1,
-    paddingVertical: 18,
+    paddingVertical: 14,
     fontSize: 16,
     color: '#333',
-    lineHeight: 22,
   },
 
   loginButton: {
@@ -221,7 +219,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     letterSpacing: 1,
     textAlign: 'center',
-    lineHeight: 28, 
   },
 
 });

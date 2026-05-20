@@ -180,7 +180,7 @@ export default function RegisterScreen() {
             disabled={loading}
           >
             <Text style={styles.loginButtonText}>
-              {loading ? t('registering').toUpperCase() : t('register_title').toUpperCase()}
+              {loading ? t('registering').toUpperCase() : t('register_account').toUpperCase()}
             </Text>
           </TouchableOpacity>
         </View>
