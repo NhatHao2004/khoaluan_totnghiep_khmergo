@@ -30,7 +30,8 @@ export default function LanguageStudyScreen() {
   const [sourcePronunciation, setSourcePronunciation] = useState('');
   const [targetPronunciation, setTargetPronunciation] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlayingInput, setIsPlayingInput] = useState(false);
+  const [isPlayingOutput, setIsPlayingOutput] = useState(false);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
 
   useEffect(() => {
@@ -104,20 +105,26 @@ export default function LanguageStudyScreen() {
     }
   };
 
-  const playSound = async (textToPlay: string, langCode: string) => {
-    if (!textToPlay || isPlaying) return;
+  const playSound = async (textToPlay: string, langCode: string, type: 'input' | 'output') => {
+    if (!textToPlay || isPlayingInput || isPlayingOutput) return;
     try {
-      setIsPlaying(true);
+      if (type === 'input') setIsPlayingInput(true);
+      else setIsPlayingOutput(true);
+
       if (sound) await sound.unloadAsync();
       const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(textToPlay)}&tl=${langCode}&client=tw-ob`;
       const { sound: newSound } = await Audio.Sound.createAsync({ uri: url }, { shouldPlay: true });
       setSound(newSound);
       newSound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) setIsPlaying(false);
+        if (status.isLoaded && status.didJustFinish) {
+          setIsPlayingInput(false);
+          setIsPlayingOutput(false);
+        }
       });
     } catch (error) {
       console.error('Lỗi khi phát âm thanh:', error);
-      setIsPlaying(false);
+      setIsPlayingInput(false);
+      setIsPlayingOutput(false);
     }
   };
   // --- End Translator Logic ---
@@ -235,6 +242,7 @@ export default function LanguageStudyScreen() {
 
               <View style={styles.inputArea}>
                 <View style={{ flex: 1 }}>
+                  <ThemedText style={styles.outTextLabel}>{isKm ? 'បញ្ចូលអត្ថបទ' : 'Đầu vào văn bản'}</ThemedText>
                   <TextInput
                     style={styles.textInput}
                     multiline
@@ -249,13 +257,17 @@ export default function LanguageStudyScreen() {
                 </View>
 
                 <View style={styles.inputFooter}>
-                  <TouchableOpacity onPress={() => playSound(inputText, isViToKm ? 'vi' : 'km')} disabled={!inputText.trim() || isPlaying}>
-                    <Ionicons name={isPlaying ? "volume-high" : "volume-medium"} size={28} color="#1A73E8" />
+                  <TouchableOpacity 
+                    onPress={() => playSound(inputText, isViToKm ? 'vi' : 'km', 'input')} 
+                    disabled={!inputText.trim() || isPlayingInput || isPlayingOutput}
+                  >
+                    <Ionicons name={isPlayingInput ? "volume-high" : "volume-medium"} size={28} color="#1A73E8" />
                   </TouchableOpacity>
                 </View>
               </View>
 
               <View style={styles.resultArea}>
+                <ThemedText style={styles.outTextLabel}>{isKm ? 'លទ្ធផលអត្ថបទ' : 'Đầu ra văn bản'}</ThemedText>
                 {translatedText ? (
                   <View style={[{ flex: 1, justifyContent: 'space-between' }, isLoading ? { opacity: 0.5 } : {}]}>
                     <View>
@@ -265,8 +277,11 @@ export default function LanguageStudyScreen() {
                       ) : null}
                     </View>
                     <View style={styles.resultFooter}>
-                      <TouchableOpacity onPress={() => playSound(translatedText, isViToKm ? 'km' : 'vi')} disabled={isPlaying}>
-                        <Ionicons name={isPlaying ? "volume-high" : "volume-medium"} size={28} color="#1A73E8" />
+                      <TouchableOpacity 
+                        onPress={() => playSound(translatedText, isViToKm ? 'km' : 'vi', 'output')} 
+                        disabled={isPlayingInput || isPlayingOutput}
+                      >
+                        <Ionicons name={isPlayingOutput ? "volume-high" : "volume-medium"} size={28} color="#1A73E8" />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -469,6 +484,14 @@ const styles = StyleSheet.create({
     padding: 15,
     minHeight: 250,
     elevation: 1,
+  },
+  outTextLabel: {
+    fontSize: 13,
+    color: '#848789ff',
+    fontWeight: '600',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   resultText: {
     fontSize: 25,
