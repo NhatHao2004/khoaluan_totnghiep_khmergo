@@ -211,7 +211,7 @@ export default function CommunityScreen() {
       // Artificial delay to let the nice spinner be seen longer
       setTimeout(() => {
         setIsSubmittingPost(false);
-      }, 1500);
+      }, 3000);
     }
   };
 
@@ -269,7 +269,7 @@ export default function CommunityScreen() {
   const handleReply = (comment: Comment) => {
     setReplyToId(comment.id);
     setReplyToName(comment.user);
-    setCommentText(`@${comment.user} `);
+    // Removed automatic @username insertion for a cleaner input experience
     setTimeout(() => {
       commentInputRef.current?.focus();
     }, 100);
@@ -292,12 +292,45 @@ export default function CommunityScreen() {
   const handleDeleteComment = async (commentId: string) => {
     if (!activePostId) return;
     try {
-      await Firestore.deleteDoc(Firestore.doc(db, 'posts', activePostId, 'comments', commentId));
-      await Firestore.updateDoc(Firestore.doc(db, 'posts', activePostId), {
-        comments: Firestore.increment(-1)
+      // 1. Tìm tất cả bình luận con (phản hồi)
+      const childDocsQuery = Firestore.query(
+        Firestore.collection(db, 'posts', activePostId, 'comments'),
+        Firestore.where('parentId', '==', commentId)
+      );
+      const childDocs = await Firestore.getDocs(childDocsQuery);
+      const totalToDelete = childDocs.size + 1; // Cha + các con
+      
+      // 2. Sử dụng Batch để xóa đồng thời
+      const batch = Firestore.writeBatch(db);
+      
+      // Xóa bình luận cha
+      batch.delete(Firestore.doc(db, 'posts', activePostId, 'comments', commentId));
+      
+      // Xóa bình luận con
+      childDocs.forEach((doc) => {
+        batch.delete(doc.ref);
       });
-      triggerToast("Đã xóa bình luận");
+      
+      // 3. Thực thi xóa
+      await batch.commit();
+      
+      // 4. Cập nhật lại tổng số bình luận của bài viết
+      await Firestore.updateDoc(Firestore.doc(db, 'posts', activePostId), {
+        comments: Firestore.increment(-totalToDelete)
+      });
+      
+      const msg = totalToDelete > 1 ? `Đã xóa bình luận và ${childDocs.size} phản hồi` : "Đã xóa bình luận";
+      
+      // 1. Đóng Modal ngay lập tức
+      setModalVisible(false);
+      setActivePostId(null);
+      
+      // 2. Chờ hiệu ứng đóng hoàn tất rồi mới hiện thông báo ở màn hình chính
+      setTimeout(() => {
+        triggerToast(msg);
+      }, 400); 
     } catch (error) {
+      console.error("Error deleting comment tree:", error);
       triggerToast("Lỗi khi xóa bình luận", "error");
     }
   };
@@ -593,25 +626,32 @@ export default function CommunityScreen() {
                 const isReply = !!item.parentId;
 
                 return (
-                  <View style={[styles.commentItem, isReply && { marginLeft: 40 }]}>
-                    {isReply && <View style={styles.replyConnector} />}
-                    <Image source={{ uri: displayCommentAvatar }} style={[styles.commentAvatar, isReply && { width: 28, height: 28 }]} />
+                  <View style={[styles.commentItem, isReply && { marginLeft: 45 }]}>
+                    <Image source={{ uri: displayCommentAvatar }} style={[styles.commentAvatar, isReply && { width: 32, height: 32 }]} />
                     <View style={styles.commentBody}>
-                      <View style={styles.commentTextBubble}>
-                        <Text style={styles.commentUser}>{item.user}</Text>
+                      <View style={styles.commentContentArea}>
+                        <View style={styles.commentUserRow}>
+                          <Text style={styles.commentUser}>{item.user}</Text>
+                          {isReply && item.parentId && (
+                            <>
+                              <Ionicons name="caret-forward-sharp" size={12} color="#666" style={{ marginHorizontal: 4, marginTop: 2 }} />
+                              <Text style={styles.repliedToUser}>
+                                {comments.find(c => c.id === item.parentId)?.user || 'Người dùng'}
+                              </Text>
+                            </>
+                          )}
+                        </View>
                         <Text style={styles.commentText}>{item.text}</Text>
                       </View>
+
                       <View style={styles.commentFooter}>
-                        <TouchableOpacity onPress={() => handleReply(item)} style={{ marginRight: 15 }}>
-                          <Text style={[styles.commentTime, { fontWeight: '700', color: '#666' }]}>Trả lời</Text>
-                        </TouchableOpacity>
                         <Text style={styles.commentTime}>{item.time}</Text>
+                        <TouchableOpacity onPress={() => handleReply(item)} style={{ marginLeft: 15 }}>
+                          <Text style={styles.footerActionText}>Trả lời</Text>
+                        </TouchableOpacity>
                         {isMyComment && (
-                          <TouchableOpacity
-                            onPress={() => handleCommentLongPress(item)}
-                            style={styles.commentMoreOption}
-                          >
-                            <Ionicons name="ellipsis-horizontal" size={14} color="#666" />
+                          <TouchableOpacity onPress={() => handleDeleteComment(item.id)} style={{ marginLeft: 15 }}>
+                            <Text style={styles.footerActionText}>Xóa</Text>
                           </TouchableOpacity>
                         )}
                       </View>
@@ -623,9 +663,9 @@ export default function CommunityScreen() {
             />
             {replyToName && (
               <View style={styles.replyBar}>
-                <Text style={styles.replyBarText}>Đang trả lời <Text style={{ fontWeight: '700' }}>{replyToName}</Text></Text>
+                <Text style={styles.replyBarText}>Đang trả lời: <Text style={{ fontWeight: '800' }}>{replyToName}</Text></Text>
                 <TouchableOpacity onPress={() => { setReplyToId(null); setReplyToName(null); }}>
-                  <Ionicons name="close-circle" size={20} color="#666" />
+                  <Ionicons name="close-circle" size={24} color="#ff0000ff" />
                 </TouchableOpacity>
               </View>
             )}
@@ -754,16 +794,18 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 10,
   },
   commentRow: { flexDirection: 'row', alignItems: 'center' },
-  commentFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 10, gap: 15 },
-  commentTextBubble: { backgroundColor: '#F0F2F5', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 18, flex: 1 },
-  commentMoreOption: { paddingLeft: 5, paddingVertical: 4 },
-  commentUser: { fontSize: 14, fontWeight: '700', color: '#007dcae0', marginBottom: 2 },
-  commentText: { fontSize: 14, color: '#1A1A1A' },
-  commentTime: { fontSize: 12, color: '#666' },
+  commentFooter: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+  commentContentArea: { paddingVertical: 2 },
+  commentUserRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 2 },
+  repliedToUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A' },
+  commentUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A' },
+  commentText: { fontSize: 14, color: '#1A1A1A', lineHeight: 19 },
+  commentTime: { fontSize: 12, color: '#999' },
+  footerActionText: { fontSize: 12, fontWeight: '700', color: '#666' },
   commentInputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 10, borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFFFFF' },
   commentInput: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: 20, paddingHorizontal: 15, paddingVertical: 8, fontSize: 15, maxHeight: 100 },
   replyBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8F9FA', paddingHorizontal: 20, paddingVertical: 8, borderTopWidth: 1, borderTopColor: '#EEE' },
-  replyBarText: { fontSize: 13, color: '#666' },
+  replyBarText: { fontSize: 14, color: '#666' },
   sendBtn: { marginLeft: 10, width: 45, height: 45, justifyContent: 'center', alignItems: 'center' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 50 },
   emptyText: { marginTop: 35, fontSize: 16, color: '#999', fontWeight: '500' },

@@ -190,29 +190,28 @@ export default function ProfileScreen() {
         visible={isLogoutModalVisible}
         onRequestClose={() => setLogoutModalVisible(false)}
       >
-        <TouchableOpacity 
-          style={styles.modalOverlay} 
-          activeOpacity={1} 
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
           onPress={() => setLogoutModalVisible(false)}
         >
           <View style={styles.logoutContent}>
             <View style={styles.modalHandle} />
-            
+
             <View style={styles.logoutHeader}>
-              <Text style={styles.logoutTitle}>{t('logout')}</Text>
               <Text style={styles.logoutMsg}>{t('logout_confirm_msg')}</Text>
             </View>
 
             <View style={styles.logoutActionRow}>
-              <TouchableOpacity 
-                style={styles.confirmLogoutBtn} 
+              <TouchableOpacity
+                style={styles.confirmLogoutBtn}
                 onPress={confirmLogout}
               >
                 <Text style={styles.confirmLogoutText}>{t('logout')}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity 
-                style={styles.cancelLogoutBtn} 
+              <TouchableOpacity
+                style={styles.cancelLogoutBtn}
                 onPress={() => setLogoutModalVisible(false)}
               >
                 <Text style={styles.cancelLogoutText}>{t('back')}</Text>
@@ -417,15 +416,13 @@ const styles = StyleSheet.create({
   cancelLogoutBtn: {
     height: 56,
     borderRadius: 16,
-    backgroundColor: 'transparent',
+    backgroundColor: '#1877F2', // Xanh nước biển
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#333',
   },
   cancelLogoutText: {
     color: '#FFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });
