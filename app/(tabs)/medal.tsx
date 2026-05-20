@@ -85,11 +85,11 @@ export default function MedalScreen() {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={styles.backBtn}>
+          <Ionicons name="arrow-back" size={26} color="#1A1A1A" />
         </TouchableOpacity>
-
         <Text style={styles.headerTitle}>{t('leaderboard')}</Text>
-        <View style={{ width: 24 }} />
+        <View style={{ width: 26 }} />
       </View>
 
       <View style={styles.tabContainer}>

@@ -70,6 +70,10 @@ export default function CommunityScreen() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [isAddingComment, setIsAddingComment] = useState(false);
   const [isSubmittingPost, setIsSubmittingPost] = useState(false);
+  const [isEditingPost, setIsEditingPost] = useState(false);
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
+  const [isOptionsModalVisible, setOptionsModalVisible] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const commentInputRef = React.useRef<TextInput>(null);
 
   // Toast States
@@ -168,26 +172,41 @@ export default function CommunityScreen() {
     if (!user || (!createPostText.trim() && !base64Image)) return;
     setIsSubmittingPost(true);
     try {
-      await Firestore.addDoc(Firestore.collection(db, 'posts'), {
-        userId: user.uid,
-        user: user.name || 'Người dùng',
-        userAvatar: user.avatar || 'https://i.pravatar.cc/150?u=me',
-        content: createPostText.trim(),
-        image: base64Image,
-        imageAspectRatio: imageRatio || 1,
-        likes: 0,
-        comments: 0,
-        likedBy: [],
-        createdAt: Firestore.serverTimestamp()
-      });
+      if (isEditingPost && editingPostId) {
+        // Mode: Edit
+        await Firestore.updateDoc(Firestore.doc(db, 'posts', editingPostId), {
+          content: createPostText.trim(),
+          image: base64Image,
+          imageAspectRatio: imageRatio || 1,
+        });
+        triggerToast("Đã cập nhật bài viết");
+      } else {
+        // Mode: Create
+        await Firestore.addDoc(Firestore.collection(db, 'posts'), {
+          userId: user.uid,
+          user: user.name || 'Người dùng',
+          userAvatar: user.avatar || 'https://i.pravatar.cc/150?u=me',
+          content: createPostText.trim(),
+          image: base64Image,
+          imageAspectRatio: imageRatio || 1,
+          likes: 0,
+          comments: 0,
+          likedBy: [],
+          createdAt: Firestore.serverTimestamp()
+        });
+        triggerToast("Đã đăng bài viết");
+      }
+
+      // Reset everything
       setCreatePostText('');
       setSelectedImage(null);
       setBase64Image(null);
       setImageRatio(null);
+      setEditingPostId(null);
+      setIsEditingPost(false);
       setCreateModalVisible(false);
-      triggerToast("Đã đăng bài viết");
     } catch (error) {
-      triggerToast("Không thể đăng bài lúc này", "error");
+      triggerToast("Thao tác thất bại", "error");
     } finally {
       setIsSubmittingPost(false);
     }
@@ -317,6 +336,28 @@ export default function CommunityScreen() {
     }
   };
 
+  const handlePostOptions = (post: Post) => {
+    if (!user || user.uid !== post.userId) return;
+    setSelectedPost(post);
+    setOptionsModalVisible(true);
+  };
+
+  const handleEditPost = (post: Post) => {
+    setEditingPostId(post.id);
+    setIsEditingPost(true);
+    setCreatePostText(post.content);
+    if (post.image) {
+      setSelectedImage(post.image);
+      setBase64Image(post.image);
+      setImageRatio(post.imageAspectRatio || 1);
+    } else {
+      setSelectedImage(null);
+      setBase64Image(null);
+      setImageRatio(null);
+    }
+    setCreateModalVisible(true);
+  };
+
   const handleDeletePost = async (postId: string, postUserId: string) => {
     if (!user || user.uid !== postUserId) return;
 
@@ -356,6 +397,12 @@ export default function CommunityScreen() {
             <Text style={styles.userName}>{item.user}</Text>
             <Text style={styles.postTime}>{item.time}</Text>
           </View>
+          <View style={{ flex: 1 }} />
+          {isMyPost && (
+            <TouchableOpacity onPress={() => handlePostOptions(item)} style={{ padding: 5 }}>
+              <Ionicons name="ellipsis-horizontal" size={20} color="#666" />
+            </TouchableOpacity>
+          )}
         </View>
         <Text style={styles.postContent}>{item.content}</Text>
         {item.image && (
@@ -375,12 +422,6 @@ export default function CommunityScreen() {
               <Text style={styles.actionCount}>{item.comments || 0}</Text>
             </TouchableOpacity>
           </View>
-
-          {isMyPost && (
-            <TouchableOpacity onPress={() => handleDeletePost(item.id, item.userId)}>
-              <Ionicons name="ellipsis-horizontal" size={20} color="#666" />
-            </TouchableOpacity>
-          )}
         </View>
       </View>
     );
@@ -447,10 +488,10 @@ export default function CommunityScreen() {
             <View style={styles.modalHeader}>
               <View style={styles.modalHandle} />
               <View style={styles.modalHeaderTitleBox}>
-                <Text style={styles.modalTitle}>Tạo bài viết</Text>
+                <Text style={styles.modalTitle}>{isEditingPost ? 'Sửa bài viết' : 'Tạo bài viết'}</Text>
                 <TouchableOpacity onPress={submitPost} disabled={!createPostText.trim() && !base64Image || isSubmittingPost}>
                   <Text style={{ color: (createPostText.trim() || base64Image) ? '#1877F2' : '#CCC', fontSize: 16, fontWeight: '700' }}>
-                    {isSubmittingPost ? 'Đang đăng...' : 'Đăng'}
+                    {isSubmittingPost ? 'Đang xử lý...' : (isEditingPost ? 'Cập nhật' : 'Đăng')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -500,7 +541,14 @@ export default function CommunityScreen() {
               <View style={{ flex: 1 }} />
               <TouchableOpacity
                 style={styles.closeModalBtn}
-                onPress={() => setCreateModalVisible(false)}
+                onPress={() => {
+                  setCreateModalVisible(false);
+                  setIsEditingPost(false);
+                  setEditingPostId(null);
+                  setCreatePostText('');
+                  setSelectedImage(null);
+                  setBase64Image(null);
+                }}
               >
                 <Ionicons name="close" size={28} color="#ff0000ff" />
               </TouchableOpacity>
@@ -543,7 +591,7 @@ export default function CommunityScreen() {
                         </TouchableOpacity>
                         <Text style={styles.commentTime}>{item.time}</Text>
                         {isMyComment && (
-                          <TouchableOpacity 
+                          <TouchableOpacity
                             onPress={() => handleCommentLongPress(item)}
                             style={styles.commentMoreOption}
                           >
@@ -566,13 +614,13 @@ export default function CommunityScreen() {
               </View>
             )}
             <View style={styles.commentInputContainer}>
-              <TextInput 
+              <TextInput
                 ref={commentInputRef}
-                style={styles.commentInput} 
-                placeholder="Viết bình luận..." 
-                value={commentText} 
-                onChangeText={setCommentText} 
-                multiline 
+                style={styles.commentInput}
+                placeholder="Viết bình luận..."
+                value={commentText}
+                onChangeText={setCommentText}
+                multiline
               />
               <TouchableOpacity style={styles.sendBtn} onPress={submitComment} disabled={!commentText.trim() || isAddingComment}>
                 {isAddingComment ? <ActivityIndicator size="small" color="#006effff" /> : <Ionicons name="send" size={28} color={commentText.trim() ? "#006effff" : "#006effff"} />}
@@ -580,6 +628,71 @@ export default function CommunityScreen() {
             </View>
           </KeyboardAvoidingView>
         </View>
+      </Modal>
+
+      {/* Post Options Bottom Sheet */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isOptionsModalVisible}
+        onRequestClose={() => setOptionsModalVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.optionsOverlay}
+          activeOpacity={1}
+          onPress={() => setOptionsModalVisible(false)}
+        >
+          <View style={styles.optionsContent}>
+            <View style={styles.optionsHandle} />
+
+            <TouchableOpacity 
+              style={styles.optionRow} 
+              onPress={() => {
+                setOptionsModalVisible(false);
+                if (selectedPost) handleEditPost(selectedPost);
+              }}
+            >
+              <View style={styles.optionIconContainer}>
+                <Ionicons name="create-outline" size={24} color="#1877F2" />
+              </View>
+              <View>
+                <Text style={styles.optionText}>Chỉnh sửa bài viết</Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.optionRow}
+              onPress={() => {
+                setOptionsModalVisible(false);
+                if (selectedPost) handleDeletePost(selectedPost.id, selectedPost.userId);
+              }}
+            >
+              <View style={styles.optionIconContainer}>
+                <Ionicons name="trash-outline" size={24} color="#FF4444" />
+              </View>
+              <View>
+                <Text style={[styles.optionText, { color: '#FF4444' }]}>Xóa bài viết</Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.optionRow}
+              onPress={() => {
+                triggerToast("Đã sao chép liên kết");
+                setOptionsModalVisible(false);
+              }}
+            >
+              <View style={styles.optionIconContainer}>
+                <Ionicons name="link-outline" size={24} color="#666" />
+              </View>
+              <View>
+                <Text style={styles.optionText}>Sao chép liên kết</Text>
+              </View>
+            </TouchableOpacity>
+
+            <View style={{ height: 20 }} />
+          </View>
+        </TouchableOpacity>
       </Modal>
     </SafeAreaView>
   );
@@ -664,4 +777,13 @@ const styles = StyleSheet.create({
   attachAction: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0F7FF', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 22, gap: 8 },
   attachActionText: { fontSize: 14, fontWeight: '700', color: '#1877F2' },
   closeModalBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', borderRadius: 22, backgroundColor: '#FFF0F0' },
+
+  // Options Modal (Bottom Sheet)
+  optionsOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  optionsContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingHorizontal: 15, paddingBottom: 30, shadowColor: '#000', shadowOffset: { width: 0, height: -5 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 15 },
+  optionsHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: 12 },
+  optionRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 15, paddingHorizontal: 15, width: '100%' },
+  optionIconContainer: { width: 32, justifyContent: 'center', alignItems: 'center', marginRight: 15 },
+  optionText: { fontSize: 16, fontWeight: '600', color: '#1A1A1A' },
+  optionSubText: { fontSize: 13, color: '#666', marginTop: 2 },
 });

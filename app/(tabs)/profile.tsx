@@ -27,6 +27,7 @@ type MenuItem = {
 const menuItems: MenuItem[] = [
   { id: 'personal-info', titleKey: 'edit_profile', icon: 'person-outline' },
   { id: 'favorites', titleKey: 'favorites', icon: 'heart-outline' },
+  { id: 'medal', titleKey: 'achievements', icon: 'ribbon-outline' },
   { id: 'support', titleKey: 'support_feedback', icon: 'chatbubble-ellipses-outline' },
   { id: 'settings', titleKey: 'settings', icon: 'settings-outline' },
   { id: 'login', titleKey: 'login', icon: 'power-outline', color: '#0022ffff' },
@@ -105,6 +106,7 @@ export default function ProfileScreen() {
     else if (id === 'login') router.push('/login');
     else if (id === 'personal-info') router.push('/(tabs)/personal-info');
     else if (id === 'favorites') router.push('/(tabs)/favorites');
+    else if (id === 'medal') router.push('/(tabs)/medal');
     else if (id === 'support') router.push('/(tabs)/support');
     else if (id === 'settings') router.push('/(tabs)/settings');
   };

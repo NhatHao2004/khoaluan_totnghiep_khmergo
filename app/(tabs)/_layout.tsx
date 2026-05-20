@@ -88,14 +88,7 @@ export default function RootLayout() {
         <Tabs.Screen
           name="medal"
           options={{
-            title: 'Thành tích',
-            tabBarIcon: ({ color, focused, size }) => (
-              <Ionicons
-                name={focused ? 'ribbon' : 'ribbon-outline'}
-                size={26}
-                color={color}
-              />
-            ),
+            href: null,
           }}
         />
         <Tabs.Screen
