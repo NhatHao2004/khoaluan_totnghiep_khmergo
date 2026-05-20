@@ -1,5 +1,4 @@
 import { ThemedText } from '@/components/themed-text';
-import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { auth, db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,7 +7,7 @@ import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function RegisterScreen() {
   const { t } = useLanguage();
@@ -22,6 +21,7 @@ export default function RegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -64,7 +64,7 @@ export default function RegisterScreen() {
 
       // 2. Xác định URL ảnh đại diện
       const avatarUrl = avatarUri
-        ? avatarUri 
+        ? avatarUri
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00CFA3&color=fff&size=128`;
 
       // 3. Lưu thông tin vào Firestore
@@ -84,7 +84,7 @@ export default function RegisterScreen() {
       let msg = t('update_failed');
       if (error.code === 'auth/email-already-in-use') {
         msg = t('email_in_use');
-      } 
+      }
       Alert.alert(t('error'), msg);
     } finally {
       setLoading(false);
@@ -96,8 +96,8 @@ export default function RegisterScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView 
-        style={styles.scrollContent} 
+      <ScrollView
+        style={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}
       >
@@ -186,9 +186,60 @@ export default function RegisterScreen() {
         </View>
 
         {/* Footer Section - Bottom Gray */}
+        {/* Footer Section - Bottom Gray */}
         <View style={styles.bottomSection}>
-          <ThemedText style={styles.footerText}>{t('terms')}</ThemedText>
+          <TouchableOpacity onPress={() => setShowTerms(true)}>
+            <ThemedText style={styles.footerText}>{t('terms')}</ThemedText>
+          </TouchableOpacity>
         </View>
+
+        {/* Terms of Service Modal */}
+        <Modal
+          visible={showTerms}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setShowTerms(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <ThemedText style={styles.modalTitle}>ĐIỀU KHOẢN DỊCH VỤ</ThemedText>
+                <TouchableOpacity onPress={() => setShowTerms(false)} style={styles.closeBtn}>
+                  <Ionicons name="close" size={24} color="#000" />
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
+                <ThemedText style={styles.termsText}>
+                  Chào mừng bạn đến với ứng dụng KhmerGo. Khi sử dụng ứng dụng, bạn đồng ý với các điều khoản sau:{"\n\n"}
+
+                  <Text style={styles.termsBold}>1. Mục đích:</Text> Cung cấp kiến thức về văn hóa, lịch sử, đời sống của người Khmer Nam Bộ và hỗ trợ nghiên cứu học tập.{"\n\n"}
+
+                  <Text style={styles.termsBold}>2. Trách nhiệm:</Text> Người dùng cam kết sử dụng đúng mục đích, không vi phạm pháp luật, tôn trọng bản sắc văn hóa và cộng đồng.{"\n\n"}
+
+                  <Text style={styles.termsBold}>3. Bản quyền:</Text> Toàn bộ nội dung (hình ảnh, văn bản, dữ liệu) thuộc sở hữu của nhóm phát triển. Nghiêm cấm sao chép, kinh doanh khi chưa được phép.{"\n\n"}
+
+                  <Text style={styles.termsBold}>4. Bảo mật:</Text> Thu thập thông tin cơ bản (phiên bản OS, dữ liệu sử dụng) để cải thiện trải nghiệm. Bảo mật thông tin theo quy định.{"\n\n"}
+
+                  <Text style={styles.termsBold}>5. Giới hạn trách nhiệm:</Text> Không chịu trách nhiệm về lỗi kết nối, thiết bị hoặc các thiệt hại ngoài mục đích tham khảo của ứng dụng.{"\n\n"}
+
+                  <Text style={styles.termsBold}>6. Chấm dứt:</Text> Có quyền khóa quyền truy cập nếu phát hiện hành vi vi phạm điều khoản hoặc gây hại đến hệ thống.{"\n\n"}
+
+                  <Text style={styles.termsBold}>7. Liên hệ:</Text> Mọi thắc mắc vui lòng gửi về:{"\n"}
+                  {"    "}• Email: <Text style={{ color: '#1A73E8' }}>support@khmergoapp.vn</Text>{"\n"}
+                  {"    "}• Số điện thoại: <Text style={{ color: '#1A73E8' }}>0123 456 789</Text>
+                </ThemedText>
+              </ScrollView>
+
+              <TouchableOpacity
+                style={styles.acceptBtn}
+                onPress={() => setShowTerms(false)}
+              >
+                <Text style={styles.acceptBtnText}>ĐÃ HIỂU</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -218,7 +269,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   navActive: {
-    fontSize: 26, 
+    fontSize: 26,
     fontWeight: '700',
     color: '#000',
     lineHeight: 36, // Reduced 
@@ -320,5 +371,76 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#A0A0A0',
     textDecorationLine: 'underline',
-  }
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    width: '100%',
+    maxHeight: '80%',
+    borderRadius: 24,
+    padding: 24,
+    elevation: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 15,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+    paddingBottom: 15,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#1E293B',
+    letterSpacing: 0.5,
+  },
+  closeBtn: {
+    padding: 5,
+  },
+  modalScroll: {
+    marginBottom: 20,
+  },
+  termsText: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: '#475569',
+    textAlign: 'justify',
+  },
+  termsBold: {
+    fontWeight: '800',
+    color: '#0F172A',
+    fontSize: 15,
+  },
+  acceptBtn: {
+    backgroundColor: '#00CFA3',
+    paddingVertical: 14,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#00CFA3',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  acceptBtnText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: 1,
+    lineHeight: 23,
+    includeFontPadding: false,
+  },
 });
