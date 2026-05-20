@@ -2,18 +2,21 @@ import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 
-// Cấu hình hiển thị thông báo
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
-
 const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+const isAndroid = Platform.OS === 'android';
+
+// Chỉ cấu hình nếu KHÔNG phải Expo Go trên Android
+if (!(isExpoGo && isAndroid)) {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+}
 
 export async function registerForPushNotificationsAsync() {
   // Bỏ qua đăng ký nếu đang chạy trên Expo Go trên Android (SDK 53+ không hỗ trợ remote notifications)
