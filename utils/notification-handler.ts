@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 
 // Cấu hình hiển thị thông báo
 Notifications.setNotificationHandler({
@@ -12,7 +13,15 @@ Notifications.setNotificationHandler({
   }),
 });
 
+const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+
 export async function registerForPushNotificationsAsync() {
+  // Bỏ qua đăng ký nếu đang chạy trên Expo Go trên Android (SDK 53+ không hỗ trợ remote notifications)
+  if (isExpoGo && Platform.OS === 'android') {
+    console.log('Skipping push notification registration on Expo Go (Android)');
+    return;
+  }
+
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('default', {
       name: 'Mặc định',
