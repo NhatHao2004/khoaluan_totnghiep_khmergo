@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function LoginScreen() {
   const { t } = useLanguage();
@@ -54,7 +54,7 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView 
         style={styles.scrollContent} 
@@ -72,7 +72,11 @@ export default function LoginScreen() {
 
           {/* Profile Avatar Icon */}
           <View style={styles.avatarWrapper}>
-            <ImagePlaceholder />
+            <Image 
+              source={require('@/assets/images/icon.png')} 
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
           </View>
 
           {/* Inputs */}
@@ -113,30 +117,12 @@ export default function LoginScreen() {
             </Text>
           </TouchableOpacity>
         </View>
-        {/* Social Login - Bottom Gray Section */}
-        <View style={styles.bottomSection}>
-          <ThemedText style={styles.socialText}>{t('login_with')}</ThemedText>
-          <View style={styles.socialRow}>
-            <View style={[styles.socialIcon, { backgroundColor: '#EA4335' }]}>
-              <Ionicons name="logo-google" size={18} color="#FFF" />
-            </View>
-            <View style={[styles.socialIcon, { backgroundColor: '#3B5998' }]}>
-              <Ionicons name="logo-facebook" size={18} color="#FFF" />
-            </View>
-          </View>
-        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
-const ImagePlaceholder = () => (
-  <View style={styles.avatarContainer}>
-    <View style={styles.avatarInner}>
-      <Ionicons name="person" size={50} color="#D1D1D1" style={{ marginTop: 10 }} />
-    </View>
-  </View>
-);
+
 
 const styles = StyleSheet.create({
   container: {
@@ -178,23 +164,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
-  avatarContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: '#EAEAEA',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarInner: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: '#F5F5F5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
+  logoImage: {
+    width: 120,
+    height: 120,
   },
   formContainer: {
     width: '100%',
@@ -252,28 +224,4 @@ const styles = StyleSheet.create({
     lineHeight: 28, 
   },
 
-  bottomSection: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 35,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 'auto',
-  },
-  socialText: {
-    fontSize: 14,
-    color: '#A0A0A0',
-    marginBottom: 15,
-  },
-  socialRow: {
-    flexDirection: 'row',
-    gap: 15,
-  },
-  socialIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  }
 });
