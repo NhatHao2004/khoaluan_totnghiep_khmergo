@@ -102,12 +102,7 @@ export default function FavoritesScreen() {
               <Ionicons name="heart-dislike-outline" size={50} color="#FF4D4D" />
             </View>
             <Text style={styles.emptyTitle}>Chưa có mục yêu thích nào</Text>
-            <Text style={styles.emptySub}>Hãy khám phá và lưu lại những địa điểm{'\n'}bạn yêu thích nhé.</Text>
-            <TouchableOpacity
-              style={styles.exploreButton}
-            >
-              <Text style={styles.exploreText}>Khám phá ngay</Text>
-            </TouchableOpacity>
+            <Text style={styles.emptySub}>Hãy khám phá và lưu lại những điều{'\n'}bạn yêu thích nhé.</Text>
           </View>
         ) : (
           <View style={styles.listContainer}>

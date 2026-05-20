@@ -60,6 +60,19 @@ export default function RootLayout() {
           }}
         />
         <Tabs.Screen
+          name="community"
+          options={{
+            title: 'Cộng đồng',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? 'people' : 'people-outline'}
+                size={27}
+                color={color}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="quiz"
           options={{
             title: 'Thử thách',

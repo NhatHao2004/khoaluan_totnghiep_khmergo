@@ -204,33 +204,41 @@ export default function RegisterScreen() {
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
                 <ThemedText style={styles.modalTitle}>ĐIỀU KHOẢN DỊCH VỤ</ThemedText>
-                <TouchableOpacity onPress={() => setShowTerms(false)} style={styles.closeBtn}>
-                  <Ionicons name="close" size={24} color="#000" />
-                </TouchableOpacity>
               </View>
 
               <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
                 <ThemedText style={styles.termsText}>
-                  Chào mừng bạn đến với ứng dụng KhmerGo. Khi sử dụng ứng dụng, bạn đồng ý với các điều khoản sau:{"\n\n"}
+                  Chào mừng bạn đến với ứng dụng KhmerGo. Khi sử dụng ứng dụng, bạn đồng ý với các điều khoản và điều kiện sau:{"\n\n"}
 
-                  <Text style={styles.termsBold}>1. Mục đích:</Text> Cung cấp kiến thức về văn hóa, lịch sử, đời sống của người Khmer Nam Bộ và hỗ trợ nghiên cứu học tập.{"\n\n"}
+                  <Text style={styles.termsBold}>1. Mục đích sử dụng:</Text>{" "}
+                  KhmerGo được phát triển nhằm hỗ trợ tìm hiểu, học tập và quảng bá văn hóa, lịch sử, đời sống và bản sắc của người Khmer Nam Bộ.{"\n\n"}
 
-                  <Text style={styles.termsBold}>2. Trách nhiệm:</Text> Người dùng cam kết sử dụng đúng mục đích, không vi phạm pháp luật, tôn trọng bản sắc văn hóa và cộng đồng.{"\n\n"}
+                  <Text style={styles.termsBold}>2. Trách nhiệm người dùng:</Text>{" "}
+                  Người dùng cam kết sử dụng ứng dụng đúng mục đích, không vi phạm pháp luật, không đăng tải nội dung phản cảm và luôn tôn trọng giá trị văn hóa cộng đồng Khmer.{"\n\n"}
 
-                  <Text style={styles.termsBold}>3. Bản quyền:</Text> Toàn bộ nội dung (hình ảnh, văn bản, dữ liệu) thuộc sở hữu của nhóm phát triển. Nghiêm cấm sao chép, kinh doanh khi chưa được phép.{"\n\n"}
+                  <Text style={styles.termsBold}>3. Quyền sở hữu nội dung:</Text>{" "}
+                  Toàn bộ hình ảnh, văn bản, dữ liệu và giao diện trên ứng dụng thuộc quyền sở hữu của nhóm phát triển hoặc được sử dụng hợp pháp. Nghiêm cấm sao chép hoặc sử dụng lại khi chưa được cho phép.{"\n\n"}
 
-                  <Text style={styles.termsBold}>4. Bảo mật:</Text> Thu thập thông tin cơ bản (phiên bản OS, dữ liệu sử dụng) để cải thiện trải nghiệm. Bảo mật thông tin theo quy định.{"\n\n"}
+                  <Text style={styles.termsBold}>4. Chính sách bảo mật:</Text>{" "}
+                  Ứng dụng có thể thu thập một số dữ liệu cơ bản như phiên bản hệ điều hành và thông tin sử dụng nhằm nâng cao trải nghiệm người dùng. Mọi thông tin đều được bảo mật theo quy định hiện hành.{"\n\n"}
 
-                  <Text style={styles.termsBold}>5. Giới hạn trách nhiệm:</Text> Không chịu trách nhiệm về lỗi kết nối, thiết bị hoặc các thiệt hại ngoài mục đích tham khảo của ứng dụng.{"\n\n"}
+                  <Text style={styles.termsBold}>5. Giới hạn trách nhiệm:</Text>{" "}
+                  KhmerGo không chịu trách nhiệm đối với các sự cố phát sinh từ thiết bị, kết nối mạng hoặc việc sử dụng thông tin ngoài mục đích tham khảo và học tập.{"\n\n"}
 
-                  <Text style={styles.termsBold}>6. Chấm dứt:</Text> Có quyền khóa quyền truy cập nếu phát hiện hành vi vi phạm điều khoản hoặc gây hại đến hệ thống.{"\n\n"}
+                  <Text style={styles.termsBold}>6. Chấm dứt quyền sử dụng:</Text>{" "}
+                  Chúng tôi có quyền tạm ngừng hoặc khóa tài khoản nếu phát hiện hành vi vi phạm điều khoản hoặc gây ảnh hưởng đến hệ thống và cộng đồng người dùng.{"\n\n"}
 
-                  <Text style={styles.termsBold}>7. Liên hệ:</Text> Mọi thắc mắc vui lòng gửi về:{"\n"}
-                  {"    "}• Email: <Text style={{ color: '#1A73E8' }}>support@khmergoapp.vn</Text>{"\n"}
-                  {"    "}• Số điện thoại: <Text style={{ color: '#1A73E8' }}>0123 456 789</Text>
+                  <Text style={styles.termsBold}>7. Liên hệ hỗ trợ:</Text>{"\n"}
+                  {"    "}• Email:{" "}
+                  <Text style={{ color: '#1A73E8' }}>
+                    support@khmergoapp.vn
+                  </Text>{"\n"}
+                  {"    "}• Số điện thoại:{" "}
+                  <Text style={{ color: '#1A73E8' }}>
+                    0123 456 789
+                  </Text>
                 </ThemedText>
               </ScrollView>
-
               <TouchableOpacity
                 style={styles.acceptBtn}
                 onPress={() => setShowTerms(false)}
@@ -394,7 +402,7 @@ const styles = StyleSheet.create({
   },
   modalHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
     borderBottomWidth: 1,
@@ -406,12 +414,13 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#1E293B',
     letterSpacing: 0.5,
+    textAlign: 'center',
   },
   closeBtn: {
     padding: 5,
   },
   modalScroll: {
-    marginBottom: 20,
+    marginBottom: 15,
   },
   termsText: {
     fontSize: 14,
@@ -427,7 +436,7 @@ const styles = StyleSheet.create({
   acceptBtn: {
     backgroundColor: '#00CFA3',
     paddingVertical: 14,
-    borderRadius: 16,
+    borderRadius: 18,
     alignItems: 'center',
     shadowColor: '#00CFA3',
     shadowOffset: { width: 0, height: 4 },
@@ -440,7 +449,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '800',
     letterSpacing: 1,
-    lineHeight: 23,
+    lineHeight: 22,
     includeFontPadding: false,
   },
 });

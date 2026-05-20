@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
@@ -66,10 +66,32 @@ export default function PersonalInfoScreen() {
       if (!uid) throw new Error(t('not_logged_in'));
 
       // 1. Update Profile (Name/Avatar)
+      const newAvatar = avatarUri || user?.avatar || '';
+      const newName = name.trim();
+
       await updateDoc(doc(db, 'users', uid), {
-        name: name.trim(),
-        avatar: avatarUri || user?.avatar || '',
+        name: newName,
+        avatar: newAvatar,
       });
+
+      // 1b. Sync with Posts (Cập nhật tên và ảnh đại diện trên toàn bộ bài viết cũ)
+      try {
+        const postsQuery = query(collection(db, 'posts'), where('userId', '==', uid));
+        const postSnapshots = await getDocs(postsQuery);
+        
+        if (!postSnapshots.empty) {
+          const batch = writeBatch(db);
+          postSnapshots.forEach((postDoc) => {
+            batch.update(postDoc.ref, {
+              user: newName,
+              userAvatar: newAvatar
+            });
+          });
+          await batch.commit();
+        }
+      } catch (syncError) {
+        console.error("Error syncing profile with posts:", syncError);
+      }
 
       // 2. Optional Password Update
       const isTryingToChangePass = oldPassword || newPassword || confirmPassword;

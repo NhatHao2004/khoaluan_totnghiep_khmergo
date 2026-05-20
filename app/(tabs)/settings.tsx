@@ -8,9 +8,10 @@ import { useRouter } from 'expo-router';
 import React, { useContext, useEffect, useState } from 'react';
 
 import {
+  Image,
+  Modal,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   TouchableOpacity,
   View
@@ -27,6 +28,7 @@ export default function SettingsScreen() {
   const { language, setLanguage, t } = useLanguage();
   const { user } = useContext(AuthContext);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [showIntro, setShowIntro] = useState(false);
 
   // Load notification setting
   useEffect(() => {
@@ -111,7 +113,7 @@ export default function SettingsScreen() {
                 <Text style={styles.switchSubLabel}>{t('study_reminder')}</Text>
               </View>
 
-              <TouchableOpacity 
+              <TouchableOpacity
                 activeOpacity={0.8}
                 onPress={() => toggleNotifications(!notificationsEnabled)}
               >
@@ -127,7 +129,7 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <View style={styles.card}>
             <Text style={styles.cardTitle}>{t('app_info')}</Text>
-            <TouchableOpacity style={styles.infoItem}>
+            <TouchableOpacity style={styles.infoItem} onPress={() => setShowIntro(true)}>
               <Text style={styles.infoLabel}>{t('intro')}</Text>
               <Ionicons name="chevron-forward" size={18} color="#CCC" />
             </TouchableOpacity>
@@ -143,6 +145,66 @@ export default function SettingsScreen() {
       </ScrollView>
 
 
+      <Modal
+        visible={showIntro}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowIntro(false)}
+      >
+        <View style={styles.introOverlay}>
+          <View style={styles.introContent}>
+            <View style={styles.introHeader}>
+              <Text style={styles.introTitle}>Giới thiệu ứng dụng</Text>
+              <TouchableOpacity onPress={() => setShowIntro(false)} style={styles.introCloseBtn}>
+                <Ionicons name="close" size={28} color="#1A1A1A" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.introScroll}>
+              {/* App Identity */}
+              <View style={styles.appIdentity}>
+                <Image source={require('@/assets/images/icon.png')} style={styles.appLogo} />
+                <Text style={styles.appName}>KhmerGo</Text>
+                <Text style={styles.appVersionTag}>Phiên bản 1.0.0</Text>
+              </View>
+
+              <Text style={styles.appDesc}>
+                Ứng dụng hỗ trợ nâng cao kiến thức về văn hóa người Khmer Nam Bộ.
+              </Text>
+
+              {/* Learning Goals */}
+              <View style={styles.introSection}>
+                <Text style={styles.introSectionTitle}>KhmerGo giúp người dùng tìm hiểu về:</Text>
+                <Text style={styles.introBullet}>• Chùa Khmer</Text>
+                <Text style={styles.introBullet}>• Lễ hội truyền thống</Text>
+                <Text style={styles.introBullet}>• Ẩm thực Khmer</Text>
+                <Text style={styles.introBullet}>• Nghệ thuật dân gia</Text>
+                <Text style={styles.introBullet}>• Ngôn ngữ và chữ viết Khmer</Text>
+              </View>
+
+              {/* Objectives */}
+              <View style={styles.introSection}>
+                <Text style={styles.introSectionTitle}>Mục tiêu chung của ứng dụng:</Text>
+                <Text style={styles.introItemText}>- Góp phần bảo tồn giá trị văn hóa Khmer Nam Bộ.</Text>
+                <Text style={styles.introItemText}>- Hỗ trợ học tập và nghiên cứu.</Text>
+                <Text style={styles.introItemText}>- Quảng bá văn hóa truyền thống đến cộng đồng.</Text>
+              </View>
+
+              {/* Team & Tech */}
+              <View style={styles.introSection}>
+                <View style={styles.introDetailRow}>
+                  <Text style={styles.introSectionTitle}>Người phát triển: </Text>
+                  <Text style={styles.introItemText}>Lâm Nhật Hào</Text>
+                </View>
+                <View style={[styles.introDetailRow, { marginTop: 0 }]}>
+                  <Text style={styles.introSectionTitle}>Công nghệ sử dụng: </Text>
+                  <Text style={styles.introItemText}>React Native, Expo, Firebase</Text>
+                </View>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -291,67 +353,131 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0F0F0',
   },
 
-  // Modal Styles
-  modalOverlay: {
+  // Intro Modal Styles
+  introOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.6)',
     justifyContent: 'flex-end',
   },
-  modalContent: {
-    backgroundColor: '#FFF',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
-    padding: 25,
-    minHeight: 400,
+  introContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    paddingTop: 20,
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+    width: '100%',
+    maxHeight: '90%',
   },
-  modalTitle: {
+  introHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 25,
+    paddingHorizontal: 5,
+  },
+  introTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#1A1A1A',
+  },
+  introCloseBtn: {
+    padding: 5,
+  },
+  introScroll: {
+    paddingBottom: 20,
+  },
+  appIdentity: {
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  appLogo: {
+    width: 80,
+    height: 80,
+    borderRadius: 20,
+    marginBottom: 12,
+  },
+  appName: {
+    fontSize: 25,
+    fontWeight: '900',
+    color: '#000000ff',
+    marginBottom: 4,
+  },
+  appVersionTag: {
+    fontSize: 13,
+    color: '#64748B',
+    fontWeight: '600',
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 20,
+  },
+  appDesc: {
+    fontSize: 15,
+    lineHeight: 24,
+    color: '#475569',
     textAlign: 'center',
+    marginBottom: 25,
+    fontStyle: 'italic',
+  },
+  introSection: {
     marginBottom: 20,
   },
-  timePickerContainer: {
+  introSectionTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#1E293B',
+    marginBottom: 8,
+  },
+  introDetailRow: {
     flexDirection: 'row',
+    alignItems: 'baseline',
+    marginBottom: 4,
+  },
+  introBullet: {
+    fontSize: 14,
+    color: '#475569',
+    marginBottom: 4,
+    paddingLeft: 10,
+  },
+  introItemText: {
+    fontSize: 14,
+    color: '#475569',
+    lineHeight: 20,
+  },
+  introRow: {
+    flexDirection: 'row',
+    gap: 20,
+    marginBottom: 5,
+  },
+  actionGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 20,
+    padding: 20,
+    marginVertical: 20,
+  },
+  actionItem: {
     alignItems: 'center',
-    justifyContent: 'center',
-    height: 200,
-    paddingHorizontal: 20,
+    gap: 8,
   },
-  timeList: {
-    flex: 1,
-    height: '100%',
-  },
-  timeItem: {
-    paddingVertical: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  timeItemText: {
-    fontSize: 20,
-    color: '#AAA',
-    fontWeight: '500',
-  },
-  activeTimeText: {
-    color: '#1A1A1A',
-    fontWeight: '700',
-    fontSize: 24,
-  },
-  timeSeparator: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginHorizontal: 15,
-  },
-  closeModalBtn: {
-    backgroundColor: '#0059ffff',
+  actionIcon: {
+    width: 45,
+    height: 45,
     borderRadius: 15,
-    paddingVertical: 15,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
   },
-  closeModalText: {
-    color: '#FFF',
-    fontSize: 16,
+  actionLabel: {
+    fontSize: 12,
     fontWeight: '700',
+    color: '#64748B',
   },
+  copyright: {
+    fontSize: 12,
+    color: '#94A3B8',
+    textAlign: 'center',
+    marginTop: 10,
+  }
 });
