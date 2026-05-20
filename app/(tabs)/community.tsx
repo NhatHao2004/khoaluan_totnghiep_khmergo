@@ -645,22 +645,22 @@ export default function CommunityScreen() {
           <View style={styles.optionsContent}>
             <View style={styles.optionsHandle} />
 
-            <TouchableOpacity 
-              style={styles.optionRow} 
+            <TouchableOpacity
+              style={styles.optionRow}
               onPress={() => {
                 setOptionsModalVisible(false);
                 if (selectedPost) handleEditPost(selectedPost);
               }}
             >
               <View style={styles.optionIconContainer}>
-                <Ionicons name="create-outline" size={24} color="#1877F2" />
+                <Ionicons name="create-sharp" size={24} color="#FFF" />
               </View>
               <View>
-                <Text style={styles.optionText}>Chỉnh sửa bài viết</Text>
+                <Text style={[styles.optionText, { color: '#ffffffff' }]}>Chỉnh sửa bài viết</Text>
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.optionRow}
               onPress={() => {
                 setOptionsModalVisible(false);
@@ -668,29 +668,14 @@ export default function CommunityScreen() {
               }}
             >
               <View style={styles.optionIconContainer}>
-                <Ionicons name="trash-outline" size={24} color="#FF4444" />
+                <Ionicons name="trash-sharp" size={24} color="#FFF" />
               </View>
               <View>
-                <Text style={[styles.optionText, { color: '#FF4444' }]}>Xóa bài viết</Text>
+                <Text style={[styles.optionText, { color: '#ffffffff' }]}>Xóa bỏ bài viết</Text>
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={styles.optionRow}
-              onPress={() => {
-                triggerToast("Đã sao chép liên kết");
-                setOptionsModalVisible(false);
-              }}
-            >
-              <View style={styles.optionIconContainer}>
-                <Ionicons name="link-outline" size={24} color="#666" />
-              </View>
-              <View>
-                <Text style={styles.optionText}>Sao chép liên kết</Text>
-              </View>
-            </TouchableOpacity>
-
-            <View style={{ height: 20 }} />
+            <View style={{ height: 10 }} />
           </View>
         </TouchableOpacity>
       </Modal>
@@ -779,11 +764,11 @@ const styles = StyleSheet.create({
   closeModalBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', borderRadius: 22, backgroundColor: '#FFF0F0' },
 
   // Options Modal (Bottom Sheet)
-  optionsOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  optionsContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingHorizontal: 15, paddingBottom: 30, shadowColor: '#000', shadowOffset: { width: 0, height: -5 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 15 },
-  optionsHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: 12 },
-  optionRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 15, paddingHorizontal: 15, width: '100%' },
-  optionIconContainer: { width: 32, justifyContent: 'center', alignItems: 'center', marginRight: 15 },
-  optionText: { fontSize: 16, fontWeight: '600', color: '#1A1A1A' },
-  optionSubText: { fontSize: 13, color: '#666', marginTop: 2 },
+  optionsOverlay: { flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end', paddingBottom: 20 },
+  optionsContent: { backgroundColor: '#1A1A1A', borderRadius: 24, marginHorizontal: 15, paddingHorizontal: 10, paddingBottom: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 5 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 15 },
+  optionsHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#444', alignSelf: 'center', marginVertical: 10 },
+  optionRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 15, width: '100%' },
+  optionIconContainer: { width: 32, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
+  optionText: { fontSize: 15, fontWeight: '600', color: '#FFF' },
+  optionSubText: { fontSize: 12, color: '#666', marginTop: 2 },
 });
