@@ -152,12 +152,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#000',
     flexShrink: 1,
+    lineHeight: 34,
+    paddingRight: 5,
   },
   navInactive: {
     fontSize: 18,
     fontWeight: '500',
     color: '#B0B0B0',
     flexShrink: 1,
+    lineHeight: 24,
+    paddingRight: 5,
   },
 
   avatarWrapper: {
@@ -180,6 +184,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     marginBottom: 20,
+    lineHeight: 22,
+    paddingRight: 5,
   },
 
   passwordContainer: {
@@ -194,6 +200,8 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 16,
     color: '#333',
+    lineHeight: 22,
+    paddingRight: 5,
   },
 
   loginButton: {
@@ -219,6 +227,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     letterSpacing: 1,
     textAlign: 'center',
+    lineHeight: 24,
+    paddingRight: 5,
   },
 
 });

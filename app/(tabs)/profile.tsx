@@ -268,8 +268,9 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '800',
     color: '#000000ff',
-    lineHeight: 48,
+    lineHeight: 32,
     paddingVertical: 5,
+    paddingRight: 5,
     textAlign: 'center',
   },
 
@@ -314,6 +315,7 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
     marginBottom: 5,
     lineHeight: 32,
+    paddingRight: 5,
     textAlign: 'center',
   },
   profileEmail: {
@@ -349,6 +351,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#1A1A1A',
     lineHeight: 22,
+    paddingRight: 5,
   },
 
   // Logout Bottom Sheet Styles
@@ -412,6 +415,8 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '700',
+    lineHeight: 22,
+    paddingRight: 5,
   },
   cancelLogoutBtn: {
     height: 56,
@@ -424,5 +429,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '700',
+    lineHeight: 22,
+    paddingRight: 5,
   },
 });
