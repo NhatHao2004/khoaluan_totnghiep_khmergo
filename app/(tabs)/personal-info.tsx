@@ -52,21 +52,21 @@ export default function PersonalInfoScreen() {
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
   const toastY = useSharedValue(-100);
 
-  const triggerToast = (msg: string, type: 'success' | 'error' = 'success') => {
+  const triggerToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToastMsg(msg);
-    setToastType(type);
+    setToastType(type as any);
     setShowToast(true);
-    toastY.value = withSpring(Platform.OS === 'ios' ? 60 : 40, { damping: 15 });
+    toastY.value = withSpring(Platform.OS === 'ios' ? 50 : 30, { damping: 15, stiffness: 100 });
 
     setTimeout(() => {
-      toastY.value = withSpring(-100);
+      toastY.value = withSpring(-120);
       setTimeout(() => setShowToast(false), 500);
-    }, 2500);
+    }, 3000);
   };
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-100, 40], [0, 1]),
+    opacity: interpolate(toastY.value, [-120, 30], [0, 1]),
   }));
 
   const pickAvatar = async () => {
@@ -85,7 +85,7 @@ export default function PersonalInfoScreen() {
   // ─── Unified Save ─────────────────────────────────────────
   const handleSubmit = async () => {
     if (!name.trim()) {
-      Alert.alert(t('error'), t('name_required'));
+      triggerToast(t('name_required'), 'error');
       return;
     }
 
@@ -329,8 +329,17 @@ export default function PersonalInfoScreen() {
       </KeyboardAvoidingView>
 
       {showToast && (
-        <Animated.View style={[styles.toastContainer, animatedToastStyle, { backgroundColor: toastType === 'success' ? '#10B981' : '#EF4444' }]}>
-          <Ionicons name={toastType === 'success' ? "checkmark-circle" : "alert-circle"} size={20} color="#FFF" />
+        <Animated.View style={[
+          styles.toastContainer, 
+          animatedToastStyle, 
+          { 
+            backgroundColor: toastType === 'success' ? '#10B981' : (toastType === 'error' ? '#FF453A' : '#007AFF'),
+            borderColor: 'rgba(255,255,255,0.2)' 
+          }
+        ]}>
+          <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}>
+            <Ionicons name={toastType === 'success' ? "checkmark" : (toastType === 'error' ? "close" : "information")} size={18} color="#FFF" />
+          </View>
           <Text style={styles.toastText}>{toastMsg}</Text>
         </Animated.View>
       )}
@@ -468,19 +477,20 @@ const styles = StyleSheet.create({
   },
   toastContainer: {
     position: 'absolute',
-    left: 20,
-    right: 20,
-    zIndex: 9999,
+    left: 15,
+    right: 15,
+    zIndex: 10000,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 15,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 22,
+    borderWidth: 1,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 10,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+    elevation: 20,
   },
-  toastText: { color: '#FFF', fontSize: 15, fontWeight: '700', marginLeft: 12 },
+  toastText: { color: '#FFF', fontSize: 15, fontWeight: '700', marginLeft: 15, flex: 1, letterSpacing: 0.3 },
 });
