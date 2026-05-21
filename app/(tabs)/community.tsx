@@ -757,11 +757,11 @@ export default function CommunityScreen() {
           <View style={styles.optionsContent}>
             <View style={styles.optionsHandle} />
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleEditPost(selectedPost); }}>
-              <View style={styles.optionIconContainer}><Ionicons name="create-sharp" size={24} color="#0051ffff" /></View>
+              <View style={styles.optionIconContainer}><Ionicons name="create-outline" size={24} color="#0051ffff" /></View>
               <View><Text style={styles.optionText}>Chỉnh sửa bài viết</Text></View>
             </TouchableOpacity>
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleDeletePost(selectedPost.id, selectedPost.userId); }}>
-              <View style={styles.optionIconContainer}><Ionicons name="trash-sharp" size={24} color="#FF3B30" /></View>
+              <View style={styles.optionIconContainer}><Ionicons name="trash-outline" size={24} color="#FF3B30" /></View>
               <View><Text style={[styles.optionText, { color: '#FF3B30' }]}>Xóa bỏ bài viết</Text></View>
             </TouchableOpacity>
             <View style={{ height: 10 }} />
@@ -848,7 +848,7 @@ const styles = StyleSheet.create({
   optionsOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   optionsContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingHorizontal: 10, paddingBottom: 30 },
   optionsHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: 12 },
-  optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: 12, paddingHorizontal: 30, width: '100%' },
+  optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: 4, paddingHorizontal: 25, width: '100%' },
   optionIconContainer: { width: 30, height: 40, justifyContent: 'center', alignItems: 'center', marginRight: 15 },
   optionText: { fontSize: 16, fontWeight: '600', color: '#1A1A1A' },
 });
