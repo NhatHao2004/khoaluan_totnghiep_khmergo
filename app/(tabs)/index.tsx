@@ -392,9 +392,6 @@ export default function HomeScreen() {
           <Animated.View style={[styles.notificationContainer, animatedSlideStyle]}>
             <View style={styles.nHeader}>
               <Text style={styles.nTitle}>Thông báo</Text>
-              <TouchableOpacity onPress={closeNotifications} style={{ marginTop: 20 }}>
-                <Ionicons name="close-circle" size={28} color="#CBD5E1" />
-              </TouchableOpacity>
             </View>
 
             <ScrollView style={styles.nList} showsVerticalScrollIndicator={false}>
