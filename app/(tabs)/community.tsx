@@ -3,7 +3,7 @@ import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as Firestore from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import {
@@ -61,6 +61,7 @@ export default function CommunityScreen() {
   const { user } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { openPostId } = useLocalSearchParams();
 
   // States
   const [posts, setPosts] = useState<Post[]>([]);
@@ -82,6 +83,23 @@ export default function CommunityScreen() {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const commentInputRef = React.useRef<TextInput>(null);
+  const commentsListRef = React.useRef<FlatList>(null);
+
+  // Tự động mở bình luận từ thông báo
+  useEffect(() => {
+    if (openPostId) {
+      setActivePostId(openPostId as string);
+      setModalVisible(true);
+      
+      // Xóa params sau khi đã mở để có thể trigger lại lần sau
+      router.setParams({ openPostId: undefined });
+
+      // Tự động cuộn xuống cuối sau khi dữ liệu tải (đợi 1 chút cho animation modal và dữ liệu FB)
+      setTimeout(() => {
+        commentsListRef.current?.scrollToEnd({ animated: true });
+      }, 1000);
+    }
+  }, [openPostId]);
 
   // Toast States
   const [showToast, setShowToast] = useState(false);
@@ -644,6 +662,7 @@ export default function CommunityScreen() {
             </View>
             
             <FlatList
+              ref={commentsListRef}
               data={comments}
               keyExtractor={(item) => item.id}
               style={{ flex: 1 }}

@@ -397,7 +397,29 @@ export default function HomeScreen() {
             <ScrollView style={styles.nList} showsVerticalScrollIndicator={false}>
               {notifications.length > 0 ? (
                 notifications.map((item) => (
-                  <View key={item.id} style={[styles.nItem, !item.isRead && { backgroundColor: '#F0F9FF' }]}>
+                  <TouchableOpacity 
+                    key={item.id} 
+                    style={[styles.nItem, !item.isRead && { backgroundColor: '#F0F9FF' }]}
+                    onPress={async () => {
+                      // Đánh dấu đã đọc
+                      if (!item.isRead) {
+                        const { doc, updateDoc } = require('firebase/firestore');
+                        await updateDoc(doc(db, 'notifications', item.id), { isRead: true });
+                      }
+                      
+                      closeNotifications();
+                      
+                      // Chuyển hướng sang Community và truyền postId
+                      if (item.postId) {
+                        router.push({
+                          pathname: '/(tabs)/community',
+                          params: { openPostId: item.postId }
+                        } as any);
+                      } else {
+                        router.push('/(tabs)/community' as any);
+                      }
+                    }}
+                  >
                     <View style={[
                       styles.nIcon, 
                       { backgroundColor: item.type === 'reply' ? '#E0F2FE' : item.type === 'quiz' ? '#FEF3C7' : item.type === 'like' ? '#FEE2E2' : '#F0FDF4' }
@@ -418,7 +440,7 @@ export default function HomeScreen() {
                         <Text style={styles.nItemTime}>{item.time}</Text>
                       </View>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 ))
               ) : (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 100 }}>
