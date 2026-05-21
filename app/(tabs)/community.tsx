@@ -351,6 +351,7 @@ export default function CommunityScreen() {
       setReplyToId(null);
       setReplyToName(null);
       setReplyToUserId(null);
+      Keyboard.dismiss();
     } catch (error) {
       triggerToast("Lỗi gửi bình luận", "error");
     } finally {
