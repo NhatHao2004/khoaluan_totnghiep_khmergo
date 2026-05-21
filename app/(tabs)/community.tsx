@@ -9,11 +9,13 @@ import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Dimensions,
   FlatList,
   Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -27,6 +29,9 @@ import Animated, {
   withSpring
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const TOP_GAP = SCREEN_HEIGHT * 0.3;
 
 interface Comment {
   id: string;
@@ -138,7 +143,6 @@ export default function CommunityScreen() {
   }, [activePostId]);
 
   const pickImage = async () => {
-    // Xin quyền truy cập thư viện ảnh (Cực kỳ quan trọng khi xuất file APK)
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       triggerToast("Vui lòng cấp quyền truy cập ảnh trong cài đặt", "error");
@@ -148,7 +152,7 @@ export default function CommunityScreen() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
-      quality: 1, // Lấy chất lượng gốc trước khi nén để ảnh nét nhất
+      quality: 1,
     });
 
     if (!result.canceled) {
@@ -156,8 +160,8 @@ export default function CommunityScreen() {
         const asset = result.assets[0];
         const manipResult = await ImageManipulator.manipulateAsync(
           asset.uri,
-          [{ resize: { width: 1000 } }], // Tăng gấp đôi độ phân giải lên 1000px
-          { compress: 0.85, format: ImageManipulator.SaveFormat.JPEG, base64: true } // Nâng chất lượng lên 85% để ảnh sắc nét
+          [{ resize: { width: 1000 } }],
+          { compress: 0.85, format: ImageManipulator.SaveFormat.JPEG, base64: true }
         );
         const base64Str = `data:image/jpeg;base64,${manipResult.base64}`;
         if (base64Str.length > 950000) {
@@ -180,7 +184,6 @@ export default function CommunityScreen() {
     setIsSubmittingPost(true);
     try {
       if (isEditingPost && editingPostId) {
-        // Mode: Edit
         await Firestore.updateDoc(Firestore.doc(db, 'posts', editingPostId), {
           content: createPostText.trim(),
           image: base64Image,
@@ -188,7 +191,6 @@ export default function CommunityScreen() {
         });
         triggerToast("Đã cập nhật bài viết");
       } else {
-        // Mode: Create
         await Firestore.addDoc(Firestore.collection(db, 'posts'), {
           userId: user.uid,
           user: user.name || 'Người dùng',
@@ -204,7 +206,6 @@ export default function CommunityScreen() {
         triggerToast("Đã đăng bài viết");
       }
 
-      // Reset everything
       setCreatePostText('');
       setSelectedImage(null);
       setBase64Image(null);
@@ -215,10 +216,9 @@ export default function CommunityScreen() {
     } catch (error) {
       triggerToast("Thao tác thất bại", "error");
     } finally {
-      // Artificial delay to let the nice spinner be seen longer
       setTimeout(() => {
         setIsSubmittingPost(false);
-      }, 3000);
+      }, 500);
     }
   };
 
@@ -276,99 +276,35 @@ export default function CommunityScreen() {
   const handleReply = (comment: Comment) => {
     setReplyToId(comment.id);
     setReplyToName(comment.user);
-    // Removed automatic @username insertion for a cleaner input experience
     setTimeout(() => {
       commentInputRef.current?.focus();
     }, 100);
   };
 
-  const handleCommentLongPress = (comment: Comment) => {
-    if (!user || user.uid !== comment.userId || !activePostId) return;
-
-    // Thay vì Alert thô kệch, ta có thể dùng triggerToast để nhắc nhở 
-    // Hoặc giữ nguyên logic xóa nhưng hiện Toast thành công mượt mà hơn (đã làm)
-  };
-
   const handleDeleteComment = async (commentId: string) => {
     if (!activePostId) return;
     try {
-      // 1. Tìm tất cả bình luận con (phản hồi)
       const childDocsQuery = Firestore.query(
         Firestore.collection(db, 'posts', activePostId, 'comments'),
         Firestore.where('parentId', '==', commentId)
       );
       const childDocs = await Firestore.getDocs(childDocsQuery);
-      const totalToDelete = childDocs.size + 1; // Cha + các con
+      const totalToDelete = childDocs.size + 1;
 
-      // 2. Sử dụng Batch để xóa đồng thời
       const batch = Firestore.writeBatch(db);
-
-      // Xóa bình luận cha
       batch.delete(Firestore.doc(db, 'posts', activePostId, 'comments', commentId));
-
-      // Xóa bình luận con
       childDocs.forEach((doc) => {
         batch.delete(doc.ref);
       });
 
-      // 3. Thực thi xóa
       await batch.commit();
-
-      // 4. Cập nhật lại tổng số bình luận của bài viết
       await Firestore.updateDoc(Firestore.doc(db, 'posts', activePostId), {
         comments: Firestore.increment(-totalToDelete)
       });
 
-      const msg = totalToDelete > 1 ? `Đã xóa bình luận và ${childDocs.size} phản hồi` : "Đã xóa bình luận";
-
-      // 1. Đóng Modal ngay lập tức
-      setModalVisible(false);
-      setActivePostId(null);
-
-      // 2. Chờ hiệu ứng đóng hoàn tất rồi mới hiện thông báo ở màn hình chính
-      setTimeout(() => {
-        triggerToast(msg);
-      }, 400);
+      triggerToast("Đã xóa bình luận");
     } catch (error) {
-      console.error("Error deleting comment tree:", error);
       triggerToast("Lỗi khi xóa bình luận", "error");
-    }
-  };
-
-  const handleEditComment = (comment: Comment) => {
-    // Để đơn giản và đẹp, tôi sẽ đưa nội dung cũ vào ô nhập liệu chính và đổi chế độ
-    // Hoặc dùng Alert.prompt nếu muốn nhanh
-    if (Platform.OS === 'ios') {
-      Alert.prompt(
-        "Sửa bình luận",
-        "Nhập nội dung mới:",
-        [
-          { text: "Hủy", style: "cancel" },
-          {
-            text: "Lưu",
-            onPress: async (text: string | undefined) => {
-              if (text && text.trim() && activePostId) {
-                try {
-                  await Firestore.updateDoc(Firestore.doc(db, 'posts', activePostId, 'comments', comment.id), {
-                    text: text.trim()
-                  });
-                  triggerToast("Đã cập nhật bình luận");
-                } catch (e) {
-                  triggerToast("Lỗi cập nhật", "error");
-                }
-              }
-            }
-          }
-        ],
-        "plain-text",
-        comment.text
-      );
-    } else {
-      // Android: Đưa nội dung vào TextInput chính hoặc dùng Alert (Android ko hỗ trợ Prompt của native)
-      setCommentText(comment.text);
-      // Bạn có thể thêm 1 state để biết đang edit, nhưng hiện tại hãy để người dùng tự gửi lại sẽ tạo comment mới 
-      // hoặc tôi có thể sửa logic submitComment để kiểm tra isEditing.
-      Alert.alert("Thông báo", "Vui lòng sửa nội dung ở khung nhập liệu và gửi lại");
     }
   };
 
@@ -421,8 +357,6 @@ export default function CommunityScreen() {
   const renderPost = ({ item }: { item: Post }) => {
     const isLiked = user ? item.likedBy?.includes(user.uid) : false;
     const isMyPost = user?.uid === item.userId;
-
-    // Luôn lấy ảnh/tên mới nhất nếu là bài viết của mình
     const displayAvatar = (isMyPost && user?.avatar) ? user.avatar : item.userAvatar;
     const displayName = (isMyPost && user?.name) ? user.name : item.user;
 
@@ -527,14 +461,20 @@ export default function CommunityScreen() {
         }
       />
 
+      {/* Modal: Tạo/Sửa bài viết */}
       <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isCreateModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
         <View style={styles.modalOverlay}>
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "padding"}
-            style={{ flex: 1, marginTop: '30%' }}
+            style={{ flex: 1 }}
             keyboardVerticalOffset={0}
           >
-            <View style={[styles.modalContent, { flex: 1 }]}>
+            <TouchableOpacity 
+              style={{ height: TOP_GAP }} 
+              activeOpacity={1} 
+              onPress={() => setCreateModalVisible(false)} 
+            />
+            <View style={[styles.modalContent, { flex: 1, marginBottom: -100, paddingBottom: 100 }]}>
               <View style={styles.modalHeader}>
                 <View style={styles.modalHandle} />
                 <View style={styles.modalHeaderTitleBox}>
@@ -561,42 +501,33 @@ export default function CommunityScreen() {
                 </View>
               </View>
 
-              <FlatList
-                data={[]}
-                renderItem={null}
-                style={{ flex: 1 }}
-                ListHeaderComponent={
-                  <View style={styles.createPostContent}>
-                    <View style={styles.userInfoRow}>
-                      <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.commentAvatar} />
-                      <Text style={styles.userNameInModal}>{user?.name || 'Người dùng'}</Text>
-                    </View>
-                    <TextInput
-                      style={styles.createPostInput}
-                      placeholder="Chia sẻ khoảnh khắc đẹp..."
-                      placeholderTextColor="#999"
-                      multiline
-                      autoFocus
-                      value={createPostText}
-                      onChangeText={setCreatePostText}
-                      scrollEnabled={false}
+              <ScrollView style={styles.createPostContent} keyboardShouldPersistTaps="handled">
+                <View style={styles.userInfoRow}>
+                  <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.commentAvatar} />
+                  <Text style={styles.userNameInModal}>{user?.name || 'Người dùng'}</Text>
+                </View>
+                <TextInput
+                  style={styles.createPostInput}
+                  placeholder="Chia sẻ khoảnh khắc đẹp..."
+                  placeholderTextColor="#999"
+                  multiline
+                  autoFocus
+                  value={createPostText}
+                  onChangeText={setCreatePostText}
+                  scrollEnabled={false}
+                />
+                {selectedImage && (
+                  <View style={styles.previewImageContainer}>
+                    <Image
+                      source={{ uri: selectedImage }}
+                      style={[styles.previewImage, { aspectRatio: imageRatio || 1 }]}
                     />
-                    {selectedImage && (
-                      <View style={styles.previewImageContainer}>
-                        <Image
-                          source={{ uri: selectedImage }}
-                          style={[styles.previewImage, { aspectRatio: imageRatio || 1 }]}
-                        />
-                        <TouchableOpacity style={styles.removeImageBtn} onPress={() => { setSelectedImage(null); setBase64Image(null); setImageRatio(null); }}>
-                          <Ionicons name="close-circle" size={24} color="rgba(0,0,0,0.6)" />
-                        </TouchableOpacity>
-                      </View>
-                    )}
+                    <TouchableOpacity style={styles.removeImageBtn} onPress={() => { setSelectedImage(null); setBase64Image(null); setImageRatio(null); }}>
+                      <Ionicons name="close-circle" size={24} color="rgba(0,0,0,0.6)" />
+                    </TouchableOpacity>
                   </View>
-                }
-                contentContainerStyle={{ flexGrow: 1 }}
-                keyboardShouldPersistTaps="handled"
-              />
+                )}
+              </ScrollView>
 
               <View style={styles.createPostActions}>
                 <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
@@ -615,7 +546,7 @@ export default function CommunityScreen() {
                     setBase64Image(null);
                   }}
                 >
-                  <Ionicons name="close" size={28} color="#ff0000ff" />
+                  <Ionicons name="close" size={28} color="#FF3B30" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -623,14 +554,20 @@ export default function CommunityScreen() {
         </View>
       </Modal>
 
+      {/* Modal: Bình luận */}
       <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "padding"}
-            style={{ flex: 1, marginTop: '30%' }}
+          <KeyboardAvoidingView 
+            behavior={Platform.OS === "ios" ? "padding" : "padding"} 
+            style={{ flex: 1 }}
             keyboardVerticalOffset={0}
           >
-            <View style={[styles.modalContent, { flex: 1 }]}>
+            <TouchableOpacity 
+              style={{ height: TOP_GAP }} 
+              activeOpacity={1} 
+              onPress={() => setModalVisible(false)} 
+            />
+            <View style={[styles.modalContent, { flex: 1, marginBottom: -100, paddingBottom: 100 }]}>
               <View style={styles.modalHeader}>
                 <View style={styles.modalHandle} />
                 <View style={styles.modalHeaderTitleBox}>
@@ -638,6 +575,7 @@ export default function CommunityScreen() {
                   <TouchableOpacity onPress={() => setModalVisible(false)}><Ionicons name="close" size={28} color="#1A1A1A" /></TouchableOpacity>
                 </View>
               </View>
+              
               <FlatList
                 data={comments}
                 keyExtractor={(item) => item.id}
@@ -683,16 +621,18 @@ export default function CommunityScreen() {
                     </View>
                   );
                 }}
-                ListEmptyComponent={<View style={{ padding: 20, alignItems: 'center' }}><Text style={{ color: '#000000ff' }}>Hãy là người đầu tiên bình luận</Text></View>}
+                ListEmptyComponent={<View style={{ padding: 40, alignItems: 'center' }}><Text style={{ color: '#999' }}>Hãy là người đầu tiên bình luận</Text></View>}
               />
+              
               {replyToName && (
                 <View style={styles.replyBar}>
                   <Text style={styles.replyBarText}>Đang trả lời: <Text style={{ fontWeight: '800' }}>{replyToName}</Text></Text>
                   <TouchableOpacity onPress={() => { setReplyToId(null); setReplyToName(null); }}>
-                    <Ionicons name="close-circle" size={24} color="#ff0000ff" />
+                    <Ionicons name="close-circle" size={24} color="#FF3B30" />
                   </TouchableOpacity>
                 </View>
               )}
+              
               <View style={styles.commentInputContainer}>
                 <TextInput
                   ref={commentInputRef}
@@ -703,7 +643,7 @@ export default function CommunityScreen() {
                   multiline
                 />
                 <TouchableOpacity style={styles.sendBtn} onPress={submitComment} disabled={!commentText.trim() || isAddingComment}>
-                  {isAddingComment ? <ActivityIndicator size="small" color="#006effff" /> : <Ionicons name="send" size={28} color={commentText.trim() ? "#006effff" : "#006effff"} />}
+                  {isAddingComment ? <ActivityIndicator size="small" color="#1877F2" /> : <Ionicons name="send" size={28} color={commentText.trim() ? "#1877F2" : "#B0B3B8"} />}
                 </TouchableOpacity>
               </View>
             </View>
@@ -737,7 +677,7 @@ export default function CommunityScreen() {
                 <Ionicons name="create-sharp" size={24} color="#FFF" />
               </View>
               <View>
-                <Text style={[styles.optionText, { color: '#ffffffff' }]}>Chỉnh sửa bài viết</Text>
+                <Text style={styles.optionText}>Chỉnh sửa bài viết</Text>
               </View>
             </TouchableOpacity>
 
@@ -749,10 +689,10 @@ export default function CommunityScreen() {
               }}
             >
               <View style={styles.optionIconContainer}>
-                <Ionicons name="trash-sharp" size={24} color="#FFF" />
+                <Ionicons name="trash-sharp" size={24} color="#FF3B30" />
               </View>
               <View>
-                <Text style={[styles.optionText, { color: '#ffffffff' }]}>Xóa bỏ bài viết</Text>
+                <Text style={[styles.optionText, { color: '#FF3B30' }]}>Xóa bỏ bài viết</Text>
               </View>
             </TouchableOpacity>
 
@@ -815,17 +755,6 @@ const styles = StyleSheet.create({
   commentsList: { paddingHorizontal: 20, paddingBottom: 20 },
   commentItem: { flexDirection: 'row', marginBottom: 15 },
   commentBody: { marginLeft: 10, flex: 1 },
-  replyConnector: {
-    position: 'absolute',
-    left: -20,
-    top: -15,
-    bottom: 25,
-    width: 2,
-    backgroundColor: '#EAEAEA',
-    borderBottomLeftRadius: 10,
-  },
-  commentRow: { flexDirection: 'row', alignItems: 'center' },
-  commentFooter: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
   commentContentArea: { paddingVertical: 2 },
   commentUserRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 2 },
   repliedToUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A', paddingVertical: 1 },
@@ -840,6 +769,7 @@ const styles = StyleSheet.create({
     paddingRight: 12,
     minWidth: 55,
   },
+  commentFooter: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
   commentInputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 10, borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFFFFF' },
   commentInput: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: 20, paddingHorizontal: 15, paddingVertical: 8, fontSize: 15, maxHeight: 100 },
   replyBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8F9FA', paddingHorizontal: 20, paddingVertical: 8, borderTopWidth: 1, borderTopColor: '#EEE' },
@@ -847,24 +777,23 @@ const styles = StyleSheet.create({
   sendBtn: { marginLeft: 10, width: 45, height: 45, justifyContent: 'center', alignItems: 'center' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 50 },
   emptyText: { marginTop: 35, fontSize: 16, color: '#999', fontWeight: '500' },
-  createPostContent: { padding: 20, flex: 1 },
-  userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
+  createPostContent: { flexGrow: 1 },
+  userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20, paddingHorizontal: 20, paddingTop: 10 },
   userNameInModal: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', marginLeft: 12, flex: 1 },
-  createPostInput: { fontSize: 18, color: '#1A1A1A', textAlignVertical: 'top', flex: 1 },
-  previewImageContainer: { marginTop: 15, position: 'relative' },
+  createPostInput: { fontSize: 18, color: '#1A1A1A', textAlignVertical: 'top', flex: 1, minHeight: 150, paddingHorizontal: 20 },
+  previewImageContainer: { position: 'relative', marginBottom: 20, paddingHorizontal: 20 },
   previewImage: { width: '100%', borderRadius: 20, backgroundColor: '#F0F0F0' },
-  removeImageBtn: { position: 'absolute', top: 10, right: 10, backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 15 },
+  removeImageBtn: { position: 'absolute', top: 10, right: 30, backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 15 },
   createPostActions: { flexDirection: 'row', padding: 15, borderTopWidth: 1, borderTopColor: '#F0F0F0', alignItems: 'center' },
   attachAction: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0F7FF', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 22, gap: 8 },
   attachActionText: { fontSize: 14, fontWeight: '700', color: '#1877F2', marginRight: 2 },
   closeModalBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', borderRadius: 22, backgroundColor: '#FFF0F0' },
 
   // Options Modal (Bottom Sheet)
-  optionsOverlay: { flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end', paddingBottom: 20 },
-  optionsContent: { backgroundColor: '#1A1A1A', borderRadius: 24, marginHorizontal: 15, paddingHorizontal: 10, paddingBottom: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 5 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 15 },
-  optionsHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#444', alignSelf: 'center', marginVertical: 10 },
-  optionRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 15, width: '100%' },
-  optionIconContainer: { width: 32, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
-  optionText: { fontSize: 15, fontWeight: '600', color: '#FFF' },
-  optionSubText: { fontSize: 12, color: '#666', marginTop: 2 },
+  optionsOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end', paddingBottom: 40 },
+  optionsContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingHorizontal: 10, paddingBottom: 20 },
+  optionsHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: 12 },
+  optionRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 15, paddingHorizontal: 20, width: '100%' },
+  optionIconContainer: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#F7F7F7', justifyContent: 'center', alignItems: 'center', marginRight: 15 },
+  optionText: { fontSize: 16, fontWeight: '600', color: '#1A1A1A' },
 });
