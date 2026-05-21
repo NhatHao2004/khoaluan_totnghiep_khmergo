@@ -149,8 +149,8 @@ export default function CommunityScreen() {
         const asset = result.assets[0];
         const manipResult = await ImageManipulator.manipulateAsync(
           asset.uri,
-          [{ resize: { width: 500 } }],
-          { compress: 0.4, format: ImageManipulator.SaveFormat.JPEG, base64: true }
+          [{ resize: { width: 1000 } }], // Tăng gấp đôi độ phân giải lên 1000px
+          { compress: 0.85, format: ImageManipulator.SaveFormat.JPEG, base64: true } // Nâng chất lượng lên 85% để ảnh sắc nét
         );
         const base64Str = `data:image/jpeg;base64,${manipResult.base64}`;
         if (base64Str.length > 950000) {
