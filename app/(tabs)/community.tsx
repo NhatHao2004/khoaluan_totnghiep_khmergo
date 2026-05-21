@@ -138,10 +138,17 @@ export default function CommunityScreen() {
   }, [activePostId]);
 
   const pickImage = async () => {
+    // Xin quyền truy cập thư viện ảnh (Cực kỳ quan trọng khi xuất file APK)
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      triggerToast("Vui lòng cấp quyền truy cập ảnh trong cài đặt", "error");
+      return;
+    }
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
-      quality: 0.5,
+      quality: 1, // Lấy chất lượng gốc trước khi nén để ảnh nét nhất
     });
 
     if (!result.canceled) {
