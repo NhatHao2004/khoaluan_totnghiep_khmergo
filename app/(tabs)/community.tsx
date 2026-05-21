@@ -3,7 +3,7 @@ import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Firestore from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import {
@@ -90,7 +90,7 @@ export default function CommunityScreen() {
     if (openPostId) {
       setActivePostId(openPostId as string);
       setModalVisible(true);
-      
+
       // Xóa params sau khi đã mở để có thể trigger lại lần sau
       router.setParams({ openPostId: undefined });
 
@@ -349,7 +349,7 @@ export default function CommunityScreen() {
       };
 
       await Firestore.addDoc(Firestore.collection(db, 'posts', activePostId, 'comments'), commentData);
-      
+
       await Firestore.updateDoc(Firestore.doc(db, 'posts', activePostId), {
         comments: Firestore.increment(1)
       });
@@ -363,7 +363,7 @@ export default function CommunityScreen() {
           sendNotification(replyToUserId, 'reply', activePostId, `đã trả lời bình luận của bạn: "${commentText.trim().substring(0, 30)}..."`);
         } else {
           // Nếu là bình luận mới: Thông báo cho chủ bài viết
-          sendNotification(postData.userId, 'comment', activePostId, `đã bình luận về bài viết của bạn: "${commentText.trim().substring(0, 30)}..."`);
+          sendNotification(postData.userId, 'comment', activePostId, `đã bình luận bài viết của bạn: "${commentText.trim().substring(0, 30)}..."`);
         }
       }
 
@@ -558,13 +558,13 @@ export default function CommunityScreen() {
       <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isCreateModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
         <View style={styles.modalOverlay}>
           {renderToast()}
-          <TouchableOpacity 
-            style={{ height: TOP_GAP }} 
-            activeOpacity={1} 
+          <TouchableOpacity
+            style={{ height: TOP_GAP }}
+            activeOpacity={1}
             onPress={() => {
               Keyboard.dismiss();
               setCreateModalVisible(false);
-            }} 
+            }}
           />
           <View style={[styles.modalContent, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + 15) }]}>
             <View style={styles.modalHeader}>
@@ -650,13 +650,13 @@ export default function CommunityScreen() {
       <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
           {renderToast()}
-          <TouchableOpacity 
-            style={{ height: TOP_GAP }} 
-            activeOpacity={1} 
+          <TouchableOpacity
+            style={{ height: TOP_GAP }}
+            activeOpacity={1}
             onPress={() => {
               Keyboard.dismiss();
               setModalVisible(false);
-            }} 
+            }}
           />
           <View style={[styles.modalContent, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + 12) }]}>
             <View style={styles.modalHeader}>
@@ -669,7 +669,7 @@ export default function CommunityScreen() {
                 }}><Ionicons name="close" size={28} color="#1A1A1A" /></TouchableOpacity>
               </View>
             </View>
-            
+
             <FlatList
               ref={commentsListRef}
               data={comments}
@@ -718,7 +718,7 @@ export default function CommunityScreen() {
               }}
               ListEmptyComponent={<View style={{ padding: 40, alignItems: 'center' }}><Text style={{ color: '#999' }}>Hãy là người đầu tiên bình luận</Text></View>}
             />
-            
+
             {replyToName && (
               <View style={styles.replyBar}>
                 <Text style={styles.replyBarText}>Đang trả lời: <Text style={{ fontWeight: '800' }}>{replyToName}</Text></Text>
@@ -727,11 +727,11 @@ export default function CommunityScreen() {
                 </TouchableOpacity>
               </View>
             )}
-            
+
             <View style={[
               styles.commentInputContainer,
-              { 
-                marginBottom: -200, 
+              {
+                marginBottom: -200,
                 paddingBottom: 200 + 12
               }
             ]}>
@@ -774,23 +774,23 @@ export default function CommunityScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
-  toastContainer: { 
-    position: 'absolute', 
+  toastContainer: {
+    position: 'absolute',
     top: 0,
-    left: 15, 
-    right: 15, 
-    zIndex: 10000, 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    paddingVertical: 14, 
-    paddingHorizontal: 20, 
-    borderRadius: 22, 
-    borderWidth: 1, 
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 12 }, 
-    shadowOpacity: 0.2, 
-    shadowRadius: 15, 
-    elevation: 25 
+    left: 15,
+    right: 15,
+    zIndex: 10000,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 22,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+    elevation: 25
   },
   toastText: { color: '#FFF', fontSize: 15, fontWeight: '700', marginLeft: 15, flex: 1, letterSpacing: 0.3 },
   screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 10, paddingBottom: 15, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },

@@ -916,7 +916,7 @@ const styles = StyleSheet.create({
   },
   nItemTitle: {
     fontSize: 15,
-    fontWeight: '800',
+    fontWeight: '500', // Chỉ dùng mức trung bình cho nội dung chung
     color: '#1E293B',
     marginBottom: 4,
   },
