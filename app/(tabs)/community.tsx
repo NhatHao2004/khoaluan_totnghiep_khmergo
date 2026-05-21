@@ -531,9 +531,10 @@ export default function CommunityScreen() {
         <View style={styles.modalOverlay}>
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "padding"}
-            style={{ flex: 1, justifyContent: 'flex-end' }}
+            style={{ flex: 1, marginTop: '30%' }}
+            keyboardVerticalOffset={0}
           >
-            <View style={[styles.modalContent, { height: '85%' }]}>
+            <View style={[styles.modalContent, { flex: 1 }]}>
               <View style={styles.modalHeader}>
                 <View style={styles.modalHandle} />
                 <View style={styles.modalHeaderTitleBox}>
@@ -626,9 +627,10 @@ export default function CommunityScreen() {
         <View style={styles.modalOverlay}>
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "padding"}
-            style={{ flex: 1, justifyContent: 'flex-end' }}
+            style={{ flex: 1, marginTop: '30%' }}
+            keyboardVerticalOffset={0}
           >
-            <View style={[styles.modalContent, { height: '70%' }]}>
+            <View style={[styles.modalContent, { flex: 1 }]}>
               <View style={styles.modalHeader}>
                 <View style={styles.modalHandle} />
                 <View style={styles.modalHeaderTitleBox}>
