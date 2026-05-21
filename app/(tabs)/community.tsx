@@ -92,6 +92,7 @@ export default function CommunityScreen() {
   // Reply States
   const [replyToId, setReplyToId] = useState<string | null>(null);
   const [replyToName, setReplyToName] = useState<string | null>(null);
+  const [replyToUserId, setReplyToUserId] = useState<string | null>(null);
 
   const triggerToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToastMsg(msg);
@@ -161,6 +162,26 @@ export default function CommunityScreen() {
     });
     return () => unsubscribe();
   }, [activePostId]);
+
+  const sendNotification = async (receiverId: string, type: 'like' | 'comment' | 'reply', postId: string, message: string) => {
+    if (!user || user.uid === receiverId) return; // Không tự thông báo cho chính mình
+
+    try {
+      await Firestore.addDoc(Firestore.collection(db, 'notifications'), {
+        toUserId: receiverId,
+        senderId: user.uid,
+        fromUserName: user.name || 'Người dùng',
+        senderAvatar: user.avatar || 'https://i.pravatar.cc/150?u=me',
+        type,
+        postId,
+        message,
+        isRead: false,
+        createdAt: Firestore.serverTimestamp()
+      });
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
+  };
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -254,6 +275,14 @@ export default function CommunityScreen() {
         likes: isLiked ? Firestore.increment(-1) : Firestore.increment(1),
         likedBy: isLiked ? Firestore.arrayRemove(user.uid) : Firestore.arrayUnion(user.uid)
       });
+
+      if (!isLiked) {
+        const postSnap = await Firestore.getDoc(postRef);
+        if (postSnap.exists()) {
+          const postData = postSnap.data();
+          sendNotification(postData.userId, 'like', postId, "đã thích bài viết của bạn");
+        }
+      }
     } catch (error) {
       console.error("Error liking post:", error);
     }
@@ -272,20 +301,38 @@ export default function CommunityScreen() {
     if (!user || !commentText.trim() || !activePostId) return;
     setIsAddingComment(true);
     try {
-      await Firestore.addDoc(Firestore.collection(db, 'posts', activePostId, 'comments'), {
+      const commentData = {
         userId: user.uid,
         user: user.name || 'Người dùng',
         avatar: user.avatar || 'https://i.pravatar.cc/150?u=me',
         text: commentText.trim(),
         parentId: replyToId || null,
         createdAt: Firestore.serverTimestamp()
-      });
+      };
+
+      await Firestore.addDoc(Firestore.collection(db, 'posts', activePostId, 'comments'), commentData);
+      
       await Firestore.updateDoc(Firestore.doc(db, 'posts', activePostId), {
         comments: Firestore.increment(1)
       });
+
+      // Thông báo cho chủ bài viết
+      const postSnap = await Firestore.getDoc(Firestore.doc(db, 'posts', activePostId));
+      if (postSnap.exists()) {
+        const postData = postSnap.data();
+        if (replyToId && replyToUserId) {
+          // Nếu là trả lời comment: Thông báo cho người bị trả lời
+          sendNotification(replyToUserId, 'reply', activePostId, `đã trả lời bình luận của bạn: "${commentText.trim().substring(0, 30)}..."`);
+        } else {
+          // Nếu là bình luận mới: Thông báo cho chủ bài viết
+          sendNotification(postData.userId, 'comment', activePostId, `đã bình luận về bài viết của bạn: "${commentText.trim().substring(0, 30)}..."`);
+        }
+      }
+
       setCommentText('');
       setReplyToId(null);
       setReplyToName(null);
+      setReplyToUserId(null);
     } catch (error) {
       triggerToast("Lỗi gửi bình luận", "error");
     } finally {
@@ -296,6 +343,7 @@ export default function CommunityScreen() {
   const handleReply = (comment: Comment) => {
     setReplyToId(comment.id);
     setReplyToName(comment.user);
+    setReplyToUserId(comment.userId);
     setTimeout(() => {
       commentInputRef.current?.focus();
     }, 100);
@@ -646,7 +694,7 @@ export default function CommunityScreen() {
             {replyToName && (
               <View style={styles.replyBar}>
                 <Text style={styles.replyBarText}>Đang trả lời: <Text style={{ fontWeight: '800' }}>{replyToName}</Text></Text>
-                <TouchableOpacity onPress={() => { setReplyToId(null); setReplyToName(null); }}>
+                <TouchableOpacity onPress={() => { setReplyToId(null); setReplyToName(null); setReplyToUserId(null); }}>
                   <Ionicons name="close-circle" size={24} color="#FF3B30" />
                 </TouchableOpacity>
               </View>

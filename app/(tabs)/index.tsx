@@ -392,6 +392,9 @@ export default function HomeScreen() {
           <Animated.View style={[styles.notificationContainer, animatedSlideStyle]}>
             <View style={styles.nHeader}>
               <Text style={styles.nTitle}>Thông báo</Text>
+              <TouchableOpacity onPress={closeNotifications} style={{ marginTop: 20 }}>
+                <Ionicons name="close-circle" size={28} color="#CBD5E1" />
+              </TouchableOpacity>
             </View>
 
             <ScrollView style={styles.nList} showsVerticalScrollIndicator={false}>
@@ -400,25 +403,30 @@ export default function HomeScreen() {
                   <View key={item.id} style={[styles.nItem, !item.isRead && { backgroundColor: '#F0F9FF' }]}>
                     <View style={[
                       styles.nIcon, 
-                      { backgroundColor: item.type === 'reply' ? '#E0F2FE' : item.type === 'quiz' ? '#FEF3C7' : '#F0FDF4' }
+                      { backgroundColor: item.type === 'reply' ? '#E0F2FE' : item.type === 'quiz' ? '#FEF3C7' : item.type === 'like' ? '#FEE2E2' : '#F0FDF4' }
                     ]}>
                       <Ionicons
-                        name={item.type === 'reply' ? 'chatbubble-ellipses-outline' : item.type === 'quiz' ? 'game-controller-outline' : 'notifications-outline'}
+                        name={item.type === 'reply' ? 'chatbubble-ellipses-outline' : item.type === 'quiz' ? 'game-controller-outline' : item.type === 'like' ? 'heart-outline' : 'notifications-outline'}
                         size={20}
-                        color={item.type === 'reply' ? '#007AFF' : item.type === 'quiz' ? '#D97706' : '#10B981'}
+                        color={item.type === 'reply' ? '#007AFF' : item.type === 'quiz' ? '#D97706' : item.type === 'like' ? '#EF4444' : '#10B981'}
                       />
                     </View>
                     <View style={styles.nContent}>
-                      <Text style={styles.nItemTitle}>
-                        <Text style={{ fontWeight: '800' }}>{item.fromUserName}</Text> {item.message}
-                      </Text>
-                      <Text style={styles.nItemBody}>{item.time}</Text>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <View style={{ flex: 1, marginRight: 10 }}>
+                          <Text style={styles.nItemTitle} numberOfLines={2}>
+                            <Text style={{ fontWeight: '800' }}>{item.fromUserName}</Text> {item.message}
+                          </Text>
+                        </View>
+                        <Text style={styles.nItemTime}>{item.time}</Text>
+                      </View>
                     </View>
                   </View>
                 ))
               ) : (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 100 }}>
-                  <Text style={{ color: '#94A3B8' }}>Chưa có thông báo nào</Text>
+                  <Ionicons name="notifications-off-outline" size={60} color="#E2E8F0" />
+                  <Text style={{ color: '#94A3B8', marginTop: 15, fontSize: 16 }}>Chưa có thông báo nào</Text>
                 </View>
               )}
             </ScrollView>
