@@ -12,6 +12,7 @@ import {
   Dimensions,
   FlatList,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -28,7 +29,7 @@ import Animated, {
   useSharedValue,
   withSpring
 } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const TOP_GAP = SCREEN_HEIGHT * 0.3;
@@ -60,6 +61,7 @@ interface Post {
 export default function CommunityScreen() {
   const { user } = useAuth();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   // States
   const [posts, setPosts] = useState<Post[]>([]);
@@ -79,6 +81,7 @@ export default function CommunityScreen() {
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [isOptionsModalVisible, setOptionsModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const commentInputRef = React.useRef<TextInput>(null);
 
   // Toast States
@@ -107,6 +110,16 @@ export default function CommunityScreen() {
     transform: [{ translateY: toastY.value }],
     opacity: interpolate(toastY.value, [-120, 30], [0, 1]),
   }));
+
+  // Keyboard detection
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardDidShow', () => setIsKeyboardVisible(true));
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => setIsKeyboardVisible(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   // Subscribe to real-time posts
   useEffect(() => {
@@ -465,7 +478,7 @@ export default function CommunityScreen() {
       <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isCreateModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
         <View style={styles.modalOverlay}>
           <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "padding"}
+            behavior={Platform.OS === "ios" ? "padding" : (isKeyboardVisible ? "padding" : "height")}
             style={{ flex: 1 }}
             keyboardVerticalOffset={0}
           >
@@ -558,7 +571,7 @@ export default function CommunityScreen() {
       <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
           <KeyboardAvoidingView 
-            behavior={Platform.OS === "ios" ? "padding" : "padding"} 
+            behavior={Platform.OS === "ios" ? "padding" : (isKeyboardVisible ? "padding" : "height")} 
             style={{ flex: 1 }}
             keyboardVerticalOffset={0}
           >
@@ -633,7 +646,10 @@ export default function CommunityScreen() {
                 </View>
               )}
               
-              <View style={styles.commentInputContainer}>
+              <View style={[
+                styles.commentInputContainer,
+                { paddingBottom: isKeyboardVisible ? 12 : (insets.bottom + 12) }
+              ]}>
                 <TextInput
                   ref={commentInputRef}
                   style={styles.commentInput}
@@ -770,7 +786,15 @@ const styles = StyleSheet.create({
     minWidth: 55,
   },
   commentFooter: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
-  commentInputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 10, borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFFFFF' },
+  commentInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+    backgroundColor: '#FFFFFF'
+  },
   commentInput: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: 20, paddingHorizontal: 15, paddingVertical: 8, fontSize: 15, maxHeight: 100 },
   replyBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8F9FA', paddingHorizontal: 20, paddingVertical: 8, borderTopWidth: 1, borderTopColor: '#EEE' },
   replyBarText: { fontSize: 14, color: '#666' },
