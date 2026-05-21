@@ -518,7 +518,7 @@ export default function CommunityScreen() {
         }
       />
 
-      <Modal animationType="slide" transparent={true} visible={isCreateModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
+      <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isCreateModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
         <View style={styles.modalOverlay}>
           <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.modalContent}>
             <View style={styles.modalHeader}>
