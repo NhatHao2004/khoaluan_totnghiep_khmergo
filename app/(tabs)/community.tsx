@@ -475,11 +475,11 @@ export default function CommunityScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       {showToast && (
         <Animated.View style={[
-          styles.toastContainer, 
-          animatedToastStyle, 
-          { 
+          styles.toastContainer,
+          animatedToastStyle,
+          {
             backgroundColor: toastType === 'success' ? '#10B981' : (toastType === 'error' ? '#FF453A' : '#007AFF'),
-            borderColor: 'rgba(255,255,255,0.2)' 
+            borderColor: 'rgba(255,255,255,0.2)'
           }
         ]}>
           <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}>
@@ -529,88 +529,94 @@ export default function CommunityScreen() {
 
       <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isCreateModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
         <View style={styles.modalOverlay}>
-          <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <View style={styles.modalHandle} />
-              <View style={styles.modalHeaderTitleBox}>
-                <Text style={styles.modalTitle}>{isEditingPost ? 'Sửa bài viết' : 'Tạo bài viết'}</Text>
-                <TouchableOpacity
-                  onPress={submitPost}
-                  disabled={!createPostText.trim() && !base64Image || isSubmittingPost}
-                  style={{ minWidth: 80, alignItems: 'flex-end', paddingVertical: 10 }}
-                >
-                  <View style={{ minWidth: 30, alignItems: 'center', justifyContent: 'center', paddingRight: 10 }}>
-                    {isSubmittingPost ? (
-                      <ActivityIndicator size="small" color="#1877F2" />
-                    ) : (
-                      <Text style={{
-                        color: (createPostText.trim() || base64Image) ? '#1877F2' : '#CCC',
-                        fontSize: 16,
-                        fontWeight: '700',
-                      }}>
-                        {isEditingPost ? 'Cập nhật' : 'Đăng bài'}
-                      </Text>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "padding"}
+            style={{ flex: 1, justifyContent: 'flex-end' }}
+          >
+            <View style={[styles.modalContent, { height: '85%' }]}>
+              <View style={styles.modalHeader}>
+                <View style={styles.modalHandle} />
+                <View style={styles.modalHeaderTitleBox}>
+                  <Text style={styles.modalTitle}>{isEditingPost ? 'Sửa bài viết' : 'Tạo bài viết'}</Text>
+                  <TouchableOpacity
+                    onPress={submitPost}
+                    disabled={!createPostText.trim() && !base64Image || isSubmittingPost}
+                    style={{ minWidth: 80, alignItems: 'flex-end', paddingVertical: 10 }}
+                  >
+                    <View style={{ minWidth: 30, alignItems: 'center', justifyContent: 'center', paddingRight: 10 }}>
+                      {isSubmittingPost ? (
+                        <ActivityIndicator size="small" color="#1877F2" />
+                      ) : (
+                        <Text style={{
+                          color: (createPostText.trim() || base64Image) ? '#1877F2' : '#CCC',
+                          fontSize: 16,
+                          fontWeight: '700',
+                        }}>
+                          {isEditingPost ? 'Cập nhật' : 'Đăng bài'}
+                        </Text>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <FlatList
+                data={[]}
+                renderItem={null}
+                style={{ flex: 1 }}
+                ListHeaderComponent={
+                  <View style={styles.createPostContent}>
+                    <View style={styles.userInfoRow}>
+                      <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.commentAvatar} />
+                      <Text style={styles.userNameInModal}>{user?.name || 'Người dùng'}</Text>
+                    </View>
+                    <TextInput
+                      style={styles.createPostInput}
+                      placeholder="Chia sẻ khoảnh khắc đẹp..."
+                      placeholderTextColor="#999"
+                      multiline
+                      autoFocus
+                      value={createPostText}
+                      onChangeText={setCreatePostText}
+                      scrollEnabled={false}
+                    />
+                    {selectedImage && (
+                      <View style={styles.previewImageContainer}>
+                        <Image
+                          source={{ uri: selectedImage }}
+                          style={[styles.previewImage, { aspectRatio: imageRatio || 1 }]}
+                        />
+                        <TouchableOpacity style={styles.removeImageBtn} onPress={() => { setSelectedImage(null); setBase64Image(null); setImageRatio(null); }}>
+                          <Ionicons name="close-circle" size={24} color="rgba(0,0,0,0.6)" />
+                        </TouchableOpacity>
+                      </View>
                     )}
                   </View>
+                }
+                contentContainerStyle={{ flexGrow: 1 }}
+                keyboardShouldPersistTaps="handled"
+              />
+
+              <View style={styles.createPostActions}>
+                <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
+                  <Ionicons name="image-outline" size={24} color="#1877F2" />
+                  <Text style={styles.attachActionText}>Ảnh</Text>
+                </TouchableOpacity>
+                <View style={{ flex: 1 }} />
+                <TouchableOpacity
+                  style={styles.closeModalBtn}
+                  onPress={() => {
+                    setCreateModalVisible(false);
+                    setIsEditingPost(false);
+                    setEditingPostId(null);
+                    setCreatePostText('');
+                    setSelectedImage(null);
+                    setBase64Image(null);
+                  }}
+                >
+                  <Ionicons name="close" size={28} color="#ff0000ff" />
                 </TouchableOpacity>
               </View>
-            </View>
-
-            <FlatList
-              data={[]}
-              renderItem={null}
-              ListHeaderComponent={
-                <View style={styles.createPostContent}>
-                  <View style={styles.userInfoRow}>
-                    <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.commentAvatar} />
-                    <Text style={styles.userNameInModal}>{user?.name || 'Người dùng'}</Text>
-                  </View>
-                  <TextInput
-                    style={styles.createPostInput}
-                    placeholder="Chia sẻ khoảnh khắc đẹp..."
-                    placeholderTextColor="#999"
-                    multiline
-                    autoFocus
-                    value={createPostText}
-                    onChangeText={setCreatePostText}
-                    scrollEnabled={false}
-                  />
-                  {selectedImage && (
-                    <View style={styles.previewImageContainer}>
-                      <Image
-                        source={{ uri: selectedImage }}
-                        style={[styles.previewImage, { aspectRatio: imageRatio || 1 }]}
-                      />
-                      <TouchableOpacity style={styles.removeImageBtn} onPress={() => { setSelectedImage(null); setBase64Image(null); setImageRatio(null); }}>
-                        <Ionicons name="close-circle" size={24} color="rgba(0,0,0,0.6)" />
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                </View>
-              }
-              contentContainerStyle={{ flexGrow: 1 }}
-              keyboardShouldPersistTaps="handled"
-            />
-
-            <View style={styles.createPostActions}>
-              <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
-                <Ionicons name="image-outline" size={24} color="#1877F2" />
-                <Text style={styles.attachActionText}>Ảnh</Text>
-              </TouchableOpacity>
-              <View style={{ flex: 1 }} />
-              <TouchableOpacity
-                style={styles.closeModalBtn}
-                onPress={() => {
-                  setCreateModalVisible(false);
-                  setIsEditingPost(false);
-                  setEditingPostId(null);
-                  setCreatePostText('');
-                  setSelectedImage(null);
-                  setBase64Image(null);
-                }}
-              >
-                <Ionicons name="close" size={28} color="#ff0000ff" />
-              </TouchableOpacity>
             </View>
           </KeyboardAvoidingView>
         </View>
@@ -618,80 +624,86 @@ export default function CommunityScreen() {
 
       <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
-          <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <View style={styles.modalHandle} />
-              <View style={styles.modalHeaderTitleBox}>
-                <Text style={styles.modalTitle}>Bình luận ({posts.find(p => p.id === activePostId)?.comments || 0})</Text>
-                <TouchableOpacity onPress={() => setModalVisible(false)}><Ionicons name="close" size={28} color="#1A1A1A" /></TouchableOpacity>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "padding"}
+            style={{ flex: 1, justifyContent: 'flex-end' }}
+          >
+            <View style={[styles.modalContent, { height: '70%' }]}>
+              <View style={styles.modalHeader}>
+                <View style={styles.modalHandle} />
+                <View style={styles.modalHeaderTitleBox}>
+                  <Text style={styles.modalTitle}>Bình luận ({posts.find(p => p.id === activePostId)?.comments || 0})</Text>
+                  <TouchableOpacity onPress={() => setModalVisible(false)}><Ionicons name="close" size={28} color="#1A1A1A" /></TouchableOpacity>
+                </View>
               </View>
-            </View>
-            <FlatList
-              data={comments}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={styles.commentsList}
-              renderItem={({ item }) => {
-                const isMyComment = user?.uid === item.userId;
-                const displayCommentAvatar = (isMyComment && user?.avatar) ? user.avatar : item.avatar;
-                const displayCommentName = (isMyComment && user?.name) ? user.name : item.user;
-                const isReply = !!item.parentId;
+              <FlatList
+                data={comments}
+                keyExtractor={(item) => item.id}
+                style={{ flex: 1 }}
+                contentContainerStyle={styles.commentsList}
+                renderItem={({ item }) => {
+                  const isMyComment = user?.uid === item.userId;
+                  const displayCommentAvatar = (isMyComment && user?.avatar) ? user.avatar : item.avatar;
+                  const displayCommentName = (isMyComment && user?.name) ? user.name : item.user;
+                  const isReply = !!item.parentId;
 
-                return (
-                  <View style={[styles.commentItem, isReply && { marginLeft: 45 }]}>
-                    <Image source={{ uri: displayCommentAvatar }} style={[styles.commentAvatar, isReply && { width: 32, height: 32 }]} />
-                    <View style={styles.commentBody}>
-                      <View style={styles.commentContentArea}>
-                        <View style={styles.commentUserRow}>
-                          <Text style={styles.commentUser}>{displayCommentName}</Text>
-                          {isReply && item.parentId && (
-                            <>
-                              <Ionicons name="caret-forward-sharp" size={12} color="#666" style={{ marginHorizontal: 4, marginTop: 2 }} />
-                              <Text style={styles.repliedToUser}>
-                                {comments.find(c => c.id === item.parentId)?.user || 'Người dùng'}
-                              </Text>
-                            </>
+                  return (
+                    <View style={[styles.commentItem, isReply && { marginLeft: 45 }]}>
+                      <Image source={{ uri: displayCommentAvatar }} style={[styles.commentAvatar, isReply && { width: 32, height: 32 }]} />
+                      <View style={styles.commentBody}>
+                        <View style={styles.commentContentArea}>
+                          <View style={styles.commentUserRow}>
+                            <Text style={styles.commentUser}>{displayCommentName}</Text>
+                            {isReply && item.parentId && (
+                              <>
+                                <Ionicons name="caret-forward-sharp" size={12} color="#666" style={{ marginHorizontal: 4, marginTop: 2 }} />
+                                <Text style={styles.repliedToUser}>
+                                  {comments.find(c => c.id === item.parentId)?.user || 'Người dùng'}
+                                </Text>
+                              </>
+                            )}
+                          </View>
+                          <Text style={styles.commentText}>{item.text}</Text>
+                        </View>
+
+                        <View style={styles.commentFooter}>
+                          <Text style={styles.commentTime}>{item.time}</Text>
+                          <TouchableOpacity onPress={() => handleReply(item)} style={{ marginLeft: 12 }}>
+                            <Text style={styles.footerActionText}>Trả lời</Text>
+                          </TouchableOpacity>
+                          {isMyComment && (
+                            <TouchableOpacity onPress={() => handleDeleteComment(item.id)} style={{ marginLeft: 1 }}>
+                              <Text style={styles.footerActionText}>Xóa</Text>
+                            </TouchableOpacity>
                           )}
                         </View>
-                        <Text style={styles.commentText}>{item.text}</Text>
-                      </View>
-
-                      <View style={styles.commentFooter}>
-                        <Text style={styles.commentTime}>{item.time}</Text>
-                        <TouchableOpacity onPress={() => handleReply(item)} style={{ marginLeft: 12 }}>
-                          <Text style={styles.footerActionText}>Trả lời</Text>
-                        </TouchableOpacity>
-                        {isMyComment && (
-                          <TouchableOpacity onPress={() => handleDeleteComment(item.id)} style={{ marginLeft: 1 }}>
-                            <Text style={styles.footerActionText}>Xóa</Text>
-                          </TouchableOpacity>
-                        )}
                       </View>
                     </View>
-                  </View>
-                );
-              }}
-              ListEmptyComponent={<View style={{ padding: 20, alignItems: 'center' }}><Text style={{ color: '#000000ff' }}>Hãy là người đầu tiên bình luận</Text></View>}
-            />
-            {replyToName && (
-              <View style={styles.replyBar}>
-                <Text style={styles.replyBarText}>Đang trả lời: <Text style={{ fontWeight: '800' }}>{replyToName}</Text></Text>
-                <TouchableOpacity onPress={() => { setReplyToId(null); setReplyToName(null); }}>
-                  <Ionicons name="close-circle" size={24} color="#ff0000ff" />
+                  );
+                }}
+                ListEmptyComponent={<View style={{ padding: 20, alignItems: 'center' }}><Text style={{ color: '#000000ff' }}>Hãy là người đầu tiên bình luận</Text></View>}
+              />
+              {replyToName && (
+                <View style={styles.replyBar}>
+                  <Text style={styles.replyBarText}>Đang trả lời: <Text style={{ fontWeight: '800' }}>{replyToName}</Text></Text>
+                  <TouchableOpacity onPress={() => { setReplyToId(null); setReplyToName(null); }}>
+                    <Ionicons name="close-circle" size={24} color="#ff0000ff" />
+                  </TouchableOpacity>
+                </View>
+              )}
+              <View style={styles.commentInputContainer}>
+                <TextInput
+                  ref={commentInputRef}
+                  style={styles.commentInput}
+                  placeholder="Viết bình luận..."
+                  value={commentText}
+                  onChangeText={setCommentText}
+                  multiline
+                />
+                <TouchableOpacity style={styles.sendBtn} onPress={submitComment} disabled={!commentText.trim() || isAddingComment}>
+                  {isAddingComment ? <ActivityIndicator size="small" color="#006effff" /> : <Ionicons name="send" size={28} color={commentText.trim() ? "#006effff" : "#006effff"} />}
                 </TouchableOpacity>
               </View>
-            )}
-            <View style={styles.commentInputContainer}>
-              <TextInput
-                ref={commentInputRef}
-                style={styles.commentInput}
-                placeholder="Viết bình luận..."
-                value={commentText}
-                onChangeText={setCommentText}
-                multiline
-              />
-              <TouchableOpacity style={styles.sendBtn} onPress={submitComment} disabled={!commentText.trim() || isAddingComment}>
-                {isAddingComment ? <ActivityIndicator size="small" color="#006effff" /> : <Ionicons name="send" size={28} color={commentText.trim() ? "#006effff" : "#006effff"} />}
-              </TouchableOpacity>
             </View>
           </KeyboardAvoidingView>
         </View>
@@ -787,7 +799,12 @@ const styles = StyleSheet.create({
   actionItem: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   actionCount: { fontSize: 16, fontWeight: '700', color: '#1A1A1A' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '85%', paddingBottom: Platform.OS === 'ios' ? 20 : 0 },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    overflow: 'hidden'
+  },
   modalHeader: { alignItems: 'center', paddingVertical: 12 },
   modalHandle: { width: 40, height: 5, borderRadius: 3, backgroundColor: '#E0E0E0', marginBottom: 10 },
   modalHeaderTitleBox: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginBottom: 10 },

@@ -45,7 +45,8 @@ export default function HomeScreen() {
   const [routeIndex, setRouteIndex] = useState(0);
   const [indexLoading, setIndexLoading] = useState(true);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(1);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   // Slide animation for notifications
   const slideX = useSharedValue(width);
@@ -155,6 +156,41 @@ export default function HomeScreen() {
     );
   }, []);
 
+  // Real-time Notifications Listener
+  useEffect(() => {
+    if (!user) return;
+    const { query, collection, where, orderBy, onSnapshot } = require('firebase/firestore');
+    const q = query(
+      collection(db, 'notifications'),
+      where('toUserId', '==', user.uid),
+      orderBy('createdAt', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot: any) => {
+      const nData = snapshot.docs.map((doc: any) => ({
+        id: doc.id,
+        ...doc.data(),
+        time: doc.data().createdAt?.toDate()?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || 'Vừa xong'
+      }));
+      setNotifications(nData);
+      setUnreadCount(nData.filter((n: any) => !n.isRead).length);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  const markAllAsRead = async () => {
+    if (!user || notifications.length === 0) return;
+    const { writeBatch, doc } = require('firebase/firestore');
+    const batch = writeBatch(db);
+    notifications.forEach(n => {
+      if (!n.isRead) {
+        batch.update(doc(db, 'notifications', n.id), { isRead: true });
+      }
+    });
+    await batch.commit();
+  };
+
   const animatedBellStyle = useAnimatedStyle(() => {
     return {
       transform: [{ rotate: `${bellRotation.value}deg` }],
@@ -217,7 +253,7 @@ export default function HomeScreen() {
           onPress={() => {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             setShowNotifications(true);
-            setUnreadCount(0);
+            markAllAsRead(); // Đánh dấu đã đọc khi mở bảng thông báo
             slideX.value = withTiming(0, { duration: 300 });
           }}
         >
@@ -359,21 +395,32 @@ export default function HomeScreen() {
             </View>
 
             <ScrollView style={styles.nList} showsVerticalScrollIndicator={false}>
-              {MOCK_NOTIFICATIONS.map((item) => (
-                <View key={item.id} style={styles.nItem}>
-                  <View style={[styles.nIcon, { backgroundColor: item.type === 'study' ? '#E0F2FE' : item.type === 'quiz' ? '#FEF3C7' : '#F0FDF4' }]}>
-                    <Ionicons
-                      name={item.type === 'study' ? 'notifications-outline' : item.type === 'quiz' ? 'game-controller' : 'star'}
-                      size={20}
-                      color={item.type === 'study' ? '#ff0000ff' : item.type === 'quiz' ? '#D97706' : '#10B981'}
-                    />
+              {notifications.length > 0 ? (
+                notifications.map((item) => (
+                  <View key={item.id} style={[styles.nItem, !item.isRead && { backgroundColor: '#F0F9FF' }]}>
+                    <View style={[
+                      styles.nIcon, 
+                      { backgroundColor: item.type === 'reply' ? '#E0F2FE' : item.type === 'quiz' ? '#FEF3C7' : '#F0FDF4' }
+                    ]}>
+                      <Ionicons
+                        name={item.type === 'reply' ? 'chatbubble-ellipses-outline' : item.type === 'quiz' ? 'game-controller-outline' : 'notifications-outline'}
+                        size={20}
+                        color={item.type === 'reply' ? '#007AFF' : item.type === 'quiz' ? '#D97706' : '#10B981'}
+                      />
+                    </View>
+                    <View style={styles.nContent}>
+                      <Text style={styles.nItemTitle}>
+                        <Text style={{ fontWeight: '800' }}>{item.fromUserName}</Text> {item.message}
+                      </Text>
+                      <Text style={styles.nItemBody}>{item.time}</Text>
+                    </View>
                   </View>
-                  <View style={styles.nContent}>
-                    <Text style={styles.nItemTitle}>{item.title}</Text>
-                    <Text style={styles.nItemBody}>{item.body}</Text>
-                  </View>
+                ))
+              ) : (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 100 }}>
+                  <Text style={{ color: '#94A3B8' }}>Chưa có thông báo nào</Text>
                 </View>
-              ))}
+              )}
             </ScrollView>
           </Animated.View>
         </TouchableOpacity>
