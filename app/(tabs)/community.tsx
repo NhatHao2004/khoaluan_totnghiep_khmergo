@@ -748,7 +748,7 @@ export default function CommunityScreen() {
                 multiline
               />
               <TouchableOpacity style={styles.sendBtn} onPress={submitComment} disabled={!commentText.trim() || isAddingComment}>
-                {isAddingComment ? <ActivityIndicator size="small" color="#1877F2" /> : <Ionicons name="send" size={28} color={commentText.trim() ? "#1877F2" : "#B0B3B8"} />}
+                {isAddingComment ? <ActivityIndicator size="small" color="#1877F2" /> : <Ionicons name="send" size={25} color={commentText.trim() ? "#1877F2" : "#1877F2"} />}
               </TouchableOpacity>
             </View>
           </View>
@@ -832,7 +832,7 @@ const styles = StyleSheet.create({
   footerActionText: { fontSize: 12, fontWeight: '700', color: '#666', paddingVertical: 5, paddingRight: 12, minWidth: 55 },
   commentFooter: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
   commentInputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFFFFF' },
-  commentInput: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: 20, paddingHorizontal: 15, paddingVertical: 8, fontSize: 15, maxHeight: 100 },
+  commentInput: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: 20, paddingHorizontal: 15, paddingVertical: 8, fontSize: 16, maxHeight: 110 },
   replyBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8F9FA', paddingHorizontal: 20, paddingVertical: 8, borderTopWidth: 1, borderTopColor: '#EEE' },
   replyBarText: { fontSize: 14, color: '#666', flex: 1, marginRight: 10 },
   sendBtn: { marginLeft: 10, width: 45, height: 45, justifyContent: 'center', alignItems: 'center' },
