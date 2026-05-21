@@ -688,15 +688,19 @@ export default function CommunityScreen() {
                     <View style={styles.commentBody}>
                       <View style={styles.commentContentArea}>
                         <View style={styles.commentUserRow}>
-                          <Text style={styles.commentUser}>{displayCommentName}</Text>
-                          {isReply && item.parentId && (
-                            <>
-                              <Ionicons name="caret-forward-sharp" size={12} color="#666" style={{ marginHorizontal: 4, marginTop: 2 }} />
-                              <Text style={styles.repliedToUser}>
-                                {comments.find(c => c.id === item.parentId)?.user || 'Người dùng'}
+                          <Text style={styles.commentUser} numberOfLines={0}>
+                            {displayCommentName}
+                            {isReply && item.parentId && (
+                              <Text style={{ fontWeight: 'normal' }}>
+                                {"  "}
+                                <Ionicons name="caret-forward-sharp" size={12} color="#666" />
+                                {"  "}
+                                <Text style={styles.repliedToUser}>
+                                  {comments.find(c => c.id === item.parentId)?.user || 'Người dùng'}
+                                </Text>
                               </Text>
-                            </>
-                          )}
+                            )}
+                          </Text>
                         </View>
                         <Text style={styles.commentText}>{item.text}</Text>
                       </View>
@@ -800,8 +804,8 @@ const styles = StyleSheet.create({
   postContainer: { paddingHorizontal: 20, paddingVertical: 20, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
   avatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#F0F0F0' },
-  headerInfo: { marginLeft: 12, flex: 1, marginRight: 10 },
-  userName: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', paddingVertical: 2, lineHeight: 22, paddingRight: 5 },
+  headerInfo: { marginLeft: 12, flex: 1, marginRight: 10, minWidth: 0 },
+  userName: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', paddingVertical: 2, paddingRight: 15, flexShrink: 1 },
   postTime: { fontSize: 14, color: '#666', marginTop: 2 },
   postContent: { fontSize: 16, color: '#1A1A1A', marginBottom: 15, paddingVertical: 2 },
   postImage: { width: '100%', borderRadius: 24, backgroundColor: '#F0F0F0', marginBottom: 15 },
@@ -818,11 +822,11 @@ const styles = StyleSheet.create({
   commentAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#F0F0F0' },
   commentsList: { paddingHorizontal: 20, paddingBottom: 20 },
   commentItem: { flexDirection: 'row', marginBottom: 15 },
-  commentBody: { marginLeft: 10, flex: 1 },
+  commentBody: { marginLeft: 10, flex: 1, minWidth: 0 },
   commentContentArea: { paddingVertical: 2 },
-  commentUserRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 2 },
+  commentUserRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 2, flexWrap: 'wrap' },
   repliedToUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A', paddingVertical: 1 },
-  commentUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A', paddingVertical: 1, lineHeight: 18, paddingRight: 5 },
+  commentUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A', paddingVertical: 1, paddingRight: 10, flexShrink: 1 },
   commentText: { fontSize: 14, color: '#1A1A1A', paddingVertical: 2 },
   commentTime: { fontSize: 12, color: '#999' },
   footerActionText: { fontSize: 12, fontWeight: '700', color: '#666', paddingVertical: 5, paddingRight: 12, minWidth: 55 },
@@ -830,13 +834,13 @@ const styles = StyleSheet.create({
   commentInputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFFFFF' },
   commentInput: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: 20, paddingHorizontal: 15, paddingVertical: 8, fontSize: 15, maxHeight: 100 },
   replyBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8F9FA', paddingHorizontal: 20, paddingVertical: 8, borderTopWidth: 1, borderTopColor: '#EEE' },
-  replyBarText: { fontSize: 14, color: '#666' },
+  replyBarText: { fontSize: 14, color: '#666', flex: 1, marginRight: 10 },
   sendBtn: { marginLeft: 10, width: 45, height: 45, justifyContent: 'center', alignItems: 'center' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 50 },
   emptyText: { marginTop: 35, fontSize: 16, color: '#999', fontWeight: '500' },
   createPostContent: { flexGrow: 1 },
   userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20, paddingHorizontal: 20, paddingTop: 10 },
-  userNameInModal: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', marginLeft: 12, lineHeight: 22, paddingRight: 5 },
+  userNameInModal: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', marginLeft: 12, paddingRight: 15, flex: 1 },
   createPostInput: { fontSize: 18, color: '#1A1A1A', textAlignVertical: 'top', flex: 1, minHeight: 150, paddingHorizontal: 20 },
   previewImageContainer: { position: 'relative', marginBottom: 20, paddingHorizontal: 20 },
   previewImage: { width: '100%', borderRadius: 20, backgroundColor: '#F0F0F0' },
