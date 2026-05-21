@@ -116,7 +116,7 @@ export default function CommunityScreen() {
     setToastMsg(msg);
     setToastType(type as any);
     setShowToast(true);
-    toastY.value = withSpring(Platform.OS === 'ios' ? 50 : 30, { damping: 15, stiffness: 100 });
+    toastY.value = withSpring(Platform.OS === 'ios' ? 60 : 50, { damping: 15, stiffness: 100 });
 
     setTimeout(() => {
       toastY.value = withSpring(-120);
@@ -126,8 +126,28 @@ export default function CommunityScreen() {
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-120, 30], [0, 1]),
+    opacity: interpolate(toastY.value, [-120, 60], [0, 1]),
   }));
+
+  // Render Toast Component Helper
+  const renderToast = () => {
+    if (!showToast) return null;
+    return (
+      <Animated.View style={[
+        styles.toastContainer,
+        animatedToastStyle,
+        {
+          backgroundColor: toastType === 'success' ? '#10B981' : (toastType === 'error' ? '#FF453A' : '#007AFF'),
+          borderColor: 'rgba(255,255,255,0.2)'
+        }
+      ]}>
+        <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}>
+          <Ionicons name={toastType === 'success' ? "checkmark" : (toastType === 'error' ? "close" : "information")} size={18} color="#FFF" />
+        </View>
+        <Text style={styles.toastText}>{toastMsg}</Text>
+      </Animated.View>
+    );
+  };
 
   // Manual Keyboard Control for Android stability
   useEffect(() => {
@@ -494,21 +514,7 @@ export default function CommunityScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      {showToast && (
-        <Animated.View style={[
-          styles.toastContainer,
-          animatedToastStyle,
-          {
-            backgroundColor: toastType === 'success' ? '#10B981' : (toastType === 'error' ? '#FF453A' : '#007AFF'),
-            borderColor: 'rgba(255,255,255,0.2)'
-          }
-        ]}>
-          <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}>
-            <Ionicons name={toastType === 'success' ? "checkmark" : (toastType === 'error' ? "close" : "information")} size={18} color="#FFF" />
-          </View>
-          <Text style={styles.toastText}>{toastMsg}</Text>
-        </Animated.View>
-      )}
+      {(!isModalVisible && !isCreateModalVisible) && renderToast()}
 
       <View style={styles.screenHeader}>
         <View style={{ width: 36 }} />
@@ -551,6 +557,7 @@ export default function CommunityScreen() {
       {/* Modal: Tạo/Sửa bài viết */}
       <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isCreateModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
         <View style={styles.modalOverlay}>
+          {renderToast()}
           <TouchableOpacity 
             style={{ height: TOP_GAP }} 
             activeOpacity={1} 
@@ -642,6 +649,7 @@ export default function CommunityScreen() {
       {/* Modal: Bình luận */}
       <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
+          {renderToast()}
           <TouchableOpacity 
             style={{ height: TOP_GAP }} 
             activeOpacity={1} 
@@ -766,7 +774,24 @@ export default function CommunityScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
-  toastContainer: { position: 'absolute', left: 15, right: 15, zIndex: 10000, flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 20, borderRadius: 22, borderWidth: 1, shadowColor: '#000', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.2, shadowRadius: 15, elevation: 20 },
+  toastContainer: { 
+    position: 'absolute', 
+    top: 0,
+    left: 15, 
+    right: 15, 
+    zIndex: 10000, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingVertical: 14, 
+    paddingHorizontal: 20, 
+    borderRadius: 22, 
+    borderWidth: 1, 
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 12 }, 
+    shadowOpacity: 0.2, 
+    shadowRadius: 15, 
+    elevation: 25 
+  },
   toastText: { color: '#FFF', fontSize: 15, fontWeight: '700', marginLeft: 15, flex: 1, letterSpacing: 0.3 },
   screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 10, paddingBottom: 15, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   screenTitle: { fontSize: 22, fontWeight: '800', color: '#1A1A1A' },
@@ -776,7 +801,7 @@ const styles = StyleSheet.create({
   postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
   avatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#F0F0F0' },
   headerInfo: { marginLeft: 12, flex: 1, marginRight: 10 },
-  userName: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', paddingVertical: 2 },
+  userName: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', paddingVertical: 2, lineHeight: 22, paddingRight: 5 },
   postTime: { fontSize: 14, color: '#666', marginTop: 2 },
   postContent: { fontSize: 16, color: '#1A1A1A', marginBottom: 15, paddingVertical: 2 },
   postImage: { width: '100%', borderRadius: 24, backgroundColor: '#F0F0F0', marginBottom: 15 },
@@ -797,7 +822,7 @@ const styles = StyleSheet.create({
   commentContentArea: { paddingVertical: 2 },
   commentUserRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 2 },
   repliedToUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A', paddingVertical: 1 },
-  commentUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A', paddingVertical: 1 },
+  commentUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A', paddingVertical: 1, lineHeight: 18, paddingRight: 5 },
   commentText: { fontSize: 14, color: '#1A1A1A', paddingVertical: 2 },
   commentTime: { fontSize: 12, color: '#999' },
   footerActionText: { fontSize: 12, fontWeight: '700', color: '#666', paddingVertical: 5, paddingRight: 12, minWidth: 55 },
@@ -811,7 +836,7 @@ const styles = StyleSheet.create({
   emptyText: { marginTop: 35, fontSize: 16, color: '#999', fontWeight: '500' },
   createPostContent: { flexGrow: 1 },
   userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20, paddingHorizontal: 20, paddingTop: 10 },
-  userNameInModal: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', marginLeft: 12, flex: 1 },
+  userNameInModal: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', marginLeft: 12, lineHeight: 22, paddingRight: 5 },
   createPostInput: { fontSize: 18, color: '#1A1A1A', textAlignVertical: 'top', flex: 1, minHeight: 150, paddingHorizontal: 20 },
   previewImageContainer: { position: 'relative', marginBottom: 20, paddingHorizontal: 20 },
   previewImage: { width: '100%', borderRadius: 20, backgroundColor: '#F0F0F0' },
