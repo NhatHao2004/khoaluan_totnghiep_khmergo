@@ -299,36 +299,36 @@ export default function CommunityScreen() {
       );
       const childDocs = await Firestore.getDocs(childDocsQuery);
       const totalToDelete = childDocs.size + 1; // Cha + các con
-      
+
       // 2. Sử dụng Batch để xóa đồng thời
       const batch = Firestore.writeBatch(db);
-      
+
       // Xóa bình luận cha
       batch.delete(Firestore.doc(db, 'posts', activePostId, 'comments', commentId));
-      
+
       // Xóa bình luận con
       childDocs.forEach((doc) => {
         batch.delete(doc.ref);
       });
-      
+
       // 3. Thực thi xóa
       await batch.commit();
-      
+
       // 4. Cập nhật lại tổng số bình luận của bài viết
       await Firestore.updateDoc(Firestore.doc(db, 'posts', activePostId), {
         comments: Firestore.increment(-totalToDelete)
       });
-      
+
       const msg = totalToDelete > 1 ? `Đã xóa bình luận và ${childDocs.size} phản hồi` : "Đã xóa bình luận";
-      
+
       // 1. Đóng Modal ngay lập tức
       setModalVisible(false);
       setActivePostId(null);
-      
+
       // 2. Chờ hiệu ứng đóng hoàn tất rồi mới hiện thông báo ở màn hình chính
       setTimeout(() => {
         triggerToast(msg);
-      }, 400); 
+      }, 400);
     } catch (error) {
       console.error("Error deleting comment tree:", error);
       triggerToast("Lỗi khi xóa bình luận", "error");
@@ -422,15 +422,16 @@ export default function CommunityScreen() {
     const isLiked = user ? item.likedBy?.includes(user.uid) : false;
     const isMyPost = user?.uid === item.userId;
 
-    // Luôn lấy ảnh avatar mới nhất nếu là bài viết của mình
+    // Luôn lấy ảnh/tên mới nhất nếu là bài viết của mình
     const displayAvatar = (isMyPost && user?.avatar) ? user.avatar : item.userAvatar;
+    const displayName = (isMyPost && user?.name) ? user.name : item.user;
 
     return (
       <View style={styles.postContainer}>
         <View style={styles.postHeader}>
           <Image source={{ uri: displayAvatar }} style={styles.avatar} />
           <View style={styles.headerInfo}>
-            <Text style={styles.userName}>{item.user}</Text>
+            <Text style={styles.userName}>{displayName}</Text>
             <Text style={styles.postTime}>{item.time}</Text>
           </View>
           {isMyPost && (
@@ -623,6 +624,7 @@ export default function CommunityScreen() {
               renderItem={({ item }) => {
                 const isMyComment = user?.uid === item.userId;
                 const displayCommentAvatar = (isMyComment && user?.avatar) ? user.avatar : item.avatar;
+                const displayCommentName = (isMyComment && user?.name) ? user.name : item.user;
                 const isReply = !!item.parentId;
 
                 return (
@@ -631,7 +633,7 @@ export default function CommunityScreen() {
                     <View style={styles.commentBody}>
                       <View style={styles.commentContentArea}>
                         <View style={styles.commentUserRow}>
-                          <Text style={styles.commentUser}>{item.user}</Text>
+                          <Text style={styles.commentUser}>{displayCommentName}</Text>
                           {isReply && item.parentId && (
                             <>
                               <Ionicons name="caret-forward-sharp" size={12} color="#666" style={{ marginHorizontal: 4, marginTop: 2 }} />
@@ -646,11 +648,11 @@ export default function CommunityScreen() {
 
                       <View style={styles.commentFooter}>
                         <Text style={styles.commentTime}>{item.time}</Text>
-                        <TouchableOpacity onPress={() => handleReply(item)} style={{ marginLeft: 15 }}>
+                        <TouchableOpacity onPress={() => handleReply(item)} style={{ marginLeft: 12 }}>
                           <Text style={styles.footerActionText}>Trả lời</Text>
                         </TouchableOpacity>
                         {isMyComment && (
-                          <TouchableOpacity onPress={() => handleDeleteComment(item.id)} style={{ marginLeft: 15 }}>
+                          <TouchableOpacity onPress={() => handleDeleteComment(item.id)} style={{ marginLeft: 1 }}>
                             <Text style={styles.footerActionText}>Xóa</Text>
                           </TouchableOpacity>
                         )}
@@ -766,9 +768,9 @@ const styles = StyleSheet.create({
   postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
   avatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#F0F0F0' },
   headerInfo: { marginLeft: 12, flex: 1, marginRight: 10 },
-  userName: { fontSize: 17, fontWeight: '700', color: '#1A1A1A' },
+  userName: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', paddingVertical: 2 },
   postTime: { fontSize: 14, color: '#666', marginTop: 2 },
-  postContent: { fontSize: 16, color: '#1A1A1A', lineHeight: 22, marginBottom: 15 },
+  postContent: { fontSize: 16, color: '#1A1A1A', marginBottom: 15, paddingVertical: 2 },
   postImage: { width: '100%', borderRadius: 24, backgroundColor: '#F0F0F0', marginBottom: 15 },
   actionsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 5 },
   leftActions: { flexDirection: 'row', alignItems: 'center', gap: 20 },
@@ -797,11 +799,18 @@ const styles = StyleSheet.create({
   commentFooter: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
   commentContentArea: { paddingVertical: 2 },
   commentUserRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 2 },
-  repliedToUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A' },
-  commentUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A' },
-  commentText: { fontSize: 14, color: '#1A1A1A', lineHeight: 19 },
+  repliedToUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A', paddingVertical: 1 },
+  commentUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A', paddingVertical: 1 },
+  commentText: { fontSize: 14, color: '#1A1A1A', paddingVertical: 2 },
   commentTime: { fontSize: 12, color: '#999' },
-  footerActionText: { fontSize: 12, fontWeight: '700', color: '#666' },
+  footerActionText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#666',
+    paddingVertical: 5,
+    paddingRight: 12,
+    minWidth: 55,
+  },
   commentInputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, paddingVertical: 10, borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFFFFF' },
   commentInput: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: 20, paddingHorizontal: 15, paddingVertical: 8, fontSize: 15, maxHeight: 100 },
   replyBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8F9FA', paddingHorizontal: 20, paddingVertical: 8, borderTopWidth: 1, borderTopColor: '#EEE' },

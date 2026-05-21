@@ -103,23 +103,30 @@ export default function PersonalInfoScreen() {
         avatar: newAvatar,
       });
 
-      // 1b. Sync with Posts (Cập nhật tên và ảnh đại diện trên toàn bộ bài viết cũ)
+      // 1b. Sync with Posts & Comments (Cập nhật tên và ảnh đại diện trên toàn bộ dữ liệu cũ)
       try {
+        const batch = writeBatch(db);
+        
+        // Cập nhật Posts
         const postsQuery = query(collection(db, 'posts'), where('userId', '==', uid));
         const postSnapshots = await getDocs(postsQuery);
-        
-        if (!postSnapshots.empty) {
-          const batch = writeBatch(db);
-          postSnapshots.forEach((postDoc) => {
-            batch.update(postDoc.ref, {
-              user: newName,
-              userAvatar: newAvatar
-            });
-          });
+        postSnapshots.forEach((postDoc) => {
+          batch.update(postDoc.ref, { user: newName, userAvatar: newAvatar });
+        });
+
+        // Cập nhật Comments (Sử dụng collectionGroup để quét tất cả sub-collections)
+        const { collectionGroup } = await import('firebase/firestore');
+        const commentsQuery = query(collectionGroup(db, 'comments'), where('userId', '==', uid));
+        const commentSnapshots = await getDocs(commentsQuery);
+        commentSnapshots.forEach((commentDoc) => {
+          batch.update(commentDoc.ref, { user: newName, avatar: newAvatar });
+        });
+
+        if (!postSnapshots.empty || !commentSnapshots.empty) {
           await batch.commit();
         }
       } catch (syncError) {
-        console.error("Error syncing profile with posts:", syncError);
+        console.error("Error syncing profile with posts/comments:", syncError);
       }
 
       // 2. Optional Password Update
