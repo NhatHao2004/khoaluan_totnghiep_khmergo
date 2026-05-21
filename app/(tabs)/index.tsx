@@ -435,12 +435,18 @@ export default function HomeScreen() {
                       
                       closeNotifications();
                       
-                      // Chuyển hướng sang Community và truyền postId
+                      // Chuyển hướng sang Community
                       if (item.postId) {
-                        router.push({
-                          pathname: '/(tabs)/community',
-                          params: { openPostId: item.postId }
-                        } as any);
+                        if (item.type === 'like') {
+                          // Nếu là Like: Chỉ sang Community xem bài viết
+                          router.push('/(tabs)/community' as any);
+                        } else {
+                          // Nếu là Comment/Reply: Sang Community và mở Modal
+                          router.push({
+                            pathname: '/(tabs)/community',
+                            params: { openPostId: item.postId }
+                          } as any);
+                        }
                       } else {
                         router.push('/(tabs)/community' as any);
                       }

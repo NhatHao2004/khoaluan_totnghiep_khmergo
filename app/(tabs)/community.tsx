@@ -757,7 +757,7 @@ export default function CommunityScreen() {
           <View style={styles.optionsContent}>
             <View style={styles.optionsHandle} />
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleEditPost(selectedPost); }}>
-              <View style={styles.optionIconContainer}><Ionicons name="create-sharp" size={24} color="#FFF" /></View>
+              <View style={styles.optionIconContainer}><Ionicons name="create-sharp" size={24} color="#0051ffff" /></View>
               <View><Text style={styles.optionText}>Chỉnh sửa bài viết</Text></View>
             </TouchableOpacity>
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleDeletePost(selectedPost.id, selectedPost.userId); }}>
