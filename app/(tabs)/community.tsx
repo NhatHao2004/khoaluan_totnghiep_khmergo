@@ -613,7 +613,7 @@ export default function CommunityScreen() {
             <View style={styles.modalHeader}>
               <View style={styles.modalHandle} />
               <View style={styles.modalHeaderTitleBox}>
-                <Text style={styles.modalTitle}>Bình luận</Text>
+                <Text style={styles.modalTitle}>Bình luận ({posts.find(p => p.id === activePostId)?.comments || 0})</Text>
                 <TouchableOpacity onPress={() => setModalVisible(false)}><Ionicons name="close" size={28} color="#1A1A1A" /></TouchableOpacity>
               </View>
             </View>
