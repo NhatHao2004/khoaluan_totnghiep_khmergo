@@ -13,7 +13,6 @@ import {
   FlatList,
   Image,
   Keyboard,
-  KeyboardAvoidingView,
   Modal,
   Platform,
   ScrollView,
@@ -548,7 +547,7 @@ export default function CommunityScreen() {
               )}
             </ScrollView>
 
-            <View style={[styles.createPostActions, { marginBottom: -150, paddingBottom: 150 + 15 }]}>
+            <View style={[styles.createPostActions, { marginBottom: -200, paddingBottom: 200 + 15 }]}>
               <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
                 <Ionicons name="image-outline" size={24} color="#1877F2" />
                 <Text style={styles.attachActionText}>Ảnh</Text>
@@ -656,8 +655,8 @@ export default function CommunityScreen() {
             <View style={[
               styles.commentInputContainer,
               { 
-                marginBottom: -150, 
-                paddingBottom: 150 + 12
+                marginBottom: -200, 
+                paddingBottom: 200 + 12
               }
             ]}>
               <TextInput
