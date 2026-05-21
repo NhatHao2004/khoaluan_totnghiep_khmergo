@@ -203,7 +203,21 @@ export default function HomeScreen() {
     };
   });
 
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const deleteNotification = async (id: string) => {
+    if (!user) return;
+    const { doc, deleteDoc } = require('firebase/firestore');
+    try {
+      await deleteDoc(doc(db, 'notifications', id));
+      setDeletingId(null);
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+    }
+  };
+
   const closeNotifications = () => {
+    setDeletingId(null); // Reset trạng thái xóa khi đóng
     slideX.value = withTiming(width, { duration: 300 });
     setTimeout(() => setShowNotifications(false), 300);
   };
@@ -394,13 +408,25 @@ export default function HomeScreen() {
               <Text style={styles.nTitle}>Thông báo</Text>
             </View>
 
-            <ScrollView style={styles.nList} showsVerticalScrollIndicator={false}>
+            <ScrollView 
+              style={styles.nList} 
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={notifications.length === 0 ? { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 100 } : { paddingBottom: 20 }}
+            >
               {notifications.length > 0 ? (
                 notifications.map((item) => (
                   <TouchableOpacity 
                     key={item.id} 
                     style={[styles.nItem, !item.isRead && { backgroundColor: '#F0F9FF' }]}
+                    onLongPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      setDeletingId(item.id);
+                    }}
                     onPress={async () => {
+                      if (deletingId) {
+                        setDeletingId(null);
+                        return;
+                      }
                       // Đánh dấu đã đọc
                       if (!item.isRead) {
                         const { doc, updateDoc } = require('firebase/firestore');
@@ -437,15 +463,24 @@ export default function HomeScreen() {
                             <Text style={{ fontWeight: '800' }}>{item.fromUserName}</Text> {item.message}
                           </Text>
                         </View>
-                        <Text style={styles.nItemTime}>{item.time}</Text>
+                        {deletingId === item.id ? (
+                          <TouchableOpacity 
+                            onPress={() => deleteNotification(item.id)}
+                            style={{ padding: 5 }}
+                          >
+                            <Ionicons name="close-circle" size={24} color="#FF3B30" />
+                          </TouchableOpacity>
+                        ) : (
+                          <Text style={styles.nItemTime}>{item.time}</Text>
+                        )}
                       </View>
                     </View>
                   </TouchableOpacity>
                 ))
               ) : (
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 100 }}>
-                  <Ionicons name="notifications-off-outline" size={60} color="#E2E8F0" />
-                  <Text style={{ color: '#94A3B8', marginTop: 15, fontSize: 16 }}>Chưa có thông báo nào</Text>
+                <View style={{ alignItems: 'center' }}>
+                  <Ionicons name="notifications-off-outline" size={45} color="#E2E8F0" />
+                  <Text style={{ color: '#94A3B8', marginTop: 12, fontSize: 14 }}>Chưa có thông báo nào</Text>
                 </View>
               )}
             </ScrollView>
