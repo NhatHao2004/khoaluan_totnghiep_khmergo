@@ -1,39 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-  ScrollView,
-  Dimensions,
-  Platform,
-  TextInput,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
-import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { 
-  FadeIn, 
-  FadeInDown, 
-  FadeOut, 
-  useAnimatedStyle, 
-  useSharedValue, 
-  withRepeat, 
-  withTiming,
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  FadeInUp,
+  Layout,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
   withSequence,
-  interpolate
+  withSpring,
+  withTiming
 } from 'react-native-reanimated';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 type AnalysisStatus = 'idle' | 'selected' | 'analyzing' | 'result';
 
 export default function AICameraScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [image, setImage] = useState<string | null>(null);
   const [status, setStatus] = useState<AnalysisStatus>('idle');
   const [result, setResult] = useState<{ title: string; content: string } | null>(null);
@@ -41,23 +42,39 @@ export default function AICameraScreen() {
 
   // Animation cho khung quét
   const scanPos = useSharedValue(0);
+  const frameScale = useSharedValue(1);
+
   useEffect(() => {
     if (status === 'analyzing') {
       scanPos.value = withRepeat(
         withSequence(
-          withTiming(1, { duration: 1500 }),
-          withTiming(0, { duration: 1500 })
+          withTiming(1, { duration: 1800 }),
+          withTiming(0, { duration: 1800 })
+        ),
+        -1
+      );
+      frameScale.value = withRepeat(
+        withSequence(
+          withTiming(1.02, { duration: 1000 }),
+          withTiming(1, { duration: 1000 })
         ),
         -1
       );
     } else {
       scanPos.value = 0;
+      frameScale.value = withSpring(1);
     }
   }, [status]);
 
   const animatedLineStyle = useAnimatedStyle(() => ({
     top: `${scanPos.value * 100}%`,
     opacity: status === 'analyzing' ? 1 : 0,
+  }));
+
+  const animatedFrameStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: frameScale.value }],
+    borderColor: status === 'analyzing' ? '#EF4444' : '#E0E0E0',
+    shadowOpacity: status === 'analyzing' ? 0.5 : 0.1,
   }));
 
   const pickImage = async (useCamera: boolean = false) => {
@@ -67,6 +84,7 @@ export default function AICameraScreen() {
       if (status !== 'granted') return;
       result = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
+        aspect: [1, 1],
         quality: 1,
       });
     } else {
@@ -74,6 +92,7 @@ export default function AICameraScreen() {
       if (status !== 'granted') return;
       result = await ImagePicker.launchImageLibraryAsync({
         allowsEditing: true,
+        aspect: [1, 1],
         quality: 1,
       });
     }
@@ -87,14 +106,13 @@ export default function AICameraScreen() {
 
   const handleAnalyze = () => {
     setStatus('analyzing');
-    // Giả lập thời gian AI phân tích (3 giây)
     setTimeout(() => {
       setResult({
-        title: "Đồ gốm Khmer cổ",
-        content: "Đây là mẫu bình gốm đặc trưng của người Khmer Nam Bộ, thường được dùng trong các nghi lễ cúng bái hoặc trang trí trong các gia đình quý tộc xưa. Họa tiết trên bình thường mang ý nghĩa về sự phồn vinh và trường thọ."
+        title: "Bình Gốm Khmer Cổ Thế Kỷ XIX",
+        content: "Đây là một hiện vật quý hiếm mang phong cách nghệ thuật 'Baphuon' muộn. Bình có họa tiết cánh sen cách điệu quanh cổ, phần thân khắc nổi hình vũ nữ Apsara đang múa. Loại gốm này được nung bằng đất sét lấy từ vùng hạ lưu sông Mekong, mang màu nâu đỏ đặc trưng của phù sa."
       });
       setStatus('result');
-    }, 3000);
+    }, 3500);
   };
 
   const reset = () => {
@@ -104,252 +122,303 @@ export default function AICameraScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color="#1A1A1A" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>AI Camera</Text>
-        <View style={{ width: 40 }} />
-      </View>
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Khung hiển thị ảnh / Placeholder */}
-        <View style={styles.imageSection}>
-          <View style={styles.imageContainer}>
-            {image ? (
-              <View style={{ width: '100%', height: '100%' }}>
-                <Image source={{ uri: image }} style={styles.previewImage} />
-                {status === 'analyzing' && (
-                  <Animated.View style={[styles.scanLine, animatedLineStyle]}>
+      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
+            <Ionicons name="arrow-back" size={28} color="#1A1A1A" />
+          </TouchableOpacity>
+          <View style={styles.headerTitleContainer}>
+            <Text style={styles.headerTitle}>AI Camera</Text>
+          </View>
+          <TouchableOpacity onPress={reset} style={styles.headerActionBtn} disabled={status === 'idle'}>
+            {status !== 'idle' && (
+              <Ionicons name="close" size={30} color="#EF4444" />
+            )}
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.fixedContent}>
+          {/* Main Visual Section */}
+          <View style={styles.mainSection}>
+            <Animated.View style={[styles.imageFrame, animatedFrameStyle]}>
+              {/* Decorative Corners Outside */}
+              <View style={[styles.corner, styles.topL]} />
+              <View style={[styles.corner, styles.topR]} />
+              <View style={[styles.corner, styles.botL]} />
+              <View style={[styles.corner, styles.botR]} />
+
+              <View style={styles.innerFrame}>
+                {image ? (
+                  <View style={styles.imageWrapper}>
+                    <Image source={{ uri: image }} style={styles.previewImage} />
+                    {status === 'analyzing' && (
+                      <Animated.View style={[styles.scanLine, animatedLineStyle]}>
+                        <LinearGradient
+                          colors={['transparent', '#EF4444', 'transparent']}
+                          start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }}
+                          style={{ flex: 1 }}
+                        />
+                        <View style={styles.scanGlow} />
+                      </Animated.View>
+                    )}
+                  </View>
+                ) : (
+                  <View style={styles.placeholderContainer}>
                     <LinearGradient
-                      colors={['transparent', '#1877F2', 'transparent']}
-                      start={{ x: 0, y: 0.5 }}
-                      end={{ x: 1, y: 0.5 }}
-                      style={{ flex: 1 }}
-                    />
-                  </Animated.View>
+                      colors={['#ffffffff', '#FFFFFF']}
+                      style={styles.placeholderGradient}
+                    >
+                      <Ionicons name="scan-outline" size={80} color="#000000ff" opacity={0.5} />
+                    </LinearGradient>
+                  </View>
                 )}
               </View>
-            ) : (
-              <View style={styles.placeholderContainer}>
-                <View style={styles.cornerTL} />
-                <View style={styles.cornerTR} />
-                <View style={styles.cornerBL} />
-                <View style={styles.cornerBR} />
-                <Ionicons name="camera-outline" size={64} color="#E0E0E0" />
-                <Text style={styles.placeholderText}>Chưa có ảnh nào được chọn</Text>
-              </View>
+            </Animated.View>
+          </View>
+
+          {/* Action Buttons */}
+          <View style={styles.actionContainer}>
+            {status === 'idle' && (
+              <Animated.View entering={FadeInDown.delay(200)} style={styles.iconButtonGroup}>
+                <TouchableOpacity style={styles.rectSecondaryBtn} onPress={() => pickImage(false)}>
+                  <Ionicons name="images" size={26} color="#1877F2" />
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.rectPrimaryBtn} onPress={() => pickImage(true)}>
+                  <Ionicons name="camera" size={35} color="#1877F2" />
+                </TouchableOpacity>
+              </Animated.View>
             )}
+
+            {status === 'selected' && (
+              <Animated.View entering={FadeInUp} style={styles.analyzeContainer}>
+                <TouchableOpacity style={styles.bigAnalyzeBtn} onPress={handleAnalyze}>
+                  <LinearGradient
+                    colors={['#FFD700', '#BF953F', '#AA8231']}
+                    style={styles.goldGradient}
+                  >
+                    <Text style={styles.analyzeText}>BẮT ĐẦU PHÂN TÍCH</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </Animated.View>
+            )}
+          </View>
+
+          {/* AI Response Section */}
+          <View style={styles.messageSection}>
+            <Animated.View layout={Layout.springify()} style={styles.aiCard}>
+              <View style={styles.aiHeader}>
+                <View style={styles.aiAvatar}>
+                  <Ionicons name="bulb" size={18} color="#FFF" />
+                </View>
+                <Text style={styles.aiName}>Trợ lý KhmerGo AI</Text>
+              </View>
+
+              <View style={styles.aiDivider} />
+
+              {status === 'idle' && (
+                <Text style={styles.aiBubbleText}>
+                  Chào bạn, hãy chụp ảnh hoặc tải lên hình ảnh về trang phục, kiến trúc, ẩm thực hoặc hiện vật văn hóa Khmer. Tôi sẽ giải thích ý nghĩa cho bạn nhé.
+                </Text>
+              )}
+
+              {status === 'selected' && (
+                <Text style={styles.aiBubbleText}>
+                  Ảnh đã sẵn sàng, hãy nhấn "Bắt đầu phân tích" để thấu kính AI tìm hiểu về hiện vật này.
+                </Text>
+              )}
+
+              {status === 'analyzing' && (
+                <View style={styles.analyzingBox}>
+                  <ActivityIndicator color="#1877F2" />
+                  <Text style={styles.analyzingText}>Mạng thần kinh AI đang truy xuất dữ liệu di sản...</Text>
+                </View>
+              )}
+
+              {status === 'result' && result && (
+                <Animated.View entering={FadeIn}>
+                  <Text style={styles.resultTitle}>{result.title}</Text>
+                  <Text style={styles.resultContent}>{result.content}</Text>
+                </Animated.View>
+              )}
+            </Animated.View>
+
+
           </View>
         </View>
 
-        {/* Nút thao tác */}
-        <View style={styles.actionSection}>
-          {(status === 'idle' || status === 'result') && (
-            <Animated.View entering={FadeInDown} style={styles.buttonRow}>
-              <TouchableOpacity style={[styles.actionBtn, styles.cameraBtn]} onPress={() => pickImage(true)}>
-                <Ionicons name="camera" size={20} color="#FFF" />
-                <Text style={styles.btnText}>Chụp ảnh</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.actionBtn, styles.uploadBtn]} onPress={() => pickImage(false)}>
-                <Ionicons name="cloud-upload" size={20} color="#FFF" />
-                <Text style={styles.btnText}>Tải ảnh lên</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          )}
-
-          {status === 'selected' && (
-            <Animated.View entering={FadeInDown} style={styles.singleButtonRow}>
-              <TouchableOpacity style={styles.analyzeBtn} onPress={handleAnalyze}>
-                <LinearGradient
-                  colors={['#1877F2', '#005AC1']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.gradientBtn}
-                >
-                  <Text style={styles.btnTextLarge}>Phân tích ngay</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelBtn} onPress={reset}>
-                <Text style={styles.cancelBtnText}>Chọn ảnh khác</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          )}
+        {/* Input Bar - Glassmorphism style */}
+        <View style={[styles.inputBar, { paddingBottom: insets.bottom + 10 }]}>
+          <View style={styles.glassContainer}>
+            <TouchableOpacity style={styles.inputIconBtn}>
+              <Ionicons name="mic" size={22} color="#1877F2" />
+            </TouchableOpacity>
+            <TextInput
+              placeholder="Hỏi AI về văn hóa Khmer..."
+              placeholderTextColor="#94A3B8"
+              style={styles.textInput}
+              value={chatText}
+              onChangeText={setChatText}
+            />
+            <TouchableOpacity style={styles.sendBtn} disabled={!chatText.trim()}>
+              <LinearGradient
+                colors={chatText.trim() ? ['#1877F2', '#005AC1'] : ['#E2E8F0', '#CBD5E1']}
+                style={styles.sendGradient}
+              >
+                <Ionicons name="send" size={18} color="#FFF" />
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
         </View>
-
-        {/* Thông tin từ AI */}
-        <View style={styles.aiMessageSection}>
-          {status === 'idle' && (
-            <Animated.View entering={FadeInDown} style={styles.aiBubble}>
-              <Text style={styles.aiText}>AI: Bạn hãy chụp hoặc tải ảnh hiện vật văn hóa lên nhé ...</Text>
-            </Animated.View>
-          )}
-
-          {status === 'selected' && (
-            <Animated.View entering={FadeInDown} style={styles.aiBubble}>
-              <Text style={styles.aiText}>AI: Bấm vào phân tích ngay, thấu kính văn hóa sẽ phân tích ảnh của bạn ...</Text>
-            </Animated.View>
-          )}
-
-          {status === 'analyzing' && (
-            <Animated.View entering={FadeIn} style={[styles.aiBubble, styles.analyzingBubble]}>
-              <ActivityIndicator size="small" color="#FFF" />
-              <Text style={[styles.aiText, { color: '#FFF', marginLeft: 10 }]}>Đang phân tích ...</Text>
-            </Animated.View>
-          )}
-
-          {status === 'result' && result && (
-            <Animated.View entering={FadeInDown} style={[styles.aiBubble, styles.resultBubble]}>
-              <Text style={[styles.aiText, { color: '#FFF', fontWeight: 'bold', fontSize: 16 }]}>AI Kết quả:</Text>
-              <Text style={[styles.aiText, { color: '#FFF', marginTop: 4, fontWeight: '700' }]}>Tiêu đề: {result.title}</Text>
-              <Text style={[styles.aiText, { color: '#FFF', marginTop: 8, lineHeight: 22 }]}>Nội dung: {result.content}</Text>
-            </Animated.View>
-          )}
-        </View>
-      </ScrollView>
-
-      {/* Thanh chat dưới cùng */}
-      <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.iconBtn}>
-          <Ionicons name="mic-outline" size={24} color="#666" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.iconBtn}>
-          <Ionicons name="images-outline" size={24} color="#666" />
-        </TouchableOpacity>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            placeholder="Nhập tin nhắn của bạn ..."
-            style={styles.input}
-            value={chatText}
-            onChangeText={setChatText}
-          />
-        </View>
-        <TouchableOpacity style={[styles.sendBtn, !chatText.trim() && { opacity: 0.5 }]}>
-          <LinearGradient
-             colors={['#1877F2', '#005AC1']}
-             style={styles.sendBtnGradient}
-          >
-            <Ionicons name="send" size={20} color="#FFF" />
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F8F9FA' },
-  header: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    justifyContent: 'space-between', 
-    paddingHorizontal: 20, 
-    paddingVertical: 15,
-    backgroundColor: '#FFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEE'
+  container: { flex: 1, backgroundColor: '#FFF' },
+  bgPatternContainer: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
+  bgIcon: { transform: [{ rotate: '-15deg' }] },
+
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
   },
-  headerTitle: { fontSize: 18, fontWeight: '800', color: '#1A1A1A' },
-  backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
-  scrollContent: { paddingBottom: 100 },
-  imageSection: { padding: 30, alignItems: 'center' },
-  imageContainer: { 
-    width: SCREEN_WIDTH - 60, 
-    aspectRatio: 1, 
-    backgroundColor: '#FFF',
-    borderRadius: 30,
-    overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: '#F0F0F0',
+  iconBtn: { width: 42, height: 42, justifyContent: 'center', alignItems: 'center' },
+  headerTitleContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: -1,
+  },
+  headerTitle: { fontSize: 20, fontWeight: '900', color: '#1A1A1A', letterSpacing: -0.5 },
+  statusIndicator: { flexDirection: 'row', alignItems: 'center', marginTop: 2 },
+  pulseDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#10B981', marginRight: 6 },
+  headerActionBtn: {
+    minWidth: 60,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    paddingRight: 5,
+  },
+  headerBtnText: {
+    color: '#EF4444',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  fixedContent: { flex: 1, paddingBottom: 100 },
+  mainSection: { paddingVertical: 10, alignItems: 'center' },
+  imageFrame: {
+    width: SCREEN_WIDTH - 60,
+    aspectRatio: 1,
+    padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
+    position: 'relative',
   },
+  innerFrame: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: '#F1F5F9',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  imageWrapper: { width: '100%', height: '100%' },
   previewImage: { width: '100%', height: '100%', resizeMode: 'cover' },
-  scanLine: { 
-    position: 'absolute', 
-    left: 0, 
-    right: 0, 
-    height: 4, 
-    zIndex: 10 
-  },
-  placeholderContainer: { alignItems: 'center', padding: 20 },
-  placeholderText: { marginTop: 15, color: '#CCC', fontSize: 14, fontWeight: '500' },
-  
-  // Corners cho placeholder
-  cornerTL: { position: 'absolute', top: 20, left: 20, width: 30, height: 30, borderTopWidth: 4, borderLeftWidth: 4, borderColor: '#1A1A1A', borderTopLeftRadius: 10 },
-  cornerTR: { position: 'absolute', top: 20, right: 20, width: 30, height: 30, borderTopWidth: 4, borderRightWidth: 4, borderColor: '#1A1A1A', borderTopRightRadius: 10 },
-  cornerBL: { position: 'absolute', bottom: 20, left: 20, width: 30, height: 30, borderBottomWidth: 4, borderLeftWidth: 4, borderColor: '#1A1A1A', borderBottomLeftRadius: 10 },
-  cornerBR: { position: 'absolute', bottom: 20, right: 20, width: 30, height: 30, borderBottomWidth: 4, borderRightWidth: 4, borderColor: '#1A1A1A', borderBottomRightRadius: 10 },
 
-  actionSection: { paddingHorizontal: 30, marginBottom: 20 },
-  buttonRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  actionBtn: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    paddingVertical: 12, 
-    paddingHorizontal: 20, 
-    borderRadius: 12,
-    width: '48%',
-    elevation: 2
-  },
-  cameraBtn: { backgroundColor: '#1877F2' },
-  uploadBtn: { backgroundColor: '#34A853' },
-  btnText: { color: '#FFF', fontWeight: '700', marginLeft: 8, fontSize: 13 },
-  
-  singleButtonRow: { alignItems: 'center' },
-  analyzeBtn: { width: '100%', height: 54, borderRadius: 15, overflow: 'hidden', elevation: 4 },
-  gradientBtn: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  btnTextLarge: { color: '#FFF', fontWeight: '800', fontSize: 16 },
-  cancelBtn: { marginTop: 15, paddingVertical: 10 },
-  cancelBtnText: { color: '#666', fontWeight: '600' },
+  scanLine: { position: 'absolute', left: 0, right: 0, height: 2, zIndex: 10 },
+  scanGlow: { position: 'absolute', top: -10, left: 0, right: 0, height: 20, backgroundColor: 'rgba(239, 68, 68, 0.15)' },
 
-  aiMessageSection: { paddingHorizontal: 25 },
-  aiBubble: { 
-    backgroundColor: '#1877F2', 
-    padding: 20, 
-    borderRadius: 20, 
-    borderTopLeftRadius: 4,
-    elevation: 2,
+  placeholderContainer: { flex: 1 },
+  placeholderGradient: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  placeholderText: { marginTop: 15, fontSize: 16, fontWeight: '700', color: '#B0BBD0' },
+
+  corner: {
+    position: 'absolute',
+    width: 45,
+    height: 45,
+    borderColor: '#1A1A1A',
+    borderStyle: 'solid',
+    zIndex: 20,
+  },
+  topL: { top: 0, left: 0, borderTopWidth: 5, borderLeftWidth: 5, borderTopLeftRadius: 15 },
+  topR: { top: 0, right: 0, borderTopWidth: 5, borderRightWidth: 5, borderTopRightRadius: 15 },
+  botL: { bottom: 0, left: 0, borderBottomWidth: 5, borderLeftWidth: 5, borderBottomLeftRadius: 15 },
+  botR: { bottom: 0, right: 0, borderBottomWidth: 5, borderRightWidth: 5, borderBottomRightRadius: 15 },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#1877F2', position: 'absolute', top: -4.5, left: -4.5 },
+
+  actionContainer: { paddingHorizontal: 25, marginTop: 5 },
+  iconButtonGroup: { flexDirection: 'row', gap: 12 },
+  rectSecondaryBtn: { flex: 1, height: 56, borderRadius: 18, borderWidth: 1.5, borderColor: '#E2E8F0', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' },
+  rectPrimaryBtn: { flex: 1, height: 56, borderRadius: 18, borderWidth: 1.5, borderColor: '#E2E8F0', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' },
+  rectGradient: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+
+  analyzeContainer: { alignItems: 'center' },
+  bigAnalyzeBtn: { width: '100%', height: 60, borderRadius: 20, overflow: 'hidden', elevation: 10 },
+  goldGradient: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12 },
+  analyzeText: { color: '#FFF', fontSize: 18, fontWeight: '900', letterSpacing: 1 },
+  changeBtn: { marginTop: 12, paddingVertical: 8 },
+  changeText: { color: '#64748B', fontWeight: '600', fontSize: 14, textDecorationLine: 'underline' },
+
+  messageSection: { paddingHorizontal: 25, marginTop: 25 },
+  aiCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 30,
+    padding: 22,
+    elevation: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 15,
+    borderWidth: 1,
+    borderColor: '#F1F5F9'
   },
-  aiText: { color: '#FFF', fontSize: 15, fontWeight: '500', lineHeight: 22 },
-  analyzingBubble: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    justifyContent: 'center',
-    backgroundColor: '#1877F2'
-  },
-  resultBubble: { 
-    backgroundColor: '#1877F2',
-  },
+  aiHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
+  aiAvatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#1877F2', justifyContent: 'center', alignItems: 'center' },
+  aiName: { marginLeft: 10, fontSize: 15, fontWeight: '800', color: '#1A1A1A' },
+  aiDivider: { height: 1, backgroundColor: '#F1F5F9', marginBottom: 15 },
+  aiBubbleText: { fontSize: 15, color: '#445266', lineHeight: 24, fontWeight: '500', textAlign: 'justify' },
+  analyzingBox: { alignItems: 'center', paddingVertical: 10 },
+  analyzingText: { marginTop: 10, color: '#1877F2', fontWeight: '600', fontSize: 13 },
 
-  bottomBar: { 
-    position: 'absolute', 
-    bottom: 0, 
-    left: 0, 
-    right: 0, 
-    backgroundColor: '#FFF', 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    paddingHorizontal: 15, 
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#EEE'
+  resultTitle: { fontSize: 20, fontWeight: '900', color: '#1A1A1A', marginBottom: 10 },
+  resultContent: { fontSize: 15, color: '#445266', lineHeight: 24, marginBottom: 20, textAlign: 'justify' },
+  resultFooter: { flexDirection: 'row', gap: 15, borderTopWidth: 1, borderTopColor: '#F1F5F9', paddingTop: 15 },
+  saveBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  shareBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  footerBtnText: { color: '#1877F2', fontWeight: '700', fontSize: 14 },
+
+  suggestions: { marginTop: 15, flexDirection: 'row' },
+  tagChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: 'rgba(24, 119, 242, 0.06)', marginRight: 10, borderWidth: 1, borderColor: 'rgba(24, 119, 242, 0.1)' },
+  tagText: { fontSize: 13, color: '#1877F2', fontWeight: '700' },
+
+  inputBar: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 20, backgroundColor: 'transparent' },
+  glassContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 30,
+    padding: 8,
+    elevation: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    borderWidth: 1,
+    borderColor: '#F1F5F9'
   },
-  inputWrapper: { flex: 1, marginHorizontal: 10, backgroundColor: '#F0F2F5', borderRadius: 25, paddingHorizontal: 15, height: 45, justifyContent: 'center' },
-  input: { fontSize: 15, color: '#1A1A1A' },
-  iconBtn: { padding: 5 },
-  sendBtn: { width: 45, height: 45, borderRadius: 23, overflow: 'hidden' },
-  sendBtnGradient: { flex: 1, justifyContent: 'center', alignItems: 'center' }
+  inputIconBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center' },
+  textInput: { flex: 1, fontSize: 15, color: '#1A1A1A', paddingHorizontal: 10, fontWeight: '500' },
+  sendBtn: { borderRadius: 22, overflow: 'hidden' },
+  sendGradient: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center' }
 });
