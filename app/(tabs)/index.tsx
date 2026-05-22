@@ -227,6 +227,7 @@ export default function HomeScreen() {
     { id: 3, label: t('culture'), icon: require('@/assets/images/festival.jpg'), color: '#A000FF', route: '/culture' },
     { id: 2, label: t('food'), icon: require('@/assets/images/amthuc.jpg'), color: '#FF0050', route: '/food' },
     { id: 4, label: t('language_study'), icon: require('@/assets/images/hoctap.jpg'), color: '#00C850', route: '/language_study' },
+    { id: 5, label: t('ai_camera'), icon: require('@/assets/images/ai_camera.png'), color: '#1877F2', route: '/ai-camera' },
   ];
 
   const toggleFavorite = (id: any) => {
@@ -311,12 +312,16 @@ export default function HomeScreen() {
           <ThemedText style={styles.sectionTitle}>{t('explore_categories')}</ThemedText>
         </Animated.View>
 
-        <View style={styles.gridContainer}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          contentContainerStyle={styles.scrollGridContainer}
+        >
           {services.map((item, index) => (
             <Animated.View
               key={item.id}
               entering={FadeInDown.delay(400 + index * 50).springify()}
-              style={styles.gridItemQuarter}
+              style={styles.gridItemScroll}
             >
               <TouchableOpacity
                 onPress={() => handleCategoryPress(item.route)}
@@ -329,7 +334,7 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </Animated.View>
           ))}
-        </View>
+        </ScrollView>
 
         {/* Featured List Header */}
         <Animated.View entering={FadeInDown.delay(500)} style={[styles.sectionHeader, { paddingBottom: 10 }]}>
@@ -668,32 +673,36 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
   },
-  gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  scrollGridContainer: {
     paddingHorizontal: 16,
-    marginBottom: 6,
+    paddingBottom: 10,
+    gap: 8,
   },
-  gridItemQuarter: {
-    width: '25%',
-    padding: 5,
+  gridItemScroll: {
+    width: 85,
+    padding: 2,
   },
   serviceCardMini: {
-    height: 115, // Tăng chiều cao để thoải mái hơn
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 12,
+    height: 108,
+    borderRadius: 18,
+    paddingHorizontal: 8,
+    paddingVertical: 10,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
     backgroundColor: '#FFF',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.05)',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
   },
   iconGlassMini: {
-    width: 52, // Tăng nhẹ kích thước khung icon
-    height: 52,
-    borderRadius: 14,
+    width: 48,
+    height: 48,
+    borderRadius: 13,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
@@ -705,7 +714,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain', // Hiển thị trọn vẹn 100% nội dung icon
   },
   serviceLabelMini: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '800',
     color: '#1E293B',
     textAlign: 'center',
