@@ -7,10 +7,10 @@ import {
   ActivityIndicator,
   Dimensions,
   Image,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
@@ -26,7 +26,7 @@ import Animated, {
   withSpring,
   withTiming
 } from 'react-native-reanimated';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -34,11 +34,9 @@ type AnalysisStatus = 'idle' | 'selected' | 'analyzing' | 'result';
 
 export default function AICameraScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const [image, setImage] = useState<string | null>(null);
   const [status, setStatus] = useState<AnalysisStatus>('idle');
   const [result, setResult] = useState<{ title: string; content: string } | null>(null);
-  const [chatText, setChatText] = useState('');
 
   // Animation cho khung quét
   const scanPos = useSharedValue(0);
@@ -46,17 +44,17 @@ export default function AICameraScreen() {
 
   useEffect(() => {
     if (status === 'analyzing') {
-      scanPos.value = withRepeat(
-        withSequence(
-          withTiming(1, { duration: 1800 }),
-          withTiming(0, { duration: 1800 })
-        ),
-        -1
+      scanPos.value = withSequence(
+        withTiming(1, { duration: 1500 }),
+        withTiming(0, { duration: 1500 }),
+        withTiming(1, { duration: 1500 }),
+        withTiming(0, { duration: 1500 }),
+        withTiming(1, { duration: 1500 })
       );
       frameScale.value = withRepeat(
         withSequence(
-          withTiming(1.02, { duration: 1000 }),
-          withTiming(1, { duration: 1000 })
+          withTiming(1.02, { duration: 2000 }),
+          withTiming(1, { duration: 2000 })
         ),
         -1
       );
@@ -108,11 +106,11 @@ export default function AICameraScreen() {
     setStatus('analyzing');
     setTimeout(() => {
       setResult({
-        title: "Bình Gốm Khmer Cổ Thế Kỷ XIX",
-        content: "Đây là một hiện vật quý hiếm mang phong cách nghệ thuật 'Baphuon' muộn. Bình có họa tiết cánh sen cách điệu quanh cổ, phần thân khắc nổi hình vũ nữ Apsara đang múa. Loại gốm này được nung bằng đất sét lấy từ vùng hạ lưu sông Mekong, mang màu nâu đỏ đặc trưng của phù sa."
+        title: "Bình Gốm Khmer Cổ",
+        content: "Đây là một hiện vật gốm quý hiếm mang đậm phong cách nghệ thuật Baphuon muộn, phản ánh sự giao thoa văn hóa Khmer cổ trong khu vực Nam Bộ. Phần cổ bình được trang trí bằng họa tiết cánh sen cách điệu xếp đều tinh tế - biểu tượng của sự thanh khiết và tâm linh trong văn hóa Phật giáo Khmer. Trên thân bình nổi bật hình ảnh các vũ nữ Apsara đang uyển chuyển trong điệu múa truyền thống, thể hiện vẻ đẹp mềm mại, thiêng liêng và nghệ thuật cung đình Angkor xưa. Hiện vật được chế tác từ loại đất sét đặc biệt lấy tại vùng hạ lưu sông Mekong, nơi giàu phù sa màu mỡ, tạo nên sắc nâu đỏ đặc trưng sau quá trình nung ở nhiệt độ cao. Những dấu vết thời gian cùng lớp men mộc cổ kính cho thấy đây không chỉ là vật dụng sinh hoạt, mà còn mang giá trị văn hóa, tín ngưỡng và nghệ thuật đặc sắc của cộng đồng Khmer qua nhiều thế hệ."
       });
       setStatus('result');
-    }, 3500);
+    }, 7500);
   };
 
   const reset = () => {
@@ -125,7 +123,7 @@ export default function AICameraScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
@@ -141,7 +139,11 @@ export default function AICameraScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.fixedContent}>
+        <ScrollView
+          style={styles.fixedContent}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
           {/* Main Visual Section */}
           <View style={styles.mainSection}>
             <Animated.View style={[styles.imageFrame, animatedFrameStyle]}>
@@ -180,34 +182,6 @@ export default function AICameraScreen() {
             </Animated.View>
           </View>
 
-          {/* Action Buttons */}
-          <View style={styles.actionContainer}>
-            {status === 'idle' && (
-              <Animated.View entering={FadeInDown.delay(200)} style={styles.iconButtonGroup}>
-                <TouchableOpacity style={styles.rectSecondaryBtn} onPress={() => pickImage(false)}>
-                  <Ionicons name="images" size={26} color="#1877F2" />
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.rectPrimaryBtn} onPress={() => pickImage(true)}>
-                  <Ionicons name="camera" size={35} color="#1877F2" />
-                </TouchableOpacity>
-              </Animated.View>
-            )}
-
-            {status === 'selected' && (
-              <Animated.View entering={FadeInUp} style={styles.analyzeContainer}>
-                <TouchableOpacity style={styles.bigAnalyzeBtn} onPress={handleAnalyze}>
-                  <LinearGradient
-                    colors={['#FFD700', '#BF953F', '#AA8231']}
-                    style={styles.goldGradient}
-                  >
-                    <Text style={styles.analyzeText}>BẮT ĐẦU PHÂN TÍCH</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              </Animated.View>
-            )}
-          </View>
-
           {/* AI Response Section */}
           <View style={styles.messageSection}>
             <Animated.View layout={Layout.springify()} style={styles.aiCard}>
@@ -222,20 +196,20 @@ export default function AICameraScreen() {
 
               {status === 'idle' && (
                 <Text style={styles.aiBubbleText}>
-                  Chào bạn, hãy chụp ảnh hoặc tải lên hình ảnh về trang phục, kiến trúc, ẩm thực hoặc hiện vật văn hóa Khmer. Tôi sẽ giải thích ý nghĩa cho bạn nhé.
+                  Tải lên hoặc chụp ảnh liên quan đến văn hóa Khmer Nam Bộ như kiến trúc, trang phục, lễ hội hay ẩm thực. KhmerGo AI sẽ hỗ trợ phân tích và giải thích chi tiết.
                 </Text>
               )}
 
               {status === 'selected' && (
                 <Text style={styles.aiBubbleText}>
-                  Ảnh đã sẵn sàng, hãy nhấn "Bắt đầu phân tích" để thấu kính AI tìm hiểu về hiện vật này.
+                  Đã sẵn sàng nhấn “Bắt đầu phân tích” để KhmerGo AI khám phá và giải thích ý nghĩa văn hóa của hiện vật này.
                 </Text>
               )}
 
               {status === 'analyzing' && (
                 <View style={styles.analyzingBox}>
                   <ActivityIndicator color="#1877F2" />
-                  <Text style={styles.analyzingText}>Mạng thần kinh AI đang truy xuất dữ liệu di sản...</Text>
+                  <Text style={styles.analyzingText}>KhmerGo AI đang phân tích ảnh</Text>
                 </View>
               )}
 
@@ -246,35 +220,38 @@ export default function AICameraScreen() {
                 </Animated.View>
               )}
             </Animated.View>
-
-
           </View>
-        </View>
+        </ScrollView>
 
-        {/* Input Bar - Glassmorphism style */}
-        <View style={[styles.inputBar, { paddingBottom: insets.bottom + 10 }]}>
-          <View style={styles.glassContainer}>
-            <TouchableOpacity style={styles.inputIconBtn}>
-              <Ionicons name="mic" size={22} color="#1877F2" />
+      </SafeAreaView>
+
+      {/* Action Buttons - Moved outside SafeAreaView to touch the absolute bottom */}
+      <View style={styles.actionContainer}>
+        {status === 'idle' && (
+          <Animated.View entering={FadeInDown.delay(200)} style={styles.iconButtonGroup}>
+            <TouchableOpacity style={styles.rectSecondaryBtn} onPress={() => pickImage(false)}>
+              <Ionicons name="images" size={26} color="#1877F2" />
             </TouchableOpacity>
-            <TextInput
-              placeholder="Hỏi AI về văn hóa Khmer..."
-              placeholderTextColor="#94A3B8"
-              style={styles.textInput}
-              value={chatText}
-              onChangeText={setChatText}
-            />
-            <TouchableOpacity style={styles.sendBtn} disabled={!chatText.trim()}>
+
+            <TouchableOpacity style={styles.rectPrimaryBtn} onPress={() => pickImage(true)}>
+              <Ionicons name="camera" size={35} color="#1877F2" />
+            </TouchableOpacity>
+          </Animated.View>
+        )}
+
+        {status === 'selected' && (
+          <Animated.View entering={FadeInUp} style={styles.analyzeContainer}>
+            <TouchableOpacity style={styles.bigAnalyzeBtn} onPress={handleAnalyze}>
               <LinearGradient
-                colors={chatText.trim() ? ['#1877F2', '#005AC1'] : ['#E2E8F0', '#CBD5E1']}
-                style={styles.sendGradient}
+                colors={['#FFD700', '#BF953F', '#AA8231']}
+                style={styles.goldGradient}
               >
-                <Ionicons name="send" size={18} color="#FFF" />
+                <Text style={styles.analyzeText}>BẮT ĐẦU PHÂN TÍCH</Text>
               </LinearGradient>
             </TouchableOpacity>
-          </View>
-        </View>
-      </SafeAreaView>
+          </Animated.View>
+        )}
+      </View>
     </View>
   );
 }
@@ -314,7 +291,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
   },
-  fixedContent: { flex: 1, paddingBottom: 100 },
+  fixedContent: { flex: 1 },
   mainSection: { paddingVertical: 10, alignItems: 'center' },
   imageFrame: {
     width: SCREEN_WIDTH - 60,
@@ -357,31 +334,34 @@ const styles = StyleSheet.create({
   botR: { bottom: 0, right: 0, borderBottomWidth: 5, borderRightWidth: 5, borderBottomRightRadius: 15 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#1877F2', position: 'absolute', top: -4.5, left: -4.5 },
 
-  actionContainer: { paddingHorizontal: 25, marginTop: 5 },
+  actionContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 25,
+    paddingBottom: 25,
+    backgroundColor: 'transparent',
+  },
   iconButtonGroup: { flexDirection: 'row', gap: 12 },
   rectSecondaryBtn: { flex: 1, height: 56, borderRadius: 18, borderWidth: 1.5, borderColor: '#E2E8F0', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' },
   rectPrimaryBtn: { flex: 1, height: 56, borderRadius: 18, borderWidth: 1.5, borderColor: '#E2E8F0', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' },
   rectGradient: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 
   analyzeContainer: { alignItems: 'center' },
-  bigAnalyzeBtn: { width: '100%', height: 60, borderRadius: 20, overflow: 'hidden', elevation: 10 },
+  bigAnalyzeBtn: { width: '70%', height: 48, borderRadius: 16, overflow: 'hidden', elevation: 6 },
   goldGradient: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12 },
-  analyzeText: { color: '#FFF', fontSize: 18, fontWeight: '900', letterSpacing: 1 },
+  analyzeText: { color: '#FFF', fontSize: 14, fontWeight: '800', letterSpacing: 0.5 },
   changeBtn: { marginTop: 12, paddingVertical: 8 },
   changeText: { color: '#64748B', fontWeight: '600', fontSize: 14, textDecorationLine: 'underline' },
 
-  messageSection: { paddingHorizontal: 25, marginTop: 25 },
+  messageSection: { paddingHorizontal: 25, marginTop: 10 },
   aiCard: {
     backgroundColor: '#FFF',
     borderRadius: 30,
     padding: 22,
-    elevation: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.08,
-    shadowRadius: 15,
-    borderWidth: 1,
-    borderColor: '#F1F5F9'
+    borderWidth: 1.5,
+    borderColor: '#1A1A1A',
   },
   aiHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
   aiAvatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#1877F2', justifyContent: 'center', alignItems: 'center' },
