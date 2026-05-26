@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -27,6 +28,7 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { analyzeImage } from '../services/ai-service';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -102,15 +104,50 @@ export default function AICameraScreen() {
     }
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
+    if (!image) return;
     setStatus('analyzing');
-    setTimeout(() => {
+
+    try {
+      // 1. Tối ưu ảnh trước khi gửi AI (giảm kích thước để nhanh hơn)
+      const manipulatedImage = await ImageManipulator.manipulateAsync(
+        image,
+        [{ resize: { width: 800 } }],
+        { base64: true, format: ImageManipulator.SaveFormat.JPEG, compress: 0.7 }
+      );
+
+      if (!manipulatedImage.base64) {
+        throw new Error("Không thể chuyển đổi ảnh sang base64");
+      }
+
+      // 2. Gọi API phân tích thực tế
+      const response = await analyzeImage(manipulatedImage.base64);
+
+      if (response.artifact) {
+        setResult({
+          title: response.artifact.name,
+          content: "Đặc điểm nhận diện: " + response.artifact.features
+        });
+      } else if (response.isRecognized && response.rawResponse) {
+        setResult({
+          title: "Phân tích từ AI",
+          content: response.rawResponse
+        });
+      } else {
+        setResult({
+          title: "Vật thể không xác định",
+          content: "KhmerGo AI chưa thể nhận diện được các đặc điểm của hiện vật này. Bạn vui lòng chụp gần hơn hoặc đảm bảo đủ ánh sáng."
+        });
+      }
+    } catch (error) {
+      console.error("Analysis Error:", error);
       setResult({
-        title: "Bình Gốm Khmer Cổ",
-        content: "Đây là một hiện vật gốm quý hiếm mang đậm phong cách nghệ thuật Baphuon muộn, phản ánh sự giao thoa văn hóa Khmer cổ trong khu vực Nam Bộ. Phần cổ bình được trang trí bằng họa tiết cánh sen cách điệu xếp đều tinh tế - biểu tượng của sự thanh khiết và tâm linh trong văn hóa Phật giáo Khmer. Trên thân bình nổi bật hình ảnh các vũ nữ Apsara đang uyển chuyển trong điệu múa truyền thống, thể hiện vẻ đẹp mềm mại, thiêng liêng và nghệ thuật cung đình Angkor xưa. Hiện vật được chế tác từ loại đất sét đặc biệt lấy tại vùng hạ lưu sông Mekong, nơi giàu phù sa màu mỡ, tạo nên sắc nâu đỏ đặc trưng sau quá trình nung ở nhiệt độ cao. Những dấu vết thời gian cùng lớp men mộc cổ kính cho thấy đây không chỉ là vật dụng sinh hoạt, mà còn mang giá trị văn hóa, tín ngưỡng và nghệ thuật đặc sắc của cộng đồng Khmer qua nhiều thế hệ."
+        title: "Lỗi kết nối",
+        content: "Hiện tại AI đang bận hoặc có lỗi kết nối. Vui lòng thử lại sau giây lát."
       });
+    } finally {
       setStatus('result');
-    }, 7500);
+    }
   };
 
   const reset = () => {

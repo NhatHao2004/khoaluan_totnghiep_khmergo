@@ -144,7 +144,7 @@ const translations = {
     culture: 'Văn hóa Khmer',
     food: 'Ẩm thực Khmer',
     language_study: 'Học tiếng Khmer',
-    ai_camera: 'AI Camera',
+    ai_camera: 'AI Camera Khmer',
     som_rong_temple: 'Chùa Som Rong',
     oc_om_boc_festival: 'Lễ hội Oóc Om Bóc',
     tra_vinh_vn: 'Trà Vinh, VN',

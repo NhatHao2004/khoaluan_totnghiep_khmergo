@@ -2,7 +2,6 @@ import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
-import { MOCK_NOTIFICATIONS } from '@/utils/notification-handler';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
@@ -312,9 +311,9 @@ export default function HomeScreen() {
           <ThemedText style={styles.sectionTitle}>{t('explore_categories')}</ThemedText>
         </Animated.View>
 
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.scrollGridContainer}
         >
           {services.map((item, index) => (
@@ -413,15 +412,15 @@ export default function HomeScreen() {
               <Text style={styles.nTitle}>Thông báo</Text>
             </View>
 
-            <ScrollView 
-              style={styles.nList} 
+            <ScrollView
+              style={styles.nList}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={notifications.length === 0 ? { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 100 } : { paddingBottom: 20 }}
             >
               {notifications.length > 0 ? (
                 notifications.map((item) => (
-                  <TouchableOpacity 
-                    key={item.id} 
+                  <TouchableOpacity
+                    key={item.id}
                     style={[styles.nItem, !item.isRead && { backgroundColor: '#F0F9FF' }]}
                     onLongPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -437,9 +436,9 @@ export default function HomeScreen() {
                         const { doc, updateDoc } = require('firebase/firestore');
                         await updateDoc(doc(db, 'notifications', item.id), { isRead: true });
                       }
-                      
+
                       closeNotifications();
-                      
+
                       // Chuyển hướng sang Community
                       if (item.postId) {
                         if (item.type === 'like') {
@@ -458,7 +457,7 @@ export default function HomeScreen() {
                     }}
                   >
                     <View style={[
-                      styles.nIcon, 
+                      styles.nIcon,
                       { backgroundColor: item.type === 'reply' ? '#E0F2FE' : item.type === 'quiz' ? '#FEF3C7' : item.type === 'like' ? '#FEE2E2' : '#F0FDF4' }
                     ]}>
                       <Ionicons
@@ -475,7 +474,7 @@ export default function HomeScreen() {
                           </Text>
                         </View>
                         {deletingId === item.id ? (
-                          <TouchableOpacity 
+                          <TouchableOpacity
                             onPress={() => deleteNotification(item.id)}
                             style={{ padding: 5 }}
                           >
@@ -498,6 +497,7 @@ export default function HomeScreen() {
           </Animated.View>
         </TouchableOpacity>
       </Modal>
+
     </View>
   );
 }

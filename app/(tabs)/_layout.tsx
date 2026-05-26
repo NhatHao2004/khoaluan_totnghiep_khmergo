@@ -1,8 +1,12 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Tabs } from 'expo-router';
+import * as Haptics from 'expo-haptics';
+import { Tabs, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet } from 'react-native';
-import 'react-native-reanimated';
+import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+
+const { width } = Dimensions.get('window');
 
 import { HapticTab } from '@/components/haptic-tab';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -17,8 +21,43 @@ const COLORS = {
   shadow: '#000000ff',
 };
 
-export default function RootLayout() {
+import React, { useEffect } from 'react';
+
+export default function TabsLayout() {
   const colorScheme = useColorScheme();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // Reset position when pathname changes to home
+  useEffect(() => {
+    if (pathname === '/') {
+      translateX.value = 0;
+      translateY.value = 0;
+    }
+  }, [pathname]);
+
+  // Position for draggable AI button
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+  const context = useSharedValue({ x: 0, y: 0 });
+
+  const gesture = Gesture.Pan()
+    .onStart(() => {
+      context.value = { x: translateX.value, y: translateY.value };
+    })
+    .onUpdate((event) => {
+      translateX.value = event.translationX + context.value.x;
+      translateY.value = event.translationY + context.value.y;
+    });
+
+  const animatedChatStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateX: translateX.value },
+        { translateY: translateY.value },
+      ],
+    };
+  });
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
@@ -183,9 +222,53 @@ export default function RootLayout() {
           }}
         />
       </Tabs>
+
+      {/* Floating AI Chat Button - Global or Home Only */}
+      {pathname === '/' && (
+        <GestureDetector gesture={gesture}>
+          <Animated.View style={[styles.floatingChatBtn, animatedChatStyle]}>
+            <TouchableOpacity
+              style={styles.chatBtnInner}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                router.push('/ai-chat' as any);
+              }}
+            >
+              <Ionicons name="chatbubble-ellipses" size={26} color="rgba(255,255,255,0.8)" />
+            </TouchableOpacity>
+          </Animated.View>
+        </GestureDetector>
+      )}
+
       <StatusBar style="auto" />
     </ThemeProvider>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  floatingChatBtn: {
+    position: 'absolute',
+    bottom: 80,
+    right: 10,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(30, 41, 59, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 25,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    zIndex: 99999,
+  },
+  chatBtnInner: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
