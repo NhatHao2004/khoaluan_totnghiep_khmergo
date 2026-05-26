@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
@@ -11,17 +12,17 @@ import {
   ActivityIndicator,
   Dimensions,
   Image,
-  KeyboardAvoidingView,
+  Keyboard,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
-import { analyzeImage } from '../services/ai-service';
+import { analyzeImage, chatWithAI } from '../services/ai-service';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -47,19 +48,94 @@ export default function AIAssistantScreen() {
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: '1',
-      text: 'Chào bạn! Tôi là trợ lý AI của KhmerGo. Tôi có thể giúp gì cho bạn về văn hóa, địa điểm hoặc ngôn ngữ Khmer?',
+      id: 'default',
+      text: 'Tôi là KhmerGo AI - luôn sẵn sàng khám phá văn hóa, địa điểm và ngôn ngữ Khmer cùng bạn.',
       sender: 'ai',
       timestamp: new Date(),
     },
   ]);
+  const [isMenuVisible, setMenuVisible] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const toastY = useSharedValue(-100);
+
+  const triggerToast = (msg: string) => {
+    setToastMsg(msg);
+    toastY.value = withSequence(
+      withTiming(50, { duration: 500 }),
+      withTiming(50, { duration: 2000 }),
+      withTiming(-100, { duration: 500 })
+    );
+  };
+
+  // Persistence Key
+  const CHAT_HISTORY_KEY = 'KHMERGO_CHAT_HISTORY';
+
+  // Load History
+  useEffect(() => {
+    const loadChat = async () => {
+      try {
+        const storedChat = await AsyncStorage.getItem(CHAT_HISTORY_KEY);
+        if (storedChat) {
+          const parsed = JSON.parse(storedChat);
+          // Convert string timestamps back to Date objects
+          const formatted = parsed.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) }));
+          setMessages(formatted);
+        }
+      } catch (e) { console.error("Load error", e); }
+    };
+    loadChat();
+  }, []);
+
+  // Save History
+  useEffect(() => {
+    const saveChat = async () => {
+      try { await AsyncStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages)); }
+      catch (e) { console.error("Save error", e); }
+    };
+    if (messages.length > 0) saveChat();
+  }, [messages]);
+
+  const clearChat = async () => {
+    // Chỉ xóa nếu có nhiều hơn 1 tin nhắn (không tính tin chào mặc định)
+    if (messages.length <= 1) return;
+
+    try {
+      await AsyncStorage.removeItem(CHAT_HISTORY_KEY);
+      setMessages([{
+        id: 'default',
+        text: 'Tôi là KhmerGo AI - luôn sẵn sàng khám phá văn hóa, địa điểm và ngôn ngữ Khmer cùng bạn.',
+        sender: 'ai',
+        timestamp: new Date(),
+      }]);
+      triggerToast('Đã dọn dẹp lịch sử trò chuyện');
+    } catch (e) { console.error(e); }
+  };
   const scrollViewRef = useRef<ScrollView>(null);
 
   // Camera State
   const [image, setImage] = useState<string | null>(null);
   const [status, setStatus] = useState<AnalysisStatus>('idle');
   const [result, setResult] = useState<{ title: string; content: string } | null>(null);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const scanPos = useSharedValue(0);
+
+  // Keyboard Handling (Mirroring Community style)
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSub = Keyboard.addListener(showEvent, (e: any) => {
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   // Camera Animations
   useEffect(() => {
@@ -80,16 +156,42 @@ export default function AIAssistantScreen() {
   }));
 
   // Chat Logic
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (inputText.trim() === '') return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const userMsg: Message = { id: Date.now().toString(), text: inputText.trim(), sender: 'user', timestamp: new Date() };
+
+    const userMsg: Message = {
+      id: Date.now().toString(),
+      text: inputText.trim(),
+      sender: 'user',
+      timestamp: new Date()
+    };
+
     setMessages((prev) => [...prev, userMsg]);
+    const currentInput = inputText.trim();
     setInputText('');
-    setTimeout(() => {
-      const aiResponse: Message = { id: (Date.now() + 1).toString(), text: 'Đang kết nối với trí tuệ nhân tạo để trả lời câu hỏi của bạn...', sender: 'ai', timestamp: new Date() };
-      setMessages((prev) => [...prev, aiResponse]);
-    }, 1000);
+
+    // Tạo ID giả cho tin nhắn đang chờ của AI
+    const aiWaitingId = (Date.now() + 1).toString();
+    const aiWaitingMsg: Message = {
+      id: aiWaitingId,
+      text: 'Đang suy nghĩ...',
+      sender: 'ai',
+      timestamp: new Date()
+    };
+
+    setMessages((prev) => [...prev, aiWaitingMsg]);
+
+    try {
+      const response = await chatWithAI(currentInput);
+      setMessages((prev) =>
+        prev.map(m => m.id === aiWaitingId ? { ...m, text: response } : m)
+      );
+    } catch (error) {
+      setMessages((prev) =>
+        prev.map(m => m.id === aiWaitingId ? { ...m, text: "Xin lỗi, tôi gặp sự cố kết nối. Bạn thử lại nhé!" } : m)
+      );
+    }
   };
 
   useEffect(() => {
@@ -141,20 +243,43 @@ export default function AIAssistantScreen() {
     }
   };
 
-  const resetCamera = () => { setImage(null); setStatus('idle'); setResult(null); };
+  const resetCamera = () => {
+    // Chỉ hoạt động khi có ảnh hoặc kết quả
+    if (!image && !result) return;
+
+    setImage(null);
+    setStatus('idle');
+    setResult(null);
+    triggerToast('Đã dọn dẹp kết quả phân tích');
+  };
+
+  const toastStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: toastY.value }],
+  }));
 
   return (
     <View style={styles.container}>
+      {/* Premium Toast */}
+      <Animated.View style={[styles.toastContainer, toastStyle]}>
+        <View style={styles.toastContent}>
+          <Ionicons name="checkmark-circle" size={20} color="#FFF" />
+          <Text style={styles.toastText}>{toastMsg}</Text>
+        </View>
+      </Animated.View>
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="chevron-back" size={28} color="#1F2937" />
         </TouchableOpacity>
         <View style={styles.headerInfo}>
-          <Text style={styles.headerTitle}>KhmerGo AI</Text>
+          <Text style={styles.headerTitle}>{activeTab === 'chat' ? 'KhmerGo AI' : 'KhmerGo AI'}</Text>
         </View>
-        <TouchableOpacity style={styles.menuBtn} onPress={resetCamera}>
-          <Ionicons name={activeTab === 'camera' ? 'trash-outline' : 'ellipsis-vertical'} size={24} color="#1F2937" />
+        <TouchableOpacity
+          style={styles.menuBtn}
+          onPress={() => activeTab === 'camera' ? resetCamera() : clearChat()}
+        >
+          <Ionicons name="trash-outline" size={24} color="#1F2937" />
         </TouchableOpacity>
       </View>
 
@@ -181,27 +306,98 @@ export default function AIAssistantScreen() {
       {/* Content Area */}
       <View style={styles.contentArea}>
         {activeTab === 'chat' ? (
-          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+          <View style={{ flex: 1 }}>
             <ScrollView ref={scrollViewRef} style={styles.messageList} contentContainerStyle={styles.messageListContent} showsVerticalScrollIndicator={false}>
               {messages.map((msg) => (
                 <View key={msg.id} style={[styles.messageWrapper, msg.sender === 'user' ? styles.userWrapper : styles.aiWrapper]}>
-                  {msg.sender === 'ai' && <View style={styles.aiAvatar}><Ionicons name="sparkles" size={16} color="#0066ffff" /></View>}
-                  <View style={[styles.bubble, msg.sender === 'user' ? styles.userBubble : styles.aiBubble]}>
-                    <Text style={[styles.messageText, msg.sender === 'user' ? styles.userText : styles.aiText]}>{msg.text}</Text>
-                  </View>
+                  {msg.sender === 'ai' ? (
+                    <>
+                      <Image source={require('@/assets/images/AI.jpg')} style={[styles.chatAvatar, { transform: [{ scale: 1.1 }] }]} />
+                      <View style={styles.aiBubbleContainer}>
+                        <View style={styles.aiBubble}>
+                          <Text
+                            style={styles.aiMessageText}
+                            textBreakStrategy="highQuality"
+                          >
+                            {msg.text.replace(/\[LINK:.*?\]/g, '').trim()}
+                          </Text>
+                        </View>
+                        {msg.text.includes('[LINK:') && (
+                          <TouchableOpacity
+                            style={styles.detailBtn}
+                            onPress={() => {
+                              const match = msg.text.match(/\[LINK:(.*?)\]/);
+                              if (match) {
+                                const id = match[1];
+                                if (id.startsWith('pagoda_')) {
+                                  router.push({ pathname: '/pagoda-detail', params: { id } });
+                                } else if (id.startsWith('culture_')) {
+                                  router.push({ pathname: '/culture-detail', params: { id } });
+                                } else if (id.startsWith('food_')) {
+                                  router.push({ pathname: '/food-detail', params: { id } });
+                                }
+                              }
+                            }}
+                          >
+                            <Text style={styles.detailBtnText}>Xem chi tiết</Text>
+                          </TouchableOpacity>
+                        )}
+                        <Text style={styles.chatTime}>
+                          {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </Text>
+                      </View>
+                    </>
+                  ) : (
+                    <>
+                      <View style={styles.userBubbleContainer}>
+                        <View style={styles.userBubble}>
+                          <Text
+                            style={styles.userMessageText}
+                            textBreakStrategy="highQuality"
+                          >
+                            {msg.text}
+                          </Text>
+                        </View>
+                        <Text style={[styles.chatTime, { textAlign: 'right' }]}>
+                          {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </Text>
+                      </View>
+                      <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.chatAvatar} />
+                    </>
+                  )}
                 </View>
               ))}
             </ScrollView>
-            <View style={styles.inputContainer}>
-              <View style={styles.inputWrapper}>
-                <TextInput style={styles.input} placeholder="Hỏi bất cứ điều gì..." placeholderTextColor="#9CA3AF" value={inputText} onChangeText={setInputText} multiline />
-              </View>
-              <TouchableOpacity style={styles.sendfab} onPress={sendMessage}><Ionicons name="send" size={24} color="#FFF" style={{ marginLeft: 4 }} /></TouchableOpacity>
+            <View style={[
+              styles.inputContainer,
+              {
+                paddingBottom: keyboardHeight > 0
+                  ? (Platform.OS === 'ios' ? keyboardHeight - 15 : keyboardHeight + 10)
+                  : 12
+              }
+            ]}>
+              <TextInput
+                style={styles.input}
+                placeholder="Hỏi bất cứ điều gì..."
+                placeholderTextColor="#9CA3AF"
+                value={inputText}
+                onChangeText={setInputText}
+                multiline
+              />
+              <TouchableOpacity style={styles.sendfab} onPress={sendMessage}>
+                <Ionicons name="send" size={28} color={inputText.trim() ? "#1877F2" : "#1877F2"} />
+              </TouchableOpacity>
             </View>
-          </KeyboardAvoidingView>
+          </View>
         ) : (
           <View style={{ flex: 1 }}>
-            <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+            <ScrollView
+              style={{ flex: 1 }}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingBottom: (status === 'idle' || status === 'selected') ? 150 : 10
+              }}
+            >
               <View style={styles.cameraSection}>
                 <View style={styles.imageFrame}>
                   <View style={[styles.corner, styles.topL]} /><View style={[styles.corner, styles.topR]} />
@@ -234,26 +430,42 @@ export default function AIAssistantScreen() {
                   </View>
                 </View>
 
-                {/* AI Card */}
-                <View style={[styles.aiCard, { marginBottom: 20 }]}>
+                {/* AI Card - positioned directly below the camera frame */}
+                <View style={[styles.aiCard, { width: '100%', marginTop: 0 }]}>
                   <View style={styles.aiHeader}>
                     <View style={styles.aiAvatarSmall}><Ionicons name="bulb" size={20} color="#FFF" /></View>
-                    <Text style={styles.aiNameSmall}>Trợ lý KhmerGo</Text>
+                    <Text style={styles.aiNameSmall}>Trợ lý KhmerGo AI</Text>
                   </View>
+
+                  {(status === 'idle' || status === 'selected') && (
+                    <View style={{ marginBottom: 5 }}>
+                      <Text style={{ fontSize: 18, fontWeight: '800', color: '#1A1A1A' }}>
+                        {status === 'idle' ? 'Chào mừng bạn' : 'Sẵn sàng phân tích'}
+                      </Text>
+                    </View>
+                  )}
                   {status === 'idle' && <Text style={styles.aiBubbleTextSmall}>Tải lên hoặc chụp ảnh liên quan đến văn hóa Khmer Nam Bộ. KhmerGo AI sẽ hỗ trợ phân tích và giải thích chi tiết.</Text>}
                   {status === 'selected' && <Text style={styles.aiBubbleTextSmall}>Đã sẵn sàng nhấn “Bắt đầu phân tích” để KhmerGo AI khám phá và giải thích ý nghĩa văn hóa của hiện vật này.</Text>}
-                  {status === 'analyzing' && <View style={styles.analyzingBox}><ActivityIndicator color="#0066ffff" /><Text style={styles.analyzingText}>Đang phân tích ...</Text></View>}
+                  {status === 'analyzing' && <View style={[styles.analyzingBox, { marginTop: -12 }]}>
+                    <ActivityIndicator color="#0066ffff" size="large" />
+                    <Text style={styles.analyzingText}>Đang phân tích hình ảnh...</Text>
+                  </View>}
+
                   {status === 'result' && result && (
-                    <View>
+                    <View style={{ marginTop: -5 }}>
                       <Text style={styles.resultTitleSmall}>{result.title}</Text>
                       <Text style={styles.aiBubbleTextSmall}>{result.content}</Text>
                     </View>
                   )}
                 </View>
+              </View>
+            </ScrollView>
 
-                {/* Action Buttons - only inside ScrollView when showing results */}
-                {status === 'result' && (
-                  <View style={[styles.camBtnRow, { marginTop: 20 }]}>
+            {/* Fixed Bottom Action Buttons */}
+            {activeTab === 'camera' && (status === 'idle' || status === 'selected') && (
+              <View style={styles.fixedCameraActions}>
+                {status === 'idle' && (
+                  <View style={styles.camBtnRow}>
                     <TouchableOpacity style={styles.rectBtn} onPress={() => pickImage(false)}>
                       <Ionicons name="images" size={32} color="#0066ffff" />
                     </TouchableOpacity>
@@ -263,28 +475,13 @@ export default function AIAssistantScreen() {
                   </View>
                 )}
 
-              </View>
-            </ScrollView>
-
-            {/* Fixed Buttons at bottom for Idle and Selected states */}
-            {activeTab === 'camera' && (status === 'idle' || status === 'selected') && (
-              <View style={styles.fixedCameraActions}>
-                {status === 'idle' ? (
-                  <View style={styles.camBtnRow}>
-                    <TouchableOpacity style={styles.rectBtn} onPress={() => pickImage(false)}>
-                      <Ionicons name="images" size={32} color="#0066ffff" />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.rectBtn} onPress={() => pickImage(true)}>
-                      <Ionicons name="camera" size={32} color="#0066ffff" />
-                    </TouchableOpacity>
-                  </View>
-                ) : status === 'selected' ? (
+                {status === 'selected' && (
                   <TouchableOpacity style={styles.analyzeBtn} onPress={handleAnalyze}>
                     <LinearGradient colors={['#0066ffff', '#0052cc']} style={styles.analyzeGradient}>
                       <Text style={styles.analyzeBtnText}>BẮT ĐẦU PHÂN TÍCH</Text>
                     </LinearGradient>
                   </TouchableOpacity>
-                ) : null}
+                )}
               </View>
             )}
           </View>
@@ -295,43 +492,132 @@ export default function AIAssistantScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F8FAFC' },
+  container: { flex: 1, backgroundColor: '#FFFFFF' },
   header: { paddingTop: 40, paddingBottom: 10, paddingHorizontal: 20, backgroundColor: '#FFF', flexDirection: 'row', alignItems: 'center' },
   backBtn: { marginRight: 15 },
   headerInfo: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 20, fontWeight: '900', color: '#1E293B', textAlign: 'center' },
+  headerTitle: { fontSize: 20, fontWeight: '900', color: '#1A1A1A', textAlign: 'center' },
   menuBtn: { width: 42, height: 42, justifyContent: 'center', alignItems: 'center' },
 
   tabContainer: { paddingHorizontal: 20, paddingVertical: 10, backgroundColor: '#FFF' },
   tabWrapper: { flexDirection: 'row', backgroundColor: '#F1F5F9', borderRadius: 25, padding: 4 },
   tab: { flex: 1, flexDirection: 'row', height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', gap: 6 },
-  activeTab: { backgroundColor: '#0066ffff', shadowColor: '#0066ffff', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 5 },
+  activeTab: { backgroundColor: '#1877F2', shadowColor: '#1877F2', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 5 },
   tabText: { fontSize: 13, fontWeight: '700', color: '#64748B' },
   activeTabText: { color: '#FFF' },
 
   contentArea: { flex: 1 },
   messageList: { flex: 1 },
-  messageListContent: { padding: 20, paddingBottom: 30 },
-  messageWrapper: { flexDirection: 'row', marginBottom: 20, maxWidth: '85%' },
+  messageListContent: { paddingHorizontal: 15, paddingTop: 15, paddingBottom: 30 },
+  messageWrapper: { flexDirection: 'row', marginBottom: 24, width: '100%', paddingHorizontal: 10, alignItems: 'flex-start' },
   aiWrapper: { alignSelf: 'flex-start' },
-  userWrapper: { alignSelf: 'flex-end' },
-  aiAvatar: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#e6f0ff', justifyContent: 'center', alignItems: 'center', marginRight: 8 },
-  bubble: { paddingHorizontal: 16, paddingVertical: 12, borderRadius: 20 },
-  aiBubble: { backgroundColor: '#FFF', borderBottomLeftRadius: 4 },
-  userBubble: { backgroundColor: '#0066ffff', borderBottomRightRadius: 4 },
-  messageText: { fontSize: 15, lineHeight: 22, textAlign: 'justify' },
-  aiText: { color: '#1E293B' },
-  userText: { color: '#FFF' },
+  userWrapper: { alignSelf: 'flex-end', justifyContent: 'flex-end' },
+  chatAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#F1F3F4', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' },
+  aiBubbleContainer: { marginLeft: 8, flex: 1, maxWidth: '82%' },
+  userBubbleContainer: { marginRight: 8, alignItems: 'flex-end', flex: 1, maxWidth: '82%' },
+  chatName: { fontSize: 13, fontWeight: '700', color: '#5F6368', marginBottom: 4, marginLeft: 8 },
+  chatTime: { fontSize: 11, color: '#70757A', marginTop: 4, marginLeft: 8 },
+  aiBubble: {
+    backgroundColor: '#F1F3F4',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 22,
+    borderTopLeftRadius: 4,
+    alignSelf: 'flex-start'
+  },
+  userBubble: {
+    backgroundColor: '#1877F2',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 22,
+    borderBottomRightRadius: 4,
+    alignSelf: 'flex-end'
+  },
+  aiMessageText: { fontSize: 16, color: '#1A1A1A', lineHeight: 22, textAlign: 'justify' },
+  userMessageText: { fontSize: 16, color: '#FFFFFF', lineHeight: 22, textAlign: 'justify' },
 
-  inputContainer: { padding: 15, flexDirection: 'row', alignItems: 'center', gap: 10 },
-  inputWrapper: { flex: 1, height: 50, backgroundColor: '#FFF', borderRadius: 25, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 },
-  input: { flex: 1, fontSize: 14, color: '#1E293B' },
-  attachBtn: { marginRight: 8 },
-  micBtn: { marginLeft: 8 },
-  sendfab: { width: 50, height: 50, borderRadius: 25, backgroundColor: '#0066ffff', justifyContent: 'center', alignItems: 'center', elevation: 5 },
+  detailBtn: {
+    backgroundColor: '#1877F2',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    marginTop: 8,
+    alignSelf: 'flex-start',
+    gap: 6
+  },
+  detailBtnText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '700'
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    paddingTop: 60,
+    paddingRight: 10
+  },
+  menuPopup: {
+    width: 220,
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    gap: 12
+  },
+  menuItemText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1A1A1A'
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: '#F1F5F9',
+    marginHorizontal: 8
+  },
+
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+    backgroundColor: '#FFFFFF'
+  },
+  input: {
+    flex: 1,
+    backgroundColor: '#F0F2F5',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    fontSize: 16,
+    maxHeight: 110,
+    color: '#1A1A1A'
+  },
+  sendfab: {
+    marginLeft: 10,
+    width: 45,
+    height: 45,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
 
   cameraSection: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 10, alignItems: 'center' },
-  imageFrame: { width: SCREEN_WIDTH - 80, aspectRatio: 1, padding: 15, position: 'relative', marginBottom: 20 },
+  imageFrame: { width: SCREEN_WIDTH - 80, aspectRatio: 1, padding: 15, position: 'relative', marginBottom: 10 },
   innerFrame: { width: '100%', height: '100%', borderRadius: 25, overflow: 'hidden', backgroundColor: '#F1F5F9', borderWidth: 1, borderColor: '#E2E8F0' },
   imageWrapper: { width: '100%', height: '100%' },
   previewImage: { width: '100%', height: '100%', resizeMode: 'cover' },
@@ -360,12 +646,12 @@ const styles = StyleSheet.create({
     borderColor: '#1F2937',
   },
   aiHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  aiAvatarSmall: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#0066ffff', justifyContent: 'center', alignItems: 'center' },
-  aiNameSmall: { marginLeft: 12, fontSize: 18, fontWeight: '900', color: '#1E293B' },
+  aiAvatarSmall: { width: 36, height: 36, borderRadius: 20, backgroundColor: '#1877F2', justifyContent: 'center', alignItems: 'center' },
+  aiNameSmall: { marginLeft: 12, fontSize: 18, fontWeight: '900', color: '#1A1A1A' },
   aiBubbleTextSmall: { fontSize: 16, color: '#475569', lineHeight: 26, textAlign: 'justify' },
   analyzingBox: { alignItems: 'center', paddingVertical: 10 },
-  analyzingText: { marginTop: 5, color: '#0066ffff', fontWeight: '600' },
-  resultTitleSmall: { fontSize: 22, fontWeight: '900', color: '#1E293B', marginBottom: 5 },
+  analyzingText: { marginTop: 5, color: '#1877F2', fontWeight: '600' },
+  resultTitleSmall: { fontSize: 22, fontWeight: '900', color: '#1A1A1A', marginBottom: 5 },
 
   camBtnRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 15 },
   rectBtn: {
@@ -388,10 +674,40 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'transparent',
-    paddingHorizontal: 25,
-    paddingBottom: 35,
-    paddingTop: 15,
+    paddingHorizontal: 20,
+    paddingBottom: 25,
+    paddingTop: 10,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  toastContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 9999,
+    alignItems: 'center',
+  },
+  toastContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#10B981',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    gap: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+    elevation: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  toastText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '700'
   },
 });
