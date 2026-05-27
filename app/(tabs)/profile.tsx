@@ -233,7 +233,7 @@ export default function ProfileScreen() {
           onPress={() => setLogoutModalVisible(false)}
         >
           <View style={styles.logoutContent}>
-            <View style={styles.modalHandle} />
+
 
             <View style={styles.logoutHeader}>
               <Text style={styles.logoutMsg}>{t('logout_confirm_msg')}</Text>
@@ -422,6 +422,7 @@ const styles = StyleSheet.create({
   logoutHeader: {
     alignItems: 'center',
     marginBottom: 30,
+    paddingTop: 20,
   },
   logoutIconCircle: {
     width: 70,
