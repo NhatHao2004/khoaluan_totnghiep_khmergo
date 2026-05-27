@@ -21,7 +21,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from 'react-native-reanimated';
 import { analyzeImage, chatWithAI } from '../services/ai-service';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -64,12 +64,15 @@ export default function AIAssistantScreen() {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withSequence(
-      withTiming(Platform.OS === 'ios' ? 70 : 60, { duration: 400 }),
-      withTiming(Platform.OS === 'ios' ? 70 : 60, { duration: 4000 }),
-      withTiming(-120, { duration: 400 })
-    );
-    setTimeout(() => setShowToast(false), 4800);
+    toastY.value = withSpring(Platform.OS === 'ios' ? 50 : 40, {
+      damping: 15,
+      stiffness: 120,
+    });
+    
+    setTimeout(() => {
+      toastY.value = withTiming(-120, { duration: 400 });
+      setTimeout(() => setShowToast(false), 400);
+    }, 4000);
   };
 
   // Persistence Key
@@ -162,7 +165,7 @@ export default function AIAssistantScreen() {
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-120, 60], [0, 1]),
+    opacity: interpolate(toastY.value, [-100, 40], [0, 1], 'clamp'),
   }));
 
   // Chat Logic
@@ -433,20 +436,18 @@ export default function AIAssistantScreen() {
                 {/* AI Card - positioned directly below the camera frame */}
                 <View style={[styles.aiCard, { width: '100%', marginTop: 0 }]}>
                   <View style={styles.aiHeader}>
-                    <View style={styles.aiAvatarSmall}><Ionicons name="bulb" size={20} color="#FFF" /></View>
-                    <Text style={styles.aiNameSmall}>Trợ lý KhmerGo AI</Text>
                   </View>
 
                   {(status === 'idle' || status === 'selected') && (
                     <View style={{ marginBottom: 5 }}>
                       <Text style={{ fontSize: 18, fontWeight: '800', color: '#1A1A1A' }}>
-                        {status === 'idle' ? 'Chào mừng bạn' : 'Sẵn sàng phân tích'}
+                        {status === 'idle' ? 'Chào bạn nhé' : 'Sẵn sàng phân tích'}
                       </Text>
                     </View>
                   )}
-                  {status === 'idle' && <Text style={styles.aiBubbleTextSmall}>Tải lên hoặc chụp ảnh liên quan đến văn hóa Khmer Nam Bộ. KhmerGo AI sẽ hỗ trợ phân tích và giải thích chi tiết.</Text>}
-                  {status === 'selected' && <Text style={styles.aiBubbleTextSmall}>Đã sẵn sàng nhấn “Bắt đầu phân tích” để KhmerGo AI khám phá và giải thích ý nghĩa văn hóa của hiện vật này.</Text>}
-                  {status === 'analyzing' && <View style={[styles.analyzingBox, { marginTop: -12 }]}>
+                  {status === 'idle' && <Text style={styles.aiBubbleTextSmall}>Tải ảnh lên hoặc chụp ảnh liên quan đến văn hóa Khmer Nam Bộ. KhmerGo AI sẽ hỗ trợ phân tích và giải thích chi tiết.</Text>}
+                  {status === 'selected' && <Text style={styles.aiBubbleTextSmall}>Đã chọn ảnh. Nhấn “Bắt đầu phân tích” để KhmerGo AI khám phá và giải thích ý nghĩa văn hóa của hiện vật này.</Text>}
+                  {status === 'analyzing' && <View style={[styles.analyzingBox, { marginTop: 120 }]}>
                     <ActivityIndicator color="#0066ffff" size="large" />
                     <Text style={styles.analyzingText}>Đang phân tích hình ảnh...</Text>
                   </View>}
@@ -657,30 +658,30 @@ const styles = StyleSheet.create({
   scanLine: { position: 'absolute', left: 0, right: 0, height: 4, zIndex: 10 },
   placeholderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 
-  corner: { position: 'absolute', width: 45, height: 45, borderColor: '#1F2937', borderStyle: 'solid', zIndex: 20 },
-  topL: { top: 0, left: 0, borderTopWidth: 6, borderLeftWidth: 6, borderTopLeftRadius: 15 },
-  topR: { top: 0, right: 0, borderTopWidth: 6, borderRightWidth: 6, borderTopRightRadius: 15 },
-  botL: { bottom: 0, left: 0, borderBottomWidth: 6, borderLeftWidth: 6, borderBottomLeftRadius: 15 },
-  botR: { bottom: 0, right: 0, borderBottomWidth: 6, borderRightWidth: 6, borderBottomRightRadius: 15 },
+  corner: { position: 'absolute', width: 45, height: 45, borderColor: '#000000ff', borderStyle: 'solid', zIndex: 20 },
+  topL: { top: 0, left: 0, borderTopWidth: 3.5, borderLeftWidth: 3.5, borderTopLeftRadius: 15 },
+  topR: { top: 0, right: 0, borderTopWidth: 3.5, borderRightWidth: 3.5, borderTopRightRadius: 15 },
+  botL: { bottom: 0, left: 0, borderBottomWidth: 3.5, borderLeftWidth: 3.5, borderBottomLeftRadius: 15 },
+  botR: { bottom: 0, right: 0, borderBottomWidth: 3.5, borderRightWidth: 3.5, borderBottomRightRadius: 15 },
 
   focusBracketContainer: { width: 80, height: 80, position: 'relative' },
-  focusBracket: { position: 'absolute', width: 25, height: 25, borderColor: '#94A3B8', borderStyle: 'solid' },
-  fb_tl: { top: 0, left: 0, borderTopWidth: 4, borderLeftWidth: 4, borderTopLeftRadius: 10 },
-  fb_tr: { top: 0, right: 0, borderTopWidth: 4, borderRightWidth: 4, borderTopRightRadius: 10 },
-  fb_bl: { bottom: 0, left: 0, borderBottomWidth: 4, borderLeftWidth: 4, borderBottomLeftRadius: 10 },
-  fb_br: { bottom: 0, right: 0, borderBottomWidth: 4, borderRightWidth: 4, borderBottomRightRadius: 10 },
+  focusBracket: { position: 'absolute', width: 25, height: 25, borderColor: '#000000ff', borderStyle: 'solid' },
+  fb_tl: { top: 0, left: 0, borderTopWidth: 2, borderLeftWidth: 2, borderTopLeftRadius: 10 },
+  fb_tr: { top: 0, right: 0, borderTopWidth: 2, borderRightWidth: 2, borderTopRightRadius: 10 },
+  fb_bl: { bottom: 0, left: 0, borderBottomWidth: 2, borderLeftWidth: 2, borderBottomLeftRadius: 10 },
+  fb_br: { bottom: 0, right: 0, borderBottomWidth: 2, borderRightWidth: 2, borderBottomRightRadius: 10 },
 
   aiCard: {
     backgroundColor: '#FFF',
     borderRadius: 35,
-    padding: 24,
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+    paddingTop: 5,
     width: '100%',
-    borderWidth: 1.5,
-    borderColor: '#1F2937',
   },
-  aiHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  aiHeader: { alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
   aiAvatarSmall: { width: 36, height: 36, borderRadius: 20, backgroundColor: '#1877F2', justifyContent: 'center', alignItems: 'center' },
-  aiNameSmall: { marginLeft: 12, fontSize: 18, fontWeight: '900', color: '#1A1A1A' },
+  aiNameSmall: { fontSize: 18, fontWeight: '900', color: '#1A1A1A', textAlign: 'center' },
   aiBubbleTextSmall: { fontSize: 16, color: '#475569', lineHeight: 26, textAlign: 'justify' },
   analyzingBox: { alignItems: 'center', paddingVertical: 10 },
   analyzingText: { marginTop: 5, color: '#1877F2', fontWeight: '600' },
