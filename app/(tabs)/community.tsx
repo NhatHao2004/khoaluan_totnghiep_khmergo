@@ -22,12 +22,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming, interpolate } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -116,12 +111,12 @@ export default function CommunityScreen() {
     setToastMsg(msg);
     setToastType(type as any);
     setShowToast(true);
-    toastY.value = withSpring(Platform.OS === 'ios' ? 60 : 50, { damping: 15, stiffness: 100 });
-
+    toastY.value = withTiming(Platform.OS === 'ios' ? 70 : 60, { duration: 400 });
+    
     setTimeout(() => {
-      toastY.value = withSpring(-120);
-      setTimeout(() => setShowToast(false), 500);
-    }, 3000);
+      toastY.value = withTiming(-100, { duration: 400 });
+      setTimeout(() => setShowToast(false), 400);
+    }, 4000);
   };
 
   const animatedToastStyle = useAnimatedStyle(() => ({

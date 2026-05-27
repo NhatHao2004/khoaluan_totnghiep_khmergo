@@ -4,7 +4,7 @@ import { Tabs, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming, runOnJS } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
 
@@ -21,7 +21,8 @@ const COLORS = {
   shadow: '#000000ff',
 };
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function TabsLayout() {
@@ -50,18 +51,63 @@ export default function TabsLayout() {
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const context = useSharedValue({ x: 0, y: 0 });
+  const opacity = useSharedValue(1);
+  const dimTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const resetIdleTimer = () => {
+    opacity.value = withTiming(1, { duration: 200 });
+    if (dimTimer.current) clearTimeout(dimTimer.current);
+    dimTimer.current = setTimeout(() => {
+      opacity.value = withTiming(0.3, { duration: 600 });
+    }, 5000);
+  };
+
+  useEffect(() => {
+    resetIdleTimer();
+    return () => { if (dimTimer.current) clearTimeout(dimTimer.current); };
+  }, []);
+
+  const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+  const BUTTON_SIZE = 60;
+  const MARGIN = 10;
+  const BTN_BOTTOM = 80;
+  const BTN_RIGHT = 10;
+
+  // X limits (Initial is right:10)
+  const MIN_X = -SCREEN_WIDTH + BUTTON_SIZE + (BTN_RIGHT * 2); 
+  const MAX_X = 0; 
+  
+  // Y limits (Initial is bottom:80)
+  const MIN_Y = -SCREEN_HEIGHT + BTN_BOTTOM + BUTTON_SIZE + 40; // top limit
+  const MAX_Y = 0; // bottom limit
 
   const gesture = Gesture.Pan()
     .onStart(() => {
       context.value = { x: translateX.value, y: translateY.value };
+      opacity.value = withTiming(1, { duration: 150 });
     })
     .onUpdate((event) => {
-      translateX.value = event.translationX + context.value.x;
-      translateY.value = event.translationY + context.value.y;
+      let nextX = event.translationX + context.value.x;
+      let nextY = event.translationY + context.value.y;
+      
+      // Clamp values during dragging
+      translateX.value = Math.min(Math.max(nextX, MIN_X), MAX_X);
+      translateY.value = Math.min(Math.max(nextY, MIN_Y), MAX_Y);
+    })
+    .onEnd(() => {
+      // Snap to nearest side (Left or Right)
+      const threshold = MIN_X / 2;
+      if (translateX.value < threshold) {
+        translateX.value = withTiming(MIN_X, { duration: 300 });
+      } else {
+        translateX.value = withTiming(MAX_X, { duration: 300 });
+      }
+      runOnJS(resetIdleTimer)();
     });
 
   const animatedChatStyle = useAnimatedStyle(() => {
     return {
+      opacity: opacity.value,
       transform: [
         { translateX: translateX.value },
         { translateY: translateY.value },

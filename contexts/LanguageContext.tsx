@@ -9,7 +9,7 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-const translations = {
+export const translations: any = {
   vi: {
     // Common
     leaderboard: 'Bảng xếp hạng',

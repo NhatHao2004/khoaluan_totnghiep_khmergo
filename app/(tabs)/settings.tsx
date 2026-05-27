@@ -1,5 +1,5 @@
 import { AuthContext } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { translations, useLanguage } from '@/contexts/LanguageContext';
 import { scheduleDaily7AMReminder } from '@/utils/notification-handler';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,7 +22,6 @@ import Animated, {
   interpolateColor,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
   withTiming
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -34,7 +33,7 @@ export default function SettingsScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [chatButtonEnabled, setChatButtonEnabled] = useState(true);
   const [showIntro, setShowIntro] = useState(false);
-  
+
   // Toast States
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
@@ -45,11 +44,11 @@ export default function SettingsScreen() {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withSpring(Platform.OS === 'ios' ? 70 : 50, { damping: 15, stiffness: 100 });
-    
+    toastY.value = withTiming(Platform.OS === 'ios' ? 70 : 50, { duration: 400 });
+
     setTimeout(() => {
-      toastY.value = withSpring(-120);
-      setTimeout(() => setShowToast(false), 500);
+      toastY.value = withTiming(-120, { duration: 400 });
+      setTimeout(() => setShowToast(false), 400);
     }, 4000);
   };
 
@@ -156,14 +155,14 @@ export default function SettingsScreen() {
               style={[styles.optionItem, language === 'vi' && styles.activeOption]}
               onPress={() => {
                 setLanguage('vi');
-                triggerToast(t('lang_changed_vi'), 'success');
+                triggerToast(translations.vi.lang_changed_vi, 'success');
               }}
             >
               <Text style={[styles.optionText, language === 'vi' && styles.activeOptionText]}>{t('vietnamese')}</Text>
-              <Ionicons 
-                name={language === 'vi' ? "checkmark-circle" : "ellipse-outline"} 
-                size={22} 
-                color={language === 'vi' ? "#FF4B4B" : "#CCCCCC"} 
+              <Ionicons
+                name={language === 'vi' ? "checkmark-circle" : "ellipse-outline"}
+                size={22}
+                color={language === 'vi' ? "#FF4B4B" : "#CCCCCC"}
               />
             </TouchableOpacity>
             <View style={styles.divider} />
@@ -171,14 +170,14 @@ export default function SettingsScreen() {
               style={[styles.optionItem, language === 'km' && styles.activeOption]}
               onPress={() => {
                 setLanguage('km');
-                triggerToast(t('lang_changed_km'), 'success');
+                triggerToast(translations.km.lang_changed_km, 'success');
               }}
             >
               <Text style={[styles.optionText, language === 'km' && styles.activeOptionText]}>{t('khmer')}</Text>
-              <Ionicons 
-                name={language === 'km' ? "checkmark-circle" : "ellipse-outline"} 
-                size={22} 
-                color={language === 'km' ? "#FF4B4B" : "#CCCCCC"} 
+              <Ionicons
+                name={language === 'km' ? "checkmark-circle" : "ellipse-outline"}
+                size={22}
+                color={language === 'km' ? "#FF4B4B" : "#CCCCCC"}
               />
             </TouchableOpacity>
           </View>
@@ -200,27 +199,6 @@ export default function SettingsScreen() {
               >
                 <Animated.View style={[styles.customToggleTrack, animatedTrackStyle]}>
                   <Animated.View style={[styles.customToggleThumb, animatedThumbStyle]} />
-                </Animated.View>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-
-        {/* Trợ lý AI */}
-        <View style={styles.section}>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>{t('assistant_settings')}</Text>
-            <View style={styles.switchItem}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.switchSubLabel}>{t('show_chat_button')}</Text>
-              </View>
-
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => toggleChatButton(!chatButtonEnabled)}
-              >
-                <Animated.View style={[styles.customToggleTrack, animatedChatTrackStyle]}>
-                  <Animated.View style={[styles.customToggleThumb, animatedChatThumbStyle]} />
                 </Animated.View>
               </TouchableOpacity>
             </View>
@@ -311,21 +289,21 @@ export default function SettingsScreen() {
 
       {/* Premium Toast System */}
       {showToast && (
-        <Animated.View 
+        <Animated.View
           style={[
-            styles.toastContainer, 
-            animatedToastStyle, 
-            { 
+            styles.toastContainer,
+            animatedToastStyle,
+            {
               backgroundColor: toastType === 'success' || toastType === 'info' ? '#10B981' : '#EF4444',
               shadowColor: toastType === 'success' || toastType === 'info' ? '#10B981' : '#EF4444',
             }
           ]}
         >
           <View style={styles.toastIcon}>
-            <Ionicons 
-              name={toastType === 'success' ? "checkmark" : "close"} 
-              size={20} 
-              color="#FFF" 
+            <Ionicons
+              name={toastType === 'success' ? "checkmark" : "close"}
+              size={20}
+              color="#FFF"
             />
           </View>
           <Text style={styles.toastText}>{toastMsg}</Text>
@@ -348,6 +326,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 50,
     paddingBottom: 10,
+    minHeight: 100, // Fixed height for visual stability
     backgroundColor: '#ffffff',
   },
   backBtn: {
@@ -358,6 +337,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#1A1A1A',
     textAlign: 'center',
+    lineHeight: 28,
   },
   scroll: {
     paddingHorizontal: 20,
@@ -386,19 +366,19 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     paddingBottom: 5,
     letterSpacing: 0.5,
-    lineHeight: 20,
+    lineHeight: 22,
   },
   optionItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 55, // Fixed height for visual stability
+    minHeight: 60, // Minimum height for visual stability
   },
   optionText: {
     fontSize: 15,
     color: '#444',
     fontWeight: '500',
-    lineHeight: 22,
+    lineHeight: 24,
   },
   activeOption: {
     // optional active styling
@@ -406,24 +386,25 @@ const styles = StyleSheet.create({
   activeOptionText: {
     color: '#1A1A1A',
     fontWeight: '600',
-    lineHeight: 22,
+    lineHeight: 24,
   },
   switchItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 52, // Fixed height for visual stability
+    minHeight: 60, // Minimum height for visual stability
   },
   switchLabel: {
     fontSize: 15,
     color: '#1E293B',
     fontWeight: '700',
-    lineHeight: 22,
+    lineHeight: 24,
   },
   switchSubLabel: {
     fontSize: 15,
     color: '#000000ff',
     marginTop: 2,
+    lineHeight: 24,
   },
   customToggleTrack: {
     width: 48,

@@ -120,13 +120,14 @@ export const chatWithAI = async (message: string): Promise<string> => {
     - Bánh tét Khmer: ID 'food_5' -> Tag [LINK:food_5]
 
     QUY TẮC:
-    1. Trả lời văn phong ĐẦY ĐẶN, mượt mà (khoảng 4-5 câu). Tránh viết câu quá ngắn.
-    2. Nếu hỏi về vị trí chùa, phải nêu đúng ĐỊA CHỈ ở trên. Nếu hỏi về văn hóa/ẩm thực, hãy mô tả hương vị hoặc ý nghĩa chính.
-    3. KIẾN THỨC ĐẶC BIỆT: Vào dịp lễ hội Ok Om Bok, Cốm dẹp là món ăn quan trọng nhất (ưu tiên nhắc đến hơn). Bánh tét thường gắn liền với dịp Tết (Chôl Chnăm Thmây).
-    4. TUYỆT ĐỐI KHÔNG viết mã ID vào nội dung trả lời. 
-    5. Bắt buộc đính kèm tag [LINK:ID] vào CUỐI CÙNG nếu nhắc đến các chủ đề chùa, văn hóa hoặc ẩm thực ở trên.
-    6. Gợi ý ngắn: "Nhấn nút xem chi tiết để xem thêm thông tin."
-    7. Chỉ tập trung vào văn hóa Khmer. Từ chối các chủ đề ngoài lề.`;
+    1. QUAN TRỌNG NHẤT: Nếu người dùng gửi lời chào (ví dụ: "chào", "hi", "hello", "xin chào", "bạn ơi", v.v.), CHỈ chào lại ngắn gọn, thân thiện và kết thúc bằng câu hỏi mở kiểu "Bạn có thắc mắc gì muốn mình giải đáp không?". TUYỆT ĐỐI KHÔNG đề xuất chủ đề, không thêm [LINK:...], không mời xem chi tiết.
+    2. Chỉ khi người dùng HỎI về một chủ đề cụ thể (chùa, lễ hội, ẩm thực, văn hóa, ngôn ngữ...) thì mới trả lời đầy đủ và đính kèm tag [LINK:ID] phù hợp vào CUỐI câu trả lời.
+    3. Trả lời văn phong đầy đặn, mượt mà (4-5 câu) khi được hỏi về nội dung. Tránh viết câu ngắn.
+    4. Nếu hỏi về vị trí chùa, phải nêu đúng ĐỊA CHỈ ở trên. Nếu hỏi về văn hóa/ẩm thực, hãy mô tả hương vị hoặc ý nghĩa chính.
+    5. KIẾN THỨC ĐẶC BIỆT: Vào dịp lễ hội Ok Om Bok, Cốm dẹp là món ăn quan trọng nhất. Bánh tét thường gắn liền với dịp Tết (Chôl Chnăm Thmây).
+    6. TUYỆT ĐỐI KHÔNG viết mã ID vào nội dung trả lời.
+    7. Gợi ý "Nhấn nút xem chi tiết để xem thêm thông tin." CHỈ KHI đã đính kèm [LINK:...].
+    8. Chỉ tập trung vào văn hóa Khmer. Từ chối các chủ đề ngoài lề.`;
 
     const response = await fetch(GROQ_API_URL, {
       method: "POST",

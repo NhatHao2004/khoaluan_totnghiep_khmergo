@@ -21,7 +21,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming, interpolate } from 'react-native-reanimated';
 import { analyzeImage, chatWithAI } from '../services/ai-service';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -55,16 +55,21 @@ export default function AIAssistantScreen() {
     },
   ]);
   const [isMenuVisible, setMenuVisible] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
-  const toastY = useSharedValue(-100);
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const toastY = useSharedValue(-120);
 
-  const triggerToast = (msg: string) => {
+  const triggerToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToastMsg(msg);
+    setToastType(type);
+    setShowToast(true);
     toastY.value = withSequence(
-      withTiming(50, { duration: 500 }),
-      withTiming(50, { duration: 2000 }),
-      withTiming(-100, { duration: 500 })
+      withTiming(Platform.OS === 'ios' ? 70 : 60, { duration: 400 }),
+      withTiming(Platform.OS === 'ios' ? 70 : 60, { duration: 4000 }),
+      withTiming(-120, { duration: 400 })
     );
+    setTimeout(() => setShowToast(false), 4800);
   };
 
   // Persistence Key
@@ -153,6 +158,11 @@ export default function AIAssistantScreen() {
   const animatedLineStyle = useAnimatedStyle(() => ({
     top: `${scanPos.value * 100}%`,
     opacity: status === 'analyzing' ? 1 : 0,
+  }));
+
+  const animatedToastStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: toastY.value }],
+    opacity: interpolate(toastY.value, [-120, 60], [0, 1]),
   }));
 
   // Chat Logic
@@ -253,19 +263,9 @@ export default function AIAssistantScreen() {
     triggerToast('Đã dọn dẹp kết quả phân tích');
   };
 
-  const toastStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: toastY.value }],
-  }));
 
   return (
     <View style={styles.container}>
-      {/* Premium Toast */}
-      <Animated.View style={[styles.toastContainer, toastStyle]}>
-        <View style={styles.toastContent}>
-          <Ionicons name="checkmark-circle" size={20} color="#FFF" />
-          <Text style={styles.toastText}>{toastMsg}</Text>
-        </View>
-      </Animated.View>
 
       {/* Header */}
       <View style={styles.header}>
@@ -487,12 +487,45 @@ export default function AIAssistantScreen() {
           </View>
         )}
       </View>
+      {showToast && (
+        <Animated.View style={[
+          styles.toastContainer,
+          animatedToastStyle,
+          {
+            backgroundColor: toastType === 'success' ? '#10B981' : (toastType === 'error' ? '#FF453A' : '#007AFF'),
+            borderColor: 'rgba(255,255,255,0.2)'
+          }
+        ]}>
+          <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}>
+            <Ionicons name={toastType === 'success' ? "checkmark" : (toastType === 'error' ? "close" : "information")} size={18} color="#FFF" />
+          </View>
+          <Text style={styles.toastText}>{toastMsg}</Text>
+        </Animated.View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
+  toastContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 15,
+    right: 15,
+    zIndex: 10000,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 22,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+    elevation: 25
+  },
+  toastText: { color: '#FFF', fontSize: 15, fontWeight: '700', marginLeft: 15, flex: 1, letterSpacing: 0.3 },
   header: { paddingTop: 40, paddingBottom: 10, paddingHorizontal: 20, backgroundColor: '#FFF', flexDirection: 'row', alignItems: 'center' },
   backBtn: { marginRight: 15 },
   headerInfo: { flex: 1, alignItems: 'center', justifyContent: 'center' },
@@ -679,35 +712,5 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-
-  toastContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 9999,
-    alignItems: 'center',
-  },
-  toastContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#10B981',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 30,
-    gap: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 15,
-    elevation: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-  },
-  toastText: {
-    color: '#FFF',
-    fontSize: 14,
-    fontWeight: '700'
   },
 });

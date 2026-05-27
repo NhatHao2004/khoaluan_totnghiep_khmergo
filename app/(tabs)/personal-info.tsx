@@ -25,7 +25,7 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
   useSharedValue,
-  withSpring
+  withTiming
 } from 'react-native-reanimated';
 
 export default function PersonalInfoScreen() {
@@ -56,12 +56,12 @@ export default function PersonalInfoScreen() {
     setToastMsg(msg);
     setToastType(type as any);
     setShowToast(true);
-    toastY.value = withSpring(Platform.OS === 'ios' ? 50 : 30, { damping: 15, stiffness: 100 });
-
+    toastY.value = withTiming(Platform.OS === 'ios' ? 70 : 50, { duration: 400 });
+    
     setTimeout(() => {
-      toastY.value = withSpring(-120);
-      setTimeout(() => setShowToast(false), 500);
-    }, 4000);
+      toastY.value = withTiming(-100, { duration: 400 });
+      setTimeout(() => setShowToast(false), 400);
+    }, 3000);
   };
 
   const animatedToastStyle = useAnimatedStyle(() => ({
