@@ -131,6 +131,7 @@ export default function HomeScreen() {
         return {
           ...data,
           id_num: data.id,
+          name: data.name || '',
           category: data.category,
           image: getAppImage(data),
           route: {
@@ -167,8 +168,10 @@ export default function HomeScreen() {
           featured.push(...getRandom(cultures, 1));
         } else if (userInterests.length === 1) {
           const cat = userInterests[0];
-          const pool = allItems.filter(i => i.category === cat);
-          featured.push(...getRandom(pool, 3));
+          const pool = allItems
+            .filter(i => i.category === cat)
+            .sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+          featured.push(...pool.slice(0, 3));
         } else {
           // If 3 interests or other combinations, pick evenly
           userInterests.forEach(cat => {

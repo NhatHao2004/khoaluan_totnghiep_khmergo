@@ -42,9 +42,9 @@ export default function RegisterScreen() {
 
   const toggleInterest = (interest: string) => {
     if (selectedInterests.includes(interest)) {
-      setSelectedInterests(selectedInterests.filter(i => i !== interest));
+      setSelectedInterests([]);
     } else {
-      setSelectedInterests([...selectedInterests, interest]);
+      setSelectedInterests([interest]);
     }
   };
 
@@ -151,7 +151,7 @@ export default function RegisterScreen() {
                   <Ionicons name="add" size={16} color="#FFF" />
                 </View>
               </TouchableOpacity>
-              <Text style={styles.avatarHint}>Thêm ảnh đại diện</Text>
+              <Text style={styles.avatarHint}>Ảnh đại diện</Text>
             </View>
 
             {/* Form */}
@@ -238,7 +238,7 @@ export default function RegisterScreen() {
                         key={item.id}
                         style={[
                           styles.interestCardBig,
-                          { backgroundColor: item.bg, borderColor: isSelected ? item.color : '#F1F5F9' }
+                          { backgroundColor: item.bg, borderColor: isSelected ? '#0F172A' : '#F1F5F9' }
                         ]}
                         onPress={() => toggleInterest(item.id)}
                         activeOpacity={0.8}
@@ -268,7 +268,7 @@ export default function RegisterScreen() {
                         key={item.id}
                         style={[
                           styles.interestCardSmall,
-                          { backgroundColor: item.bg, borderColor: isSelected ? item.color : '#F1F5F9' }
+                          { backgroundColor: item.bg, borderColor: isSelected ? '#0F172A' : '#F1F5F9' }
                         ]}
                         onPress={() => toggleInterest(item.id)}
                         activeOpacity={0.8}
@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
 
   mainBtn: { borderRadius: 18, overflow: 'hidden' },
   btnGradient: { height: 60, justifyContent: 'center', alignItems: 'center' },
-  btnText: { fontSize: 16, fontWeight: '800', color: '#FFF', letterSpacing: 1 },
+  btnText: { fontSize: 16, fontWeight: '800', color: '#FFF', letterSpacing: 1, lineHeight: 24, includeFontPadding: false },
 
   footer: { marginTop: 20, alignItems: 'center' },
   footerText: { fontSize: 13, color: '#94A3B8', textDecorationLine: 'underline' },
@@ -493,5 +493,5 @@ const styles = StyleSheet.create({
   termsText: { fontSize: 14, lineHeight: 22, color: '#475569', textAlign: 'justify' },
   termsBold: { fontWeight: '800', color: '#0F172A' },
   acceptBtn: { backgroundColor: '#1E293B', height: 56, borderRadius: 16, justifyContent: 'center', alignItems: 'center' },
-  acceptBtnText: { color: '#FFF', fontSize: 15, fontWeight: '800' },
+  acceptBtnText: { color: '#FFF', fontSize: 15, fontWeight: '800', lineHeight: 22, includeFontPadding: false },
 });
