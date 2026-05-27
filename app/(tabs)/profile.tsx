@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: '#1A1A1A',
-    lineHeight: 22,
+    lineHeight: 23,
     paddingRight: 5,
   },
 
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#999',
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 24, // Increased for VN
   },
   logoutActionRow: {
     gap: 12,
@@ -415,13 +415,12 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '700',
-    lineHeight: 22,
-    paddingRight: 5,
+    lineHeight: 28, // Increased for VN accents
   },
   cancelLogoutBtn: {
     height: 56,
     borderRadius: 16,
-    backgroundColor: '#1877F2', // Xanh nước biển
+    backgroundColor: '#1877F2',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -429,7 +428,6 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '700',
-    lineHeight: 22,
-    paddingRight: 5,
+    lineHeight: 28, // Increased for VN accents
   },
 });

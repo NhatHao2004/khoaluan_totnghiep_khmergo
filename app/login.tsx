@@ -1,9 +1,8 @@
-import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { auth } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -31,7 +30,7 @@ export default function LoginScreen() {
       await signInWithEmailAndPassword(auth, email, password);
       // Load dữ liệu người dùng lập tức từ Firestore trước khi chuyển trang
       await refreshUser();
-      
+
       if (returnTo) {
         router.replace({
           pathname: returnTo as any,
@@ -56,8 +55,8 @@ export default function LoginScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView 
-        style={styles.scrollContent} 
+      <ScrollView
+        style={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}
       >
@@ -72,8 +71,8 @@ export default function LoginScreen() {
 
           {/* Profile Avatar Icon */}
           <View style={styles.avatarWrapper}>
-            <Image 
-              source={require('@/assets/images/icon.png')} 
+            <Image
+              source={require('@/assets/images/icon.png')}
               style={styles.logoImage}
               resizeMode="contain"
             />
@@ -152,7 +151,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#000',
     flexShrink: 1,
-    lineHeight: 34,
+    lineHeight: 38, // Slightly more room for accents
     paddingRight: 5,
   },
   navInactive: {
@@ -160,7 +159,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#B0B0B0',
     flexShrink: 1,
-    lineHeight: 24,
+    lineHeight: 28, // Slightly more room for accents
     paddingRight: 5,
   },
 
@@ -184,7 +183,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     marginBottom: 20,
-    lineHeight: 22,
+    lineHeight: 24, // Optimized for VN
     paddingRight: 5,
   },
 
@@ -227,7 +226,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     letterSpacing: 1,
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 26, // Optimized for VN
     paddingRight: 5,
   },
 

@@ -10,15 +10,16 @@ import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Dimensions,
-  Image,
   Modal,
   RefreshControl,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  StyleSheet as RNStyleSheet,
 } from 'react-native';
+const StyleSheet = RNStyleSheet;
+import { Image } from 'expo-image';
 import Animated, {
   FadeInDown,
   FadeInRight,
@@ -319,16 +320,19 @@ export default function HomeScreen() {
           {services.map((item, index) => (
             <Animated.View
               key={item.id}
-              entering={FadeInDown.delay(400 + index * 50).springify()}
+              entering={FadeInDown.delay(100 + index * 40).duration(400)} // Faster & earlier
               style={styles.gridItemScroll}
             >
               <TouchableOpacity
                 onPress={() => handleCategoryPress(item.route)}
                 style={styles.serviceCardMini}
               >
-                <View style={styles.iconGlassMini}>
-                  <Image source={item.icon} style={styles.serviceIconImage} />
-                </View>
+                <Image 
+                  source={item.icon} 
+                  style={styles.serviceIconImage}
+                  transition={200}
+                  contentFit="contain"
+                />
                 <ThemedText style={styles.serviceLabelMini} numberOfLines={2}>{item.label}</ThemedText>
               </TouchableOpacity>
             </Animated.View>
@@ -370,7 +374,12 @@ export default function HomeScreen() {
                 onPress={() => handleCategoryPress(item.route)}
               >
                 <View style={styles.cardImageContainer}>
-                  <Image source={item.image} style={styles.cardImage} />
+                  <Image 
+                    source={item.image} 
+                    style={styles.cardImage}
+                    transition={300}
+                    contentFit="cover"
+                  />
                 </View>
 
                 <View style={styles.cardContent}>
@@ -502,7 +511,7 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = RNStyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
@@ -711,9 +720,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   serviceIconImage: {
-    width: '90%', // Leave a tiny bit of breathing room for 'full' feel without touching edges
-    height: '90%',
-    resizeMode: 'contain',
+    width: 58,
+    height: 58,
+    marginBottom: 8,
   },
   serviceLabelMini: {
     fontSize: 9, // Slightly smaller to fit 4 cards perfectly
