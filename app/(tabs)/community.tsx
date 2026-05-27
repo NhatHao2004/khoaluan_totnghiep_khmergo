@@ -558,7 +558,7 @@ export default function CommunityScreen() {
           />
           <View style={[styles.modalContent, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + 15) }]}>
             <View style={styles.modalHeader}>
-              <View style={styles.modalHandle} />
+
               <View style={styles.modalHeaderTitleBox}>
                 <Text style={styles.modalTitle}>{isEditingPost ? 'Sửa bài viết' : 'Tạo bài viết'}</Text>
                 <TouchableOpacity
@@ -659,7 +659,7 @@ export default function CommunityScreen() {
           />
           <View style={[styles.modalContent, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + 12) }]}>
             <View style={styles.modalHeader}>
-              <View style={styles.modalHandle} />
+
               <View style={styles.modalHeaderTitleBox}>
                 <Text style={styles.modalTitle}>Bình luận ({posts.find(p => p.id === activePostId)?.comments || 0})</Text>
                 <TouchableOpacity onPress={() => {
@@ -886,7 +886,7 @@ const styles = StyleSheet.create({
   leftActions: { flexDirection: 'row', alignItems: 'center', gap: 20 },
   actionItem: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   actionCount: { fontSize: 16, fontWeight: '700', color: '#1A1A1A' },
-  modalOverlay: { flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 30, borderTopRightRadius: 30, overflow: 'hidden' },
   modalHeader: { alignItems: 'center', paddingVertical: 12 },
   modalHandle: { width: 40, height: 5, borderRadius: 3, backgroundColor: '#E0E0E0', marginBottom: 10 },
