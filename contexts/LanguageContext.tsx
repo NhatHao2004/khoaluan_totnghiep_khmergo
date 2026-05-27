@@ -179,7 +179,7 @@ export const translations: any = {
     error_required: 'Vui lòng điền đầy đủ thông tin',
     email_in_use: 'Email đã tồn tại hoặc đã được sử dụng bởi tài khoản khác',
     fullname_label: 'Họ và tên',
-    select_interests_title: 'Bạn quan tâm đến gì?',
+    select_interests_title: 'Bạn quan tâm đến gì nào',
 
     // New Home & Pagoda Strings
     welcome_hello: 'Chào mừng 👋',

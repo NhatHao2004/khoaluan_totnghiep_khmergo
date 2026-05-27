@@ -9,7 +9,6 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import {
-  Alert,
   Dimensions,
   Image,
   KeyboardAvoidingView,
@@ -253,7 +252,7 @@ export default function RegisterScreen() {
 
             {/* Interest Selection - Asymmetric Layout */}
             <View style={styles.interestsBox}>
-              <Text style={styles.interestsHeader}>{t('select_interests_title') || 'Bạn quan tâm đến gì?'}</Text>
+              <Text style={styles.interestsHeader}>{t('select_interests_title') || 'Bạn quan tâm đến gì nào'}</Text>
               <View style={styles.interestsAsymmetricGrid}>
                 {/* Left Column: Big Card */}
                 <View style={styles.leftCol}>
@@ -440,7 +439,7 @@ const styles = StyleSheet.create({
   addBtnSmall: { position: 'absolute', bottom: 0, right: 0, width: 28, height: 28, borderRadius: 14, backgroundColor: '#10B981', justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: '#FFF' },
   avatarHint: { marginTop: 10, fontSize: 13, color: '#94A3B8', fontWeight: '600' },
 
-  form: { gap: 18, marginBottom: 25 },
+  form: { gap: 18, marginBottom: 10 },
   inputGroup: { gap: 8 },
   inputLabel: { fontSize: 14, fontWeight: '700', color: '#64748B', marginLeft: 4 },
   inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: 16, paddingHorizontal: 16, height: 56, borderWidth: 1, borderColor: '#F1F5F9' },

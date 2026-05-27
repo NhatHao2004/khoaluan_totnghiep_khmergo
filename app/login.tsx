@@ -2,10 +2,33 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { auth } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming
+} from 'react-native-reanimated';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const { t } = useLanguage();
@@ -14,220 +37,275 @@ export default function LoginScreen() {
   const params = useLocalSearchParams();
   const returnTo = params.returnTo as string;
   const returnId = params.returnId as string;
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Toast States
+  const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const toastY = useSharedValue(-120);
+  const waveRotation = useSharedValue(0);
+
+  React.useEffect(() => {
+    waveRotation.value = withRepeat(
+      withSequence(
+        withTiming(25, { duration: 300 }),
+        withTiming(-25, { duration: 300 })
+      ),
+      -1,
+      true
+    );
+  }, []);
+
+  const waveStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${waveRotation.value}deg` }],
+  }));
+
+  const triggerToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMsg(msg);
+    setToastType(type);
+    setShowToast(true);
+    toastY.value = withTiming(Platform.OS === 'ios' ? 70 : 50, { duration: 400 });
+
+    setTimeout(() => {
+      toastY.value = withTiming(-120, { duration: 400 });
+      setTimeout(() => setShowToast(false), 400);
+    }, 3000);
+  };
+
+  const animatedToastStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: toastY.value }],
+    opacity: interpolate(toastY.value, [-120, 50], [0, 1]),
+  }));
+
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert(t('error'), t('error_fill_fields') || 'Vui lòng nhập Email và Mật khẩu');
+      triggerToast(t('error_required'), 'error');
       return;
     }
 
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // Load dữ liệu người dùng lập tức từ Firestore trước khi chuyển trang
+      await signInWithEmailAndPassword(auth, email.trim(), password);
       await refreshUser();
 
-      if (returnTo) {
-        router.replace({
-          pathname: returnTo as any,
-          params: { ...(returnId ? { id: returnId } : {}), toast: 'login_success' }
-        });
-      } else {
-        router.replace({ pathname: '/(tabs)', params: { toast: 'login_success' } });
-      }
+      triggerToast(t('login_success'), 'success');
+
+      setTimeout(() => {
+        if (returnTo) {
+          router.replace({
+            pathname: returnTo as any,
+            params: { ...(returnId ? { id: returnId } : {}), toast: 'login_success' }
+          });
+        } else {
+          router.replace({ pathname: '/(tabs)', params: { toast: 'login_success' } });
+        }
+      }, 1500);
     } catch (error: any) {
       let msg = t('update_failed');
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-        msg = t('wrong_old_pass'); // Reusing some keys or just fallback
+        msg = t('wrong_old_pass');
       }
-      Alert.alert(t('error'), msg);
+      triggerToast(msg, 'error');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView
-        style={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1 }}
+    <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <View style={styles.innerContent}>
-          {/* Top Navigation */}
-          <View style={styles.topNav}>
-            <Text style={styles.navActive}>{t('login_title')}</Text>
+        <View style={styles.fixedHeader}>
+          <View style={styles.headerTitleRow}>
+            <Text style={styles.titleText}>{t('login_title')}</Text>
             <TouchableOpacity onPress={() => router.replace('/register')}>
-              <Text style={styles.navInactive}>{t('register_title')}</Text>
+              <Text style={styles.registerLinkText}>{t('register_title')}</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Profile Avatar Icon */}
-          <View style={styles.avatarWrapper}>
-            <Image
-              source={require('@/assets/images/icon.png')}
-              style={styles.logoImage}
-              resizeMode="contain"
-            />
-          </View>
-
-          {/* Inputs */}
-          <View style={styles.formContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder={t('email_label')}
-              placeholderTextColor="#C1C1C1"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-            />
-
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder={t('password_label')}
-                placeholderTextColor="#C1C1C1"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <Ionicons name={showPassword ? "eye" : "eye-off"} size={20} color="#C1C1C1" />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Login Button */}
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={handleLogin}
-            disabled={loading}
-          >
-            <Text style={styles.loginButtonText}>
-              {loading ? t('processing').toUpperCase() : t('login').toUpperCase()}
-            </Text>
-          </TouchableOpacity>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          overScrollMode="never"
+          bounces={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          <View style={styles.card}>
+            {/* Logo/Icon Wrapper */}
+            <View style={styles.logoWrapper}>
+              <Image
+                source={require('@/assets/images/icon.png')}
+                style={styles.logoImage}
+                resizeMode="contain"
+              />
+              <View style={styles.logoHintRow}>
+                <Text style={styles.logoHint}>Chào mừng bạn quay lại</Text>
+                <Animated.View style={[waveStyle, { marginLeft: 8 }]}>
+                  <Text style={styles.waveEmoji}>👋</Text>
+                </Animated.View>
+              </View>
+            </View>
+
+            {/* Form */}
+            <View style={styles.form}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Email</Text>
+                <View style={styles.inputWrapper}>
+                  <Ionicons name="mail-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="example@email.com"
+                    placeholderTextColor="#CBD5E1"
+                    value={email}
+                    onChangeText={setEmail}
+                    autoCapitalize="none"
+                    keyboardType="email-address"
+                  />
+                </View>
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>{t('password_label')}</Text>
+                <View style={styles.inputWrapper}>
+                  <Ionicons name="lock-closed-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="••••••••"
+                    placeholderTextColor="#CBD5E1"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                  />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color="#94A3B8" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+
+            {/* Login Button */}
+            <TouchableOpacity
+              style={styles.mainBtn}
+              onPress={handleLogin}
+              disabled={loading}
+              activeOpacity={0.9}
+            >
+              <LinearGradient
+                colors={['#10B981', '#059669']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.btnGradient}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#FFF" />
+                ) : (
+                  <Text style={styles.btnText}>
+                    {t('login').toUpperCase()}
+                  </Text>
+                )}
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+
+      {/* Premium Toast System */}
+      {showToast && (
+        <Animated.View
+          style={[
+            styles.toastContainer,
+            animatedToastStyle,
+            {
+              backgroundColor: toastType === 'success' || toastType === 'info' ? '#10B981' : '#EF4444',
+              shadowColor: toastType === 'success' || toastType === 'info' ? '#10B981' : '#EF4444',
+            }
+          ]}
+        >
+          <View style={styles.toastIcon}>
+            <Ionicons
+              name={toastType === 'success' ? "checkmark" : "close"}
+              size={20}
+              color="#FFF"
+            />
+          </View>
+          <Text style={styles.toastText}>{toastMsg}</Text>
+        </Animated.View>
+      )}
+    </View>
   );
 }
 
-
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF', // Toàn màn hình trắng
-  },
-  scrollContent: {
-    backgroundColor: '#FFFFFF',
-    flex: 1,
-  },
-  innerContent: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 30,
-    paddingTop: 80,
-    paddingBottom: 40,
-  },
-  topNav: {
+  container: { flex: 1, backgroundColor: '#F8FAFC' },
+  fixedHeader: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 10, backgroundColor: '#F8FAFC' },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 40, backgroundColor: '#F8FAFC' },
+  headerTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
+  titleText: { fontSize: 32, fontWeight: '900', color: '#0F172A', letterSpacing: -1 },
+  registerLinkText: { fontSize: 16, color: '#64748B', fontWeight: '600', marginBottom: 4 },
+
+  card: { backgroundColor: '#FFF', borderRadius: 32, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.05, shadowRadius: 20, elevation: 5 },
+
+  logoWrapper: { alignItems: 'center', marginBottom: 25 },
+  logoImage: { width: 130, height: 130 },
+  logoHintRow: { marginTop: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
+  logoHint: { fontSize: 16, color: '#64748B', fontWeight: '700' },
+  waveEmoji: { fontSize: 20 },
+
+  form: { gap: 20, marginBottom: 30 },
+  inputGroup: { gap: 8 },
+  inputLabel: { fontSize: 14, fontWeight: '700', color: '#64748B', marginLeft: 4 },
+  inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: 16, paddingHorizontal: 16, height: 56, borderWidth: 1, borderColor: '#F1F5F9' },
+  inputIcon: { marginRight: 12 },
+  input: { flex: 1, fontSize: 16, color: '#1E293B', fontWeight: '600', paddingVertical: 10 },
+
+  mainBtn: { borderRadius: 18, overflow: 'hidden' },
+  btnGradient: { height: 60, justifyContent: 'center', alignItems: 'center' },
+  btnText: { fontSize: 16, fontWeight: '800', color: '#FFF', letterSpacing: 1, lineHeight: 24, includeFontPadding: false },
+
+  footer: { marginTop: 30, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+  footerText: { fontSize: 14, color: '#64748B', fontWeight: '500' },
+  footerLink: { fontSize: 14, color: '#10B981', fontWeight: '700' },
+
+  // Toast Styles
+  toastContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 20,
+    right: 20,
+    height: 56,
+    borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
-    justifyContent: 'space-between',
-    marginBottom: 50,
-    gap: 10,
+    paddingHorizontal: 16,
+    zIndex: 9999,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
   },
-  navActive: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#000',
-    lineHeight: 40,
-    includeFontPadding: false,
-    paddingRight: 10,
-  },
-  navInactive: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#B0B0B0',
-    lineHeight: 28,
-    includeFontPadding: false,
-    paddingRight: 5,
-  },
-
-  avatarWrapper: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  logoImage: {
-    width: 120,
-    height: 120,
-  },
-  formContainer: {
-    width: '100%',
-    marginBottom: 40,
-  },
-  input: {
-    width: '100%',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EAEAEA',
-    paddingVertical: 14,
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 20,
-    lineHeight: 24, // Optimized for VN
-    paddingRight: 5,
-  },
-
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EAEAEA',
-  },
-  passwordInput: {
-    flex: 1,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: '#333',
-    lineHeight: 24,
-    paddingRight: 5,
-  },
-
-  loginButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  toastIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
-    backgroundColor: '#00CFA3',
-    width: '100%',
-    paddingVertical: 14,
-    minHeight: 60,
-    borderRadius: 30,
-    shadowColor: '#00CFA3',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 3,
-    marginBottom: 50,
+    alignItems: 'center',
   },
-
-  loginButtonText: {
-    fontSize: 16,
+  toastText: {
+    color: '#FFF',
+    fontSize: 15,
     fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: 1,
-    textAlign: 'center',
-    lineHeight: 24,
-    paddingHorizontal: 10,
+    marginLeft: 12,
+    flex: 1,
+    letterSpacing: 0.2,
+    includeFontPadding: false,
+    lineHeight: 22,
   },
-
 });
