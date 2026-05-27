@@ -8,7 +8,6 @@ import * as Firestore from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Dimensions,
   FlatList,
   Image,
@@ -20,7 +19,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -135,7 +134,7 @@ export default function CommunityScreen() {
         styles.toastContainer,
         animatedToastStyle,
         {
-          backgroundColor: toastType === 'success' ? '#059669' : (toastType === 'error' ? '#FF453A' : '#007AFF'),
+          backgroundColor: toastType === 'success' ? '#00c184ff' : (toastType === 'error' ? '#FF453A' : '#007AFF'),
           borderColor: 'rgba(255,255,255,0.2)'
         }
       ]}>
@@ -820,16 +819,16 @@ export default function CommunityScreen() {
             </View>
             <Text style={styles.pModalTitle}>Xóa bài viết</Text>
             <Text style={styles.pModalSub}>Hành động này không thể hoàn tác</Text>
-            
+
             <View style={styles.pModalActionRow}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.pModalPrimaryBtn, { backgroundColor: '#EF4444', shadowColor: '#EF4444' }]}
                 onPress={confirmDeletePost}
               >
                 <Text style={styles.pModalPrimaryBtnText}>Xóa bài viết</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
                 style={[styles.pModalSecondaryBtn, { backgroundColor: '#3B82F6' }]}
                 onPress={() => setShowDeleteModal(false)}
               >
