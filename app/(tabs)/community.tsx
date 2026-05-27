@@ -77,6 +77,9 @@ export default function CommunityScreen() {
   const [isOptionsModalVisible, setOptionsModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const commentInputRef = React.useRef<TextInput>(null);
   const commentsListRef = React.useRef<FlatList>(null);
 
@@ -111,7 +114,7 @@ export default function CommunityScreen() {
     setToastMsg(msg);
     setToastType(type as any);
     setShowToast(true);
-    toastY.value = withTiming(Platform.OS === 'ios' ? 70 : 60, { duration: 400 });
+    toastY.value = withTiming(Platform.OS === 'ios' ? 50 : 40, { duration: 400 });
 
     setTimeout(() => {
       toastY.value = withTiming(-100, { duration: 400 });
@@ -132,7 +135,7 @@ export default function CommunityScreen() {
         styles.toastContainer,
         animatedToastStyle,
         {
-          backgroundColor: toastType === 'success' ? '#10B981' : (toastType === 'error' ? '#FF453A' : '#007AFF'),
+          backgroundColor: toastType === 'success' ? '#059669' : (toastType === 'error' ? '#FF453A' : '#007AFF'),
           borderColor: 'rgba(255,255,255,0.2)'
         }
       ]}>
@@ -298,7 +301,7 @@ export default function CommunityScreen() {
 
   const handleLike = async (postId: string, likedBy: string[] = []) => {
     if (!user) {
-      triggerToast("Vui lòng đăng nhập", "error");
+      setShowLoginModal(true);
       return;
     }
     const postRef = Firestore.doc(db, 'posts', postId);
@@ -323,7 +326,7 @@ export default function CommunityScreen() {
 
   const handleComment = (id: string) => {
     if (!user) {
-      triggerToast("Vui lòng đăng nhập để bình luận", "error");
+      setShowLoginModal(true);
       return;
     }
     setActivePostId(id);
@@ -334,7 +337,7 @@ export default function CommunityScreen() {
     if (!user || !commentText.trim() || !activePostId) return;
     setIsAddingComment(true);
     const currentComment = commentText.trim();
-    
+
     // Reset input immediately for perceived speed
     setCommentText('');
     setReplyToId(null);
@@ -437,28 +440,23 @@ export default function CommunityScreen() {
     setCreateModalVisible(true);
   };
 
-  const handleDeletePost = async (postId: string, postUserId: string) => {
+  const handleDeletePost = (postId: string, postUserId: string) => {
     if (!user || user.uid !== postUserId) return;
+    setPostToDelete(postId);
+    setShowDeleteModal(true);
+  };
 
-    Alert.alert(
-      "Xóa bài viết",
-      "Hành động này không thể hoàn tác",
-      [
-        { text: "Quay lại", style: "cancel" },
-        {
-          text: "Xóa",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await Firestore.deleteDoc(Firestore.doc(db, 'posts', postId));
-              triggerToast("Đã xóa bài viết");
-            } catch (error) {
-              triggerToast("Lỗi khi xóa bài viết", "error");
-            }
-          }
-        }
-      ]
-    );
+  const confirmDeletePost = async () => {
+    if (!postToDelete) return;
+    try {
+      await Firestore.deleteDoc(Firestore.doc(db, 'posts', postToDelete));
+      triggerToast("Đã xóa bài viết");
+    } catch (error) {
+      triggerToast("Lỗi khi xóa bài viết", "error");
+    } finally {
+      setShowDeleteModal(false);
+      setPostToDelete(null);
+    }
   };
 
   const renderPost = ({ item }: { item: Post }) => {
@@ -523,14 +521,7 @@ export default function CommunityScreen() {
           style={styles.plusBtn}
           onPress={() => {
             if (!user) {
-              Alert.alert(
-                "Yêu cầu đăng nhập",
-                "Đăng nhập để sử dụng tính năng này",
-                [
-                  { text: "Hủy", style: "cancel" },
-                  { text: "Đăng nhập", onPress: () => router.push('/login') }
-                ]
-              );
+              setShowLoginModal(true);
               return;
             }
             setCreateModalVisible(true);
@@ -593,8 +584,8 @@ export default function CommunityScreen() {
               </View>
             </View>
 
-            <ScrollView 
-              style={styles.createPostContent} 
+            <ScrollView
+              style={styles.createPostContent}
               contentContainerStyle={{ flexGrow: 1 }}
               keyboardShouldPersistTaps="handled"
             >
@@ -612,7 +603,7 @@ export default function CommunityScreen() {
                 onChangeText={setCreatePostText}
                 scrollEnabled={false}
               />
-              
+
               <View style={{ flex: 1 }} />
 
               {(selectedImage && keyboardHeight === 0) && (
@@ -775,6 +766,81 @@ export default function CommunityScreen() {
           </View>
         </TouchableOpacity>
       </Modal>
+
+      {/* Custom Login Modal */}
+      <Modal
+        visible={showLoginModal}
+        transparent={true}
+        animationType="fade"
+        statusBarTranslucent={true}
+        onRequestClose={() => setShowLoginModal(false)}
+      >
+        <View style={styles.pModalOverlay}>
+          <View style={styles.pModalContent}>
+            <View style={styles.pModalIconCircle}>
+              <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
+            </View>
+            <Text style={styles.pModalTitle}>Yêu cầu đăng nhập</Text>
+            <Text style={styles.pModalSub}>
+              Đăng nhập để sử dụng tính năng này
+            </Text>
+
+            <View style={styles.pModalActionRow}>
+              <TouchableOpacity
+                style={styles.pModalPrimaryBtn}
+                onPress={() => {
+                  setShowLoginModal(false);
+                  router.push('/login');
+                }}
+              >
+                <Text style={styles.pModalPrimaryBtnText}>Đăng nhập</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.pModalSecondaryBtn}
+                onPress={() => setShowLoginModal(false)}
+              >
+                <Text style={styles.pModalSecondaryBtnText}>Hủy</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Custom Delete Confirmation Modal */}
+      <Modal
+        visible={showDeleteModal}
+        transparent={true}
+        animationType="fade"
+        statusBarTranslucent={true}
+        onRequestClose={() => setShowDeleteModal(false)}
+      >
+        <View style={styles.pModalOverlay}>
+          <View style={styles.pModalContent}>
+            <View style={[styles.pModalIconCircle, { backgroundColor: '#FEF2F2', borderColor: '#FEE2E2' }]}>
+              <Ionicons name="trash-outline" size={40} color="#EF4444" />
+            </View>
+            <Text style={styles.pModalTitle}>Xóa bài viết</Text>
+            <Text style={styles.pModalSub}>Hành động này không thể hoàn tác</Text>
+            
+            <View style={styles.pModalActionRow}>
+              <TouchableOpacity 
+                style={[styles.pModalPrimaryBtn, { backgroundColor: '#EF4444', shadowColor: '#EF4444' }]}
+                onPress={confirmDeletePost}
+              >
+                <Text style={styles.pModalPrimaryBtnText}>Xóa bài viết</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.pModalSecondaryBtn, { backgroundColor: '#3B82F6' }]}
+                onPress={() => setShowDeleteModal(false)}
+              >
+                <Text style={[styles.pModalSecondaryBtnText, { color: '#FFF' }]}>Quay lại</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -858,4 +924,86 @@ const styles = StyleSheet.create({
   optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: 4, paddingHorizontal: 25, width: '100%' },
   optionIconContainer: { width: 30, height: 40, justifyContent: 'center', alignItems: 'center', marginRight: 15 },
   optionText: { fontSize: 16, fontWeight: '600', color: '#1A1A1A' },
+
+  // --- Premium Login Modal Styles (Unique Names to avoid conflict) ---
+  pModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  pModalContent: {
+    backgroundColor: '#FFF',
+    borderRadius: 32,
+    padding: 30,
+    width: '100%',
+    maxWidth: 340,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  pModalIconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#EFF6FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#DBEAFE',
+  },
+  pModalTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#1E293B',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  pModalSub: {
+    fontSize: 15,
+    color: '#64748B',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  pModalActionRow: {
+    width: '100%',
+    gap: 12,
+  },
+  pModalPrimaryBtn: {
+    backgroundColor: '#3B82F6',
+    height: 56,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  pModalPrimaryBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  pModalSecondaryBtn: {
+    backgroundColor: '#EF4444',
+    height: 56,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  pModalSecondaryBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
 });
