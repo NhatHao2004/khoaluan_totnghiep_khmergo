@@ -775,15 +775,13 @@ export default function CommunityScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setShowLoginModal(false)}
       >
-        <View style={styles.pModalOverlay}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
           <View style={styles.pModalContent}>
             <View style={styles.pModalIconCircle}>
               <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
             </View>
             <Text style={styles.pModalTitle}>Yêu cầu đăng nhập</Text>
-            <Text style={styles.pModalSub}>
-              Đăng nhập để sử dụng tính năng này
-            </Text>
+            <Text style={styles.pModalSub}>Đăng nhập để sử dụng tính năng này</Text>
 
             <View style={styles.pModalActionRow}>
               <TouchableOpacity
@@ -815,7 +813,7 @@ export default function CommunityScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setShowDeleteModal(false)}
       >
-        <View style={styles.pModalOverlay}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
           <View style={styles.pModalContent}>
             <View style={[styles.pModalIconCircle, { backgroundColor: '#FEF2F2', borderColor: '#FEE2E2' }]}>
               <Ionicons name="trash-outline" size={40} color="#EF4444" />
@@ -882,7 +880,7 @@ const styles = StyleSheet.create({
   leftActions: { flexDirection: 'row', alignItems: 'center', gap: 20 },
   actionItem: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   actionCount: { fontSize: 16, fontWeight: '700', color: '#1A1A1A' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 30, borderTopRightRadius: 30, overflow: 'hidden' },
   modalHeader: { alignItems: 'center', paddingVertical: 12 },
   modalHandle: { width: 40, height: 5, borderRadius: 3, backgroundColor: '#E0E0E0', marginBottom: 10 },
@@ -918,7 +916,7 @@ const styles = StyleSheet.create({
   attachAction: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0F7FF', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 22, gap: 8 },
   attachActionText: { fontSize: 14, fontWeight: '700', color: '#1877F2', marginRight: 2 },
   closeModalBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', borderRadius: 22, backgroundColor: '#FFF0F0' },
-  optionsOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  optionsOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)', justifyContent: 'flex-end' },
   optionsContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingHorizontal: 10, paddingBottom: 30 },
   optionsHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: 12 },
   optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: 4, paddingHorizontal: 25, width: '100%' },

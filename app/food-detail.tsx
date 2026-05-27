@@ -278,7 +278,7 @@ export default function FoodDetailScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setShowLoginModal(false)}
       >
-        <View style={styles.modalOverlay}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
           <View style={styles.modalContent}>
             <View style={styles.modalIconCircle}>
               <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
