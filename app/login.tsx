@@ -213,6 +213,24 @@ export default function LoginScreen() {
                 )}
               </LinearGradient>
             </TouchableOpacity>
+
+            {/* Social Login Footer */}
+            <View style={styles.socialFooter}>
+               <View style={styles.dividerBox}>
+                  <View style={styles.dividerLine} />
+                  <Text style={styles.dividerText}>Sử dụng tài khoản khác</Text>
+                  <View style={styles.dividerLine} />
+               </View>
+
+               <View style={styles.socialIconsRow}>
+                  <TouchableOpacity style={[styles.socialCircle, { backgroundColor: '#FF5A5F' }]}>
+                     <Ionicons name="logo-google" size={24} color="#FFF" />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.socialCircle, { backgroundColor: '#1877F2' }]}>
+                     <Ionicons name="logo-facebook" size={24} color="#FFF" />
+                  </TouchableOpacity>
+               </View>
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -246,7 +264,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFF' },
   fixedHeader: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 10, backgroundColor: '#FFF' },
-  scrollContent: { paddingHorizontal: 20, paddingTop: 100, paddingBottom: 40, backgroundColor: '#FFF' },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 40, paddingBottom: 40, backgroundColor: '#FFF' },
   headerTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
   titleText: { fontSize: 32, fontWeight: '900', color: '#0F172A', letterSpacing: -1 },
   registerLinkText: { fontSize: 16, color: '#64748B', fontWeight: '600', marginBottom: 4 },
@@ -273,6 +291,43 @@ const styles = StyleSheet.create({
   footer: { marginTop: 30, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
   footerText: { fontSize: 14, color: '#64748B', fontWeight: '500' },
   footerLink: { fontSize: 14, color: '#10B981', fontWeight: '700' },
+
+  socialFooter: {
+    marginTop: 40,
+    alignItems: 'center',
+  },
+  dividerBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 25,
+  },
+  dividerLine: {
+    height: 1,
+    backgroundColor: '#E2E8F0',
+    width: 60,
+  },
+  dividerText: {
+    fontSize: 13,
+    color: '#94A3B8',
+    fontWeight: '500',
+  },
+  socialIconsRow: {
+    flexDirection: 'row',
+    gap: 25,
+  },
+  socialCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
 
   // Toast Styles
   toastContainer: {
