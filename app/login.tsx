@@ -238,14 +238,14 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F8FAFC' },
-  fixedHeader: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 10, backgroundColor: '#F8FAFC' },
-  scrollContent: { paddingHorizontal: 20, paddingTop: 100, paddingBottom: 40, backgroundColor: '#F8FAFC' },
+  container: { flex: 1, backgroundColor: '#FFF' },
+  fixedHeader: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 10, backgroundColor: '#FFF' },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 100, paddingBottom: 40, backgroundColor: '#FFF' },
   headerTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
   titleText: { fontSize: 32, fontWeight: '900', color: '#0F172A', letterSpacing: -1 },
   registerLinkText: { fontSize: 16, color: '#64748B', fontWeight: '600', marginBottom: 4 },
 
-  card: { backgroundColor: '#FFF', borderRadius: 32, padding: 24 },
+  card: { backgroundColor: 'transparent', borderRadius: 32, padding: 24 },
 
   logoWrapper: { alignItems: 'center', marginBottom: 25 },
   logoImage: { width: 130, height: 130 },

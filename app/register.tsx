@@ -421,15 +421,15 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F8FAFC' },
-  fixedHeader: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 10, backgroundColor: '#F8FAFC' },
-  scrollContent: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 0, backgroundColor: '#F8FAFC' },
+  container: { flex: 1, backgroundColor: '#FFF' },
+  fixedHeader: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 10, backgroundColor: '#FFF' },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 0, backgroundColor: '#FFF' },
   backBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#FFF', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
   headerTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
   titleText: { fontSize: 32, fontWeight: '900', color: '#0F172A', letterSpacing: -1 },
   loginLinkText: { fontSize: 16, color: '#64748B', fontWeight: '600', marginBottom: 4 },
 
-  card: { backgroundColor: '#FFF', borderRadius: 32, padding: 24 },
+  card: { backgroundColor: 'transparent', borderRadius: 32, padding: 24 },
 
   avatarWrapper: { alignItems: 'center', marginBottom: 30 },
   avatarContainer: { width: 100, height: 100, padding: 4, borderRadius: 50, backgroundColor: '#FFF', borderWidth: 2, borderColor: '#F1F5F9', position: 'relative' },
