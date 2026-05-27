@@ -240,7 +240,7 @@ export default function SettingsScreen() {
               </TouchableOpacity>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.introScroll}>
+            <View style={styles.introScroll}>
 
               {/* App Identity */}
               <View style={styles.appIdentity}>
@@ -282,7 +282,7 @@ export default function SettingsScreen() {
                   <Text style={styles.introItemText}>Lâm Nhật Hào</Text>
                 </View>
               </View>
-            </ScrollView>
+            </View>
           </View>
         </View>
       </Modal>

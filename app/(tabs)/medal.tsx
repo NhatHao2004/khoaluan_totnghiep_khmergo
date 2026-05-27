@@ -135,7 +135,7 @@ export default function MedalScreen() {
                     {`${topThree[1].points} ${t('points')}`}
                   </Text>
                 </View>
-                <View style={[styles.podiumBase, { height: 135, backgroundColor: '#FFD700' }]}>
+                <View style={[styles.podiumBase, { height: 135, backgroundColor: '#ff0000ff' }]}>
                   <Text style={styles.podiumRank}>1</Text>
                 </View>
               </View>
@@ -158,7 +158,7 @@ export default function MedalScreen() {
                     {`${topThree[0].points} ${t('points')}`}
                   </Text>
                 </View>
-                <View style={[styles.podiumBase, { height: 100, backgroundColor: '#C0C0C0' }]}>
+                <View style={[styles.podiumBase, { height: 100, backgroundColor: '#FDD835' }]}>
                   <Text style={styles.podiumRank}>2</Text>
                 </View>
               </View>
@@ -181,7 +181,7 @@ export default function MedalScreen() {
                     {`${topThree[2].points} ${t('points')}`}
                   </Text>
                 </View>
-                <View style={[styles.podiumBase, { height: 65, backgroundColor: '#CD7F32' }]}>
+                <View style={[styles.podiumBase, { height: 65, backgroundColor: '#1ca900ff' }]}>
                   <Text style={styles.podiumRank}>3</Text>
                 </View>
               </View>
@@ -299,9 +299,9 @@ const styles = StyleSheet.create({
   },
 
   activeTab: {
-    backgroundColor: '#FFF',
-    boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
-    elevation: 2,
+    backgroundColor: '#008cffff',
+    boxShadow: '0px 4px 10px rgba(16, 185, 129, 0.2)',
+    elevation: 3,
   },
   tabText: {
     color: '#000000ff',
@@ -310,7 +310,8 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   activeTabText: {
-    color: '#1A1A1A',
+    color: '#FFFFFF',
+    fontWeight: '800',
     lineHeight: 20,
   },
 
