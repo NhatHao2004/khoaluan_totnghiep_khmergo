@@ -97,13 +97,13 @@ export default function RegisterScreen() {
     }
 
     if (password !== repeatPassword) {
-      Alert.alert(t('error'), t('pass_mismatch'));
+      triggerToast(t('pass_mismatch'), 'error');
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      Alert.alert(t('error'), t('pass_fields_required'));
+      triggerToast(t('pass_fields_required'), 'error');
       return;
     }
 
@@ -125,15 +125,14 @@ export default function RegisterScreen() {
         createdAt: new Date().toISOString(),
       });
 
-      Alert.alert(t('completed'), t('register_success'), [
-        { text: t('back'), onPress: () => router.replace('/(tabs)') }
-      ]);
+      triggerToast(t('register_success'), 'success');
+      setTimeout(() => router.replace('/(tabs)'), 2000);
     } catch (error: any) {
       let msg = t('update_failed');
       if (error.code === 'auth/email-already-in-use') {
         msg = t('email_in_use');
       }
-      Alert.alert(t('error'), msg);
+      triggerToast(msg, 'error');
     } finally {
       setLoading(false);
     }
