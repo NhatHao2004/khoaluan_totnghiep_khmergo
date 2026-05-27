@@ -220,7 +220,6 @@ export default function LoginScreen() {
             animatedToastStyle,
             {
               backgroundColor: toastType === 'success' || toastType === 'info' ? '#10B981' : '#EF4444',
-              shadowColor: toastType === 'success' || toastType === 'info' ? '#10B981' : '#EF4444',
             }
           ]}
         >
@@ -241,12 +240,12 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
   fixedHeader: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 10, backgroundColor: '#F8FAFC' },
-  scrollContent: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 40, backgroundColor: '#F8FAFC' },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 100, paddingBottom: 40, backgroundColor: '#F8FAFC' },
   headerTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
   titleText: { fontSize: 32, fontWeight: '900', color: '#0F172A', letterSpacing: -1 },
   registerLinkText: { fontSize: 16, color: '#64748B', fontWeight: '600', marginBottom: 4 },
 
-  card: { backgroundColor: '#FFF', borderRadius: 32, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.05, shadowRadius: 20, elevation: 5 },
+  card: { backgroundColor: '#FFF', borderRadius: 32, padding: 24 },
 
   logoWrapper: { alignItems: 'center', marginBottom: 25 },
   logoImage: { width: 130, height: 130 },
@@ -281,10 +280,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     zIndex: 9999,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 10,
   },
   toastIcon: {
     width: 32,
