@@ -474,7 +474,7 @@ export default function CommunityScreen() {
           </View>
           {isMyPost && (
             <TouchableOpacity onPress={() => handlePostOptions(item)} style={{ padding: 5 }}>
-              <Ionicons name="ellipsis-horizontal" size={20} color="#666" />
+              <Ionicons name="ellipsis-vertical" size={20} color="#666" />
             </TouchableOpacity>
           )}
         </View>
@@ -752,7 +752,6 @@ export default function CommunityScreen() {
       <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isOptionsModalVisible} onRequestClose={() => setOptionsModalVisible(false)}>
         <TouchableOpacity style={styles.optionsOverlay} activeOpacity={1} onPress={() => setOptionsModalVisible(false)}>
           <View style={[styles.optionsContent, { paddingBottom: insets.bottom + 10 }]}>
-            <View style={styles.optionsHandle} />
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleEditPost(selectedPost); }}>
               <View style={styles.optionIconContainer}><Ionicons name="create-outline" size={24} color="#0051ffff" /></View>
               <View><Text style={styles.optionText}>Chỉnh sửa bài viết</Text></View>
@@ -774,7 +773,7 @@ export default function CommunityScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setShowLoginModal(false)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+        <View style={styles.pModalOverlay}>
           <View style={styles.pModalContent}>
             <View style={styles.pModalIconCircle}>
               <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
@@ -812,7 +811,7 @@ export default function CommunityScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setShowDeleteModal(false)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+        <View style={styles.pModalOverlay}>
           <View style={styles.pModalContent}>
             <View style={[styles.pModalIconCircle, { backgroundColor: '#FEF2F2', borderColor: '#FEE2E2' }]}>
               <Ionicons name="trash-outline" size={40} color="#EF4444" />
@@ -879,7 +878,7 @@ const styles = StyleSheet.create({
   leftActions: { flexDirection: 'row', alignItems: 'center', gap: 20 },
   actionItem: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   actionCount: { fontSize: 16, fontWeight: '700', color: '#1A1A1A' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)', justifyContent: 'flex-end' },
+  modalOverlay: { flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 30, borderTopRightRadius: 30, overflow: 'hidden' },
   modalHeader: { alignItems: 'center', paddingVertical: 12 },
   modalHandle: { width: 40, height: 5, borderRadius: 3, backgroundColor: '#E0E0E0', marginBottom: 10 },
@@ -915,17 +914,17 @@ const styles = StyleSheet.create({
   attachAction: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0F7FF', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 22, gap: 8 },
   attachActionText: { fontSize: 14, fontWeight: '700', color: '#1877F2', marginRight: 2 },
   closeModalBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', borderRadius: 22, backgroundColor: '#FFF0F0' },
-  optionsOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.7)', justifyContent: 'flex-end' },
-  optionsContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingHorizontal: 10, paddingBottom: 30 },
+  optionsOverlay: { flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end' },
+  optionsContent: { backgroundColor: '#FFFFFF', borderRadius: 30, marginHorizontal: 15, marginBottom: 15, paddingHorizontal: 10, paddingTop: 20, paddingBottom: 5, shadowColor: '#000', shadowOffset: { width: 0, height: -10 }, shadowOpacity: 0.1, shadowRadius: 20, elevation: 20 },
   optionsHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: 12 },
-  optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: 4, paddingHorizontal: 25, width: '100%' },
+  optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: 2, paddingHorizontal: 25, width: '100%' },
   optionIconContainer: { width: 30, height: 40, justifyContent: 'center', alignItems: 'center', marginRight: 15 },
   optionText: { fontSize: 16, fontWeight: '600', color: '#1A1A1A' },
 
   // --- Premium Login Modal Styles (Unique Names to avoid conflict) ---
   pModalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
