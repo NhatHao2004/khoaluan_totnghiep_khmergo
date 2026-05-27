@@ -227,10 +227,8 @@ export default function ProfileScreen() {
         onRequestClose={() => setLogoutModalVisible(false)}
         statusBarTranslucent
       >
-        <TouchableOpacity
+        <View
           style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setLogoutModalVisible(false)}
         >
           <View style={styles.logoutContent}>
 
@@ -255,7 +253,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             </View>
           </View>
-        </TouchableOpacity>
+        </View>
       </Modal>
     </View>
   );
