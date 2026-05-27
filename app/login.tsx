@@ -93,18 +93,14 @@ export default function LoginScreen() {
       await signInWithEmailAndPassword(auth, email.trim(), password);
       await refreshUser();
 
-      triggerToast(t('login_success'), 'success');
-
-      setTimeout(() => {
-        if (returnTo) {
-          router.replace({
-            pathname: returnTo as any,
-            params: { ...(returnId ? { id: returnId } : {}), toast: 'login_success' }
-          });
-        } else {
-          router.replace({ pathname: '/(tabs)', params: { toast: 'login_success' } });
-        }
-      }, 1500);
+      if (returnTo) {
+        router.replace({
+          pathname: returnTo as any,
+          params: { ...(returnId ? { id: returnId } : {}), toast: 'login_success' }
+        });
+      } else {
+        router.replace({ pathname: '/(tabs)', params: { toast: 'login_success' } });
+      }
     } catch (error: any) {
       let msg = t('update_failed');
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
