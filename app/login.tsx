@@ -34,10 +34,10 @@ export default function LoginScreen() {
       if (returnTo) {
         router.replace({
           pathname: returnTo as any,
-          params: returnId ? { id: returnId } : {}
+          params: { ...(returnId ? { id: returnId } : {}), toast: 'login_success' }
         });
       } else {
-        router.replace('/(tabs)');
+        router.replace({ pathname: '/(tabs)', params: { toast: 'login_success' } });
       }
     } catch (error: any) {
       let msg = t('update_failed');

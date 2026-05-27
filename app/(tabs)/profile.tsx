@@ -42,6 +42,7 @@ export default function ProfileScreen() {
   const { t } = useLanguage();
   const [userRank, setUserRank] = useState<string | number>('---');
   const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const lastFetchTime = useRef<number>(0);
 
   const fetchRank = async (force = false) => {
@@ -82,8 +83,9 @@ export default function ProfileScreen() {
 
   const confirmLogout = async () => {
     setLogoutModalVisible(false);
+    setIsLoggingOut(true);
     await logout();
-    router.replace('/(tabs)');
+    router.replace({ pathname: '/(tabs)', params: { toast: 'logout_success' } });
   };
 
   const handleMenuPress = (id: string) => {
@@ -112,8 +114,8 @@ export default function ProfileScreen() {
 
   // Lọc các menu item dựa trên trạng thái đăng nhập
   const filteredMenuItems = menuItems.filter(item => {
-    if (item.id === 'logout') return !!user;
-    if (item.id === 'login') return !user;
+    if (item.id === 'logout') return !!user && !isLoggingOut;
+    if (item.id === 'login') return !user || isLoggingOut;
     return true;
   });
 
@@ -141,7 +143,7 @@ export default function ProfileScreen() {
 
             {/* Info */}
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>{user?.name || t('guest')}</Text>
+              <Text style={styles.profileName}>{(user && !isLoggingOut) ? user?.name : t('guest')}</Text>
             </View>
           </View>
         </Animated.View>
@@ -154,7 +156,7 @@ export default function ProfileScreen() {
               style={[
                 styles.menuItem,
                 index < filteredMenuItems.length - 1 && styles.menuItemBorder,
-                !user && item.id !== 'login' && { opacity: 0.5 }
+                (!user || isLoggingOut) && item.id !== 'login' && { opacity: 0.5 }
               ]}
               onPress={() => handleMenuPress(item.id)}
               activeOpacity={0.6}
@@ -162,19 +164,22 @@ export default function ProfileScreen() {
               <Ionicons
                 name={item.icon as any}
                 size={22}
-                color={item.color || '#555'}
+                color={((!user || isLoggingOut) && item.id !== 'login') ? '#94A3B8' : (item.color || '#555')}
                 style={[
                   styles.menuIcon,
                   item.id === 'login' && { marginLeft: 3, marginRight: 12 }
                 ]}
               />
-              <Text style={[styles.menuTitle, item.color ? { color: item.color } : {}]}>
+              <Text style={[
+                styles.menuTitle, 
+                ((!user || isLoggingOut) && item.id !== 'login') ? { color: '#94A3B8' } : (item.color ? { color: item.color } : {})
+              ]}>
                 {t(item.titleKey)}
               </Text>
               <Ionicons
                 name="chevron-forward"
                 size={18}
-                color={item.color || '#CCC'}
+                color={((!user || isLoggingOut) && item.id !== 'login') ? '#E2E8F0' : (item.color || '#CCC')}
               />
             </TouchableOpacity>
           ))}

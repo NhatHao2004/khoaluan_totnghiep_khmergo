@@ -4,35 +4,38 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { useRouter } from 'expo-router';
+import { Image } from 'expo-image';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { collection, onSnapshot, query } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Dimensions,
   Modal,
+  Platform,
   RefreshControl,
+  StyleSheet as RNStyleSheet,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
-  StyleSheet as RNStyleSheet,
 } from 'react-native';
-const StyleSheet = RNStyleSheet;
-import { Image } from 'expo-image';
 import Animated, {
   FadeInDown,
   FadeInRight,
+  interpolate,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
   withRepeat,
   withSequence,
+  withSpring,
   withTiming
 } from 'react-native-reanimated';
+const StyleSheet = RNStyleSheet;
 
-const { width } = Dimensions.get('window');
-const CATEGORY_CARD_WIDTH = (width - 32 - (3 * 8)) / 4; // Total width - padding - gaps
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const CATEGORY_CARD_WIDTH = (SCREEN_WIDTH - 40 - (3 * 8)) / 4; // 20px padding each side, 8px gaps between 4 cards
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -49,8 +52,41 @@ export default function HomeScreen() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
 
+  // Toast States
+  const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const toastY = useSharedValue(-120);
+
+  const triggerToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMsg(msg);
+    setToastType(type);
+    setShowToast(true);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    toastY.value = withTiming(Platform.OS === 'ios' ? 70 : 50, { duration: 400 });
+    
+    setTimeout(() => {
+      toastY.value = withTiming(-120, { duration: 400 });
+      setTimeout(() => setShowToast(false), 400);
+    }, 4000);
+  };
+
+  const params = useLocalSearchParams();
+  useLayoutEffect(() => {
+    const timer = setTimeout(() => {
+      if (params.toast === 'login_success') {
+        triggerToast(t('login_success'), 'success');
+        router.setParams({ toast: undefined });
+      } else if (params.toast === 'logout_success') {
+        triggerToast(t('logout_success'), 'info');
+        router.setParams({ toast: undefined });
+      }
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [params.toast]);
+
   // Slide animation for notifications
-  const slideX = useSharedValue(width);
+  const slideX = useSharedValue(SCREEN_WIDTH);
   const scrollY = useSharedValue(0);
 
 
@@ -204,6 +240,11 @@ export default function HomeScreen() {
     };
   });
 
+  const animatedToastStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: toastY.value }],
+    opacity: interpolate(toastY.value, [-120, 60], [0, 1]),
+  }));
+
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const deleteNotification = async (id: string) => {
@@ -219,7 +260,7 @@ export default function HomeScreen() {
 
   const closeNotifications = () => {
     setDeletingId(null); // Reset trạng thái xóa khi đóng
-    slideX.value = withTiming(width, { duration: 300 });
+    slideX.value = withTiming(SCREEN_WIDTH, { duration: 300 });
     setTimeout(() => setShowNotifications(false), 300);
   };
 
@@ -244,47 +285,72 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.userInfo}>
-          <TouchableOpacity
-            onPress={() => router.push('/(tabs)/profile' as any)}
-          >
-            {user?.avatar ? (
-              <Image source={{ uri: user.avatar as string }} style={styles.avatar} />
-            ) : (
-              <View style={styles.avatarPlaceholder}>
-                <Ionicons name="person-circle-outline" size={53} color="#000000ff" />
-              </View>
-            )}
-          </TouchableOpacity>
-          <View style={styles.welcomeText}>
-            <ThemedText style={styles.helloText}>{t('welcome_hello')}</ThemedText>
-            <ThemedText style={styles.userName} numberOfLines={1}>{user?.name || t('guest')}</ThemedText>
-          </View>
-        </View>
-        <TouchableOpacity
-          style={styles.notificationBtnSimple}
-          onPress={() => {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            setShowNotifications(true);
-            markAllAsRead(); // Đánh dấu đã đọc khi mở bảng thông báo
-            slideX.value = withTiming(0, { duration: 300 });
-          }}
+      {/* Premium Toast System - At the very top for priority */}
+      {showToast && (
+        <Animated.View 
+          style={[
+            styles.toastContainer, 
+            animatedToastStyle, 
+            { 
+              backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
+              shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
+            }
+          ]}
         >
-          <Animated.View style={animatedBellStyle}>
-            <Ionicons name="notifications-outline" size={30} color="#000" />
-            {unreadCount > 0 && (
-              <View style={styles.notificationBadge}>
-                <ThemedText style={styles.badgeText}>{unreadCount}</ThemedText>
-              </View>
-            )}
-          </Animated.View>
-        </TouchableOpacity>
-      </View>
+          <View style={styles.toastIcon}>
+            <Ionicons 
+              name={toastType === 'success' ? "checkmark" : "close"} 
+              size={20} 
+              color="#FFF" 
+            />
+          </View>
+          <Text style={styles.toastText}>{toastMsg}</Text>
+        </Animated.View>
+      )}
 
+      <Animated.View entering={FadeInDown.delay(100).duration(800)}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.userInfo}>
+            <TouchableOpacity
+              onPress={() => router.push('/(tabs)/profile' as any)}
+            >
+              {user?.avatar ? (
+                <Image source={{ uri: user.avatar as string }} style={styles.avatar} />
+              ) : (
+                <View style={styles.avatarPlaceholder}>
+                  <Ionicons name="person-circle-outline" size={53} color="#000000ff" />
+                </View>
+              )}
+            </TouchableOpacity>
+            <View style={styles.welcomeText}>
+              <ThemedText style={styles.helloText}>{t('welcome_hello')}</ThemedText>
+              <ThemedText style={styles.userName} numberOfLines={1}>{user?.name || t('guest')}</ThemedText>
+            </View>
+          </View>
+          <TouchableOpacity
+            style={styles.notificationBtnSimple}
+            onPress={() => {
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              setShowNotifications(true);
+              markAllAsRead(); // Đánh dấu đã đọc khi mở bảng thông báo
+              slideX.value = withTiming(0, { duration: 300 });
+            }}
+          >
+            <Animated.View style={animatedBellStyle}>
+              <Ionicons name="notifications-outline" size={30} color="#000" />
+              {unreadCount > 0 && (
+                <View style={styles.notificationBadge}>
+                  <ThemedText style={styles.badgeText}>{unreadCount}</ThemedText>
+                </View>
+              )}
+            </Animated.View>
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
 
-      <ScrollView
+      <Animated.View entering={FadeInDown.delay(700).duration(800)} style={{ flex: 1 }}>
+        <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 2 }}
@@ -299,7 +365,7 @@ export default function HomeScreen() {
         }
       >
         {/* Promo Banner */}
-        <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.promoBanner}>
+        <Animated.View entering={FadeInDown.delay(800).springify()} style={styles.promoBanner}>
           <Image
             source={require('@/assets/images/banner.png')}
             style={styles.promoImage}
@@ -308,27 +374,23 @@ export default function HomeScreen() {
         </Animated.View>
 
         {/* Categories Grid */}
-        <Animated.View entering={FadeInDown.delay(300)} style={styles.sectionHeader}>
+        <Animated.View entering={FadeInDown.delay(1000)} style={styles.sectionHeader}>
           <ThemedText style={styles.sectionTitle}>{t('explore_categories')}</ThemedText>
         </Animated.View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.scrollGridContainer}
-        >
+        <View style={styles.categoryGrid}>
           {services.map((item, index) => (
             <Animated.View
               key={item.id}
-              entering={FadeInDown.delay(100 + index * 40).duration(400)} // Faster & earlier
-              style={styles.gridItemScroll}
+              entering={FadeInDown.delay(1100 + index * 50).duration(500)} 
+              style={styles.categoryCol}
             >
               <TouchableOpacity
                 onPress={() => handleCategoryPress(item.route)}
                 style={styles.serviceCardMini}
               >
-                <Image 
-                  source={item.icon} 
+                <Image
+                  source={item.icon}
                   style={styles.serviceIconImage}
                   transition={200}
                   contentFit="contain"
@@ -337,10 +399,10 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </Animated.View>
           ))}
-        </ScrollView>
+        </View>
 
         {/* Featured List Header */}
-        <Animated.View entering={FadeInDown.delay(500)} style={[styles.sectionHeader, { paddingBottom: 10 }]}>
+        <Animated.View entering={FadeInDown.delay(900)} style={[styles.sectionHeader, { paddingBottom: 10 }]}>
           <ThemedText style={[styles.sectionTitle, { flex: 1, marginRight: 10 }]} numberOfLines={1}>
             {t('suggestions_for_you')}
           </ThemedText>
@@ -374,8 +436,8 @@ export default function HomeScreen() {
                 onPress={() => handleCategoryPress(item.route)}
               >
                 <View style={styles.cardImageContainer}>
-                  <Image 
-                    source={item.image} 
+                  <Image
+                    source={item.image}
                     style={styles.cardImage}
                     transition={300}
                     contentFit="cover"
@@ -402,6 +464,8 @@ export default function HomeScreen() {
           ))
         )}
       </ScrollView>
+
+      </Animated.View>
 
       {/* Notification Center Modal */}
       <Modal
@@ -516,6 +580,20 @@ const styles = RNStyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
     paddingTop: 40,
+  },
+  featuredCard: {
+    width: SCREEN_WIDTH - 32,
+    marginHorizontal: 16,
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+    shadowColor: '#1E293B',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
   },
   header: {
     flexDirection: 'row',
@@ -670,6 +748,11 @@ const styles = RNStyleSheet.create({
     paddingTop: 5,
     paddingBottom: 0,
   },
+  viewAllText: {
+    color: '#64748B',
+    fontSize: 13,
+    fontWeight: '600',
+  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '900',
@@ -677,59 +760,50 @@ const styles = RNStyleSheet.create({
     lineHeight: 30,
     paddingBottom: 0,
   },
-  viewAllText: {
-    color: '#64748B',
-    fontSize: 13,
-    fontWeight: '600',
+  categoryGrid: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    justifyContent: 'space-between',
+    marginBottom: 20,
   },
-  scrollGridContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 10,
-    gap: 8,
-  },
-  gridItemScroll: {
+  categoryCol: {
     width: CATEGORY_CARD_WIDTH,
-    padding: 2,
   },
   serviceCardMini: {
-    height: 110,
-    borderRadius: 20,
-    paddingHorizontal: 8,
+    backgroundColor: '#FFF',
+    borderRadius: 18,
     paddingVertical: 12,
-    justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#F1F5F9',
-    // Clean shadow instead of elevation
-    shadowColor: '#000',
+    shadowColor: '#1E293B',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#F8FAFC',
   },
-  iconGlassMini: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
+  iconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#F8FAFC',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
-    overflow: 'hidden',
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
   },
   serviceIconImage: {
-    width: 58,
-    height: 58,
+    width: 38,
+    height: 38,
     marginBottom: 8,
   },
   serviceLabelMini: {
-    fontSize: 9, // Slightly smaller to fit 4 cards perfectly
+    fontSize: 10,
     fontWeight: '800',
-    color: '#1E293B',
+    color: '#334155',
     textAlign: 'center',
-    lineHeight: 12,
+    lineHeight: 16,
     paddingHorizontal: 2,
   },
   iconContainer: {
@@ -765,18 +839,38 @@ const styles = RNStyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
   },
-  featuredCard: {
-    marginHorizontal: 16,
-    backgroundColor: '#FFF',
+  // Toast Styles
+  toastContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 20,
+    right: 20,
+    height: 56,
     borderRadius: 20,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#F1F5F9',
-    shadowColor: '#1E293B',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    zIndex: 9999,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  toastIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  toastText: {
+    color: '#FFF',
+    fontSize: 15,
+    fontWeight: '700',
+    marginLeft: 12,
+    flex: 1,
+    letterSpacing: 0.2,
   },
   cardImageContainer: {
     width: '100%',

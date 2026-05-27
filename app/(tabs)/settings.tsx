@@ -10,6 +10,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import {
   Image,
   Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,9 +18,11 @@ import {
   View
 } from 'react-native';
 import Animated, {
+  interpolate,
   interpolateColor,
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
   withTiming
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -31,6 +34,24 @@ export default function SettingsScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [chatButtonEnabled, setChatButtonEnabled] = useState(true);
   const [showIntro, setShowIntro] = useState(false);
+  
+  // Toast States
+  const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const toastY = useSharedValue(-120);
+
+  const triggerToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMsg(msg);
+    setToastType(type);
+    setShowToast(true);
+    toastY.value = withSpring(Platform.OS === 'ios' ? 70 : 50, { damping: 15, stiffness: 100 });
+    
+    setTimeout(() => {
+      toastY.value = withSpring(-120);
+      setTimeout(() => setShowToast(false), 500);
+    }, 4000);
+  };
 
   // Load notification setting
   useEffect(() => {
@@ -53,14 +74,17 @@ export default function SettingsScreen() {
 
     if (value) {
       await scheduleDaily7AMReminder();
+      triggerToast(t('notif_on'), 'success');
     } else {
       await Notifications.cancelAllScheduledNotificationsAsync();
+      triggerToast(t('notif_off'), 'info');
     }
   };
 
   const toggleChatButton = async (value: boolean) => {
     setChatButtonEnabled(value);
     await AsyncStorage.setItem('chat_button_enabled', value.toString());
+    triggerToast(value ? t('chat_on') : t('chat_off'), 'success');
   };
 
   const toggleAnim = useSharedValue(notificationsEnabled ? 1 : 0);
@@ -104,6 +128,11 @@ export default function SettingsScreen() {
     };
   });
 
+  const animatedToastStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: toastY.value }],
+    opacity: interpolate(toastY.value, [-120, 50], [0, 1]),
+  }));
+
 
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right']}>
@@ -125,7 +154,10 @@ export default function SettingsScreen() {
             <Text style={styles.cardTitle}>{t('language')}</Text>
             <TouchableOpacity
               style={[styles.optionItem, language === 'vi' && styles.activeOption]}
-              onPress={() => setLanguage('vi')}
+              onPress={() => {
+                setLanguage('vi');
+                triggerToast(t('lang_changed_vi'), 'success');
+              }}
             >
               <Text style={[styles.optionText, language === 'vi' && styles.activeOptionText]}>{t('vietnamese')}</Text>
               <Ionicons 
@@ -137,7 +169,10 @@ export default function SettingsScreen() {
             <View style={styles.divider} />
             <TouchableOpacity
               style={[styles.optionItem, language === 'km' && styles.activeOption]}
-              onPress={() => setLanguage('km')}
+              onPress={() => {
+                setLanguage('km');
+                triggerToast(t('lang_changed_km'), 'success');
+              }}
             >
               <Text style={[styles.optionText, language === 'km' && styles.activeOptionText]}>{t('khmer')}</Text>
               <Ionicons 
@@ -150,7 +185,7 @@ export default function SettingsScreen() {
         </View>
 
         {/* Thông báo */}
-        <View style={styles.section}>
+        <View style={[styles.section, !user && { opacity: 0.5 }]}>
           <View style={styles.card}>
             <Text style={styles.cardTitle}>{t('notif_settings')}</Text>
             <View style={styles.switchItem}>
@@ -160,7 +195,8 @@ export default function SettingsScreen() {
 
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={() => toggleNotifications(!notificationsEnabled)}
+                onPress={() => user && toggleNotifications(!notificationsEnabled)}
+                disabled={!user}
               >
                 <Animated.View style={[styles.customToggleTrack, animatedTrackStyle]}>
                   <Animated.View style={[styles.customToggleThumb, animatedThumbStyle]} />
@@ -272,6 +308,29 @@ export default function SettingsScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Premium Toast System */}
+      {showToast && (
+        <Animated.View 
+          style={[
+            styles.toastContainer, 
+            animatedToastStyle, 
+            { 
+              backgroundColor: toastType === 'success' || toastType === 'info' ? '#10B981' : '#EF4444',
+              shadowColor: toastType === 'success' || toastType === 'info' ? '#10B981' : '#EF4444',
+            }
+          ]}
+        >
+          <View style={styles.toastIcon}>
+            <Ionicons 
+              name={toastType === 'success' ? "checkmark" : "close"} 
+              size={20} 
+              color="#FFF" 
+            />
+          </View>
+          <Text style={styles.toastText}>{toastMsg}</Text>
+        </Animated.View>
+      )}
 
     </SafeAreaView>
   );
@@ -547,5 +606,38 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     textAlign: 'center',
     marginTop: 10,
-  }
+  },
+  // Toast Styles
+  toastContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 20,
+    right: 20,
+    height: 56,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    zIndex: 9999,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  toastIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  toastText: {
+    color: '#FFF',
+    fontSize: 15,
+    fontWeight: '700',
+    marginLeft: 12,
+    flex: 1,
+    letterSpacing: 0.2,
+  },
 });

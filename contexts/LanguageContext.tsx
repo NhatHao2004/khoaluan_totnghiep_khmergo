@@ -214,6 +214,15 @@ const translations = {
     cat_numbers: 'Số và cách đếm số',
     cat_family: 'Gia đình thân yêu',
     cat_food: 'Ẩm thực đặc sắc',
+    // Toast Messages
+    login_success: 'Đăng nhập tài khoản thành công',
+    logout_success: 'Tài khoản đã được đăng xuất',
+    notif_on: 'Đã bật nhắc nhở học tập',
+    notif_off: 'Đã tắt nhắc nhở học tập',
+    chat_on: 'Đã hiện nút trợ lý AI',
+    chat_off: 'Đã ẩn nút trợ lý AI',
+    lang_changed_vi: 'Đã chuyển sang tiếng Việt',
+    lang_changed_km: 'Đã chuyển sang tiếng Khmer',
   },
   km: {
     // Common
@@ -422,6 +431,15 @@ const translations = {
     cat_numbers: 'លេខ និងការរាប់',
     cat_family: 'គ្រួសារ និងការហៅទូរសព្ទ',
     cat_food: 'អាហារនិងភេសជ្ជៈ',
+    // Toast Messages
+    login_success: 'បានចូលដោយជោគជ័យ',
+    logout_success: 'បានចាកចេញពីគណនី',
+    notif_on: 'បានបើកការរំលឹកការសិក្សា',
+    notif_off: 'បានបិទការរំលឹកការសិក្សា',
+    chat_on: 'បានបង្ហាញប៊ូតុងជំនួយការ AI',
+    chat_off: 'បានលាក់ប៊ូតុងជំនួយការ AI',
+    lang_changed_vi: 'បានប្តូរទៅជាភាសាវៀតណាម',
+    lang_changed_km: 'បានប្តូរទៅជាភាសាខ្មែរ',
   }
 };
 

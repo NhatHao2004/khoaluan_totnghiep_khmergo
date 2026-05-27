@@ -422,6 +422,7 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: '800',
     opacity: 0.9,
+    lineHeight: 44, // Added for clipping
   },
   listContainer: {
     flex: 1,
@@ -438,7 +439,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F5F5F5',
   },
   listItemRankContainer: {
-    width: 19, // Reduced from 38
+    width: 25, // Increased from 19 to fit '10' better
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,
@@ -447,7 +448,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#1A1A1A',
-    lineHeight: 18,
+    lineHeight: 22, // Optimized for VN/Numbers
   },
 
   listItemAvatar: {

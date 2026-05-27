@@ -61,7 +61,7 @@ export default function PersonalInfoScreen() {
     setTimeout(() => {
       toastY.value = withSpring(-120);
       setTimeout(() => setShowToast(false), 500);
-    }, 3000);
+    }, 4000);
   };
 
   const animatedToastStyle = useAnimatedStyle(() => ({
@@ -474,6 +474,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     textAlign: 'center',
+    lineHeight: 26, // Optimized for VN
   },
   toastContainer: {
     position: 'absolute',
