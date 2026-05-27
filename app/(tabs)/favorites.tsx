@@ -102,7 +102,7 @@ export default function FavoritesScreen() {
               <Ionicons name="heart-dislike-outline" size={50} color="#FF4D4D" />
             </View>
             <Text style={styles.emptyTitle}>Chưa có mục yêu thích nào</Text>
-            <Text style={styles.emptySub}>Hãy khám phá và lưu lại những điều{'\n'}bạn yêu thích nhé.</Text>
+            <Text style={styles.emptySub}>Hãy khám phá và lưu lại những điều{'\n'}bạn yêu thích nhé</Text>
           </View>
         ) : (
           <View style={styles.listContainer}>
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 225,
+    paddingTop: 240,
     paddingHorizontal: 30,
   },
   emptyIconCircle: {

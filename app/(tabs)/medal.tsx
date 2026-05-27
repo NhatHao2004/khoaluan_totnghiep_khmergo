@@ -158,7 +158,7 @@ export default function MedalScreen() {
                     {`${topThree[0].points} ${t('points')}`}
                   </Text>
                 </View>
-                <View style={[styles.podiumBase, { height: 100, backgroundColor: '#FDD835' }]}>
+                <View style={[styles.podiumBase, { height: 100, backgroundColor: '#f8d330ff' }]}>
                   <Text style={styles.podiumRank}>2</Text>
                 </View>
               </View>
@@ -423,7 +423,10 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: '800',
     opacity: 0.9,
-    lineHeight: 44, // Added for clipping
+    lineHeight: 44,
+    textShadowColor: '#000',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   listContainer: {
     flex: 1,

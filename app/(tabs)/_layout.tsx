@@ -275,7 +275,7 @@ export default function TabsLayout() {
       </Tabs>
 
       {/* Floating AI Chat Button - Globally visible in tabs */}
-      {isChatEnabled && (
+      {isChatEnabled && ['/', '/index', '/community', '/quiz', '/profile'].includes(pathname) && (
         <GestureDetector gesture={gesture}>
           <Animated.View style={[styles.floatingChatBtn, animatedChatStyle]}>
             <TouchableOpacity
