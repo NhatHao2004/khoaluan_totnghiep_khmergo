@@ -7,7 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { collection, onSnapshot, query } from 'firebase/firestore';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dimensions,
   Modal,
@@ -403,7 +403,7 @@ export default function HomeScreen() {
           </View>
 
           {/* Featured List Header */}
-          <View style={[styles.sectionHeader, { paddingBottom: 10 }]}>
+          <View style={[styles.sectionHeader, { paddingBottom: 10, marginTop: 8 }]}>
             <ThemedText style={[styles.sectionTitle, { flex: 1, marginRight: 10 }]} numberOfLines={1}>
               {t('suggestions_for_you')}
             </ThemedText>
@@ -757,7 +757,8 @@ const styles = RNStyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 20,
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 0,
+    marginTop: 10,
   },
   categoryCol: {
     width: CATEGORY_CARD_WIDTH,
