@@ -5,11 +5,10 @@ import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import {
-  ActivityIndicator,
   Dimensions,
   Modal,
   Platform,
@@ -18,11 +17,9 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import Animated, {
-  FadeInDown,
-  FadeInRight,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
@@ -47,7 +44,6 @@ export default function HomeScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [routeIndex, setRouteIndex] = useState(0);
-  const [indexLoading, setIndexLoading] = useState(true);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -63,8 +59,12 @@ export default function HomeScreen() {
     setToastType(type);
     setShowToast(true);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    toastY.value = withTiming(Platform.OS === 'ios' ? 70 : 50, { duration: 400 });
-    
+    toastY.value = withSpring(Platform.OS === 'ios' ? 50 : 40, {
+      damping: 15,
+      stiffness: 120,
+      mass: 1,
+    });
+
     setTimeout(() => {
       toastY.value = withTiming(-120, { duration: 400 });
       setTimeout(() => setShowToast(false), 400);
@@ -72,18 +72,20 @@ export default function HomeScreen() {
   };
 
   const params = useLocalSearchParams();
-  useLayoutEffect(() => {
-    const timer = setTimeout(() => {
-      if (params.toast === 'login_success') {
-        triggerToast(t('login_success'), 'success');
-        router.setParams({ toast: undefined });
-      } else if (params.toast === 'logout_success') {
-        triggerToast(t('logout_success'), 'info');
-        router.setParams({ toast: undefined });
-      }
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, [params.toast]);
+  useEffect(() => {
+    if (!isLoading && params.toast) {
+      const timer = setTimeout(() => {
+        if (params.toast === 'login_success') {
+          triggerToast(t('login_success'), 'success');
+          router.setParams({ toast: undefined });
+        } else if (params.toast === 'logout_success') {
+          triggerToast(t('logout_success'), 'info');
+          router.setParams({ toast: undefined });
+        }
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, params.toast]);
 
   // Slide animation for notifications
   const slideX = useSharedValue(SCREEN_WIDTH);
@@ -242,7 +244,7 @@ export default function HomeScreen() {
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-120, 60], [0, 1]),
+    opacity: interpolate(toastY.value, [-100, 40], [0, 1], 'clamp'),
   }));
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -287,28 +289,28 @@ export default function HomeScreen() {
     <View style={styles.container}>
       {/* Premium Toast System - At the very top for priority */}
       {showToast && (
-        <Animated.View 
+        <Animated.View
           style={[
-            styles.toastContainer, 
-            animatedToastStyle, 
-            { 
+            styles.toastContainer,
+            animatedToastStyle,
+            {
               backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
               shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
             }
           ]}
         >
           <View style={styles.toastIcon}>
-            <Ionicons 
-              name={toastType === 'success' ? "checkmark" : "close"} 
-              size={20} 
-              color="#FFF" 
+            <Ionicons
+              name={toastType === 'success' ? "checkmark" : "close"}
+              size={20}
+              color="#FFF"
             />
           </View>
           <Text style={styles.toastText}>{toastMsg}</Text>
         </Animated.View>
       )}
 
-      <Animated.View entering={FadeInDown.delay(100).duration(800)}>
+      <View>
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.userInfo}>
@@ -347,88 +349,80 @@ export default function HomeScreen() {
             </Animated.View>
           </TouchableOpacity>
         </View>
-      </Animated.View>
+      </View>
 
-      <Animated.View entering={FadeInDown.delay(700).duration(800)} style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 2 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            progressViewOffset={50}
-            colors={['#FF0050']}
-            tintColor="#FF0050"
-          />
-        }
-      >
-        {/* Promo Banner */}
-        <Animated.View entering={FadeInDown.delay(800).springify()} style={styles.promoBanner}>
-          <Image
-            source={require('@/assets/images/banner.png')}
-            style={styles.promoImage}
-            resizeMode="cover"
-          />
-        </Animated.View>
-
-        {/* Categories Grid */}
-        <Animated.View entering={FadeInDown.delay(1000)} style={styles.sectionHeader}>
-          <ThemedText style={styles.sectionTitle}>{t('explore_categories')}</ThemedText>
-        </Animated.View>
-
-        <View style={styles.categoryGrid}>
-          {services.map((item, index) => (
-            <Animated.View
-              key={item.id}
-              entering={FadeInDown.delay(1100 + index * 50).duration(500)} 
-              style={styles.categoryCol}
-            >
-              <TouchableOpacity
-                onPress={() => handleCategoryPress(item.route)}
-                style={styles.serviceCardMini}
-              >
-                <Image
-                  source={item.icon}
-                  style={styles.serviceIconImage}
-                  transition={200}
-                  contentFit="contain"
-                />
-                <ThemedText style={styles.serviceLabelMini} numberOfLines={2}>{item.label}</ThemedText>
-              </TouchableOpacity>
-            </Animated.View>
-          ))}
-        </View>
-
-        {/* Featured List Header */}
-        <Animated.View entering={FadeInDown.delay(900)} style={[styles.sectionHeader, { paddingBottom: 10 }]}>
-          <ThemedText style={[styles.sectionTitle, { flex: 1, marginRight: 10 }]} numberOfLines={1}>
-            {t('suggestions_for_you')}
-          </ThemedText>
-          <TouchableOpacity
-            style={{ flexShrink: 0 }}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              const cyclicRoutes: any[] = ['/pagoda', '/culture', '/food'];
-              const route = cyclicRoutes[routeIndex % cyclicRoutes.length];
-              setRouteIndex(prev => prev + 1);
-              router.push(route);
-            }}
-          >
-            <ThemedText style={styles.viewAllText} numberOfLines={1}>{t('see_all')}</ThemedText>
-          </TouchableOpacity>
-        </Animated.View>
-
-        {isLoading && !refreshing ? (
-          <View style={styles.featuredLoader}>
-            <ActivityIndicator size="large" color="#FF0050" />
+          style={styles.content}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 2 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              progressViewOffset={50}
+              colors={['#FF0050']}
+              tintColor="#FF0050"
+            />
+          }
+        >
+          {/* Promo Banner */}
+          <View style={styles.promoBanner}>
+            <Image
+              source={require('@/assets/images/banner.png')}
+              style={styles.promoImage}
+              resizeMode="cover"
+            />
           </View>
-        ) : (
-          featuredDestinations.map((item, index) => (
-            <Animated.View
+
+          {/* Categories Grid */}
+          <View style={styles.sectionHeader}>
+            <ThemedText style={styles.sectionTitle}>{t('explore_categories')}</ThemedText>
+          </View>
+
+          <View style={styles.categoryGrid}>
+            {services.map((item, index) => (
+              <View
+                key={item.id}
+                style={styles.categoryCol}
+              >
+                <TouchableOpacity
+                  onPress={() => handleCategoryPress(item.route)}
+                  style={styles.serviceCardMini}
+                >
+                  <Image
+                    source={item.icon}
+                    style={styles.serviceIconImage}
+                    transition={200}
+                    contentFit="contain"
+                  />
+                  <ThemedText style={styles.serviceLabelMini} numberOfLines={2}>{item.label}</ThemedText>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+
+          {/* Featured List Header */}
+          <View style={[styles.sectionHeader, { paddingBottom: 10 }]}>
+            <ThemedText style={[styles.sectionTitle, { flex: 1, marginRight: 10 }]} numberOfLines={1}>
+              {t('suggestions_for_you')}
+            </ThemedText>
+            <TouchableOpacity
+              style={{ flexShrink: 0 }}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                const cyclicRoutes: any[] = ['/pagoda', '/culture', '/food'];
+                const route = cyclicRoutes[routeIndex % cyclicRoutes.length];
+                setRouteIndex(prev => prev + 1);
+                router.push(route);
+              }}
+            >
+              <ThemedText style={styles.viewAllText} numberOfLines={1}>{t('see_all')}</ThemedText>
+            </TouchableOpacity>
+          </View>
+          {featuredDestinations.map((item, index) => (
+            <View
               key={item.id}
-              entering={FadeInRight.delay(600 + index * 100).springify()}
               style={styles.featuredCard}
             >
               <TouchableOpacity
@@ -460,12 +454,11 @@ export default function HomeScreen() {
                   </View>
                 </View>
               </TouchableOpacity>
-            </Animated.View>
-          ))
-        )}
-      </ScrollView>
+            </View>
+          ))}
+        </ScrollView>
 
-      </Animated.View>
+      </View>
 
       {/* Notification Center Modal */}
       <Modal
