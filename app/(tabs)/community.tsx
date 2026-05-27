@@ -333,42 +333,47 @@ export default function CommunityScreen() {
   const submitComment = async () => {
     if (!user || !commentText.trim() || !activePostId) return;
     setIsAddingComment(true);
+    const currentComment = commentText.trim();
+    
+    // Reset input immediately for perceived speed
+    setCommentText('');
+    setReplyToId(null);
+    setReplyToName(null);
+    setReplyToUserId(null);
+    Keyboard.dismiss();
+
     try {
       const commentData = {
         userId: user.uid,
         user: user.name || 'Người dùng',
         avatar: user.avatar || 'https://i.pravatar.cc/150?u=me',
-        text: commentText.trim(),
+        text: currentComment,
         parentId: replyToId || null,
         createdAt: Firestore.serverTimestamp()
       };
 
-      await Firestore.addDoc(Firestore.collection(db, 'posts', activePostId, 'comments'), commentData);
+      // Run Firestore updates in parallel
+      await Promise.all([
+        Firestore.addDoc(Firestore.collection(db, 'posts', activePostId, 'comments'), commentData),
+        Firestore.updateDoc(Firestore.doc(db, 'posts', activePostId), {
+          comments: Firestore.increment(1)
+        })
+      ]);
 
-      await Firestore.updateDoc(Firestore.doc(db, 'posts', activePostId), {
-        comments: Firestore.increment(1)
-      });
-
-      // Thông báo cho chủ bài viết
+      // Background notification logic
       const postSnap = await Firestore.getDoc(Firestore.doc(db, 'posts', activePostId));
       if (postSnap.exists()) {
         const postData = postSnap.data();
         if (replyToId && replyToUserId) {
-          // Nếu là trả lời comment: Thông báo cho người bị trả lời
-          sendNotification(replyToUserId, 'reply', activePostId, `đã trả lời bình luận của bạn: "${commentText.trim().substring(0, 30)}..."`);
+          sendNotification(replyToUserId, 'reply', activePostId, `đã trả lời bình luận của bạn: "${currentComment.substring(0, 30)}..."`);
         } else {
-          // Nếu là bình luận mới: Thông báo cho chủ bài viết
-          sendNotification(postData.userId, 'comment', activePostId, `đã bình luận bài viết của bạn: "${commentText.trim().substring(0, 30)}..."`);
+          sendNotification(postData.userId, 'comment', activePostId, `đã bình luận bài viết của bạn: "${currentComment.substring(0, 30)}..."`);
         }
       }
-
-      setCommentText('');
-      setReplyToId(null);
-      setReplyToName(null);
-      setReplyToUserId(null);
-      Keyboard.dismiss();
     } catch (error) {
       triggerToast("Lỗi gửi bình luận", "error");
+      // Re-set text if error so user doesn't lose it
+      setCommentText(currentComment);
     } finally {
       setIsAddingComment(false);
     }
@@ -588,7 +593,11 @@ export default function CommunityScreen() {
               </View>
             </View>
 
-            <ScrollView style={styles.createPostContent} keyboardShouldPersistTaps="handled">
+            <ScrollView 
+              style={styles.createPostContent} 
+              contentContainerStyle={{ flexGrow: 1 }}
+              keyboardShouldPersistTaps="handled"
+            >
               <View style={styles.userInfoRow}>
                 <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.commentAvatar} />
                 <Text style={styles.userNameInModal}>{user?.name || 'Người dùng'}</Text>
@@ -603,7 +612,10 @@ export default function CommunityScreen() {
                 onChangeText={setCreatePostText}
                 scrollEnabled={false}
               />
-              {selectedImage && (
+              
+              <View style={{ flex: 1 }} />
+
+              {(selectedImage && keyboardHeight === 0) && (
                 <View style={styles.previewImageContainer}>
                   <Image
                     source={{ uri: selectedImage }}
@@ -616,27 +628,29 @@ export default function CommunityScreen() {
               )}
             </ScrollView>
 
-            <View style={[styles.createPostActions, { paddingBottom: insets.bottom + 5 }]}>
-              <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
-                <Ionicons name="image-outline" size={24} color="#1877F2" />
-                <Text style={styles.attachActionText}>Ảnh</Text>
-              </TouchableOpacity>
-              <View style={{ flex: 1 }} />
-              <TouchableOpacity
-                style={styles.closeModalBtn}
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setCreateModalVisible(false);
-                  setIsEditingPost(false);
-                  setEditingPostId(null);
-                  setCreatePostText('');
-                  setSelectedImage(null);
-                  setBase64Image(null);
-                }}
-              >
-                <Ionicons name="close" size={28} color="#FF3B30" />
-              </TouchableOpacity>
-            </View>
+            {keyboardHeight === 0 && (
+              <View style={[styles.createPostActions, { paddingBottom: insets.bottom + 5 }]}>
+                <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
+                  <Ionicons name="image-outline" size={24} color="#1877F2" />
+                  <Text style={styles.attachActionText}>Ảnh</Text>
+                </TouchableOpacity>
+                <View style={{ flex: 1 }} />
+                <TouchableOpacity
+                  style={styles.closeModalBtn}
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    setCreateModalVisible(false);
+                    setIsEditingPost(false);
+                    setEditingPostId(null);
+                    setCreatePostText('');
+                    setSelectedImage(null);
+                    setBase64Image(null);
+                  }}
+                >
+                  <Ionicons name="close" size={28} color="#FF3B30" />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </View>
       </Modal>
@@ -831,7 +845,7 @@ const styles = StyleSheet.create({
   userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20, paddingHorizontal: 20, paddingTop: 10 },
   userNameInModal: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', marginLeft: 12, paddingRight: 15, flex: 1 },
   createPostInput: { fontSize: 18, color: '#1A1A1A', textAlignVertical: 'top', flex: 1, minHeight: 150, paddingHorizontal: 20 },
-  previewImageContainer: { position: 'relative', marginBottom: 20, paddingHorizontal: 20 },
+  previewImageContainer: { position: 'relative', marginBottom: 12, paddingHorizontal: 20 },
   previewImage: { width: '100%', borderRadius: 20, backgroundColor: '#F0F0F0' },
   removeImageBtn: { position: 'absolute', top: 10, right: 30, backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 15 },
   createPostActions: { flexDirection: 'row', padding: 15, borderTopWidth: 1, borderTopColor: '#F0F0F0', alignItems: 'center', backgroundColor: '#FFFFFF' },
