@@ -3,11 +3,27 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { auth, db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  Dimensions,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function RegisterScreen() {
   const { t } = useLanguage();
@@ -35,14 +51,12 @@ export default function RegisterScreen() {
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.3, // Giảm chất lượng để base64 nhẹ hơn
-      base64: true, // Lấy luôn base64
+      allowsEditing: false,
+      quality: 0.3,
+      base64: true,
     });
 
     if (!result.canceled && result.assets[0].base64) {
-      // Lưu cả uri để hiển thị và base64 để upload
       setAvatarUri(`data:image/jpeg;base64,${result.assets[0].base64}`);
     }
   };
@@ -58,35 +72,30 @@ export default function RegisterScreen() {
       return;
     }
 
-    // Validate định dạng email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      Alert.alert(t('error'), t('pass_fields_required')); // Fallback
+      Alert.alert(t('error'), t('pass_fields_required'));
       return;
     }
 
     setLoading(true);
     try {
-      // 1. Create User in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
       const user = userCredential.user;
 
-      // 2. Xác định URL ảnh đại diện
       const avatarUrl = avatarUri
         ? avatarUri
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00CFA3&color=fff&size=128`;
 
-      // 3. Lưu thông tin vào Firestore
       await setDoc(doc(db, 'users', user.uid), {
         name: name.trim(),
         email: email.trim().toLowerCase(),
         avatar: avatarUrl,
         points: 0,
-        interests: selectedInterests, // Save selected interests
+        interests: selectedInterests,
         createdAt: new Date().toISOString(),
       });
 
-      // 4. Đăng ký thành công - vào app luôn
       Alert.alert(t('completed'), t('register_success'), [
         { text: t('back'), onPress: () => router.replace('/(tabs)') }
       ]);
@@ -102,430 +111,387 @@ export default function RegisterScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView
-        style={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1 }}
+    <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <View style={styles.innerContent}>
-          {/* Top Navigation */}
-          <View style={styles.topNav}>
-            <Text style={styles.navActive} numberOfLines={1}>{t('register_title')}</Text>
+        <View style={styles.fixedHeader}>
+          <View style={styles.headerTitleRow}>
+            <Text style={styles.titleText}>{t('register_title')}</Text>
             <TouchableOpacity onPress={() => router.replace('/login')}>
-              <Text style={styles.navInactive} numberOfLines={1}>{t('login_title')}</Text>
+              <Text style={styles.loginLinkText}>{t('login_title')}</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Camera Avatar Placeholder */}
-          <View style={styles.avatarWrapper}>
-            <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
-              <View style={styles.avatarInner}>
-                {avatarUri ? (
-                  <Image source={{ uri: avatarUri }} style={{ width: 90, height: 90, borderRadius: 45 }} />
-                ) : (
-                  <Ionicons name="camera" size={35} color="#D1D1D1" />
-                )}
-              </View>
-            </TouchableOpacity>
-          </View>
-
-          {/* Inputs */}
-          <View style={styles.formContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder={t('fullname_placeholder')}
-              placeholderTextColor="#C1C1C1"
-              value={name}
-              onChangeText={setName}
-              autoCapitalize="words"
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder={t('email_label')}
-              placeholderTextColor="#C1C1C1"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-            />
-
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder={t('password_label')}
-                placeholderTextColor="#C1C1C1"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <Ionicons name={showPassword ? "eye" : "eye-off"} size={20} color="#C1C1C1" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={[styles.passwordContainer, { marginTop: 20 }]}>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder={t('confirm_password_label')}
-                placeholderTextColor="#C1C1C1"
-                value={repeatPassword}
-                onChangeText={setRepeatPassword}
-                secureTextEntry={!showRepeatPassword}
-              />
-              <TouchableOpacity onPress={() => setShowRepeatPassword(!showRepeatPassword)}>
-                <Ionicons name={showRepeatPassword ? "eye" : "eye-off"} size={20} color="#C1C1C1" />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Interests Selection */}
-          <View style={styles.interestsContainer}>
-            <Text style={styles.interestsTitle}>{t('select_interests_title') || 'Chọn sở thích của bạn'}</Text>
-            <View style={styles.interestsGrid}>
-              {[
-                { id: 'Chùa', label: t('temple') },
-                { id: 'Văn hóa', label: t('culture') },
-                { id: 'Ẩm thực', label: t('food') }
-              ].map((item) => (
-                <TouchableOpacity
-                  key={item.id}
-                  style={[
-                    styles.interestChip,
-                    selectedInterests.includes(item.id) && styles.interestChipActive
-                  ]}
-                  onPress={() => toggleInterest(item.id)}
-                >
-                  <Text style={[
-                    styles.interestChipText,
-                    selectedInterests.includes(item.id) && styles.interestChipTextActive
-                  ]}>
-                    {item.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          {/* Register Button */}
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={handleRegister}
-            disabled={loading}
-          >
-            <Text style={styles.loginButtonText}>
-              {loading ? t('registering').toUpperCase() : t('register_account').toUpperCase()}
-            </Text>
-          </TouchableOpacity>
         </View>
 
-        {/* Footer Section - Bottom Gray */}
-        {/* Footer Section - Bottom Gray */}
-        <View style={styles.bottomSection}>
-          <TouchableOpacity onPress={() => setShowTerms(true)}>
-            <ThemedText style={styles.footerText}>{t('terms')}</ThemedText>
-          </TouchableOpacity>
-        </View>
-
-        {/* Terms of Service Modal */}
-        <Modal
-          visible={showTerms}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setShowTerms(false)}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          overScrollMode="never"
+          bounces={false}
+          contentContainerStyle={styles.scrollContent}
         >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <ThemedText style={styles.modalTitle}>ĐIỀU KHOẢN DỊCH VỤ</ThemedText>
+          <View style={styles.card}>
+            {/* Avatar Picker */}
+            <View style={styles.avatarWrapper}>
+              <TouchableOpacity style={styles.avatarContainer} onPress={pickImage} activeOpacity={0.8}>
+                <View style={styles.avatarInner}>
+                  {avatarUri ? (
+                    <Image source={{ uri: avatarUri }} style={styles.avatarImg} />
+                  ) : (
+                    <LinearGradient
+                      colors={['#F1F5F9', '#E2E8F0']}
+                      style={styles.avatarPlaceholder}
+                    >
+                      <Ionicons name="camera" size={32} color="#94A3B8" />
+                    </LinearGradient>
+                  )}
+                </View>
+                <View style={styles.addBtnSmall}>
+                  <Ionicons name="add" size={16} color="#FFF" />
+                </View>
+              </TouchableOpacity>
+              <Text style={styles.avatarHint}>Thêm ảnh đại diện</Text>
+            </View>
+
+            {/* Form */}
+            <View style={styles.form}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>{t('fullname_label') || 'Họ và tên'}</Text>
+                <View style={styles.inputWrapper}>
+                  <Ionicons name="person-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t('fullname_placeholder')}
+                    placeholderTextColor="#CBD5E1"
+                    value={name}
+                    onChangeText={setName}
+                  />
+                </View>
               </View>
 
-              <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
-                <ThemedText style={styles.termsText}>
-                  Chào mừng bạn đến với ứng dụng KhmerGo. Khi sử dụng ứng dụng, bạn đồng ý với các điều khoản và điều kiện sau:{"\n\n"}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Email</Text>
+                <View style={styles.inputWrapper}>
+                  <Ionicons name="mail-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="example@email.com"
+                    placeholderTextColor="#CBD5E1"
+                    value={email}
+                    onChangeText={setEmail}
+                    autoCapitalize="none"
+                    keyboardType="email-address"
+                  />
+                </View>
+              </View>
 
-                  <Text style={styles.termsBold}>1. Mục đích sử dụng:</Text>{" "}
-                  KhmerGo được phát triển nhằm hỗ trợ tìm hiểu, học tập và quảng bá văn hóa, lịch sử, đời sống và bản sắc của người Khmer Nam Bộ.{"\n\n"}
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>{t('password_label')}</Text>
+                <View style={styles.inputWrapper}>
+                  <Ionicons name="lock-closed-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="••••••••"
+                    placeholderTextColor="#CBD5E1"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                  />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color="#94A3B8" />
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-                  <Text style={styles.termsBold}>2. Trách nhiệm người dùng:</Text>{" "}
-                  Người dùng cam kết sử dụng ứng dụng đúng mục đích, không vi phạm pháp luật, không đăng tải nội dung phản cảm và luôn tôn trọng giá trị văn hóa cộng đồng Khmer.{"\n\n"}
-
-                  <Text style={styles.termsBold}>3. Quyền sở hữu nội dung:</Text>{" "}
-                  Toàn bộ hình ảnh, văn bản, dữ liệu và giao diện trên ứng dụng thuộc quyền sở hữu của nhóm phát triển hoặc được sử dụng hợp pháp. Nghiêm cấm sao chép hoặc sử dụng lại khi chưa được cho phép.{"\n\n"}
-
-                  <Text style={styles.termsBold}>4. Chính sách bảo mật:</Text>{" "}
-                  Ứng dụng có thể thu thập một số dữ liệu cơ bản như phiên bản hệ điều hành và thông tin sử dụng nhằm nâng cao trải nghiệm người dùng. Mọi thông tin đều được bảo mật theo quy định hiện hành.{"\n\n"}
-
-                  <Text style={styles.termsBold}>5. Giới hạn trách nhiệm:</Text>{" "}
-                  KhmerGo không chịu trách nhiệm đối với các sự cố phát sinh từ thiết bị, kết nối mạng hoặc việc sử dụng thông tin ngoài mục đích tham khảo và học tập.{"\n\n"}
-
-                  <Text style={styles.termsBold}>6. Chấm dứt quyền sử dụng:</Text>{" "}
-                  Chúng tôi có quyền tạm ngừng hoặc khóa tài khoản nếu phát hiện hành vi vi phạm điều khoản hoặc gây ảnh hưởng đến hệ thống và cộng đồng người dùng.{"\n\n"}
-
-                  <Text style={styles.termsBold}>7. Liên hệ hỗ trợ:</Text>{"\n"}
-                  {"    "}• Email:{" "}
-                  <Text style={{ color: '#1A73E8' }}>
-                    support@khmergoapp.vn
-                  </Text>{"\n"}
-                  {"    "}• Số điện thoại:{" "}
-                  <Text style={{ color: '#1A73E8' }}>
-                    0123 456 789
-                  </Text>
-                </ThemedText>
-              </ScrollView>
-              <TouchableOpacity
-                style={styles.acceptBtn}
-                onPress={() => setShowTerms(false)}
-              >
-                <Text style={styles.acceptBtnText}>ĐÃ HIỂU</Text>
-              </TouchableOpacity>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>{t('confirm_password_label')}</Text>
+                <View style={styles.inputWrapper}>
+                  <Ionicons name="shield-checkmark-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="••••••••"
+                    placeholderTextColor="#CBD5E1"
+                    value={repeatPassword}
+                    onChangeText={setRepeatPassword}
+                    secureTextEntry={!showRepeatPassword}
+                  />
+                  <TouchableOpacity onPress={() => setShowRepeatPassword(!showRepeatPassword)}>
+                    <Ionicons name={showRepeatPassword ? "eye-off-outline" : "eye-outline"} size={20} color="#94A3B8" />
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
+
+            {/* Interest Selection - Asymmetric Layout */}
+            <View style={styles.interestsBox}>
+              <Text style={styles.interestsHeader}>{t('select_interests_title') || 'Bạn quan tâm đến gì?'}</Text>
+              <View style={styles.interestsAsymmetricGrid}>
+                {/* Left Column: Big Card */}
+                <View style={styles.leftCol}>
+                  {[
+                    { id: 'Chùa', label: t('temple'), img: require('@/assets/images/pagoda.jpg'), color: '#F59E0B', bg: '#FFFFFF' }
+                  ].map((item) => {
+                    const isSelected = selectedInterests.includes(item.id);
+                    return (
+                      <TouchableOpacity
+                        key={item.id}
+                        style={[
+                          styles.interestCardBig,
+                          { backgroundColor: item.bg, borderColor: isSelected ? item.color : '#F1F5F9' }
+                        ]}
+                        onPress={() => toggleInterest(item.id)}
+                        activeOpacity={0.8}
+                      >
+                        <Text style={[styles.interestCardTextBig, { color: isSelected ? '#1E293B' : '#64748B' }]}>
+                          {item.label}
+                        </Text>
+                        <Image
+                          source={item.img}
+                          style={styles.interestImgBig}
+                          resizeMode="contain"
+                        />
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+
+                {/* Right Column: Two Small Cards */}
+                <View style={styles.rightCol}>
+                  {[
+                    { id: 'Văn hóa', label: t('culture'), img: require('@/assets/images/festival.jpg'), color: '#8B5CF6', bg: '#FFFFFF' },
+                    { id: 'Ẩm thực', label: t('food'), img: require('@/assets/images/amthuc.jpg'), color: '#EF4444', bg: '#FFFFFF' }
+                  ].map((item) => {
+                    const isSelected = selectedInterests.includes(item.id);
+                    return (
+                      <TouchableOpacity
+                        key={item.id}
+                        style={[
+                          styles.interestCardSmall,
+                          { backgroundColor: item.bg, borderColor: isSelected ? item.color : '#F1F5F9' }
+                        ]}
+                        onPress={() => toggleInterest(item.id)}
+                        activeOpacity={0.8}
+                      >
+                        <View style={styles.smallCardContent}>
+                          <Image
+                            source={item.img}
+                            style={styles.interestImgSmall}
+                            resizeMode="contain"
+                          />
+                          <Text style={[styles.interestCardTextSmall, { color: isSelected ? '#1E293B' : '#64748B' }]} numberOfLines={1}>
+                            {item.label}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            </View>
+
+            {/* Register Button */}
+            <TouchableOpacity
+              style={styles.mainBtn}
+              onPress={handleRegister}
+              disabled={loading}
+              activeOpacity={0.9}
+            >
+              <LinearGradient
+                colors={['#10B981', '#059669']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.btnGradient}
+              >
+                <Text style={styles.btnText}>
+                  {loading ? t('registering').toUpperCase() : t('register_account').toUpperCase()}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.footer} onPress={() => setShowTerms(true)}>
+              <Text style={styles.footerText}>{t('terms')}</Text>
+            </TouchableOpacity>
           </View>
-        </Modal>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+
+      {/* Terms Modal */}
+      <Modal visible={showTerms} animationType="fade" transparent onRequestClose={() => setShowTerms(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <ThemedText style={styles.modalTitle}>ĐIỀU KHOẢN DỊCH VỤ</ThemedText>
+            </View>
+
+            <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
+              <ThemedText style={styles.termsText}>
+                Chào mừng bạn đến với ứng dụng KhmerGo. Khi sử dụng ứng dụng, bạn đồng ý với các điều khoản và điều kiện sau:{"\n\n"}
+
+                <Text style={styles.termsBold}>1. Mục đích sử dụng:</Text>{" "}
+                KhmerGo được phát triển nhằm hỗ trợ tìm hiểu, học tập và quảng bá văn hóa, lịch sử, đời sống và bản sắc của người Khmer Nam Bộ.{"\n\n"}
+
+                <Text style={styles.termsBold}>2. Trách nhiệm người dùng:</Text>{" "}
+                Người dùng cam kết sử dụng ứng dụng đúng mục đích, không vi phạm pháp luật, không đăng tải nội dung phản cảm và luôn tôn trọng giá trị văn hóa cộng đồng Khmer.{"\n\n"}
+
+                <Text style={styles.termsBold}>3. Quyền sở hữu nội dung:</Text>{" "}
+                Toàn bộ hình ảnh, văn bản, dữ liệu và giao diện trên ứng dụng thuộc quyền sở hữu của nhóm phát triển hoặc được sử dụng hợp pháp. Nghiêm cấm sao chép hoặc sử dụng lại khi chưa được cho phép.{"\n\n"}
+
+                <Text style={styles.termsBold}>4. Chính sách bảo mật:</Text>{" "}
+                Ứng dụng có thể thu thập một số dữ liệu cơ bản như phiên bản hệ điều hành và thông tin sử dụng nhằm nâng cao trải nghiệm người dùng. Mọi thông tin đều được bảo mật theo quy định hiện hành.{"\n\n"}
+
+                <Text style={styles.termsBold}>5. Giới hạn trách nhiệm:</Text>{" "}
+                KhmerGo không chịu trách nhiệm đối với các sự cố phát sinh từ thiết bị, kết nối mạng hoặc việc sử dụng thông tin ngoài mục đích tham khảo và học tập.{"\n\n"}
+
+                <Text style={styles.termsBold}>6. Chấm dứt quyền sử dụng:</Text>{" "}
+                Chúng tôi có quyền tạm ngừng hoặc khóa tài khoản nếu phát hiện hành vi vi phạm điều khoản hoặc gây ảnh hưởng đến hệ thống và cộng đồng người dùng.{"\n\n"}
+
+                <Text style={styles.termsBold}>7. Liên hệ hỗ trợ:</Text>{"\n"}
+                {"    "}• Email:{" "}
+                <Text style={{ color: '#1A73E8' }}>
+                  support@khmergoapp.vn
+                </Text>{"\n"}
+                {"    "}• Số điện thoại:{" "}
+                <Text style={{ color: '#1A73E8' }}>
+                  0123 456 789
+                </Text>
+              </ThemedText>
+            </ScrollView>
+            <TouchableOpacity
+              style={styles.acceptBtn}
+              onPress={() => setShowTerms(false)}
+            >
+              <Text style={styles.acceptBtnText}>ĐÃ HIỂU</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  scrollContent: {
-    backgroundColor: '#FFFFFF',
-    flex: 1,
-  },
-  innerContent: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 30, // Reduced for more space
-    paddingTop: 80,
-    paddingBottom: 40,
-  },
-  topNav: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    justifyContent: 'space-between',
-    marginBottom: 50,
-    gap: 10,
-  },
-  navActive: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#000',
-    lineHeight: 38,  },
-  navInactive: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#B0B0B0',
-    lineHeight: 28, // Reduced
-  },
+  container: { flex: 1, backgroundColor: '#F8FAFC' },
+  fixedHeader: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 10, backgroundColor: '#F8FAFC' },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 0, backgroundColor: '#F8FAFC' },
+  backBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#FFF', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
+  headerTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
+  titleText: { fontSize: 32, fontWeight: '900', color: '#0F172A', letterSpacing: -1 },
+  loginLinkText: { fontSize: 16, color: '#64748B', fontWeight: '600', marginBottom: 4 },
 
-  avatarWrapper: {
-    alignItems: 'center',
-    marginBottom: 40,
+  card: { backgroundColor: '#FFF', borderRadius: 32, padding: 24 },
+
+  avatarWrapper: { alignItems: 'center', marginBottom: 30 },
+  avatarContainer: { width: 100, height: 100, padding: 4, borderRadius: 50, backgroundColor: '#FFF', borderWidth: 2, borderColor: '#F1F5F9', position: 'relative' },
+  avatarInner: { flex: 1, borderRadius: 46, overflow: 'hidden' },
+  avatarImg: { width: '100%', height: '100%', borderRadius: 46 },
+  avatarPlaceholder: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  addBtnSmall: { position: 'absolute', bottom: 0, right: 0, width: 28, height: 28, borderRadius: 14, backgroundColor: '#10B981', justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: '#FFF' },
+  avatarHint: { marginTop: 10, fontSize: 13, color: '#94A3B8', fontWeight: '600' },
+
+  form: { gap: 18, marginBottom: 25 },
+  inputGroup: { gap: 8 },
+  inputLabel: { fontSize: 14, fontWeight: '700', color: '#64748B', marginLeft: 4 },
+  inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: 16, paddingHorizontal: 16, height: 56, borderWidth: 1, borderColor: '#F1F5F9' },
+  inputIcon: { marginRight: 12 },
+  input: { flex: 1, fontSize: 16, color: '#1E293B', fontWeight: '600', paddingVertical: 10 },
+
+  interestsBox: { marginBottom: 20 },
+  interestsHeader: { fontSize: 14, fontWeight: '700', color: '#64748B', marginBottom: 12, marginLeft: 4 },
+  interestsAsymmetricGrid: {
+    flexDirection: 'row',
+    gap: 12,
+    height: 180,
   },
-  avatarContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: '#EAEAEA',
+  leftCol: {
+    flex: 1.2,
+  },
+  rightCol: {
+    flex: 1,
+    gap: 12,
+  },
+  interestCardBig: {
+    flex: 1,
+    borderRadius: 24,
+    borderWidth: 2,
+    padding: 16,
+    justifyContent: 'space-between',
+    position: 'relative',
+    backgroundColor: '#FFFFFF',
+  },
+  interestCardSmall: {
+    flex: 1,
+    borderRadius: 20,
+    borderWidth: 2,
+    padding: 12,
     justifyContent: 'center',
-    alignItems: 'center',
+    position: 'relative',
+    backgroundColor: '#FFFFFF',
   },
-  avatarInner: {
+  smallCardContent: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  interestImgBig: {
     width: 90,
     height: 90,
-    borderRadius: 45,
-    backgroundColor: '#F5F5F5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
+    borderRadius: 16,
+    alignSelf: 'center',
   },
-  formContainer: {
-    width: '100%',
-    marginBottom: 40,
+  interestImgSmall: {
+    width: 45,
+    height: 45,
+    borderRadius: 12,
   },
-  input: {
-    width: '100%',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EAEAEA',
-    paddingVertical: 18,
+  interestCardTextBig: {
     fontSize: 16,
-    color: '#333',
-    marginBottom: 20,
-    lineHeight: 24,
-    paddingRight: 5,
-  },
-
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EAEAEA',
-  },
-  passwordInput: {
-    flex: 1,
-    paddingVertical: 18,
-    fontSize: 16,
-    color: '#333',
-    lineHeight: 24,
-    paddingRight: 5,
-  },
-
-  loginButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#00CFA3',
-    width: '100%',
-    paddingVertical: 14,
-    minHeight: 60,
-    borderRadius: 30,
-    shadowColor: '#00CFA3',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 3,
-    marginBottom: 50,
-  },
-
-  loginButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: 1,
-    textAlign: 'center',
-    lineHeight: 24,
-    paddingHorizontal: 10,
-  },
-
-  bottomSection: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 35,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 'auto',
-  },
-  footerText: {
-    fontSize: 12,
-    color: '#A0A0A0',
-    textDecorationLine: 'underline',
-  },
-  // Modal Styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modalContent: {
-    backgroundColor: '#FFFFFF',
-    width: '100%',
-    maxHeight: '80%',
-    borderRadius: 24,
-    padding: 24,
-    elevation: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 15,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-    paddingBottom: 15,
-  },
-  modalTitle: {
-    fontSize: 18,
     fontWeight: '900',
-    color: '#1E293B',
-    letterSpacing: 0.5,
     textAlign: 'center',
   },
-  closeBtn: {
-    padding: 5,
-  },
-  modalScroll: {
-    marginBottom: 15,
-  },
-  termsText: {
-    fontSize: 14,
-    lineHeight: 22,
-    color: '#475569',
-    textAlign: 'justify',
-  },
-  termsBold: {
+  interestCardTextSmall: {
+    fontSize: 12,
     fontWeight: '800',
-    color: '#0F172A',
-    fontSize: 15,
+    textAlign: 'center',
   },
-  acceptBtn: {
-    backgroundColor: '#00CFA3',
-    paddingVertical: 14,
-    borderRadius: 18,
+  checkBadgeBig: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#00CFA3',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    borderWidth: 2,
+    borderColor: '#FFF',
   },
-  acceptBtnText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '800',
-    letterSpacing: 1,
-    lineHeight: 24,
-    includeFontPadding: false,
+  checkBadgeSmall: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFF',
   },
-  interestsContainer: {
-    width: '100%',
-    marginBottom: 30,
-  },
-  interestsTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 15,
-  },
-  interestsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  interestChip: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: '#EAEAEA',
-    backgroundColor: '#FFF',
-  },
-  interestChipActive: {
-    borderColor: '#00CFA3',
-    backgroundColor: '#00CFA3',
-  },
-  interestChipText: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '600',
-  },
-  interestChipTextActive: {
-    color: '#FFF',
-    fontWeight: '700',
-  },
+
+  mainBtn: { borderRadius: 18, overflow: 'hidden' },
+  btnGradient: { height: 60, justifyContent: 'center', alignItems: 'center' },
+  btnText: { fontSize: 16, fontWeight: '800', color: '#FFF', letterSpacing: 1 },
+
+  footer: { marginTop: 20, alignItems: 'center' },
+  footerText: { fontSize: 13, color: '#94A3B8', textDecorationLine: 'underline' },
+
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(15, 23, 42, 0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalContent: { backgroundColor: '#FFF', width: '100%', borderRadius: 32, padding: 24 },
+  modalHeader: { paddingBottom: 15, borderBottomWidth: 1, borderBottomColor: '#F1F5F9' },
+  modalTitle: { fontSize: 18, fontWeight: '900', color: '#1E293B', textAlign: 'center' },
+  modalScroll: { marginVertical: 20, maxHeight: 400 },
+  termsText: { fontSize: 14, lineHeight: 22, color: '#475569', textAlign: 'justify' },
+  termsBold: { fontWeight: '800', color: '#0F172A' },
+  acceptBtn: { backgroundColor: '#1E293B', height: 56, borderRadius: 16, justifyContent: 'center', alignItems: 'center' },
+  acceptBtnText: { color: '#FFF', fontSize: 15, fontWeight: '800' },
 });

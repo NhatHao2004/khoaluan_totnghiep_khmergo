@@ -175,6 +175,8 @@ export const translations: any = {
     terms: 'Điều khoản dịch vụ',
     error_required: 'Vui lòng điền đầy đủ các trường',
     email_in_use: 'Email đã tồn tại hoặc đã được sử dụng bởi tài khoản khác',
+    fullname_label: 'Họ và tên',
+    select_interests_title: 'Bạn quan tâm đến gì?',
 
     // New Home & Pagoda Strings
     welcome_hello: 'Chào mừng 👋',
@@ -392,6 +394,8 @@ export const translations: any = {
     terms: 'លក្ខខណ្ឌសេវាកម្ម',
     error_required: 'សូមបំពេញព័ត៌មានឱ្យគ្រប់គ្រាន់',
     email_in_use: 'អ៊ីមែលនេះមានរួចហើយ ឬត្រូវបានប្រើប្រាស់ដោយគណនីផ្សេងទៀត',
+    fullname_label: 'ឈ្មោះពេញ',
+    select_interests_title: 'តើអ្នកចាប់អារម្មណ៍អ្វីខ្លះ?',
 
     // New Home & Pagoda Strings
     welcome_hello: 'សូមស្វាគមន៍ 👋',
