@@ -16,7 +16,14 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
+const CATEGORY_IMAGES = [
+  require('@/assets/images/giadinh.jpg'),
+  require('@/assets/images/monan.jpg'),
+  require('@/assets/images/chaohoi.jpg'),
+  require('@/assets/images/sodem.jpg'),
+];
 export default function LanguageStudyScreen() {
   const router = useRouter();
   const { t, language } = useLanguage();
@@ -203,14 +210,11 @@ export default function LanguageStudyScreen() {
                 >
                   <View style={styles.categoryImageContainer}>
                     <ExpoImage
-                      source={[
-                        require('@/assets/images/giadinh.jpg'),
-                        require('@/assets/images/monan.jpg'),
-                        require('@/assets/images/chaohoi.jpg'),
-                        require('@/assets/images/sodem.jpg'),
-                      ][index % 4]}
+                      source={CATEGORY_IMAGES[index % CATEGORY_IMAGES.length]}
                       style={styles.categoryCardImage}
                       contentFit="contain"
+                      priority="high"
+                      transition={200}
                     />
                   </View>
                   <View style={styles.categoryCardBody}>
