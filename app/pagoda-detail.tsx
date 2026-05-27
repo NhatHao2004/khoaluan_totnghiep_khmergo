@@ -8,7 +8,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Dimensions, Image, Linking, ScrollView,
+  Dimensions, Image, Linking, Modal, ScrollView,
   Share,
   StatusBar,
   StyleSheet, Text, TouchableOpacity, View
@@ -36,6 +36,7 @@ export default function PagodaDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const [activeTab, setActiveTab] = useState<'map' | 'quiz'>('map');
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -287,20 +288,7 @@ export default function PagodaDetailScreen() {
                   style={styles.quizStartBtn}
                   onPress={() => {
                     if (!user) {
-                      Alert.alert(
-                        t('login_required') || 'Yêu cầu đăng nhập',
-                        t('login_to_use') || 'Bạn cần đăng nhập để tham gia thử thách này',
-                        [
-                          { text: isKm ? 'បោះបង់' : 'Hủy', style: 'cancel' },
-                          {
-                            text: isKm ? 'ចូល' : 'Đăng nhập',
-                            onPress: () => router.push({
-                              pathname: '/login',
-                              params: { returnTo: '/pagoda-detail', returnId: id }
-                            })
-                          }
-                        ]
-                      );
+                      setShowLoginModal(true);
                       return;
                     }
 
@@ -323,6 +311,49 @@ export default function PagodaDetailScreen() {
           <View style={{ height: 20 }} />
         </View>
       </ScrollView>
+
+      {/* Custom Login Modal */}
+      <Modal
+        visible={showLoginModal}
+        transparent={true}
+        animationType="fade"
+        statusBarTranslucent={true}
+        onRequestClose={() => setShowLoginModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalIconCircle}>
+              <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
+            </View>
+            <Text style={styles.modalTitle}>{t('login_required') || 'Yêu cầu đăng nhập'}</Text>
+            <Text style={styles.modalSub}>
+              {t('login_to_use') || 'Bạn cần đăng nhập để tham gia thử thách này'}
+            </Text>
+            
+            <View style={styles.modalActionRow}>
+              <TouchableOpacity 
+                style={styles.modalPrimaryBtn}
+                onPress={() => {
+                  setShowLoginModal(false);
+                  router.push({
+                    pathname: '/login',
+                    params: { returnTo: '/pagoda-detail', returnId: id }
+                  });
+                }}
+              >
+                <Text style={styles.modalPrimaryBtnText}>{isKm ? 'ចូល' : 'Đăng nhập'}</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.modalSecondaryBtn}
+                onPress={() => setShowLoginModal(false)}
+              >
+                <Text style={styles.modalSecondaryBtnText}>{isKm ? 'បោះបង់' : 'Hủy'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -576,5 +607,87 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '800',
+  },
+
+  // --- Premium Modal Styles ---
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalContent: {
+    backgroundColor: '#FFF',
+    borderRadius: 32,
+    padding: 30,
+    width: '100%',
+    maxWidth: 340,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  modalIconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#EFF6FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#DBEAFE',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#1E293B',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalSub: {
+    fontSize: 15,
+    color: '#64748B',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  modalActionRow: {
+    width: '100%',
+    gap: 12,
+  },
+  modalPrimaryBtn: {
+    backgroundColor: '#3B82F6',
+    height: 56,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  modalPrimaryBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  modalSecondaryBtn: {
+    backgroundColor: '#EF4444',
+    height: 56,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  modalSecondaryBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });

@@ -44,6 +44,15 @@ export default function GameMCQScreen() {
   const [isShowingFeedback, setIsShowingFeedback] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // Check login on mount
+  useEffect(() => {
+    if (!user) {
+      const timer = setTimeout(() => setShowLoginModal(true), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [user]);
 
   // Fetch Dynamic Quiz Data
   useEffect(() => {
@@ -224,6 +233,36 @@ export default function GameMCQScreen() {
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator size="large" color="#FF6B2C" />
         <Text style={{ marginTop: 12, color: '#64748B' }}>Đang tải câu hỏi...</Text>
+      </View>
+    );
+  }
+
+  // ─────────────── GUEST VIEW ───────────────
+  if (!user) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 24 }]}>
+        <StatusBar barStyle="dark-content" />
+        <View style={styles.guestIconCircle}>
+          <Ionicons name="lock-closed" size={50} color="#3B82F6" />
+        </View>
+        <Text style={styles.guestTitle}>Yêu cầu đăng nhập</Text>
+        <Text style={styles.guestSub}>
+          Bạn cần đăng nhập để tham gia thử thách,{'\n'}lưu lại thành tích và tích luỹ điểm thưởng.
+        </Text>
+
+        <TouchableOpacity
+          style={[styles.guestPrimaryBtn, { backgroundColor: '#3B82F6' }]}
+          onPress={() => router.push('/login')}
+        >
+          <Text style={styles.guestPrimaryBtnText}>Đăng nhập ngay</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.guestSecondaryBtn}
+          onPress={() => router.back()}
+        >
+          <Text style={styles.guestSecondaryBtnText}>Để sau, quay lại</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -506,6 +545,44 @@ export default function GameMCQScreen() {
                 }}
               >
                 <Text style={styles.confirmExitBtnText}>Thoát</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Custom Login Modal */}
+      <Modal
+        visible={showLoginModal}
+        transparent={true}
+        animationType="fade"
+        statusBarTranslucent={true}
+        onRequestClose={() => setShowLoginModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.exitModalContent}>
+            <View style={[styles.exitIconCircle, { backgroundColor: '#EFF6FF', borderColor: '#DBEAFE' }]}>
+              <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
+            </View>
+            <Text style={styles.exitTitle}>Bạn chưa đăng nhập</Text>
+            <Text style={styles.exitSub}>Hãy đăng nhập để lưu lại thành tích{'\n'}và tích luỹ điểm thưởng nhé!</Text>
+            
+            <View style={styles.exitActionRow}>
+              <TouchableOpacity 
+                style={styles.stayBtn}
+                onPress={() => {
+                  setShowLoginModal(false);
+                  router.push('/login');
+                }}
+              >
+                <Text style={styles.stayBtnText}>Đăng nhập ngay</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.confirmExitBtn}
+                onPress={() => setShowLoginModal(false)}
+              >
+                <Text style={styles.confirmExitBtnText}>Để sau</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -978,6 +1055,66 @@ const styles = StyleSheet.create({
   },
   confirmExitBtnText: {
     color: '#FFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+
+  // --- Guest View Styles ---
+  guestIconCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#EFF6FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#DBEAFE',
+  },
+  guestTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#1E293B',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  guestSub: {
+    fontSize: 16,
+    color: '#64748B',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 40,
+    paddingHorizontal: 20,
+  },
+  guestPrimaryBtn: {
+    width: '100%',
+    height: 60,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  guestPrimaryBtnText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  guestSecondaryBtn: {
+    width: '100%',
+    height: 60,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+  },
+  guestSecondaryBtnText: {
+    color: '#64748B',
     fontSize: 16,
     fontWeight: '700',
   },
