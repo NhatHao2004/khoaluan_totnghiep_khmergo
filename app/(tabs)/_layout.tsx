@@ -40,11 +40,6 @@ export default function TabsLayout() {
       }
     };
     loadChatSetting();
-
-    if (pathname === '/') {
-      translateX.value = 0;
-      translateY.value = 0;
-    }
   }, [pathname]);
 
   // Position for draggable AI button
