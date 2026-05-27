@@ -21,7 +21,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming, interpolate } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import { analyzeImage, chatWithAI } from '../services/ai-service';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -244,7 +244,7 @@ export default function AIAssistantScreen() {
       } else if (response.isRecognized && response.rawResponse) {
         setResult({ title: "Phân tích từ AI", content: response.rawResponse });
       } else {
-        setResult({ title: "Vật thể không xác định", content: "AI chưa thể nhận diện được các đặc điểm của hiện vật này." });
+        setResult({ title: "Vật thể không xác định", content: "Hiện vật này hiện chưa khớp với dữ liệu nhận diện trong hệ thống KhmerGo AI. Vui lòng thử lại với hình ảnh rõ nét hơn hoặc góc chụp khác để AI có thể phân tích chính xác hơn." });
       }
     } catch (error) {
       setResult({ title: "Lỗi kết nối", content: "Vui lòng thử lại sau giây lát." });
