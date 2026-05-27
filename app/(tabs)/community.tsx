@@ -22,7 +22,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming, interpolate } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -112,7 +112,7 @@ export default function CommunityScreen() {
     setToastType(type as any);
     setShowToast(true);
     toastY.value = withTiming(Platform.OS === 'ios' ? 70 : 60, { duration: 400 });
-    
+
     setTimeout(() => {
       toastY.value = withTiming(-100, { duration: 400 });
       setTimeout(() => setShowToast(false), 400);
@@ -751,9 +751,9 @@ export default function CommunityScreen() {
       </Modal>
 
       {/* Post Options Bottom Sheet */}
-      <Modal animationType="slide" transparent={true} visible={isOptionsModalVisible} onRequestClose={() => setOptionsModalVisible(false)}>
+      <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isOptionsModalVisible} onRequestClose={() => setOptionsModalVisible(false)}>
         <TouchableOpacity style={styles.optionsOverlay} activeOpacity={1} onPress={() => setOptionsModalVisible(false)}>
-          <View style={styles.optionsContent}>
+          <View style={[styles.optionsContent, { paddingBottom: insets.bottom + 10 }]}>
             <View style={styles.optionsHandle} />
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleEditPost(selectedPost); }}>
               <View style={styles.optionIconContainer}><Ionicons name="create-outline" size={24} color="#0051ffff" /></View>
