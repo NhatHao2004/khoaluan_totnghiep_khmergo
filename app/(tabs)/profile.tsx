@@ -6,7 +6,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
-  Alert,
   Image,
   Modal,
   ScrollView,
@@ -42,6 +41,7 @@ export default function ProfileScreen() {
   const { t } = useLanguage();
   const [userRank, setUserRank] = useState<string | number>('---');
   const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [isLoginRequiredVisible, setLoginRequiredVisible] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const lastFetchTime = useRef<number>(0);
 
@@ -91,14 +91,7 @@ export default function ProfileScreen() {
   const handleMenuPress = (id: string) => {
     // Nếu chưa đăng nhập, chỉ cho phép nhấn vào 'login'
     if (!user && id !== 'login') {
-      Alert.alert(
-        t('login_required'),
-        t('login_to_use'),
-        [
-          { text: t('back'), style: 'cancel' },
-          { text: t('login'), onPress: () => router.push('/login') }
-        ]
-      );
+      setLoginRequiredVisible(true);
       return;
     }
 
@@ -171,7 +164,7 @@ export default function ProfileScreen() {
                 ]}
               />
               <Text style={[
-                styles.menuTitle, 
+                styles.menuTitle,
                 ((!user || isLoggingOut) && item.id !== 'login') ? { color: '#94A3B8' } : (item.color ? { color: item.color } : {})
               ]}>
                 {t(item.titleKey)}
@@ -187,6 +180,44 @@ export default function ProfileScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      {/* Custom Login Modal */}
+      <Modal
+        visible={isLoginRequiredVisible}
+        transparent={true}
+        animationType="fade"
+        statusBarTranslucent={true}
+        onRequestClose={() => setLoginRequiredVisible(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+          <View style={styles.loginModalContent}>
+            <View style={styles.loginModalIconCircle}>
+              <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
+            </View>
+            <Text style={styles.loginModalTitle}>{t('login_required')}</Text>
+            <Text style={styles.loginModalSub}>{t('login_to_use')}</Text>
+
+            <View style={styles.loginModalActionRow}>
+              <TouchableOpacity
+                style={styles.loginModalPrimaryBtn}
+                onPress={() => {
+                  setLoginRequiredVisible(false);
+                  router.push('/login');
+                }}
+              >
+                <Text style={styles.loginModalPrimaryBtnText}>{t('login_title')}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.loginModalSecondaryBtn}
+                onPress={() => setLoginRequiredVisible(false)}
+              >
+                <Text style={styles.loginModalSecondaryBtnText}>{t('back')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Logout Confirmation Bottom Sheet */}
       <Modal
@@ -441,6 +472,81 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '700',
-    lineHeight: 28, // Increased for VN accents
+    lineHeight: 28,
+  },
+
+  // Login Required Modal (centered card)
+  loginModalContent: {
+    backgroundColor: '#FFF',
+    borderRadius: 32,
+    padding: 30,
+    width: '100%',
+    maxWidth: 340,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  loginModalIconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#EFF6FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#DBEAFE',
+  },
+  loginModalTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#1E293B',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  loginModalSub: {
+    fontSize: 15,
+    color: '#64748B',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  loginModalActionRow: {
+    width: '100%',
+    gap: 12,
+  },
+  loginModalPrimaryBtn: {
+    backgroundColor: '#3B82F6',
+    height: 56,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  loginModalPrimaryBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  loginModalSecondaryBtn: {
+    backgroundColor: '#EF4444',
+    height: 56,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  loginModalSecondaryBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });
