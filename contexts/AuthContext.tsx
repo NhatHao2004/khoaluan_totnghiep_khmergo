@@ -12,6 +12,7 @@ export interface UserProfile {
   rank?: string;
   accuracy?: number;
   completedQuizzes?: number;
+  interests?: string[];
 }
 
 
@@ -49,6 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           rank: data.rank || 'Đồng',
           accuracy: data.accuracy ?? 0,
           completedQuizzes: data.completedQuizzes ?? 0,
+          interests: data.interests || [],
         });
 
       } else {

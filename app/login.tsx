@@ -150,16 +150,16 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: '700',
     color: '#000',
-    flexShrink: 1,
-    lineHeight: 38, // Slightly more room for accents
-    paddingRight: 5,
+    lineHeight: 40,
+    includeFontPadding: false,
+    paddingRight: 10,
   },
   navInactive: {
     fontSize: 18,
     fontWeight: '500',
     color: '#B0B0B0',
-    flexShrink: 1,
-    lineHeight: 28, // Slightly more room for accents
+    lineHeight: 28,
+    includeFontPadding: false,
     paddingRight: 5,
   },
 
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 16,
     color: '#333',
-    lineHeight: 22,
+    lineHeight: 24,
     paddingRight: 5,
   },
 
@@ -226,8 +226,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     letterSpacing: 1,
     textAlign: 'center',
-    lineHeight: 26, // Optimized for VN
-    paddingRight: 5,
+    lineHeight: 24,
+    paddingHorizontal: 10,
   },
 
 });

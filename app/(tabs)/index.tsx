@@ -117,7 +117,7 @@ export default function HomeScreen() {
     return require('@/assets/images/pagoda.jpg');
   };
 
-  const loadFeaturedData = () => {
+  const loadFeaturedData = (forceRandom = false) => {
     setIsLoading(true);
     const q = query(collection(db, 'destinations'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -147,16 +147,41 @@ export default function HomeScreen() {
         };
       });
 
-      // Group by category
+      // Group by category after processing all items
       const pagodas = allItems.filter(i => i.category === 'Chùa');
       const cultures = allItems.filter(i => i.category === 'Văn hóa');
       const foods = allItems.filter(i => i.category === 'Ẩm thực');
 
-      // Randomly pick one from each category
+      // Interest-based picking logic
       const featured: any[] = [];
-      if (pagodas.length > 0) featured.push(pagodas[Math.floor(Math.random() * pagodas.length)]);
-      if (cultures.length > 0) featured.push(cultures[Math.floor(Math.random() * cultures.length)]);
-      if (foods.length > 0) featured.push(foods[Math.floor(Math.random() * foods.length)]);
+      const userInterests: string[] = user?.interests || [];
+
+      const getRandom = (arr: any[], n: number) => {
+        const shuffled = [...arr].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, n);
+      };
+
+      if (userInterests.length > 0 && !forceRandom) {
+        if (userInterests.includes('Chùa') && userInterests.includes('Văn hóa') && userInterests.length === 2) {
+          featured.push(...getRandom(pagodas, 2));
+          featured.push(...getRandom(cultures, 1));
+        } else if (userInterests.length === 1) {
+          const cat = userInterests[0];
+          const pool = allItems.filter(i => i.category === cat);
+          featured.push(...getRandom(pool, 3));
+        } else {
+          // If 3 interests or other combinations, pick evenly
+          userInterests.forEach(cat => {
+            const pool = allItems.filter(i => i.category === cat);
+            featured.push(...getRandom(pool, 1));
+          });
+        }
+      } else {
+        // Default random pick (Guest, no interests, or Pull-to-refresh)
+        if (pagodas.length > 0) featured.push(pagodas[Math.floor(Math.random() * pagodas.length)]);
+        if (cultures.length > 0) featured.push(cultures[Math.floor(Math.random() * cultures.length)]);
+        if (foods.length > 0) featured.push(foods[Math.floor(Math.random() * foods.length)]);
+      }
 
       setFeaturedDestinations(featured);
       setIsLoading(false);
@@ -177,7 +202,7 @@ export default function HomeScreen() {
   const onRefresh = React.useCallback(() => {
     if (refreshing) return;
     setRefreshing(true);
-    loadFeaturedData();
+    loadFeaturedData(true); // Force random pick on refresh
   }, [language, t, refreshing]);
 
   useEffect(() => {

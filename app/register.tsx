@@ -22,6 +22,15 @@ export default function RegisterScreen() {
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+
+  const toggleInterest = (interest: string) => {
+    if (selectedInterests.includes(interest)) {
+      setSelectedInterests(selectedInterests.filter(i => i !== interest));
+    } else {
+      setSelectedInterests([...selectedInterests, interest]);
+    }
+  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -73,6 +82,7 @@ export default function RegisterScreen() {
         email: email.trim().toLowerCase(),
         avatar: avatarUrl,
         points: 0,
+        interests: selectedInterests, // Save selected interests
         createdAt: new Date().toISOString(),
       });
 
@@ -170,6 +180,34 @@ export default function RegisterScreen() {
               <TouchableOpacity onPress={() => setShowRepeatPassword(!showRepeatPassword)}>
                 <Ionicons name={showRepeatPassword ? "eye" : "eye-off"} size={20} color="#C1C1C1" />
               </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Interests Selection */}
+          <View style={styles.interestsContainer}>
+            <Text style={styles.interestsTitle}>{t('select_interests_title') || 'Chọn sở thích của bạn'}</Text>
+            <View style={styles.interestsGrid}>
+              {[
+                { id: 'Chùa', label: t('temple') },
+                { id: 'Văn hóa', label: t('culture') },
+                { id: 'Ẩm thực', label: t('food') }
+              ].map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={[
+                    styles.interestChip,
+                    selectedInterests.includes(item.id) && styles.interestChipActive
+                  ]}
+                  onPress={() => toggleInterest(item.id)}
+                >
+                  <Text style={[
+                    styles.interestChipText,
+                    selectedInterests.includes(item.id) && styles.interestChipTextActive
+                  ]}>
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
 
@@ -280,8 +318,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: '700',
     color: '#000',
-    lineHeight: 36, // Reduced 
-  },
+    lineHeight: 38,  },
   navInactive: {
     fontSize: 18,
     fontWeight: '500',
@@ -323,7 +360,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     marginBottom: 20,
-    lineHeight: 22,
+    lineHeight: 24,
+    paddingRight: 5,
   },
 
   passwordContainer: {
@@ -338,7 +376,8 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     fontSize: 16,
     color: '#333',
-    lineHeight: 22,
+    lineHeight: 24,
+    paddingRight: 5,
   },
 
   loginButton: {
@@ -364,7 +403,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     letterSpacing: 1,
     textAlign: 'center',
-    lineHeight: 26,
+    lineHeight: 24,
+    paddingHorizontal: 10,
   },
 
   bottomSection: {
@@ -449,7 +489,43 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '800',
     letterSpacing: 1,
-    lineHeight: 22,
+    lineHeight: 24,
     includeFontPadding: false,
+  },
+  interestsContainer: {
+    width: '100%',
+    marginBottom: 30,
+  },
+  interestsTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 15,
+  },
+  interestsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  interestChip: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#EAEAEA',
+    backgroundColor: '#FFF',
+  },
+  interestChipActive: {
+    borderColor: '#00CFA3',
+    backgroundColor: '#00CFA3',
+  },
+  interestChipText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '600',
+  },
+  interestChipTextActive: {
+    color: '#FFF',
+    fontWeight: '700',
   },
 });
