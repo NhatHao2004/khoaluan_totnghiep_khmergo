@@ -216,11 +216,11 @@ export default function AIAssistantScreen() {
     if (useCamera) {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== 'granted') return;
-      result = await ImagePicker.launchCameraAsync({ allowsEditing: true, aspect: [1, 1], quality: 1 });
+      result = await ImagePicker.launchCameraAsync({ allowsEditing: false, quality: 1 });
     } else {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') return;
-      result = await ImagePicker.launchImageLibraryAsync({ allowsEditing: true, aspect: [1, 1], quality: 1 });
+      result = await ImagePicker.launchImageLibraryAsync({ allowsEditing: false, quality: 1 });
     }
     if (!result.canceled) {
       setImage(result.assets[0].uri);

@@ -85,16 +85,11 @@ export default function GameMCQScreen() {
   const feedbackOpacity = useRef(new Animated.Value(0)).current;
   const feedbackScale = useRef(new Animated.Value(0.5)).current;
   const cardShake = useRef(new Animated.Value(0)).current;
+  const contentFade = useRef(new Animated.Value(1)).current;
+  const slideUp = useRef(new Animated.Value(0)).current;
 
   // Update progress bar
-  useEffect(() => {
-    if (phase !== 'question') return;
-    Animated.timing(progressAnim, {
-      toValue: (questionIndex + 1),
-      duration: 350,
-      useNativeDriver: false,
-    }).start();
-  }, [questionIndex, phase]);
+
 
   const shakeCard = useCallback(() => {
     Animated.sequence([
@@ -114,16 +109,34 @@ export default function GameMCQScreen() {
       Animated.spring(feedbackOpacity, { toValue: 1, useNativeDriver: true, tension: 50, friction: 7 }),
       Animated.spring(feedbackScale, { toValue: 1, useNativeDriver: true, tension: 50, friction: 7 }),
     ]).start();
-
-    setTimeout(() => {
-      Animated.parallel([
-        Animated.timing(feedbackOpacity, { toValue: 0, duration: 300, useNativeDriver: true }),
-        Animated.timing(feedbackScale, { toValue: 1.1, duration: 300, useNativeDriver: true }),
-      ]).start(() => {
-        setIsShowingFeedback(false);
-      });
-    }, 1500);
   }, []);
+
+  const moveToNextQuestion = () => {
+    // Tốc độ nhanh hơn (snappier)
+    Animated.parallel([
+      Animated.timing(feedbackOpacity, { toValue: 0, duration: 150, useNativeDriver: true }),
+      Animated.timing(feedbackScale, { toValue: 1.1, duration: 150, useNativeDriver: true }),
+      Animated.timing(contentFade, { toValue: 0, duration: 120, useNativeDriver: true }),
+      Animated.timing(slideUp, { toValue: 5, duration: 120, useNativeDriver: true }),
+    ]).start(() => {
+      setIsShowingFeedback(false);
+      setShowExplanation(false);
+
+      if (isLastQuestion) {
+        handleFinish(results);
+      } else {
+        setQuestionIndex(prev => prev + 1);
+        setSelectedOption(null);
+        setAnswerState('idle');
+        
+        slideUp.setValue(-8); // Giảm quãng đường trượt để nhanh hơn
+        Animated.parallel([
+          Animated.timing(contentFade, { toValue: 1, duration: 250, useNativeDriver: true }),
+          Animated.spring(slideUp, { toValue: 0, tension: 80, friction: 10, useNativeDriver: true }),
+        ]).start();
+      }
+    });
+  };
 
   const handleAnswer = (optionIndex: number) => {
     if (answerState !== 'idle' || !currentQuestion) return;
@@ -144,17 +157,12 @@ export default function GameMCQScreen() {
     }
     showFeedback();
 
-    // Auto advance after 2.5 seconds
-    setTimeout(() => {
-      setShowExplanation(false);
-      if (isLastQuestion) {
-        handleFinish(newResults);
-      } else {
-        setQuestionIndex(prev => prev + 1);
-        setSelectedOption(null);
-        setAnswerState('idle');
-      }
-    }, 2500);
+    // Chạy thanh tiến trình ngay khi trả lời xong câu hỏi đó
+    Animated.timing(progressAnim, {
+      toValue: (questionIndex + 1),
+      duration: 400,
+      useNativeDriver: false,
+    }).start();
   };
 
   const handleFinish = async (finalResults: boolean[]) => {
@@ -162,10 +170,17 @@ export default function GameMCQScreen() {
     setPhase('result');
     if (user && earnedTotal > 0) {
       setIsSaving(true);
+      setHasSaved(false);
       try {
         const actualCorrectCount = finalResults.filter(Boolean).length;
         const isPerfect = actualCorrectCount === TOTAL_QUESTIONS;
-        const added = await updateQuizScore(user.uid, pagodaId as string, earnedTotal, isPerfect);
+        
+        // Chạy song song: lưu điểm và đảm bảo hiện "Đang lưu" ít nhất 1.2s để UX mượt hơn
+        const [added] = await Promise.all([
+          updateQuizScore(user.uid, pagodaId as string, earnedTotal, isPerfect),
+          new Promise(resolve => setTimeout(resolve, 1200)) 
+        ]);
+
         setEarned(added);
         await refreshUser();
         setHasSaved(true);
@@ -178,7 +193,7 @@ export default function GameMCQScreen() {
   };
 
   const handleReplay = () => {
-    setPhase('intro');
+    setPhase('question');
     setQuestionIndex(0);
     setSelectedOption(null);
     setAnswerState('idle');
@@ -186,7 +201,11 @@ export default function GameMCQScreen() {
     setCorrectCount(0);
     setResults([]);
     setShowExplanation(false);
+    setHasSaved(false);
+    setIsSaving(false);
     progressAnim.setValue(0);
+    contentFade.setValue(1);
+    slideUp.setValue(0);
   };
 
   const getOptionStyle = (index: number) => {
@@ -338,90 +357,109 @@ export default function GameMCQScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Dot Indicators - Floating style */}
-        <View style={styles.modernDotRow}>
-          {quizData.questions.map((_, i) => (
-            <View
-              key={i}
-              style={[
-                styles.modernDot,
-                i < questionIndex
-                  ? results[i]
-                    ? styles.modernDotCorrect
-                    : styles.modernDotWrong
-                  : i === questionIndex
-                    ? [styles.modernDotActive, { backgroundColor: quizData.color }]
-                    : styles.modernDotEmpty,
-              ]}
-            />
-          ))}
-        </View>
+        <Animated.View style={{ 
+          opacity: contentFade,
+          transform: [{ translateY: slideUp }]
+        }}>
+          {/* Dot Indicators - Floating style */}
+          <View style={styles.modernDotRow}>
+            {quizData.questions.map((_, i) => (
+              <View
+                key={i}
+                style={[
+                  styles.modernDot,
+                  i < questionIndex
+                    ? results[i]
+                      ? styles.modernDotCorrect
+                      : styles.modernDotWrong
+                    : i === questionIndex
+                      ? [styles.modernDotActive, { backgroundColor: quizData.color }]
+                      : styles.modernDotEmpty,
+                ]}
+              />
+            ))}
+          </View>
 
-        {/* Question Area */}
-        <Animated.View
-          style={[styles.mainCard, { transform: [{ translateX: cardShake }] }]}
-        >
-          <Text style={styles.mainQuestionText}>
-            {currentQuestion?.question}
-          </Text>
+          {/* Question Area */}
+          <Animated.View
+            style={[styles.mainCard, { transform: [{ translateX: cardShake }] }]}
+          >
+            <Text style={styles.mainQuestionText}>
+              {currentQuestion?.question}
+            </Text>
+          </Animated.View>
+
+          {/* Options Area */}
+          <View style={styles.optionsArea}>
+            {currentQuestion?.options.map((option, index) => (
+              <TouchableOpacity
+                key={index}
+                style={getOptionStyle(index)}
+                activeOpacity={0.8}
+                onPress={() => handleAnswer(index)}
+                disabled={answerState !== 'idle'}
+              >
+                <View style={getOptionLetterStyle(index)}>
+                  {answerState !== 'idle' && index === currentQuestion?.correctIndex ? (
+                    <Ionicons name="checkmark" size={16} color="#FFF" />
+                  ) : answerState !== 'idle' && index === selectedOption && index !== currentQuestion.correctIndex ? (
+                    <Ionicons name="close" size={16} color="#FFF" />
+                  ) : (
+                    <Text style={[
+                      styles.optLetter,
+                      answerState !== 'idle' && index === currentQuestion.correctIndex ? { color: '#FFF' } : {}
+                    ]}>
+                      {String.fromCharCode(65 + index)}
+                    </Text>
+                  )}
+                </View>
+                <Text style={styles.optText}>{option}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </Animated.View>
-
-        {/* Options Area */}
-        <View style={styles.optionsArea}>
-          {currentQuestion?.options.map((option, index) => (
-            <TouchableOpacity
-              key={index}
-              style={getOptionStyle(index)}
-              activeOpacity={0.8}
-              onPress={() => handleAnswer(index)}
-              disabled={answerState !== 'idle'}
-            >
-              <View style={getOptionLetterStyle(index)}>
-                {answerState !== 'idle' && index === currentQuestion?.correctIndex ? (
-                  <Ionicons name="checkmark" size={16} color="#FFF" />
-                ) : answerState !== 'idle' && index === selectedOption && index !== currentQuestion.correctIndex ? (
-                  <Ionicons name="close" size={16} color="#FFF" />
-                ) : (
-                  <Text style={[
-                    styles.optLetter,
-                    answerState !== 'idle' && index === currentQuestion.correctIndex ? { color: '#FFF' } : {}
-                  ]}>
-                    {String.fromCharCode(65 + index)}
-                  </Text>
-                )}
-              </View>
-              <Text style={styles.optText}>{option}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
         <View style={{ height: 40 }} />
       </ScrollView>
 
-      {/* Modern Absolute Feedback Overlay */}
+      {/* Modern Absolute Feedback Overlay - Now with manual Tap to continue */}
       {isShowingFeedback && (
-        <Animated.View style={[
-          styles.modernFeedback,
-          answerState === 'wrong' && styles.modernFeedbackWrong,
-          {
-            opacity: feedbackOpacity,
-            transform: [{ scale: feedbackScale }]
-          }
-        ]}>
-          <Ionicons
-            name={answerState === 'correct' ? 'checkmark-circle' : 'close-circle'}
-            size={60}
-            color="#FFF"
-          />
-          <Text style={styles.modernFeedbackText}>
-            {answerState === 'correct' ? 'Chính xác' : 'Sai rồi'}
-          </Text>
-          {currentQuestion?.explanation && (
-            <Text style={[styles.modernFeedbackText, { fontSize: 16, fontWeight: '500', marginTop: 12, lineHeight: 20 }]}>
-              {currentQuestion.explanation}
-            </Text>
-          )}
-        </Animated.View>
+        <TouchableOpacity
+          activeOpacity={1}
+          style={StyleSheet.absoluteFill}
+          onPress={moveToNextQuestion}
+        >
+          <View style={styles.feedbackOverlay}>
+            <Animated.View style={[
+              styles.modernFeedback,
+              answerState === 'wrong' && styles.modernFeedbackWrong,
+              {
+                opacity: feedbackOpacity,
+                transform: [{ scale: feedbackScale }]
+              }
+            ]}>
+              <Ionicons
+                name={answerState === 'correct' ? 'checkmark-circle' : 'close-circle'}
+                size={60}
+                color="#FFF"
+              />
+              <Text style={styles.modernFeedbackText}>
+                {answerState === 'correct' ? 'Chính xác' : 'Sai rồi'}
+              </Text>
+
+              {currentQuestion?.explanation && (
+                <View style={styles.explanationContainer}>
+                  <Text style={styles.explanationText}>
+                    {currentQuestion.explanation}
+                  </Text>
+                </View>
+              )}
+
+              <View style={styles.tapToContinue}>
+                <Text style={styles.tapToContinueText}>Chạm để tiếp tục</Text>
+              </View>
+            </Animated.View>
+          </View>
+        </TouchableOpacity>
       )}
 
       {/* Floating Close Button at Bottom Right */}
@@ -674,12 +712,16 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
 
-  // ── FEEDBACK BANNER ──
+  // ── FEEDBACK OVERLAY ──
+  feedbackOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(30, 41, 59, 0.4)', // Subtle dark overlay
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
   modernFeedback: {
-    position: 'absolute',
-    top: '40%',
-    left: 40,
-    right: 40,
+    width: '100%',
     backgroundColor: '#22C55E',
     flexDirection: 'column',
     alignItems: 'center',
@@ -692,7 +734,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 25,
     elevation: 15,
-    zIndex: 1000,
   },
   modernFeedbackWrong: {
     backgroundColor: '#EF4444',
@@ -700,9 +741,50 @@ const styles = StyleSheet.create({
   },
   modernFeedbackText: {
     color: '#FFF',
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '900',
     textAlign: 'center',
+  },
+  explanationContainer: {
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    padding: 18,
+    borderRadius: 20,
+    marginTop: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  explanationText: {
+    color: '#1E293B',
+    fontSize: 15,
+    fontWeight: '600',
+    lineHeight: 22,
+    textAlign: 'justify',
+  },
+  tapToContinue: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 16,
+    backgroundColor: '#3B82F6', // Nền xanh nước biển
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  tapToContinueText: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 13,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
 
   // ── RESULT SCREEN ──
