@@ -14,7 +14,7 @@ export default function QuizScreen() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const router = useRouter();
-  const [userRank, setUserRank] = useState<string | number>('---');
+  const [userRank, setUserRank] = useState<string | number>('');
   const [quizLoading, setQuizLoading] = useState(true);
   const lastFetchTime = useRef<number>(0);
 
@@ -33,7 +33,7 @@ export default function QuizScreen() {
     }
 
     if (!user) {
-      if (userRank !== '---') setUserRank('---');
+      if (userRank !== '') setUserRank('');
       return;
     }
     try {
@@ -46,7 +46,7 @@ export default function QuizScreen() {
       lastFetchTime.current = Date.now();
     } catch (error) {
       console.log('Error fetching rank:', error);
-      if (userRank !== '---') setUserRank('---');
+      if (userRank !== '') setUserRank('');
     }
   };
 
