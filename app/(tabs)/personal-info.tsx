@@ -3,6 +3,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { auth, db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
 import { doc, updateDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
@@ -64,6 +65,31 @@ export default function PersonalInfoScreen() {
     }, 3000);
   };
 
+  const handleBack = () => {
+    // Reset state before leaving (optional but ensures "xóa sạch" feel)
+    if (user) {
+      setName(user.name || '');
+      setAvatarUri(user.avatar || null);
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    }
+    router.replace('/(tabs)/profile');
+  };
+
+  // Reset state to user data whenever the screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user) {
+        setName(user.name || '');
+        setAvatarUri(user.avatar || null);
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      }
+    }, [user])
+  );
+
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
     opacity: interpolate(toastY.value, [-120, 30], [0, 1]),
@@ -72,7 +98,7 @@ export default function PersonalInfoScreen() {
   const pickAvatar = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
-      allowsEditing: true,
+      allowsEditing: false,
       aspect: [1, 1],
       quality: 0.3,
       base64: true,
@@ -187,7 +213,7 @@ export default function PersonalInfoScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={styles.backBtn}>
+        <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={26} color="#000000ff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>{t('edit_profile')}</Text>

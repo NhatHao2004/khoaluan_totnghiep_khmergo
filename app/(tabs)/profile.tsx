@@ -194,6 +194,7 @@ export default function ProfileScreen() {
         transparent={true}
         visible={isLogoutModalVisible}
         onRequestClose={() => setLogoutModalVisible(false)}
+        statusBarTranslucent
       >
         <TouchableOpacity
           style={styles.modalOverlay}
@@ -366,18 +367,24 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   logoutContent: {
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingHorizontal: 25,
     paddingBottom: 40,
     paddingTop: 10,
+    // Add shadow for white sheet
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 20,
   },
   modalHandle: {
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#333',
+    backgroundColor: '#E5E7EB',
     alignSelf: 'center',
     marginBottom: 25,
   },
@@ -401,10 +408,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   logoutMsg: {
-    fontSize: 15,
-    color: '#999',
+    fontSize: 16,
+    color: '#1A1A1A',
     textAlign: 'center',
-    lineHeight: 24, // Increased for VN
+    lineHeight: 24,
+    fontWeight: '500',
   },
   logoutActionRow: {
     gap: 12,
