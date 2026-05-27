@@ -173,7 +173,7 @@ export const translations: any = {
     registering: 'Đang tạo tài khoản...',
     login_with: 'Đăng nhập bằng',
     terms: 'Điều khoản dịch vụ',
-    error_required: 'Vui lòng điền đầy đủ các trường',
+    error_required: 'Vui lòng điền đầy đủ thông tin',
     email_in_use: 'Email đã tồn tại hoặc đã được sử dụng bởi tài khoản khác',
     fullname_label: 'Họ và tên',
     select_interests_title: 'Bạn quan tâm đến gì?',

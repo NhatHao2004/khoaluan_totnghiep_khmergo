@@ -22,6 +22,12 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
+} from 'react-native-reanimated';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -39,6 +45,29 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+
+  // Toast States
+  const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const toastY = useSharedValue(-120);
+
+  const triggerToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMsg(msg);
+    setToastType(type);
+    setShowToast(true);
+    toastY.value = withTiming(Platform.OS === 'ios' ? 70 : 50, { duration: 400 });
+
+    setTimeout(() => {
+      toastY.value = withTiming(-120, { duration: 400 });
+      setTimeout(() => setShowToast(false), 400);
+    }, 3000);
+  };
+
+  const animatedToastStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: toastY.value }],
+    opacity: interpolate(toastY.value, [-120, 50], [0, 1]),
+  }));
 
   const toggleInterest = (interest: string) => {
     if (selectedInterests.includes(interest)) {
@@ -63,7 +92,7 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (!name || !email || !password || !repeatPassword) {
-      Alert.alert(t('error'), t('error_required'));
+      triggerToast(t('error_required'), 'error');
       return;
     }
 
@@ -366,6 +395,29 @@ export default function RegisterScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Premium Toast System */}
+      {showToast && (
+        <Animated.View
+          style={[
+            styles.toastContainer,
+            animatedToastStyle,
+            {
+              backgroundColor: toastType === 'success' || toastType === 'info' ? '#10B981' : '#EF4444',
+              shadowColor: toastType === 'success' || toastType === 'info' ? '#10B981' : '#EF4444',
+            }
+          ]}
+        >
+          <View style={styles.toastIcon}>
+            <Ionicons
+              name={toastType === 'success' ? "checkmark" : "close"}
+              size={20}
+              color="#FFF"
+            />
+          </View>
+          <Text style={styles.toastText}>{toastMsg}</Text>
+        </Animated.View>
+      )}
     </View>
   );
 }
@@ -494,4 +546,40 @@ const styles = StyleSheet.create({
   termsBold: { fontWeight: '800', color: '#0F172A' },
   acceptBtn: { backgroundColor: '#1E293B', height: 56, borderRadius: 16, justifyContent: 'center', alignItems: 'center' },
   acceptBtnText: { color: '#FFF', fontSize: 15, fontWeight: '800', lineHeight: 22, includeFontPadding: false },
+
+  // Toast Styles
+  toastContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 20,
+    right: 20,
+    height: 56,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    zIndex: 9999,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  toastIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  toastText: {
+    color: '#FFF',
+    fontSize: 15,
+    fontWeight: '700',
+    marginLeft: 12,
+    flex: 1,
+    letterSpacing: 0.2,
+    includeFontPadding: false,
+    lineHeight: 22,
+  },
 });
