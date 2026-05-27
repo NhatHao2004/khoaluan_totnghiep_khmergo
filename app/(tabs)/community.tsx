@@ -616,7 +616,7 @@ export default function CommunityScreen() {
               )}
             </ScrollView>
 
-            <View style={[styles.createPostActions, { marginBottom: -200, paddingBottom: 200 + 15 }]}>
+            <View style={[styles.createPostActions, { paddingBottom: insets.bottom + 5 }]}>
               <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
                 <Ionicons name="image-outline" size={24} color="#1877F2" />
                 <Text style={styles.attachActionText}>Ảnh</Text>
@@ -727,13 +727,7 @@ export default function CommunityScreen() {
               </View>
             )}
 
-            <View style={[
-              styles.commentInputContainer,
-              {
-                marginBottom: -200,
-                paddingBottom: 200 + 12
-              }
-            ]}>
+            <View style={[styles.commentInputContainer, { paddingBottom: insets.bottom + 12 }]}>
               <TextInput
                 ref={commentInputRef}
                 style={styles.commentInput}
