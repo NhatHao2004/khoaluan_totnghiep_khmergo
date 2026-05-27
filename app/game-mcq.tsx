@@ -4,9 +4,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Animated,
   Dimensions,
+  Modal,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -43,6 +43,7 @@ export default function GameMCQScreen() {
   const [earned, setEarned] = useState(0);
   const [isShowingFeedback, setIsShowingFeedback] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
 
   // Fetch Dynamic Quiz Data
   useEffect(() => {
@@ -112,30 +113,21 @@ export default function GameMCQScreen() {
   }, []);
 
   const moveToNextQuestion = () => {
-    // Tốc độ nhanh hơn (snappier)
-    Animated.parallel([
-      Animated.timing(feedbackOpacity, { toValue: 0, duration: 150, useNativeDriver: true }),
-      Animated.timing(feedbackScale, { toValue: 1.1, duration: 150, useNativeDriver: true }),
-      Animated.timing(contentFade, { toValue: 0, duration: 120, useNativeDriver: true }),
-      Animated.timing(slideUp, { toValue: 5, duration: 120, useNativeDriver: true }),
-    ]).start(() => {
-      setIsShowingFeedback(false);
-      setShowExplanation(false);
+    setIsShowingFeedback(false);
+    setShowExplanation(false);
 
-      if (isLastQuestion) {
-        handleFinish(results);
-      } else {
-        setQuestionIndex(prev => prev + 1);
-        setSelectedOption(null);
-        setAnswerState('idle');
-        
-        slideUp.setValue(-8); // Giảm quãng đường trượt để nhanh hơn
-        Animated.parallel([
-          Animated.timing(contentFade, { toValue: 1, duration: 250, useNativeDriver: true }),
-          Animated.spring(slideUp, { toValue: 0, tension: 80, friction: 10, useNativeDriver: true }),
-        ]).start();
-      }
-    });
+    if (isLastQuestion) {
+      handleFinish(results);
+    } else {
+      setQuestionIndex(prev => prev + 1);
+      setSelectedOption(null);
+      setAnswerState('idle');
+
+      // Reset these for the next round instantly
+      contentFade.setValue(1);
+      slideUp.setValue(0);
+      feedbackOpacity.setValue(0);
+    }
   };
 
   const handleAnswer = (optionIndex: number) => {
@@ -174,11 +166,11 @@ export default function GameMCQScreen() {
       try {
         const actualCorrectCount = finalResults.filter(Boolean).length;
         const isPerfect = actualCorrectCount === TOTAL_QUESTIONS;
-        
+
         // Chạy song song: lưu điểm và đảm bảo hiện "Đang lưu" ít nhất 1.2s để UX mượt hơn
         const [added] = await Promise.all([
           updateQuizScore(user.uid, pagodaId as string, earnedTotal, isPerfect),
-          new Promise(resolve => setTimeout(resolve, 1200)) 
+          new Promise(resolve => setTimeout(resolve, 1200))
         ]);
 
         setEarned(added);
@@ -357,7 +349,7 @@ export default function GameMCQScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Animated.View style={{ 
+        <Animated.View style={{
           opacity: contentFade,
           transform: [{ translateY: slideUp }]
         }}>
@@ -421,60 +413,104 @@ export default function GameMCQScreen() {
         <View style={{ height: 40 }} />
       </ScrollView>
 
-      {/* Modern Absolute Feedback Overlay - Now with manual Tap to continue */}
+      {/* New Bottom Feedback UI */}
       {isShowingFeedback && (
-        <TouchableOpacity
-          activeOpacity={1}
-          style={StyleSheet.absoluteFill}
-          onPress={moveToNextQuestion}
-        >
-          <View style={styles.feedbackOverlay}>
-            <Animated.View style={[
-              styles.modernFeedback,
-              answerState === 'wrong' && styles.modernFeedbackWrong,
-              {
-                opacity: feedbackOpacity,
-                transform: [{ scale: feedbackScale }]
-              }
-            ]}>
-              <Ionicons
-                name={answerState === 'correct' ? 'checkmark-circle' : 'close-circle'}
-                size={60}
-                color="#FFF"
-              />
-              <Text style={styles.modernFeedbackText}>
-                {answerState === 'correct' ? 'Chính xác' : 'Sai rồi'}
-              </Text>
-
-              {currentQuestion?.explanation && (
-                <View style={styles.explanationContainer}>
-                  <Text style={styles.explanationText}>
-                    {currentQuestion.explanation}
-                  </Text>
-                </View>
-              )}
-
-              <View style={styles.tapToContinue}>
-                <Text style={styles.tapToContinueText}>Chạm để tiếp tục</Text>
+        <View style={styles.feedbackBottomWrapper}>
+          <View style={[
+            styles.feedbackBottomCard,
+            answerState === 'wrong' && styles.feedbackBottomCardWrong,
+          ]}>
+            <View style={styles.feedbackHeaderRow}>
+              <View style={[styles.statusIconCircle, answerState === 'wrong' && styles.statusIconCircleWrong]}>
+                <Ionicons
+                  name={answerState === 'correct' ? 'checkmark' : 'close'}
+                  size={24}
+                  color="#FFF"
+                />
               </View>
-            </Animated.View>
+              <Text style={[styles.statusText, answerState === 'wrong' && styles.statusTextWrong]}>
+                {answerState === 'correct' ? 'Tuyệt vời' : 'Chưa chính xác'}
+              </Text>
+            </View>
+
+            {currentQuestion?.explanation && (
+              <ScrollView
+                style={styles.explScroll}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 10 }}
+              >
+                <Text style={[styles.explTextNew, answerState === 'wrong' && styles.explTextNewWrong]}>
+                  {currentQuestion.explanation}
+                </Text>
+              </ScrollView>
+            )}
+
+            <View style={styles.correctAnswerBox}>
+              <Text style={[styles.correctAnswerLabel, answerState === 'wrong' && styles.correctAnswerLabelWrong]}>
+                Đáp án đúng
+              </Text>
+              <Text style={[styles.correctAnswerText, answerState === 'wrong' && styles.correctAnswerTextWrong]}>
+                {currentQuestion?.options[currentQuestion.correctIndex]}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.nextBtnNew, answerState === 'wrong' && styles.nextBtnNewWrong]}
+              onPress={moveToNextQuestion}
+              activeOpacity={0.9}
+            >
+              <Text style={styles.nextBtnTextNew}>Tiếp tục</Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
+        </View>
       )}
 
       {/* Floating Close Button at Bottom Right */}
       <TouchableOpacity
-        onPress={() =>
-          Alert.alert('Thoát khỏi trò chơi', 'Tiến trình của bạn sẽ không được lưu', [
-            { text: 'Tiếp tục', style: 'cancel' },
-            { text: 'Thoát', style: 'destructive', onPress: () => router.back() },
-          ])
-        }
+        onPress={() => setShowExitModal(true)}
         style={styles.floatingCloseBtn}
         activeOpacity={0.8}
       >
         <Ionicons name="close" size={26} color="#FFF" />
       </TouchableOpacity>
+
+      {/* Custom Exit Modal */}
+      <Modal
+        visible={showExitModal}
+        transparent={true}
+        animationType="fade"
+        statusBarTranslucent={true}
+        onRequestClose={() => setShowExitModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.exitModalContent}>
+            <View style={styles.exitIconCircle}>
+              <Ionicons name="exit-outline" size={40} color="#EF4444" />
+            </View>
+            <Text style={styles.exitTitle}>Thoát khỏi trò chơi</Text>
+            <Text style={styles.exitSub}>Tiến trình hiện tại của bạn sẽ{'\n'}không được lưu lại</Text>
+
+            <View style={styles.exitActionRow}>
+              <TouchableOpacity
+                style={styles.stayBtn}
+                onPress={() => setShowExitModal(false)}
+              >
+                <Text style={styles.stayBtnText}>Tiếp tục chơi</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.confirmExitBtn}
+                onPress={() => {
+                  setShowExitModal(false);
+                  router.back();
+                }}
+              >
+                <Text style={styles.confirmExitBtnText}>Thoát</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -712,79 +748,119 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
 
-  // ── FEEDBACK OVERLAY ──
-  feedbackOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(30, 41, 59, 0.4)', // Subtle dark overlay
+  // --- New Bottom Feedback Styles ---
+  feedbackBottomWrapper: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(15, 23, 42, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
+    zIndex: 2000,
   },
-  modernFeedback: {
+  feedbackBottomCard: {
+    backgroundColor: '#F0FDF4',
+    borderRadius: 36,
     width: '100%',
+    maxWidth: 350,
+    padding: 30,
+    borderWidth: 2,
+    borderColor: '#DCFCE7',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.2,
+    shadowRadius: 30,
+    elevation: 20,
+  },
+  feedbackBottomCardWrong: {
+    backgroundColor: '#FEF2F2', // Light red
+    borderColor: '#FEE2E2',
+  },
+  feedbackHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 16,
+  },
+  statusIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#22C55E',
-    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  statusIconCircleWrong: {
+    backgroundColor: '#EF4444',
+  },
+  statusText: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#166534',
+  },
+  statusTextWrong: {
+    color: '#991B1B',
+  },
+  explScroll: {
+    maxHeight: 120,
+    marginBottom: 8,
+  },
+  explTextNew: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#166534',
+    fontWeight: '600',
+    textAlign: 'justify',
+  },
+  explTextNewWrong: {
+    color: '#991B1B',
+  },
+  nextBtnNew: {
+    backgroundColor: '#22C55E',
+    height: 60,
+    borderRadius: 20,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 30,
-    borderRadius: 30,
-    gap: 16,
+    gap: 10,
     shadowColor: '#22C55E',
-    shadowOffset: { width: 0, height: 15 },
-    shadowOpacity: 0.4,
-    shadowRadius: 25,
-    elevation: 15,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  modernFeedbackWrong: {
+  nextBtnNewWrong: {
     backgroundColor: '#EF4444',
     shadowColor: '#EF4444',
   },
-  modernFeedbackText: {
+  nextBtnTextNew: {
     color: '#FFF',
-    fontSize: 22,
-    fontWeight: '900',
-    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: '800',
   },
-  explanationContainer: {
+  correctAnswerBox: {
     width: '100%',
-    backgroundColor: '#FFFFFF',
-    padding: 18,
-    borderRadius: 20,
-    marginTop: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  explanationText: {
-    color: '#1E293B',
-    fontSize: 15,
-    fontWeight: '600',
-    lineHeight: 22,
-    textAlign: 'justify',
-  },
-  tapToContinue: {
-    flexDirection: 'row',
+    marginBottom: 20,
     alignItems: 'center',
-    gap: 8,
-    marginTop: 16,
-    backgroundColor: '#3B82F6', // Nền xanh nước biển
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 14,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
+    gap: 4,
   },
-  tapToContinueText: {
-    color: 'rgba(255,255,255,0.9)',
-    fontSize: 13,
-    fontWeight: '700',
+  correctAnswerLabel: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#166534',
     textTransform: 'uppercase',
     letterSpacing: 1,
+  },
+  correctAnswerLabelWrong: {
+    color: '#991B1B',
+  },
+  correctAnswerText: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#166534',
+    textAlign: 'center',
+  },
+  correctAnswerTextWrong: {
+    color: '#991B1B',
   },
 
   // ── RESULT SCREEN ──
@@ -827,4 +903,82 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   resultSecondaryBtnText: { color: '#64748B', fontSize: 14, fontWeight: '600', textAlign: 'center' },
+
+  // --- Modal Styles ---
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  exitModalContent: {
+    backgroundColor: '#FFF',
+    borderRadius: 30,
+    padding: 30,
+    width: '100%',
+    maxWidth: 340,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  exitIconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FEF2F2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#FEE2E2',
+    paddingLeft: 7,
+  },
+  exitTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#1E293B',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  exitSub: {
+    fontSize: 15,
+    color: '#64748B',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 25,
+  },
+  exitActionRow: {
+    width: '100%',
+    gap: 12,
+  },
+  stayBtn: {
+    backgroundColor: '#3B82F6',
+    height: 56,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  stayBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  confirmExitBtn: {
+    backgroundColor: '#EF4444',
+    height: 56,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  confirmExitBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
 });
