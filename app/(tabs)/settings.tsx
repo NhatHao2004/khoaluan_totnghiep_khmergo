@@ -19,7 +19,8 @@ import {
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
-  withSpring
+  useSharedValue,
+  withTiming
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -28,6 +29,7 @@ export default function SettingsScreen() {
   const { language, setLanguage, t } = useLanguage();
   const { user } = useContext(AuthContext);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [chatButtonEnabled, setChatButtonEnabled] = useState(true);
   const [showIntro, setShowIntro] = useState(false);
 
   // Load notification setting
@@ -36,6 +38,10 @@ export default function SettingsScreen() {
       const saved = await AsyncStorage.getItem('notifications_enabled');
       if (saved !== null) {
         setNotificationsEnabled(saved === 'true');
+      }
+      const savedChat = await AsyncStorage.getItem('chat_button_enabled');
+      if (savedChat !== null) {
+        setChatButtonEnabled(savedChat === 'true');
       }
     };
     loadSetting();
@@ -52,9 +58,25 @@ export default function SettingsScreen() {
     }
   };
 
+  const toggleChatButton = async (value: boolean) => {
+    setChatButtonEnabled(value);
+    await AsyncStorage.setItem('chat_button_enabled', value.toString());
+  };
+
+  const toggleAnim = useSharedValue(notificationsEnabled ? 1 : 0);
+  const chatToggleAnim = useSharedValue(chatButtonEnabled ? 1 : 0);
+
+  useEffect(() => {
+    toggleAnim.value = withTiming(notificationsEnabled ? 1 : 0, { duration: 250 });
+  }, [notificationsEnabled]);
+
+  useEffect(() => {
+    chatToggleAnim.value = withTiming(chatButtonEnabled ? 1 : 0, { duration: 250 });
+  }, [chatButtonEnabled]);
+
   const animatedTrackStyle = useAnimatedStyle(() => {
     const backgroundColor = interpolateColor(
-      notificationsEnabled ? 1 : 0,
+      toggleAnim.value,
       [0, 1],
       ['#CCCCCC', '#FF4B4B']
     );
@@ -63,13 +85,28 @@ export default function SettingsScreen() {
 
   const animatedThumbStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateX: withSpring(notificationsEnabled ? 20 : 0, { damping: 20 }) }],
+      transform: [{ translateX: toggleAnim.value * 20 }],
+    };
+  });
+
+  const animatedChatTrackStyle = useAnimatedStyle(() => {
+    const backgroundColor = interpolateColor(
+      chatToggleAnim.value,
+      [0, 1],
+      ['#CCCCCC', '#FF4B4B']
+    );
+    return { backgroundColor };
+  });
+
+  const animatedChatThumbStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: chatToggleAnim.value * 20 }],
     };
   });
 
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.container} edges={['left', 'right']}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={styles.backBtn}>
@@ -91,7 +128,11 @@ export default function SettingsScreen() {
               onPress={() => setLanguage('vi')}
             >
               <Text style={[styles.optionText, language === 'vi' && styles.activeOptionText]}>{t('vietnamese')}</Text>
-              {language === 'vi' && <Ionicons name="checkmark-circle" size={20} color="#ff0000ff" />}
+              <Ionicons 
+                name={language === 'vi' ? "checkmark-circle" : "ellipse-outline"} 
+                size={22} 
+                color={language === 'vi' ? "#FF4B4B" : "#CCCCCC"} 
+              />
             </TouchableOpacity>
             <View style={styles.divider} />
             <TouchableOpacity
@@ -99,7 +140,11 @@ export default function SettingsScreen() {
               onPress={() => setLanguage('km')}
             >
               <Text style={[styles.optionText, language === 'km' && styles.activeOptionText]}>{t('khmer')}</Text>
-              {language === 'km' && <Ionicons name="checkmark-circle" size={20} color="#ff0000ff" />}
+              <Ionicons 
+                name={language === 'km' ? "checkmark-circle" : "ellipse-outline"} 
+                size={22} 
+                color={language === 'km' ? "#FF4B4B" : "#CCCCCC"} 
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -119,6 +164,27 @@ export default function SettingsScreen() {
               >
                 <Animated.View style={[styles.customToggleTrack, animatedTrackStyle]}>
                   <Animated.View style={[styles.customToggleThumb, animatedThumbStyle]} />
+                </Animated.View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        {/* Trợ lý AI */}
+        <View style={styles.section}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>{t('assistant_settings')}</Text>
+            <View style={styles.switchItem}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.switchSubLabel}>{t('show_chat_button')}</Text>
+              </View>
+
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => toggleChatButton(!chatButtonEnabled)}
+              >
+                <Animated.View style={[styles.customToggleTrack, animatedChatTrackStyle]}>
+                  <Animated.View style={[styles.customToggleThumb, animatedChatThumbStyle]} />
                 </Animated.View>
               </TouchableOpacity>
             </View>
@@ -161,6 +227,7 @@ export default function SettingsScreen() {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.introScroll}>
+
               {/* App Identity */}
               <View style={styles.appIdentity}>
                 <Image source={require('@/assets/images/icon.png')} style={styles.appLogo} />
@@ -178,7 +245,7 @@ export default function SettingsScreen() {
                 <Text style={styles.introBullet}>• Chùa Khmer</Text>
                 <Text style={styles.introBullet}>• Lễ hội truyền thống</Text>
                 <Text style={styles.introBullet}>• Ẩm thực Khmer</Text>
-                <Text style={styles.introBullet}>• Nghệ thuật dân gia</Text>
+                <Text style={styles.introBullet}>• Văn hóa dân gian</Text>
                 <Text style={styles.introBullet}>• Ngôn ngữ và chữ viết Khmer</Text>
               </View>
 
@@ -192,19 +259,20 @@ export default function SettingsScreen() {
 
               {/* Team & Tech */}
               <View style={styles.introSection}>
-                <View style={styles.introDetailRow}>
-                  <Text style={styles.introSectionTitle}>Người phát triển: </Text>
-                  <Text style={styles.introItemText}>Lâm Nhật Hào</Text>
-                </View>
                 <View style={[styles.introDetailRow, { marginTop: 0 }]}>
                   <Text style={styles.introSectionTitle}>Công nghệ sử dụng: </Text>
                   <Text style={styles.introItemText}>React Native, Expo, Firebase</Text>
+                </View>
+                <View style={styles.introDetailRow}>
+                  <Text style={styles.introSectionTitle}>Người phát triển: </Text>
+                  <Text style={styles.introItemText}>Lâm Nhật Hào</Text>
                 </View>
               </View>
             </ScrollView>
           </View>
         </View>
       </Modal>
+
     </SafeAreaView>
   );
 }
@@ -365,9 +433,9 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 32,
     paddingTop: 20,
     paddingHorizontal: 24,
-    paddingBottom: 40,
+    paddingBottom: 0,
     width: '100%',
-    maxHeight: '90%',
+    maxHeight: '79%',
   },
   introHeader: {
     flexDirection: 'row',

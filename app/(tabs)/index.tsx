@@ -226,7 +226,7 @@ export default function HomeScreen() {
     { id: 3, label: t('culture'), icon: require('@/assets/images/festival.jpg'), color: '#A000FF', route: '/culture' },
     { id: 2, label: t('food'), icon: require('@/assets/images/amthuc.jpg'), color: '#FF0050', route: '/food' },
     { id: 4, label: t('language_study'), icon: require('@/assets/images/hoctap.jpg'), color: '#00C850', route: '/language_study' },
-    { id: 5, label: t('ai_camera'), icon: require('@/assets/images/ai_camera.png'), color: '#1877F2', route: '/ai-camera' },
+
   ];
 
   const toggleFavorite = (id: any) => {

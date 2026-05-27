@@ -35,6 +35,8 @@ const translations = {
     app_info: 'Thông tin ứng dụng',
     intro: 'Giới thiệu',
     version: 'Phiên bản',
+    assistant_settings: 'Trợ lý AI',
+    show_chat_button: 'Hiển thị nút Chat AI',
     // Support Screen
     support_feedback: 'Hỗ trợ và Phản hồi',
     feedback_type: 'Loại phản hồi',
@@ -237,6 +239,8 @@ const translations = {
     app_info: 'ព័ត៌មានកម្មវិធី',
     intro: 'អំពីយើង',
     version: 'ជំនាន់',
+    assistant_settings: 'ជំនួយការ AI',
+    show_chat_button: 'បង្ហាញប៊ូតុងជជែក AI',
     // Support Screen
     support_feedback: 'ជំនួយ និងមតិកែលម្អ',
     feedback_type: 'ប្រភេទមតិកែលម្អ',

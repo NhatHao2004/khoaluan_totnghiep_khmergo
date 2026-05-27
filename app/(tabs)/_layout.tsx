@@ -21,15 +21,25 @@ const COLORS = {
   shadow: '#000000ff',
 };
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function TabsLayout() {
   const colorScheme = useColorScheme();
   const pathname = usePathname();
   const router = useRouter();
+  const [isChatEnabled, setIsChatEnabled] = useState(true);
 
   // Reset position when pathname changes to home
   useEffect(() => {
+    const loadChatSetting = async () => {
+      const saved = await AsyncStorage.getItem('chat_button_enabled');
+      if (saved !== null) {
+        setIsChatEnabled(saved === 'true');
+      }
+    };
+    loadChatSetting();
+
     if (pathname === '/') {
       translateX.value = 0;
       translateY.value = 0;
@@ -224,7 +234,7 @@ export default function TabsLayout() {
       </Tabs>
 
       {/* Floating AI Chat Button - Global or Home Only */}
-      {pathname === '/' && (
+      {pathname === '/' && isChatEnabled && (
         <GestureDetector gesture={gesture}>
           <Animated.View style={[styles.floatingChatBtn, animatedChatStyle]}>
             <TouchableOpacity
