@@ -36,7 +36,7 @@ const translations = {
     intro: 'Giới thiệu',
     version: 'Phiên bản',
     assistant_settings: 'Trợ lý AI',
-    show_chat_button: 'Hiển thị nút Chat AI',
+    show_chat_button: 'Hiển thị nút Chat',
     // Support Screen
     support_feedback: 'Hỗ trợ và Phản hồi',
     feedback_type: 'Loại phản hồi',

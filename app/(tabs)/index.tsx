@@ -31,6 +31,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
+const CATEGORY_CARD_WIDTH = (width - 32 - (3 * 8)) / 4; // Total width - padding - gaps
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -226,7 +227,6 @@ export default function HomeScreen() {
     { id: 3, label: t('culture'), icon: require('@/assets/images/festival.jpg'), color: '#A000FF', route: '/culture' },
     { id: 2, label: t('food'), icon: require('@/assets/images/amthuc.jpg'), color: '#FF0050', route: '/food' },
     { id: 4, label: t('language_study'), icon: require('@/assets/images/hoctap.jpg'), color: '#00C850', route: '/language_study' },
-
   ];
 
   const toggleFavorite = (id: any) => {
@@ -679,47 +679,49 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   gridItemScroll: {
-    width: 85,
+    width: CATEGORY_CARD_WIDTH,
     padding: 2,
   },
   serviceCardMini: {
-    height: 108,
-    borderRadius: 18,
+    height: 110,
+    borderRadius: 20,
     paddingHorizontal: 8,
-    paddingVertical: 10,
+    paddingVertical: 12,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.05)',
-    elevation: 2,
+    borderColor: '#F1F5F9',
+    // Clean shadow instead of elevation
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
-    shadowRadius: 5,
+    shadowRadius: 10,
+    elevation: 2,
   },
   iconGlassMini: {
-    width: 48,
-    height: 48,
-    borderRadius: 13,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: '#F8FAFC',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
     overflow: 'hidden',
   },
   serviceIconImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'contain', // Hiển thị trọn vẹn 100% nội dung icon
+    width: '90%', // Leave a tiny bit of breathing room for 'full' feel without touching edges
+    height: '90%',
+    resizeMode: 'contain',
   },
   serviceLabelMini: {
-    fontSize: 9.5,
+    fontSize: 9, // Slightly smaller to fit 4 cards perfectly
     fontWeight: '800',
     color: '#1E293B',
     textAlign: 'center',
-    marginTop: 2,
-    lineHeight: 16, // Tăng lên 14 thay vì 12 để không bị cắt dấu
+    lineHeight: 12,
+    paddingHorizontal: 2,
   },
   iconContainer: {
     alignItems: 'center',

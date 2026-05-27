@@ -83,7 +83,7 @@ export default function ProfileScreen() {
   const confirmLogout = async () => {
     setLogoutModalVisible(false);
     await logout();
-    router.replace('/login');
+    router.replace('/(tabs)');
   };
 
   const handleMenuPress = (id: string) => {
