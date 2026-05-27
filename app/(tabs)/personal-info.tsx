@@ -2,15 +2,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { auth, db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
 import { useFocusEffect } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
-import { doc, updateDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
+import { collection, doc, getDocs, query, updateDoc, where, writeBatch } from 'firebase/firestore';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -19,15 +18,15 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, {
   interpolate,
   useAnimatedStyle,
   useSharedValue,
   withTiming
 } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function PersonalInfoScreen() {
   const { user, refreshUser } = useAuth();
@@ -57,8 +56,8 @@ export default function PersonalInfoScreen() {
     setToastMsg(msg);
     setToastType(type as any);
     setShowToast(true);
-    toastY.value = withTiming(Platform.OS === 'ios' ? 70 : 50, { duration: 400 });
-    
+    toastY.value = withTiming(Platform.OS === 'ios' ? 50 : 40, { duration: 400 });
+
     setTimeout(() => {
       toastY.value = withTiming(-100, { duration: 400 });
       setTimeout(() => setShowToast(false), 400);
@@ -132,7 +131,7 @@ export default function PersonalInfoScreen() {
       // 1b. Sync with Posts & Comments (Cập nhật tên và ảnh đại diện trên toàn bộ dữ liệu cũ)
       try {
         const batch = writeBatch(db);
-        
+
         // Cập nhật Posts
         const postsQuery = query(collection(db, 'posts'), where('userId', '==', uid));
         const postSnapshots = await getDocs(postsQuery);
@@ -183,7 +182,7 @@ export default function PersonalInfoScreen() {
 
       await refreshUser();
       triggerToast(t('update_success'), 'success');
-      
+
       // Delay navigation to let toast be seen longer
       setTimeout(() => {
         router.push('/(tabs)/profile');
@@ -356,11 +355,11 @@ export default function PersonalInfoScreen() {
 
       {showToast && (
         <Animated.View style={[
-          styles.toastContainer, 
-          animatedToastStyle, 
-          { 
+          styles.toastContainer,
+          animatedToastStyle,
+          {
             backgroundColor: toastType === 'success' ? '#10B981' : (toastType === 'error' ? '#FF453A' : '#007AFF'),
-            borderColor: 'rgba(255,255,255,0.2)' 
+            borderColor: 'rgba(255,255,255,0.2)'
           }
         ]}>
           <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}>

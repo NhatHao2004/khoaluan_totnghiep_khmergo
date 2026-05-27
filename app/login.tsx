@@ -69,7 +69,7 @@ export default function LoginScreen() {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withTiming(Platform.OS === 'ios' ? 70 : 50, { duration: 400 });
+    toastY.value = withTiming(Platform.OS === 'ios' ? 50 : 40, { duration: 400 });
 
     setTimeout(() => {
       toastY.value = withTiming(-120, { duration: 400 });

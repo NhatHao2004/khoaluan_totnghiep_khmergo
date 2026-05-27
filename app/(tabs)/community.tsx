@@ -134,7 +134,7 @@ export default function CommunityScreen() {
         styles.toastContainer,
         animatedToastStyle,
         {
-          backgroundColor: toastType === 'success' ? '#00c184ff' : (toastType === 'error' ? '#FF453A' : '#007AFF'),
+          backgroundColor: toastType === 'success' ? '#10B981' : (toastType === 'error' ? '#FF453A' : '#007AFF'),
           borderColor: 'rgba(255,255,255,0.2)'
         }
       ]}>
