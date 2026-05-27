@@ -129,7 +129,7 @@ export default function SettingsScreen() {
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-120, 50], [0, 1]),
+    opacity: interpolate(toastY.value, [-100, 40], [0, 1], 'clamp'),
   }));
 
 
@@ -600,6 +600,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     zIndex: 9999,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 20,

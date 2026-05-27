@@ -64,10 +64,7 @@ export default function AIAssistantScreen() {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withSpring(Platform.OS === 'ios' ? 50 : 40, {
-      damping: 15,
-      stiffness: 120,
-    });
+    toastY.value = withTiming(Platform.OS === 'ios' ? 50 : 40, { duration: 400 });
     
     setTimeout(() => {
       toastY.value = withTiming(-120, { duration: 400 });
@@ -493,8 +490,8 @@ export default function AIAssistantScreen() {
           styles.toastContainer,
           animatedToastStyle,
           {
-            backgroundColor: toastType === 'success' ? '#10B981' : (toastType === 'error' ? '#FF453A' : '#007AFF'),
-            borderColor: 'rgba(255,255,255,0.2)'
+            backgroundColor: toastType === 'error' ? '#EF4444' : (toastType === 'success' ? '#10B981' : '#007AFF'),
+            shadowColor: toastType === 'error' ? '#EF4444' : (toastType === 'success' ? '#10B981' : '#007AFF'),
           }
         ]}>
           <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}>
@@ -521,10 +518,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 22,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.2,
-    shadowRadius: 15,
-    elevation: 25
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10
   },
   toastText: { color: '#FFF', fontSize: 15, fontWeight: '700', marginLeft: 15, flex: 1, letterSpacing: 0.3 },
   header: { paddingTop: 40, paddingBottom: 10, paddingHorizontal: 20, backgroundColor: '#FFF', flexDirection: 'row', alignItems: 'center' },

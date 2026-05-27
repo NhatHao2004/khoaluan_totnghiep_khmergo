@@ -123,7 +123,7 @@ export default function CommunityScreen() {
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-120, 60], [0, 1]),
+    opacity: interpolate(toastY.value, [-100, 40], [0, 1], 'clamp'),
   }));
 
   // Render Toast Component Helper
@@ -134,12 +134,12 @@ export default function CommunityScreen() {
         styles.toastContainer,
         animatedToastStyle,
         {
-          backgroundColor: toastType === 'success' ? '#10B981' : (toastType === 'error' ? '#FF453A' : '#007AFF'),
-          borderColor: 'rgba(255,255,255,0.2)'
+          backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
+          shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
         }
       ]}>
-        <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}>
-          <Ionicons name={toastType === 'success' ? "checkmark" : (toastType === 'error' ? "close" : "information")} size={18} color="#FFF" />
+        <View style={styles.toastIcon}>
+          <Ionicons name={toastType === 'success' ? "checkmark" : "close"} size={20} color="#FFF" />
         </View>
         <Text style={styles.toastText}>{toastMsg}</Text>
       </Animated.View>
@@ -859,7 +859,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.2,
     shadowRadius: 15,
-    elevation: 25
+    elevation: 25,
+  },
+  toastIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   toastText: { color: '#FFF', fontSize: 15, fontWeight: '700', marginLeft: 15, flex: 1, letterSpacing: 0.3 },
   screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 10, paddingBottom: 15, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },

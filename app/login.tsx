@@ -79,7 +79,7 @@ export default function LoginScreen() {
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-120, 50], [0, 1]),
+    opacity: interpolate(toastY.value, [-100, 40], [0, 1], 'clamp'),
   }));
 
   const handleLogin = async () => {
@@ -219,7 +219,8 @@ export default function LoginScreen() {
             styles.toastContainer,
             animatedToastStyle,
             {
-              backgroundColor: toastType === 'success' || toastType === 'info' ? '#10B981' : '#EF4444',
+              backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
+              shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
             }
           ]}
         >
@@ -280,6 +281,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     zIndex: 9999,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
   },
   toastIcon: {
     width: 32,
