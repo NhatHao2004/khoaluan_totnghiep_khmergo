@@ -168,7 +168,12 @@ export default function LoginScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>{t('password_label')}</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 4 }}>
+                  <Text style={styles.inputLabel}>{t('password_label')}</Text>
+                  <TouchableOpacity>
+                    <Text style={{ fontSize: 13, color: '#64748B', fontWeight: '600' }}>Quên mật khẩu</Text>
+                  </TouchableOpacity>
+                </View>
                 <View style={styles.inputWrapper}>
                   <Ionicons name="lock-closed-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
                   <TextInput
