@@ -70,7 +70,7 @@ const Destinations = () => {
         </button>
       </header>
 
-      <div className="card" style={{ marginBottom: '2rem' }}>
+      <div className="card" style={{ marginBottom: '2rem', width: '100%' }}>
         <div style={{ position: 'relative' }}>
           <Search size={20} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input 
@@ -83,7 +83,7 @@ const Destinations = () => {
         </div>
       </div>
 
-      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+      <div className="card" style={{ padding: 0, overflow: 'hidden', width: '100%' }}>
         {loading ? (
           <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>Đang tải dữ liệu...</div>
         ) : (

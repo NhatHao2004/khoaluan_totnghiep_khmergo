@@ -1,9 +1,11 @@
 import { collection, getDocs } from 'firebase/firestore';
-import { BookOpen, MapPin, TrendingUp, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
+import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase/config';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     users: 0,
     destinations: 0,
@@ -18,7 +20,7 @@ const Dashboard = () => {
         const destSnap = await getDocs(collection(db, 'destinations'));
         const quizSnap = await getDocs(collection(db, 'quizzes'));
         const postsSnap = await getDocs(collection(db, 'posts'));
-        
+
         setStats({
           users: usersSnap.size,
           destinations: destSnap.size,
@@ -32,34 +34,33 @@ const Dashboard = () => {
     fetchStats();
   }, []);
 
-  const StatCard = ({ title, value, icon: Icon, color }: any) => (
-    <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', minWidth: '0' }}>
-      <div style={{ padding: '0.875rem', borderRadius: '12px', background: `${color}15`, color: color, flexShrink: 0 }}>
-        <Icon size={24} />
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.8125rem', whiteSpace: 'nowrap', marginBottom: '0.25rem', lineHeight: '1.4' }}>{title}</p>
-        <h3 style={{ fontSize: '1.375rem', fontWeight: 700, whiteSpace: 'nowrap', lineHeight: '1.2' }}>{value}</h3>
+  const StatCard = ({ title, value, background, onClick }: any) => (
+    <div
+      className="card stat-card"
+      onClick={onClick}
+      style={{ background, cursor: onClick ? 'pointer' : 'default' }}
+    >
+      <div>
+        <h3>{value}</h3>
+        <p>{title}</p>
       </div>
     </div>
   );
 
   return (
     <div className="fade-in">
-      <h1 style={{ fontSize: '2rem', marginBottom: '2rem' }}>Tổng quan</h1>
-
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
-        <StatCard title="Người dùng" value={stats.users} icon={Users} color="#3b82f6" />
-        <StatCard title="Địa danh" value={stats.destinations} icon={MapPin} color="#d4af37" />
-        <StatCard title="Câu đố" value={stats.quizzes} icon={BookOpen} color="#10b981" />
-        <StatCard title="Bài viết" value={stats.posts} icon={TrendingUp} color="#8b5cf6" />
+        <StatCard title="Tổng người dùng" value={stats.users} background="var(--card-orange)" onClick={() => navigate('/users')} />
+        <StatCard title="Địa danh" value={stats.destinations} background="var(--card-green)" />
+        <StatCard title="Câu đố" value={stats.quizzes} background="var(--card-pink)" />
+        <StatCard title="Bài viết mới" value={stats.posts} background="var(--card-blue)" />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
-        <div className="card">
-          <h3 style={{ marginBottom: '1.5rem' }}>Phản hồi mới</h3>
-          <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>
-            Chưa có phản hồi mới
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem', flex: 1 }}>
+        <div className="card" style={{ minHeight: 'calc(100vh - 300px)', display: 'flex', flexDirection: 'column' }}>
+          <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1.5rem' }}>Phản hồi mới</h2>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+            <p>Chưa có phản hồi mới</p>
           </div>
         </div>
       </div>

@@ -1,7 +1,8 @@
+import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Ban, Calendar, CheckCircle, Filter, Hash, Mail, MessageCircleMore, MessageSquareText, Search, Shield, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
-import { Search, Shield, User } from 'lucide-react';
 
 interface UserProfile {
   id: string;
@@ -9,12 +10,24 @@ interface UserProfile {
   points: number;
   avatar?: string;
   email?: string;
+  isBlocked?: boolean;
+  createdAt?: any;
+  [key: string]: any;
 }
 
 const Users = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+  const [selectedFeedbackUser, setSelectedFeedbackUser] = useState<UserProfile | null>(null);
+  const [userFeedbacks, setUserFeedbacks] = useState<any[]>([]);
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({ isOpen: false, title: '', message: '', onConfirm: () => { } });
 
   useEffect(() => {
     fetchUsers();
@@ -24,8 +37,8 @@ const Users = () => {
     setLoading(true);
     try {
       const querySnapshot = await getDocs(collection(db, 'users'));
-      const docs = querySnapshot.docs.map(doc => ({ 
-        id: doc.id, 
+      const docs = querySnapshot.docs.map(doc => ({
+        id: doc.id,
         ...doc.data(),
         name: doc.data().name || doc.data()['tên'] || 'Anonymous'
       } as UserProfile));
@@ -36,89 +49,263 @@ const Users = () => {
     setLoading(false);
   };
 
-  const filteredUsers = users.filter(u => 
+  const fetchFeedbacks = async (userId: string) => {
+    try {
+      const q = query(collection(db, 'feedbacks'), where('userId', '==', userId));
+      const querySnapshot = await getDocs(q);
+      const feedbacks = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setUserFeedbacks(feedbacks);
+    } catch (error) {
+      console.error("Error fetching feedbacks:", error);
+      setUserFeedbacks([]);
+    }
+  };
+
+  const handleOpenFeedback = (user: UserProfile) => {
+    setSelectedFeedbackUser(user);
+    fetchFeedbacks(user.id);
+  };
+
+  const filteredUsers = users.filter(u =>
     u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const stats = {
+    total: users.length,
+    active: users.filter(u => !u.isBlocked).length,
+    blocked: users.filter(u => u.isBlocked).length
+  };
+
+  const toggleBlock = (user: UserProfile) => {
+    const action = user.isBlocked ? 'bỏ chặn' : 'chặn';
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Xác nhận thay đổi',
+      message: `Bạn có chắc chắn muốn ${action} người dùng\n"${user.name}" không`,
+      onConfirm: async () => {
+        try {
+          const userRef = doc(db, 'users', user.id);
+          await updateDoc(userRef, { isBlocked: !user.isBlocked });
+          fetchUsers();
+          setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+        } catch (error) {
+          console.error("Error updating user status:", error);
+        }
+      }
+    });
+  };
+
   return (
     <div className="fade-in">
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem' }}>
         <div>
-          <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Quản lý Người dùng</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Xem danh sách và quản lý điểm số của người dùng.</p>
+          <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#1e293b', letterSpacing: '-0.025em' }}>Quản lý người dùng</h1>
+          <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem', fontSize: '0.9375rem' }}>Quản lý và hỗ trợ người dùng KhmerGo</p>
         </div>
-      </header>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <div style={{ padding: '0.5rem 1.25rem', background: 'var(--card-green)', color: '#fff', borderRadius: '10px', fontSize: '0.8125rem', fontWeight: 700, boxShadow: '0 4px 12px rgba(46, 216, 182, 0.2)' }}>
+            {stats.active} Đang hoạt động
+          </div>
+          <div style={{ padding: '0.5rem 1.25rem', background: 'var(--card-pink)', color: '#fff', borderRadius: '10px', fontSize: '0.8125rem', fontWeight: 700, boxShadow: '0 4px 12px rgba(255, 83, 112, 0.2)' }}>
+            {stats.blocked} Đã chặn
+          </div>
+        </div>
+      </div>
 
-      <div className="card" style={{ marginBottom: '2rem' }}>
-        <div style={{ position: 'relative' }}>
-          <Search size={20} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-          <input 
-            type="text" 
-            placeholder="Tìm kiếm theo tên hoặc ID..." 
-            style={{ width: '100%', paddingLeft: '3rem' }}
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2.5rem' }}>
+        <div style={{
+          flex: 1,
+          background: '#fff',
+          borderRadius: '14px',
+          padding: '0.75rem 1.25rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '1rem',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.03)',
+          border: '1px solid #edf2f7'
+        }}>
+          <Search size={20} color="#94a3b8" />
+          <input
+            type="text"
+            placeholder="Tìm theo tên, email..."
+            style={{ width: '100%', border: 'none', outline: 'none', fontSize: '0.9375rem', color: '#1e293b', fontWeight: 500 }}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+        <button style={{ padding: '0 1.5rem', background: '#fff', borderRadius: '14px', border: '1px solid #edf2f7', display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', fontWeight: 600, color: '#475569', boxShadow: '0 2px 12px rgba(0,0,0,0.03)' }}>
+          <Filter size={18} color="#64748b" />
+          Bộ lọc
+        </button>
       </div>
 
-      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-        {loading ? (
-          <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>Đang tải người dùng...</div>
-        ) : (
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>AVATAR</th>
-                <th>TÊN NGƯỜI DÙNG</th>
-                <th>ID</th>
-                <th>ĐIỂM SỐ</th>
-                <th style={{ textAlign: 'right' }}>THAO TÁC</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map(user => (
-                <tr key={user.id}>
-                  <td>
-                    <img 
-                      src={user.avatar || 'https://i.pravatar.cc/150?u=' + user.id} 
-                      alt={user.name} 
-                      style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2px solid #f1f5f9' }} 
-                    />
-                  </td>
-                  <td style={{ fontWeight: 600 }}>{user.name}</td>
-                  <td style={{ color: 'var(--text-muted)', fontSize: '0.8125rem', fontFamily: 'monospace' }}>{user.id}</td>
-                  <td>
-                    <span style={{ 
-                      background: '#fef3c7', 
-                      color: '#92400e', 
-                      padding: '0.25rem 0.75rem', 
-                      borderRadius: '99px', 
-                      fontSize: '0.875rem', 
-                      fontWeight: 600 
-                    }}>
-                      {user.points || 0} pts
-                    </span>
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                      <button className="btn-ghost" title="Chặn người dùng">
-                        <Shield size={16} color="#ef4444" />
-                      </button>
-                      <button className="btn-ghost" title="Xem chi tiết">
-                        <User size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '5rem' }}>
+          <div className="fade-in">Đang tải danh sách người dùng...</div>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+          {filteredUsers.map(user => (
+            <motion.div layout key={user.id} className="card" style={{ padding: '1.5rem', textAlign: 'center', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
+                {user.isBlocked ? (
+                  <span title="Đã chặn"><Ban size={18} color="#ff5370" /></span>
+                ) : (
+                  <span title="Hoạt động"><CheckCircle size={18} color="#2ed8b6" /></span>
+                )}
+              </div>
+              <img src={user.avatar || 'https://i.pravatar.cc/150?u=' + user.id} alt={user.name} style={{ width: 80, height: 80, borderRadius: '50%', marginBottom: '1rem', objectFit: 'cover', border: '3px solid #f6f7fb' }} />
+              <h3 style={{ fontSize: '1.125rem', fontWeight: 700, marginBottom: '0.25rem' }}>{user.name}</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.8125rem', marginBottom: '1.25rem' }}>{user.email || 'Email ẩn'}</p>
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5rem', padding: '0.75rem 0', background: '#f6f7fb', borderRadius: '12px' }}>
+                <div style={{ flex: 1 }}><p style={{ fontSize: '0.625rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Điểm số</p><p style={{ fontWeight: 700, color: 'var(--primary)' }}>{Number(user.points) || 0}</p></div>
+                <div style={{ width: '1px', height: '20px', background: '#ddd' }}></div>
+                <div style={{ flex: 1 }}><p style={{ fontSize: '0.625rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Hoàn thành</p><p style={{ fontWeight: 700, color: 'var(--primary)' }}>{user.completedQuizzes || 0}</p></div>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                  onClick={() => handleOpenFeedback(user)}
+                  style={{
+                    padding: '0.625rem',
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: 'var(--card-blue)',
+                    cursor: 'pointer',
+                    color: '#fff',
+                    boxShadow: '0 4px 10px rgba(64, 153, 255, 0.3)'
+                  }}
+                  title="Xem phản hồi"
+                >
+                  <MessageCircleMore size={18} />
+                </button>
+                <button onClick={() => setSelectedUser(user)} style={{ flex: 1, padding: '0.625rem', borderRadius: '8px', border: '1px solid #eee', background: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem' }}>Chi tiết</button>
+                <button
+                  onClick={() => toggleBlock(user)}
+                  style={{ padding: '0.625rem', borderRadius: '8px', border: 'none', background: user.isBlocked ? '#2ed8b6' : '#ff5370', color: '#fff', cursor: 'pointer' }}
+                >
+                  {user.isBlocked ? <CheckCircle size={18} /> : <Ban size={18} />}
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      {/* Main Detail Modal */}
+      <AnimatePresence>
+        {selectedUser && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1.5rem' }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} onClick={() => setSelectedUser(null)} />
+            <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} style={{ position: 'relative', width: '100%', maxWidth: '400px', background: '#fff', borderRadius: '24px', padding: '1.5rem', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+              <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                <img src={selectedUser.avatar || 'https://i.pravatar.cc/150?u=' + selectedUser.id} style={{ width: 90, height: 90, borderRadius: '50%', marginBottom: '0.75rem' }} />
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{selectedUser.name}</h2>
+                <span style={{ display: 'inline-block', padding: '0.25rem 1rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, background: selectedUser.isBlocked ? '#ffe9ec' : '#e6fff0', color: selectedUser.isBlocked ? '#ff5370' : '#2ed8b6', marginTop: '0.5rem' }}>
+                  {selectedUser.isBlocked ? 'ĐÃ CHẶN' : 'ĐANG HOẠT ĐỘNG'}
+                </span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div style={{ gridColumn: 'span 2' }}>
+                  <InfoItem icon={Mail} label="Email" value={selectedUser.email || 'N/A'} />
+                </div>
+                <InfoItem icon={Star} label="Điểm số" value={`${Number(selectedUser.points) || 0} pts`} />
+                <InfoItem icon={Calendar} label="Ngày tham gia" value={selectedUser.createdAt && selectedUser.createdAt.seconds ? new Date(selectedUser.createdAt.seconds * 1000).toLocaleDateString('vi-VN') : 'Mới'} />
+                <div style={{ gridColumn: 'span 2' }}>
+                  <InfoItem icon={Hash} label="ID Người dùng" value={selectedUser.id} />
+                </div>
+              </div>
+              <button onClick={() => setSelectedUser(null)} style={{ width: '100%', marginTop: '1.5rem', padding: '0.875rem', borderRadius: '12px', border: 'none', background: 'var(--card-blue)', color: '#fff', fontWeight: 700, cursor: 'pointer' }}>Hoàn tất</button>
+            </motion.div>
+          </div>
         )}
-      </div>
+      </AnimatePresence>
+
+      {/* Custom Confirmation Modal */}
+      <AnimatePresence>
+        {confirmConfig.isOpen && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: '1.5rem' }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }} />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              style={{ position: 'relative', width: '100%', maxWidth: '400px', background: '#fff', borderRadius: '28px', padding: '2.5rem', textAlign: 'center', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
+            >
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: '#fff9f0', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                <Shield size={32} color="#ffb64d" />
+              </div>
+              <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1rem', color: '#1e293b' }}>{confirmConfig.title}</h3>
+              <p style={{ color: '#64748b', lineHeight: 1.6, marginBottom: '2.5rem', whiteSpace: 'pre-line' }}>{confirmConfig.message}</p>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button
+                  onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+                  style={{ flex: 1, padding: '1rem', borderRadius: '14px', border: '1px solid #edf2f7', background: '#fff', color: '#475569', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={confirmConfig.onConfirm}
+                  style={{ flex: 1, padding: '1rem', borderRadius: '14px', border: 'none', background: '#ff5370', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(255, 83, 112, 0.3)' }}
+                >
+                  Đồng ý
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Feedback Modal */}
+      <AnimatePresence>
+        {selectedFeedbackUser && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1.5rem' }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} onClick={() => setSelectedFeedbackUser(null)} />
+            <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} style={{ position: 'relative', width: '100%', maxWidth: '500px', background: '#fff', borderRadius: '24px', padding: '2rem', boxShadow: '0 20px 40px rgba(0,0,0,0.2)', maxHeight: '80vh', overflowY: 'auto' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#1e293b' }}>
+                  Phản hồi từ <span style={{ fontWeight: 800 }}>{selectedFeedbackUser.name}</span>
+                </h2>
+              </div>
+
+              {userFeedbacks.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--text-muted)' }}>
+                  <MessageSquareText size={48} style={{ marginBottom: '1rem', opacity: 0.2 }} />
+                  <p>Người dùng này chưa gửi phản hồi nào.</p>
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                  {userFeedbacks.map((fb) => (
+                    <div key={fb.id} style={{ padding: '1.25rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #edf2f7' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--primary)' }}># {fb.id.slice(-6).toUpperCase()}</span>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                          {fb.createdAt && fb.createdAt.seconds ? new Date(fb.createdAt.seconds * 1000).toLocaleDateString('vi-VN') : 'Gần đây'}
+                        </span>
+                      </div>
+                      <p style={{ fontSize: '0.9375rem', lineHeight: 1.5, color: '#334155' }}>{fb.content || fb.message || 'Không có nội dung'}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button onClick={() => setSelectedFeedbackUser(null)} style={{ width: '100%', marginTop: '2rem', padding: '1rem', borderRadius: '12px', border: 'none', background: 'var(--card-blue)', color: '#fff', fontWeight: 700, cursor: 'pointer' }}>Đóng</button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
+
+const InfoItem = ({ icon: Icon, label, value }: any) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', background: '#f8fafc', borderRadius: '12px' }}>
+    <Icon size={18} color="#6a748a" />
+    <div style={{ overflow: 'hidden' }}>
+      <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '0.125rem' }}>{label}</p>
+      <p style={{ fontWeight: 600, fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</p>
+    </div>
+  </div>
+);
 
 export default Users;

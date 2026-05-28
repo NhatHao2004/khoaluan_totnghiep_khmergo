@@ -1,34 +1,44 @@
-import { BookOpen, LayoutDashboard, LogOut, MapPin } from 'lucide-react';
+import { BookOpen, LayoutDashboard, LogOut, MapPin, Users } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+
+import icon from '../assets/icon.png';
 
 const Sidebar = () => {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <div style={{ width: 40, height: 40, background: 'var(--primary)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 900 }}>K</span>
-        </div>
-        KhmerGo
+        <img src={icon} alt="KhmerGo Logo" style={{ width: 28, height: 28, marginRight: '10px', borderRadius: '6px' }} />
+        <span>KhmerGo</span>
       </div>
 
-      <nav style={{ flex: 1 }}>
-        <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-          <LayoutDashboard size={20} color="#3b82f6" />
+      <div style={{ height: '1px', background: 'rgba(0,0,0,0.1)', width: '100%' }}></div>
+
+      <nav className="sidebar-nav">
+        <NavLink to="/" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+          <LayoutDashboard size={18} />
           Trang chủ
         </NavLink>
-        <NavLink to="/destinations" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-          <MapPin size={20} color="#f59e0b" />
+
+        <NavLink to="/users" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+          <Users size={18} />
+          Người dùng
+        </NavLink>
+
+
+        <NavLink to="/destinations" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+          <MapPin size={18} />
           Địa danh
         </NavLink>
-        <NavLink to="/quizzes" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-          <BookOpen size={20} color="#10b981" />
+
+        <NavLink to="/quizzes" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+          <BookOpen size={18} />
           Câu đố
         </NavLink>
       </nav>
 
-      <div style={{ marginTop: 'auto', paddingTop: '0.5rem' }}>
-        <button className="nav-link" style={{ width: '100%', border: 'none', background: 'none', marginBottom: 0 }}>
-          <LogOut size={20} color="#ef4444" />
+      <div style={{ marginTop: 'auto', padding: '1.5rem' }}>
+        <button className="nav-link" style={{ width: '100%', background: 'none', border: 'none', padding: '10px 0' }}>
+          <LogOut size={18} color="#ff5370" />
           Đăng xuất
         </button>
       </div>
