@@ -157,7 +157,7 @@ export default function LoginScreen() {
                   <Ionicons name="mail-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
                   <TextInput
                     style={styles.input}
-                    placeholder="example@email.com"
+                    placeholder="example@gmail.com"
                     placeholderTextColor="#CBD5E1"
                     value={email}
                     onChangeText={setEmail}
@@ -171,7 +171,7 @@ export default function LoginScreen() {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 4 }}>
                   <Text style={styles.inputLabel}>{t('password_label')}</Text>
                   <TouchableOpacity>
-                    <Text style={{ fontSize: 13, color: '#64748B', fontWeight: '600' }}>Quên mật khẩu</Text>
+                    <Text style={{ fontSize: 13, color: '#94A3B8', fontWeight: '500' }}>Quên mật khẩu</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.inputWrapper}>
@@ -216,20 +216,20 @@ export default function LoginScreen() {
 
             {/* Social Login Footer */}
             <View style={styles.socialFooter}>
-               <View style={styles.dividerBox}>
-                  <View style={styles.dividerLine} />
-                  <Text style={styles.dividerText}>Sử dụng tài khoản khác</Text>
-                  <View style={styles.dividerLine} />
-               </View>
+              <View style={styles.dividerBox}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>Sử dụng tài khoản khác</Text>
+                <View style={styles.dividerLine} />
+              </View>
 
-               <View style={styles.socialIconsRow}>
-                  <TouchableOpacity style={[styles.socialCircle, { backgroundColor: '#FF5A5F' }]}>
-                     <Ionicons name="logo-google" size={24} color="#FFF" />
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[styles.socialCircle, { backgroundColor: '#1877F2' }]}>
-                     <Ionicons name="logo-facebook" size={24} color="#FFF" />
-                  </TouchableOpacity>
-               </View>
+              <View style={styles.socialIconsRow}>
+                <TouchableOpacity style={[styles.socialCircle, { backgroundColor: '#FF5A5F' }]}>
+                  <Ionicons name="logo-google" size={24} color="#FFF" />
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.socialCircle, { backgroundColor: '#1877F2' }]}>
+                  <Ionicons name="logo-facebook" size={24} color="#FFF" />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </ScrollView>
