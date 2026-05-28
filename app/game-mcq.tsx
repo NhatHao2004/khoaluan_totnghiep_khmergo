@@ -476,7 +476,7 @@ export default function GameMCQScreen() {
               <ScrollView
                 style={styles.explScroll}
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 10 }}
+                contentContainerStyle={{ paddingBottom: 0 }}
               >
                 <Text style={[styles.explTextNew, answerState === 'wrong' && styles.explTextNewWrong]}>
                   {currentQuestion.explanation}
@@ -566,9 +566,9 @@ export default function GameMCQScreen() {
             </View>
             <Text style={styles.exitTitle}>Bạn chưa đăng nhập</Text>
             <Text style={styles.exitSub}>Hãy đăng nhập để lưu lại thành tích{'\n'}và tích luỹ điểm thưởng nhé!</Text>
-            
+
             <View style={styles.exitActionRow}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.stayBtn}
                 onPress={() => {
                   setShowLoginModal(false);
@@ -577,8 +577,8 @@ export default function GameMCQScreen() {
               >
                 <Text style={styles.stayBtnText}>Đăng nhập ngay</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
                 style={styles.confirmExitBtn}
                 onPress={() => setShowLoginModal(false)}
               >
@@ -878,19 +878,20 @@ const styles = StyleSheet.create({
     color: '#991B1B',
   },
   explScroll: {
-    maxHeight: 140,
-    marginBottom: 16,
+    width: '100%',
+    maxHeight: 250,
+    marginBottom: 20,
     backgroundColor: '#FFFFFF',
     borderWidth: 2,
     borderColor: '#1E293B',
     borderStyle: 'dashed',
     borderRadius: 16,
-    padding: 15,
-    marginTop: 5,
+    padding: 12,
+    marginTop: 15,
   },
   explTextNew: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 15,
+    lineHeight: 24,
     color: '#334155',
     fontWeight: '600',
     textAlign: 'center',
@@ -922,6 +923,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   correctAnswerBox: {
+    marginTop: 10,
     marginBottom: 20,
     alignSelf: 'center',
     alignItems: 'center',
