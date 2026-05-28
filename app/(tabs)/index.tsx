@@ -646,7 +646,7 @@ const styles = RNStyleSheet.create({
     justifyContent: 'center',
   },
   helloText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#1E293B',
     fontWeight: '700',
     letterSpacing: 0.3,

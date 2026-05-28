@@ -31,16 +31,36 @@ export default function SupportScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('faq')}</Text>
           <TouchableOpacity style={styles.faqItem} onPress={() => router.push('/faq/use' as any)}>
-            <Text style={styles.faqText}>{t('faq_how_to_use')}</Text>
-            <Ionicons name="chevron-forward" size={18} color="#CCC" />
+            <View style={[styles.faqIconCircle, { backgroundColor: '#EFF6FF' }]}>
+              <Ionicons name="help-circle-outline" size={22} color="#3B82F6" />
+            </View>
+            <View style={styles.faqInfo}>
+              <Text style={styles.faqText}>{t('faq_how_to_use')}</Text>
+              <Text style={styles.faqSub}>{t('tap_to_see_guide')}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.faqItem} onPress={() => router.push('/faq/quiz' as any)}>
-            <Text style={styles.faqText}>{t('faq_how_to_quiz')}</Text>
-            <Ionicons name="chevron-forward" size={18} color="#CCC" />
+            <View style={[styles.faqIconCircle, { backgroundColor: '#FFF7ED' }]}>
+              <Ionicons name="trophy-outline" size={22} color="#F59E0B" />
+            </View>
+            <View style={styles.faqInfo}>
+              <Text style={styles.faqText}>{t('faq_how_to_quiz')}</Text>
+              <Text style={styles.faqSub}>{t('tap_to_see_guide')}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.faqItem} onPress={() => router.push('/faq/learn' as any)}>
-            <Text style={styles.faqText}>{t('faq_how_to_learn')}</Text>
-            <Ionicons name="chevron-forward" size={18} color="#CCC" />
+            <View style={[styles.faqIconCircle, { backgroundColor: '#F0FDF4' }]}>
+              <Ionicons name="person-add-outline" size={22} color="#22C55E" />
+            </View>
+            <View style={styles.faqInfo}>
+              <Text style={styles.faqText}>{t('faq_how_to_learn')}</Text>
+              <Text style={styles.faqSub}>{t('tap_to_see_guide')}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -88,16 +108,30 @@ const styles = StyleSheet.create({
   faqItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 15,
-    paddingLeft: 15,
+    paddingVertical: 18,
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
   },
+  faqIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  faqInfo: {
+    flex: 1,
+  },
   faqText: {
     fontSize: 15,
-    color: '#333',
-    fontWeight: '600',
-    flex: 1,
+    color: '#1E293B',
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  faqSub: {
+    fontSize: 13,
+    color: '#94A3B8',
+    fontWeight: '500',
   },
 });

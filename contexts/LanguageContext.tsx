@@ -131,6 +131,7 @@ export const translations: any = {
     content_required: 'Vui lòng nhập nội dung phản hồi',
     feedback_success: 'Đã gửi phản hồi thành công! Cảm ơn bạn.',
     feedback_failed: 'Gửi phản hồi thất bại. Vui lòng thử lại.',
+    tap_to_see_guide: 'Bấm để xem hướng dẫn chi tiết',
     // FAQ Extra
     faq_how_to_use: 'Cách sử dụng ứng dụng',
     faq_how_to_quiz: 'Cách làm bài thử thách',
@@ -353,6 +354,7 @@ export const translations: any = {
     content_required: 'សូមបញ្ចូលខ្លឹមសារមតិ',
     feedback_success: 'បានផ្ញើមតិដោយជោគជ័យ! អរគុណ។',
     feedback_failed: 'ផ្ញើមតិបរាជ័យ។ សូមព្យាយាមម្តងទៀត។',
+    tap_to_see_guide: 'ចុចដើម្បីមើលការណែនាំលម្អិត',
     // FAQ Extra
     faq_how_to_use: 'របៀបប្រើកម្មវិធី',
     faq_how_to_quiz: 'របៀបធ្វើតេស្ត',
