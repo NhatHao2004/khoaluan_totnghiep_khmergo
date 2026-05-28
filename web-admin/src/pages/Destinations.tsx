@@ -1,7 +1,7 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Edit2, Search, Shield, Trash2 } from 'lucide-react';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { db } from '../firebase/config';
 
 interface Destination {
@@ -37,6 +37,67 @@ const TABS: { key: TabKey; label: string; color: string; bg: string }[] = [
   { key: 'Văn hóa', label: 'Văn hóa Khmer', color: '#ffffffff', bg: 'var(--card-blue)' },
   { key: 'Ẩm thực', label: 'Ẩm thực Khmer', color: '#ffffffff', bg: 'var(--card-blue)' },
 ];
+
+const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 'text', textarea = false }: any) => {
+  return (
+    <div className="input-group">
+      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', marginBottom: '0.5rem', textTransform: 'uppercase' }}>{label}</label>
+      <div style={{ position: 'relative' }}>
+        {Icon && <Icon size={18} color="#94a3b8" style={{ position: 'absolute', left: '1rem', top: textarea ? '1rem' : '50%', transform: textarea ? 'none' : 'translateY(-50%)' }} />}
+        {textarea ? (
+          <div style={{ display: 'grid' }}>
+            <div
+              style={{
+                gridArea: '1 / 1 / 2 / 2',
+                visibility: 'hidden',
+                whiteSpace: 'pre-wrap',
+                wordWrap: 'break-word',
+                padding: Icon ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 1rem',
+                fontSize: 'inherit',
+                fontFamily: 'inherit',
+                lineHeight: 1.6,
+                minHeight: '80px',
+                textAlign: 'justify',
+              }}
+            >
+              {(value || '') + ' \n'}
+            </div>
+            <textarea
+              rows={1}
+              style={{
+                gridArea: '1 / 1 / 2 / 2',
+                width: '100%',
+                padding: Icon ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 1rem',
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0',
+                outline: 'none',
+                fontWeight: 600,
+                resize: 'none',
+                lineHeight: 1.6,
+                overflow: 'hidden',
+                textAlign: 'justify',
+                background: 'transparent',
+                fontFamily: 'inherit',
+                fontSize: 'inherit',
+              }}
+              value={value || ''}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder={placeholder}
+            />
+          </div>
+        ) : (
+          <input
+            type={type}
+            style={{ width: '100%', padding: Icon ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 1rem', borderRadius: '12px', border: '1px solid #e2e8f0', outline: 'none', fontWeight: 600 }}
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={placeholder}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
 
 const Destinations = () => {
   const [destinations, setDestinations] = useState<Destination[]>([]);
@@ -163,51 +224,6 @@ const Destinations = () => {
   const countByTab = (key: TabKey) => destinations.filter(d => d.category === key).length;
 
   const currentTabMeta = TABS.find(t => t.key === activeTab)!;
-
-  const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 'text', textarea = false }: any) => {
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-    const adjustHeight = () => {
-      if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
-        textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
-      }
-    };
-
-    useEffect(() => {
-      if (textarea) {
-        // Sử dụng requestAnimationFrame để đảm bảo DOM đã render xong và scrollHeight đã chính xác
-        requestAnimationFrame(adjustHeight);
-      }
-    }, [value, textarea]);
-
-    return (
-      <div className="input-group">
-        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', marginBottom: '0.5rem', textTransform: 'uppercase' }}>{label}</label>
-        <div style={{ position: 'relative' }}>
-          {Icon && <Icon size={18} color="#94a3b8" style={{ position: 'absolute', left: '1rem', top: textarea ? '1rem' : '50%', transform: textarea ? 'none' : 'translateY(-50%)' }} />}
-          {textarea ? (
-            <textarea
-              ref={textareaRef}
-              rows={1}
-              style={{ width: '100%', padding: Icon ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 1rem', borderRadius: '12px', border: '1px solid #e2e8f0', outline: 'none', fontWeight: 600, resize: 'none', lineHeight: 1.6, overflow: 'hidden', minHeight: '80px', textAlign: 'justify' }}
-              value={value || ''}
-              onChange={(e) => onChange(e.target.value)}
-              placeholder={placeholder}
-            />
-          ) : (
-            <input
-              type={type}
-              style={{ width: '100%', padding: Icon ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 1rem', borderRadius: '12px', border: '1px solid #e2e8f0', outline: 'none', fontWeight: 600 }}
-              value={value || ''}
-              onChange={(e) => onChange(e.target.value)}
-              placeholder={placeholder}
-            />
-          )}
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div style={{ paddingBottom: '2rem' }}>
