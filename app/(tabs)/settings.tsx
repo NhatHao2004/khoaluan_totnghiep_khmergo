@@ -552,6 +552,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#475569',
     lineHeight: 20,
+    marginBottom: 4,
   },
   introRow: {
     flexDirection: 'row',
