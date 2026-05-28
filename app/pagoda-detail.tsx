@@ -552,6 +552,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#64748B',
     textTransform: 'uppercase',
+    lineHeight: 20,
   },
   tabBtnTextActive: {
     color: '#FFF',

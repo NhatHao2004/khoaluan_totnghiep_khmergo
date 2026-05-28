@@ -336,7 +336,8 @@ const styles = StyleSheet.create({
   tabBtnText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#64748B'
+    color: '#64748B',
+    lineHeight: 20,
   },
   tabBtnTextActive: {
     color: '#FFF'
