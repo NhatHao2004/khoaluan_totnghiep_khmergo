@@ -1,6 +1,6 @@
 import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Ban, Calendar, CheckCircle, Filter, Hash, Mail, MessageCircleMore, MessageSquareText, Search, Shield, Star } from 'lucide-react';
+import { Ban, CheckCircle, Mail, MessageCircleMore, MessageSquareText, Search, Shield, Star, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { db } from '../firebase/config';
 
@@ -101,7 +101,7 @@ const Users = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem' }}>
         <div>
           <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#1e293b', letterSpacing: '-0.025em' }}>Quản lý người dùng</h1>
-          <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem', fontSize: '0.9375rem' }}>Quản lý và hỗ trợ người dùng KhmerGo</p>
+          <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem', fontSize: '0.9375rem' }}>Chăm sóc và hỗ trợ trải nghiệm người dùng KhmerGo</p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
           <div style={{ padding: '0.5rem 1.25rem', background: 'var(--card-green)', color: '#fff', borderRadius: '10px', fontSize: '0.8125rem', fontWeight: 700, boxShadow: '0 4px 12px rgba(46, 216, 182, 0.2)' }}>
@@ -128,16 +128,12 @@ const Users = () => {
           <Search size={20} color="#94a3b8" />
           <input
             type="text"
-            placeholder="Tìm theo tên, email..."
+            placeholder="Tìm theo tên, hoặc email..."
             style={{ width: '100%', border: 'none', outline: 'none', fontSize: '0.9375rem', color: '#1e293b', fontWeight: 500 }}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button style={{ padding: '0 1.5rem', background: '#fff', borderRadius: '14px', border: '1px solid #edf2f7', display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', fontWeight: 600, color: '#475569', boxShadow: '0 2px 12px rgba(0,0,0,0.03)' }}>
-          <Filter size={18} color="#64748b" />
-          Bộ lọc
-        </button>
       </div>
 
       {loading ? (
@@ -179,10 +175,17 @@ const Users = () => {
                 >
                   <MessageCircleMore size={18} />
                 </button>
-                <button onClick={() => setSelectedUser(user)} style={{ flex: 1, padding: '0.625rem', borderRadius: '8px', border: '1px solid #eee', background: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem' }}>Chi tiết</button>
+                <button
+                  onClick={() => setSelectedUser(user)}
+                  style={{ flex: 1, padding: '0.625rem', borderRadius: '8px', border: '1px solid #eee', background: '#fff', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem' }}
+                  title="Xem chi tiết"
+                >
+                  Chi tiết
+                </button>
                 <button
                   onClick={() => toggleBlock(user)}
                   style={{ padding: '0.625rem', borderRadius: '8px', border: 'none', background: user.isBlocked ? '#2ed8b6' : '#ff5370', color: '#fff', cursor: 'pointer' }}
+                  title={user.isBlocked ? "Mở chặn người dùng" : "Chặn người dùng này"}
                 >
                   {user.isBlocked ? <CheckCircle size={18} /> : <Ban size={18} />}
                 </button>
@@ -198,6 +201,9 @@ const Users = () => {
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1.5rem' }}>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} onClick={() => setSelectedUser(null)} />
             <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} style={{ position: 'relative', width: '100%', maxWidth: '400px', background: '#fff', borderRadius: '24px', padding: '1.5rem', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+              <div style={{ position: 'absolute', top: '1.25rem', right: '1.25rem' }}>
+                <button onClick={() => setSelectedUser(null)} style={{ background: '#f8fafc', border: 'none', padding: '0.5rem', borderRadius: '50%', cursor: 'pointer', color: '#64748b' }}><X size={20} /></button>
+              </div>
               <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
                 <img src={selectedUser.avatar || 'https://i.pravatar.cc/150?u=' + selectedUser.id} style={{ width: 90, height: 90, borderRadius: '50%', marginBottom: '0.75rem' }} />
                 <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{selectedUser.name}</h2>
@@ -209,11 +215,8 @@ const Users = () => {
                 <div style={{ gridColumn: 'span 2' }}>
                   <InfoItem icon={Mail} label="Email" value={selectedUser.email || 'N/A'} />
                 </div>
-                <InfoItem icon={Star} label="Điểm số" value={`${Number(selectedUser.points) || 0} pts`} />
-                <InfoItem icon={Calendar} label="Ngày tham gia" value={selectedUser.createdAt && selectedUser.createdAt.seconds ? new Date(selectedUser.createdAt.seconds * 1000).toLocaleDateString('vi-VN') : 'Mới'} />
-                <div style={{ gridColumn: 'span 2' }}>
-                  <InfoItem icon={Hash} label="ID Người dùng" value={selectedUser.id} />
-                </div>
+                <InfoItem icon={Star} label="Điểm số" value={`${Number(selectedUser.points) || 0} điểm`} />
+                <InfoItem icon={CheckCircle} label="Hoàn thành" value={`${selectedUser.completedQuizzes || 0} bài thử thách`} />
               </div>
               <button onClick={() => setSelectedUser(null)} style={{ width: '100%', marginTop: '1.5rem', padding: '0.875rem', borderRadius: '12px', border: 'none', background: 'var(--card-blue)', color: '#fff', fontWeight: 700, cursor: 'pointer' }}>Hoàn tất</button>
             </motion.div>
