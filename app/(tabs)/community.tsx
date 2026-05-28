@@ -796,7 +796,7 @@ export default function CommunityScreen() {
                 style={styles.pModalSecondaryBtn}
                 onPress={() => setShowLoginModal(false)}
               >
-                <Text style={styles.pModalSecondaryBtnText}>Hủy</Text>
+                <Text style={styles.pModalSecondaryBtnText}>Quay lại</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -1008,6 +1008,6 @@ const styles = StyleSheet.create({
   pModalSecondaryBtnText: {
     color: '#FFF',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
   },
 });

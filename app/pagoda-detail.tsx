@@ -7,7 +7,6 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Dimensions, Image, Linking, Modal, ScrollView,
   Share,
   StatusBar,
@@ -329,9 +328,9 @@ export default function PagodaDetailScreen() {
             <Text style={styles.modalSub}>
               {t('login_to_use') || 'Bạn cần đăng nhập để tham gia thử thách này'}
             </Text>
-            
+
             <View style={styles.modalActionRow}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalPrimaryBtn}
                 onPress={() => {
                   setShowLoginModal(false);
@@ -343,12 +342,12 @@ export default function PagodaDetailScreen() {
               >
                 <Text style={styles.modalPrimaryBtnText}>{isKm ? 'ចូល' : 'Đăng nhập'}</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
                 style={styles.modalSecondaryBtn}
                 onPress={() => setShowLoginModal(false)}
               >
-                <Text style={styles.modalSecondaryBtnText}>{isKm ? 'បោះបង់' : 'Hủy'}</Text>
+                <Text style={styles.modalSecondaryBtnText}>{isKm ? 'បោះបង់' : 'Quay lại'}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -688,6 +687,6 @@ const styles = StyleSheet.create({
   modalSecondaryBtnText: {
     color: '#FFF',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
   },
 });

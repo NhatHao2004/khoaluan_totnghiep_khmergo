@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Dimensions, Image, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -226,9 +226,9 @@ export default function QuizScreen() {
             </View>
             <Text style={styles.modalTitle}>{t('login_required')}</Text>
             <Text style={styles.modalSub}>{t('login_to_use')}</Text>
-            
+
             <View style={styles.modalActionRow}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalPrimaryBtn}
                 onPress={() => {
                   setShowLoginModal(false);
@@ -237,12 +237,12 @@ export default function QuizScreen() {
               >
                 <Text style={styles.modalPrimaryBtnText}>Đăng nhập</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
                 style={styles.modalSecondaryBtn}
                 onPress={() => setShowLoginModal(false)}
               >
-                <Text style={styles.modalSecondaryBtnText}>Huỷ</Text>
+                <Text style={styles.modalSecondaryBtnText}>Quay lại</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -672,6 +672,6 @@ const styles = StyleSheet.create({
   modalSecondaryBtnText: {
     color: '#FFF',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
   },
 });

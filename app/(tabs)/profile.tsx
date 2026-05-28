@@ -457,8 +457,8 @@ const styles = StyleSheet.create({
   confirmLogoutText: {
     color: '#FFF',
     fontSize: 16,
-    fontWeight: '700',
-    lineHeight: 28, // Increased for VN accents
+    fontWeight: '800',
+    lineHeight: 28,
   },
   cancelLogoutBtn: {
     height: 56,
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
   cancelLogoutText: {
     color: '#FFF',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
     lineHeight: 28,
   },
 
@@ -546,6 +546,7 @@ const styles = StyleSheet.create({
   loginModalSecondaryBtnText: {
     color: '#FFF',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
+    lineHeight: 28,
   },
 });

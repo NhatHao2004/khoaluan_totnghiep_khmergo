@@ -19,7 +19,7 @@ export const translations: any = {
     language: 'Ngôn ngữ',
     vietnamese: 'Tiếng Việt',
     khmer: 'Tiếng Khmer',
-    back: 'Hủy',
+    back: 'Quay lại',
     confirm: 'Xác nhận',
     close: 'Đóng',
     save: 'Lưu',
