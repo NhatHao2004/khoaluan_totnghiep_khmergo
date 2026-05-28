@@ -70,7 +70,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
       }
     } catch (error: any) {
-      console.error("Error fetching user data:", error);
+      // Chỉ log lỗi nếu không phải là lỗi bị chặn tài khoản (vì lỗi đó là chủ ý)
+      if (error.message !== 'ACCOUNT_BLOCKED') {
+        console.error("Error fetching user data:", error);
+      }
+      
       // Nếu lỗi là do phân quyền (thường là bị chặn bởi Rules)
       if (error.code === 'permission-denied') {
         await signOut(auth);
@@ -78,7 +82,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw new Error('ACCOUNT_BLOCKED');
       }
       
-      // Với các lỗi khác, ném về để UI xử lý
       throw error;
     }
   };
