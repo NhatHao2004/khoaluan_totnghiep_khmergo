@@ -13,6 +13,7 @@ export interface UserProfile {
   accuracy?: number;
   completedQuizzes?: number;
   interests?: string[];
+  isBlocked?: boolean;
 }
 
 
@@ -41,6 +42,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
       if (userDoc.exists()) {
         const data = userDoc.data();
+        
+        // Kiểm tra xem người dùng có bị chặn không
+        if (data.isBlocked) {
+          await signOut(auth);
+          setUser(null);
+          throw new Error('ACCOUNT_BLOCKED');
+        }
+
         setUser({
           uid: firebaseUser.uid,
           email: firebaseUser.email,
@@ -51,6 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           accuracy: data.accuracy ?? 0,
           completedQuizzes: data.completedQuizzes ?? 0,
           interests: data.interests || [],
+          isBlocked: data.isBlocked || false,
         });
 
       } else {
@@ -59,12 +69,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           email: firebaseUser.email,
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching user data:", error);
-      setUser({
-        uid: firebaseUser.uid,
-        email: firebaseUser.email,
-      });
+      // Nếu lỗi là do phân quyền (thường là bị chặn bởi Rules)
+      if (error.code === 'permission-denied') {
+        await signOut(auth);
+        setUser(null);
+        throw new Error('ACCOUNT_BLOCKED');
+      }
+      
+      // Với các lỗi khác, ném về để UI xử lý
+      throw error;
     }
   };
 
@@ -73,6 +88,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const currentUser = auth.currentUser;
     if (currentUser) {
       await fetchAndSetUser(currentUser);
+    } else {
+      // Nếu không có currentUser, có thể do fetchAndSetUser vừa gọi signOut
+      // Chúng ta thử kiểm tra lần cuối từ Firestore nếu cần, hoặc đơn giản là ném lỗi
+      throw new Error('AUTH_FAILED');
     }
   };
 

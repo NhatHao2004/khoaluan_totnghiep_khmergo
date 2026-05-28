@@ -93,6 +93,9 @@ export default function LoginScreen() {
       await signInWithEmailAndPassword(auth, email.trim(), password);
       await refreshUser();
 
+      // Sau khi refresh, nếu user vẫn null nghĩa là có lỗi hoặc bị chặn
+      // fetchAndSetUser sẽ ném ACCOUNT_BLOCKED, refreshUser sẽ ném AUTH_FAILED nếu user null
+
       if (returnTo) {
         router.replace({
           pathname: returnTo as any,
@@ -103,7 +106,9 @@ export default function LoginScreen() {
       }
     } catch (error: any) {
       let msg = t('update_failed');
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+      if (error.message === 'ACCOUNT_BLOCKED' || error.message === 'AUTH_FAILED') {
+        msg = 'Tài khoản của bạn đã bị khóa';
+      } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
         msg = t('wrong_old_pass');
       }
       triggerToast(msg, 'error');
