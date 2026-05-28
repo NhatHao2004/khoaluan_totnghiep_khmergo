@@ -1,6 +1,6 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Edit2, Search, Shield, Trash2 } from 'lucide-react';
+import { CheckCircle, Edit2, Search, Shield, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { db } from '../firebase/config';
 
@@ -14,6 +14,11 @@ interface Destination {
   description_khmer?: string;
   imageUrl?: string;
   imageUrl1?: string;
+  imageUrl2?: string;
+  imageUrl3?: string;
+  imageUrl4?: string;
+  imageUrl5?: string;
+  imageUrl6?: string;
   imageKey?: string;
   category?: string;
   rating?: number;
@@ -40,11 +45,10 @@ const TABS: { key: TabKey; label: string; color: string; bg: string }[] = [
 
 const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 'text', textarea = false }: any) => {
   const commonStyles: any = {
-    padding: Icon ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 1rem',
+    padding: Icon ? '1.125rem 1.25rem 1.125rem 3rem' : '1.125rem 1.25rem',
     fontSize: '0.9375rem',
     fontFamily: 'inherit',
-    lineHeight: '1.6',
-    textAlign: 'justify',
+    lineHeight: '1.85',
     width: '100%',
     wordBreak: 'break-word',
     whiteSpace: 'pre-wrap',
@@ -108,6 +112,9 @@ const Destinations = () => {
   const [editingItem, setEditingItem] = useState<Destination | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' }>({
+    isOpen: false, message: '', type: 'success'
+  });
   const [confirmConfig, setConfirmConfig] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({
     isOpen: false, title: '', message: '', onConfirm: () => { }
   });
@@ -116,12 +123,17 @@ const Destinations = () => {
     name: '', name_khmer: '',
     location: '', location_khmer: '',
     description: '', description_khmer: '',
-    imageUrl: '', imageUrl1: '', imageKey: '',
+    imageUrl: '', imageUrl1: '', imageUrl2: '', imageUrl3: '', imageUrl4: '', imageUrl5: '', imageUrl6: '', imageKey: '',
     latitude: '', longitude: '', rental: '',
     category: 'Chùa',
     favorite: false,
     contentBlocks: []
   });
+
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ isOpen: true, message, type });
+    setTimeout(() => setToast(prev => ({ ...prev, isOpen: false })), 3000);
+  };
 
   useEffect(() => {
     fetchDestinations();
@@ -148,9 +160,10 @@ const Destinations = () => {
       await updateDoc(docRef, updateData);
       setDestinations(destinations.map(d => d.id === id ? editingItem : d));
       setEditingItem(null);
+      showToast('Cập nhật nội dung thành công');
     } catch (error) {
       console.error("Error updating document:", error);
-      alert("Lỗi: Không có quyền cập nhật. Hãy kiểm tra Firestore Rules và đảm bảo bộ sưu tập 'destinations' có quyền 'write: if true'!");
+      showToast('Lỗi: Không thể cập nhật nội dung', 'error');
     }
   };
 
@@ -163,23 +176,27 @@ const Destinations = () => {
       setDestinations([createdItem, ...destinations]);
       setIsAddingNew(false);
       setNewItem({ name: '', location: '', description: '', imageUrl: '', category: activeTab });
+      showToast('Thêm nội dung mới thành công');
     } catch (error) {
       console.error("Error adding document:", error);
+      showToast('Lỗi: Không thể thêm nội dung mới', 'error');
     }
   };
 
   const handleDelete = async (id: string) => {
     setConfirmConfig({
       isOpen: true,
-      title: 'Xóa địa danh',
-      message: 'Bạn có chắc chắn muốn xóa địa danh này?\nThao tác này không thể hoàn tác.',
+      title: 'Xóa nội dung',
+      message: 'Bạn có chắc chắn muốn xóa nội dung này\nThao tác này không thể hoàn tác',
       onConfirm: async () => {
         try {
           await deleteDoc(doc(db, 'destinations', id));
           setDestinations(destinations.filter(d => d.id !== id));
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+          showToast('Đã xóa nội dung thành công');
         } catch (error) {
           console.error("Error deleting document:", error);
+          showToast('Lỗi: Không thể xóa nội dung', 'error');
         }
       }
     });
@@ -214,7 +231,6 @@ const Destinations = () => {
     }
   };
 
-  // Lọc theo tab hiện tại + tìm kiếm
   const filteredDestinations = destinations
     .filter(d => d.category === activeTab)
     .filter(d =>
@@ -222,18 +238,45 @@ const Destinations = () => {
       d.location?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-  // Đếm số lượng từng loại
   const countByTab = (key: TabKey) => destinations.filter(d => d.category === key).length;
 
   const currentTabMeta = TABS.find(t => t.key === activeTab)!;
 
   return (
     <div style={{ paddingBottom: '2rem' }}>
-      {/* Header */}
+      <AnimatePresence>
+        {toast.isOpen && (
+          <motion.div
+            initial={{ x: 300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 300, opacity: 0 }}
+            style={{
+              position: 'fixed',
+              top: '2rem',
+              right: '2rem',
+              zIndex: 10000,
+              padding: '1rem 1.5rem',
+              background: toast.type === 'success' ? '#10b981' : '#ff5370',
+              color: '#fff',
+              borderRadius: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+              fontWeight: 700,
+              fontSize: '0.9375rem'
+            }}
+          >
+            {toast.type === 'success' ? <CheckCircle size={20} /> : <Shield size={20} />}
+            {toast.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
         <div>
           <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#1e293b', letterSpacing: '-0.025em' }}>Quản lý nội dung</h1>
-          <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem', fontSize: '0.9375rem' }}>Quản lý chùa, văn hóa và ẩm thực Khmer</p>
+          <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem', fontSize: '0.9375rem' }}>Quản lý nội dung chùa, văn hóa và ẩm thực Khmer</p>
         </div>
         <button
           onClick={() => { setIsAddingNew(true); setNewItem({ ...newItem, category: activeTab }); }}
@@ -243,7 +286,6 @@ const Destinations = () => {
         </button>
       </div>
 
-      {/* Tab Bar */}
       <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', background: '#fff', borderRadius: '16px', padding: '0.5rem', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', border: '1px solid #f1f5f9' }}>
         {TABS.map(tab => {
           const isActive = activeTab === tab.key;
@@ -288,7 +330,6 @@ const Destinations = () => {
         })}
       </div>
 
-      {/* Search Bar */}
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', background: '#fff', borderRadius: '16px', padding: '0.75rem 1.25rem', boxShadow: '0 2px 12px rgba(0,0,0,0.03)', border: '1px solid #edf2f7' }}>
           <Search size={20} color="#94a3b8" />
@@ -302,7 +343,6 @@ const Destinations = () => {
         </div>
       </div>
 
-      {/* Card Grid */}
       {loading ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
           {[1, 2, 3, 4, 5, 6].map(i => (
@@ -312,6 +352,7 @@ const Destinations = () => {
       ) : filteredDestinations.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '5rem 2rem', background: '#fff', borderRadius: '24px', border: '1px solid #f1f5f9' }}>
           <div style={{ width: '80px', height: '80px', background: currentTabMeta.bg, borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+            <Search size={32} color="#fff" />
           </div>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.5rem' }}>
             {searchTerm ? 'Không tìm thấy kết quả' : `Chưa có ${currentTabMeta.label.toLowerCase()} nào`}
@@ -334,7 +375,6 @@ const Destinations = () => {
                 transition={{ duration: 0.2 }}
                 style={{ background: '#fff', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column' }}
               >
-                {/* Image */}
                 <div style={{ position: 'relative', height: '200px', overflow: 'hidden' }}>
                   <img
                     src={dest.imageUrl || 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600'}
@@ -357,14 +397,12 @@ const Destinations = () => {
                   </div>
                 </div>
 
-                {/* Content */}
                 <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
                   <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b', marginBottom: '0.5rem' }}>{dest.name}</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.8125rem', marginBottom: '1rem' }}>
                     <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{dest.location || 'Chưa cập nhật địa chỉ'}</span>
                   </div>
 
-                  {/* Actions */}
                   <div style={{ marginTop: 'auto', display: 'flex', gap: '0.75rem', paddingTop: '1.25rem', borderTop: '1px solid #f1f5f9' }}>
                     <button
                       onClick={() => setEditingItem(dest)}
@@ -376,7 +414,7 @@ const Destinations = () => {
                     <button
                       onClick={() => handleDelete(dest.id)}
                       style={{ padding: '0.625rem', borderRadius: '10px', border: 'none', background: '#fff5f5', color: '#ff5370', cursor: 'pointer', transition: 'all 0.2s' }}
-                      title="Xóa địa danh"
+                      title="Xóa nội dung"
                     >
                       <Trash2 size={18} />
                     </button>
@@ -388,7 +426,6 @@ const Destinations = () => {
         </div>
       )}
 
-      {/* Editor Modal */}
       <AnimatePresence>
         {(editingItem || isAddingNew) && (
           <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1.5rem' }}>
@@ -407,34 +444,40 @@ const Destinations = () => {
 
               <form onSubmit={isAddingNew ? handleAddNew : handleUpdate} style={{ display: 'grid', gap: '1.5rem' }}>
                 <div style={{ maxHeight: 'calc(100vh - 300px)', overflowY: 'auto', paddingRight: '0.5rem', display: 'grid', gap: '1.5rem' }}>
-                  {/* Thông tin cơ bản */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <InputField label="Tên địa danh" value={isAddingNew ? newItem.name : editingItem?.name} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, name: v }) : setEditingItem({ ...editingItem!, name: v })} />
                     <InputField label="Tên (Khmer)" value={isAddingNew ? newItem.name_khmer : editingItem?.name_khmer} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, name_khmer: v }) : setEditingItem({ ...editingItem!, name_khmer: v })} />
                   </div>
 
-                  {/* Địa chỉ & Tọa độ */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <InputField label="Địa chỉ" value={isAddingNew ? newItem.location : editingItem?.location} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, location: v }) : setEditingItem({ ...editingItem!, location: v })} />
                     <InputField label="Địa chỉ (Khmer)" value={isAddingNew ? newItem.location_khmer : editingItem?.location_khmer} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, location_khmer: v }) : setEditingItem({ ...editingItem!, location_khmer: v })} />
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                    <InputField label="Vĩ độ" value={isAddingNew ? newItem.latitude : editingItem?.latitude} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, latitude: v }) : setEditingItem({ ...editingItem!, latitude: v })} />
-                    <InputField label="Kinh độ" value={isAddingNew ? newItem.longitude : editingItem?.longitude} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, longitude: v }) : setEditingItem({ ...editingItem!, longitude: v })} />
-                  </div>
+                  {activeTab !== 'Văn hóa' && (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                      <InputField label="Vĩ độ" value={isAddingNew ? newItem.latitude : editingItem?.latitude} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, latitude: v }) : setEditingItem({ ...editingItem!, latitude: v })} />
+                      <InputField label="Kinh độ" value={isAddingNew ? newItem.longitude : editingItem?.longitude} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, longitude: v }) : setEditingItem({ ...editingItem!, longitude: v })} />
+                    </div>
+                  )}
 
-                  {/* Hình ảnh */}
                   <div style={{ display: 'grid', gap: '1.25rem' }}>
                     <InputField label="Link ảnh chính" value={isAddingNew ? newItem.imageUrl : editingItem?.imageUrl} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl: v }) : setEditingItem({ ...editingItem!, imageUrl: v })} />
-                    <InputField label="Link ảnh phụ" value={isAddingNew ? newItem.imageUrl1 : editingItem?.imageUrl1} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl1: v }) : setEditingItem({ ...editingItem!, imageUrl1: v })} />
+                    <InputField label="Link ảnh phụ 1" value={isAddingNew ? newItem.imageUrl1 : editingItem?.imageUrl1} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl1: v }) : setEditingItem({ ...editingItem!, imageUrl1: v })} />
+                    {activeTab === 'Văn hóa' && (
+                      <>
+                        <InputField label="Link ảnh phụ 2" value={isAddingNew ? newItem.imageUrl2 : editingItem?.imageUrl2} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl2: v }) : setEditingItem({ ...editingItem!, imageUrl2: v })} />
+                        <InputField label="Link ảnh phụ 3" value={isAddingNew ? newItem.imageUrl3 : editingItem?.imageUrl3} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl3: v }) : setEditingItem({ ...editingItem!, imageUrl3: v })} />
+                        <InputField label="Link ảnh phụ 4" value={isAddingNew ? newItem.imageUrl4 : editingItem?.imageUrl4} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl4: v }) : setEditingItem({ ...editingItem!, imageUrl4: v })} />
+                        <InputField label="Link ảnh phụ 5" value={isAddingNew ? newItem.imageUrl5 : editingItem?.imageUrl5} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl5: v }) : setEditingItem({ ...editingItem!, imageUrl5: v })} />
+                        <InputField label="Link ảnh phụ 6" value={isAddingNew ? newItem.imageUrl6 : editingItem?.imageUrl6} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl6: v }) : setEditingItem({ ...editingItem!, imageUrl6: v })} />
+                      </>
+                    )}
                   </div>
 
-                  {/* Mô tả */}
-                  <InputField label="Mô tả ngắn" textarea value={isAddingNew ? newItem.description : editingItem?.description} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, description: v }) : setEditingItem({ ...editingItem!, description: v })} />
+                  <InputField label="Mô tả ngắn (Tiếng Việt)" textarea value={isAddingNew ? newItem.description : editingItem?.description} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, description: v }) : setEditingItem({ ...editingItem!, description: v })} />
                   <InputField label="Mô tả ngắn (Khmer)" textarea value={isAddingNew ? newItem.description_khmer : editingItem?.description_khmer} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, description_khmer: v }) : setEditingItem({ ...editingItem!, description_khmer: v })} />
 
-                  {/* Content Blocks */}
                   <div style={{ borderTop: '2px dashed #f1f5f9', paddingTop: '0.75rem', marginTop: '0rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                       <h3 style={{ fontSize: '0.85rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase' }}>Các khối nội dung chi tiết</h3>
@@ -466,7 +509,7 @@ const Destinations = () => {
                 <div style={{ display: 'flex', gap: '1rem', marginTop: '0', paddingTop: '0' }}>
                   <button type="button" onClick={() => { setEditingItem(null); setIsAddingNew(false); }} style={{ flex: 1, padding: '0.875rem', borderRadius: '14px', border: '1px solid #e2e8f0', background: '#ff0000ff', color: '#ffffffff', fontWeight: 700, cursor: 'pointer' }}>Hủy bỏ</button>
                   <button type="submit" style={{ flex: 1, padding: '0.875rem', borderRadius: '14px', border: 'none', background: 'var(--card-blue)', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(64, 153, 255, 0.2)' }}>
-                    {isAddingNew ? 'Tạo mới ngay' : 'Cập nhật thay đổi'}
+                    {isAddingNew ? 'Tạo mới ngay' : 'Cập nhật'}
                   </button>
                 </div>
               </form>
@@ -487,8 +530,8 @@ const Destinations = () => {
               <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1rem', color: '#1e293b' }}>{confirmConfig.title}</h3>
               <p style={{ color: '#64748b', lineHeight: 1.6, marginBottom: '2.5rem', whiteSpace: 'pre-line' }}>{confirmConfig.message}</p>
               <div style={{ display: 'flex', gap: '1rem' }}>
-                <button onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))} style={{ flex: 1, padding: '0.875rem', borderRadius: '14px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', fontWeight: 700, cursor: 'pointer' }}>Hủy</button>
-                <button onClick={confirmConfig.onConfirm} style={{ flex: 1, padding: '0.875rem', borderRadius: '14px', border: 'none', background: '#ff5370', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(255, 83, 112, 0.2)' }}>Đồng ý xóa</button>
+                <button onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))} style={{ flex: 1, padding: '0.875rem', borderRadius: '14px', border: '1px solid #e2e8f0', background: 'var(--card-blue)', color: '#ffffffff', fontWeight: 700, cursor: 'pointer' }}>Hủy</button>
+                <button onClick={confirmConfig.onConfirm} style={{ flex: 1, padding: '0.875rem', borderRadius: '14px', border: 'none', background: '#ff5370', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(255, 83, 112, 0.2)' }}>Đồng ý</button>
               </div>
             </motion.div>
           </div>

@@ -138,8 +138,22 @@ const Users = () => {
       </div>
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '5rem' }}>
-          <div className="fade-in">Đang tải danh sách người dùng...</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} style={{ height: 280, background: '#fff', borderRadius: '24px', animation: 'pulse 1.5s infinite ease-in-out' }} />
+          ))}
+        </div>
+      ) : filteredUsers.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '5rem 2rem', background: '#fff', borderRadius: '24px', border: '1px solid #f1f5f9' }}>
+          <div style={{ width: '80px', height: '80px', background: 'var(--card-blue)', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+            <Search size={32} color="#fff" />
+          </div>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.5rem' }}>
+            {searchTerm ? 'Không tìm thấy người dùng' : 'Chưa có người dùng nào'}
+          </h3>
+          <p style={{ color: '#94a3b8', fontSize: '0.9375rem' }}>
+            {searchTerm ? 'Thử thay đổi từ khóa tìm kiếm' : 'Danh sách người dùng hiện đang trống'}
+          </p>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
