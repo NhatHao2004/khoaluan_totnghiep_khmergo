@@ -91,6 +91,7 @@ const Users = () => {
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
         } catch (error) {
           console.error("Error updating user status:", error);
+          alert("Lỗi: Không có quyền cập nhật người dùng. Kiểm tra Firestore Rules!");
         }
       }
     });

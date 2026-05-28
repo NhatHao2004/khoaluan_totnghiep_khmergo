@@ -1,4 +1,4 @@
-import { BookOpen, LayoutDashboard, LogOut, MapPin, Users } from 'lucide-react';
+import { BookOpen, LayoutDashboard, LogOut, Users } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 import icon from '../assets/icon.png';
@@ -24,15 +24,9 @@ const Sidebar = () => {
           Người dùng
         </NavLink>
 
-
         <NavLink to="/destinations" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-          <MapPin size={18} />
-          Nội dung
-        </NavLink>
-
-        <NavLink to="/quizzes" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           <BookOpen size={18} />
-          Câu đố
+          Nội dung
         </NavLink>
       </nav>
 

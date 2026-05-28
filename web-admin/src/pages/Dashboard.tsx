@@ -51,7 +51,7 @@ const Dashboard = () => {
     <div className="fade-in">
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
         <StatCard title="Tổng người dùng" value={stats.users} background="var(--card-orange)" onClick={() => navigate('/users')} />
-        <StatCard title="Địa danh" value={stats.destinations} background="var(--card-green)" />
+        <StatCard title="Nội dung" value={stats.destinations} background="var(--card-green)" />
         <StatCard title="Câu đố" value={stats.quizzes} background="var(--card-pink)" />
         <StatCard title="Bài viết mới" value={stats.posts} background="var(--card-blue)" />
       </div>
