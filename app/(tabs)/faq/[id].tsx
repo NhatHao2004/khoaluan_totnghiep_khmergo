@@ -107,7 +107,7 @@ export default function FAQDetailScreen() {
     <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push('/(tabs)/support')} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={26} color="#1E293B" />
+          <Ionicons name="arrow-back" size={28} color="#1E293B" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
         <View style={{ width: 26 }} />
@@ -155,14 +155,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 55,
-    paddingBottom: 20,
+    paddingTop: 50,
+    paddingBottom: 15,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
   },
   backBtn: {
-    padding: 2,
+    padding: 1,
   },
   headerTitle: {
     fontSize: 18,
