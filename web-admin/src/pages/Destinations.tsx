@@ -39,6 +39,19 @@ const TABS: { key: TabKey; label: string; color: string; bg: string }[] = [
 ];
 
 const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 'text', textarea = false }: any) => {
+  const commonStyles: any = {
+    padding: Icon ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 1rem',
+    fontSize: '0.9375rem',
+    fontFamily: 'inherit',
+    lineHeight: '1.6',
+    textAlign: 'justify',
+    width: '100%',
+    wordBreak: 'break-word',
+    whiteSpace: 'pre-wrap',
+    border: '1px solid transparent',
+    boxSizing: 'border-box',
+  };
+
   return (
     <div className="input-group">
       <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#64748b', marginBottom: '0.5rem', textTransform: 'uppercase' }}>{label}</label>
@@ -48,37 +61,26 @@ const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 't
           <div style={{ display: 'grid' }}>
             <div
               style={{
+                ...commonStyles,
                 gridArea: '1 / 1 / 2 / 2',
                 visibility: 'hidden',
-                whiteSpace: 'pre-wrap',
-                wordWrap: 'break-word',
-                padding: Icon ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 1rem',
-                fontSize: 'inherit',
-                fontFamily: 'inherit',
-                lineHeight: 1.6,
                 minHeight: '80px',
-                textAlign: 'justify',
               }}
             >
-              {(value || '') + ' \n'}
+              {(value || '') + ' '}
             </div>
             <textarea
               rows={1}
               style={{
+                ...commonStyles,
                 gridArea: '1 / 1 / 2 / 2',
-                width: '100%',
-                padding: Icon ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 1rem',
                 borderRadius: '12px',
                 border: '1px solid #e2e8f0',
                 outline: 'none',
                 fontWeight: 600,
                 resize: 'none',
-                lineHeight: 1.6,
                 overflow: 'hidden',
-                textAlign: 'justify',
                 background: 'transparent',
-                fontFamily: 'inherit',
-                fontSize: 'inherit',
               }}
               value={value || ''}
               onChange={(e) => onChange(e.target.value)}
