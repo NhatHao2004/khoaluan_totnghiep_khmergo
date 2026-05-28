@@ -760,7 +760,7 @@ export default function CommunityScreen() {
               <View style={styles.optionIconContainer}><Ionicons name="trash-outline" size={24} color="#FF3B30" /></View>
               <View><Text style={[styles.optionText, { color: '#FF3B30' }]}>Xóa bỏ bài viết</Text></View>
             </TouchableOpacity>
-            <View style={{ height: 10 }} />
+            <View style={{ height: 8 }} />
           </View>
         </TouchableOpacity>
       </Modal>
