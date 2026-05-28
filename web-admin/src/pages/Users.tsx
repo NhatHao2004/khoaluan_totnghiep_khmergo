@@ -1,6 +1,6 @@
 import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Ban, CheckCircle, Mail, MessageCircleMore, MessageSquareText, Search, Shield, Star, X } from 'lucide-react';
+import { Ban, CheckCircle, Mail, MessageCircleMore, MessageSquareText, Search, Shield, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { db } from '../firebase/config';
 
@@ -201,9 +201,6 @@ const Users = () => {
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1.5rem' }}>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} onClick={() => setSelectedUser(null)} />
             <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} style={{ position: 'relative', width: '100%', maxWidth: '400px', background: '#fff', borderRadius: '24px', padding: '1.5rem', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
-              <div style={{ position: 'absolute', top: '1.25rem', right: '1.25rem' }}>
-                <button onClick={() => setSelectedUser(null)} style={{ background: '#f8fafc', border: 'none', padding: '0.5rem', borderRadius: '50%', cursor: 'pointer', color: '#64748b' }}><X size={20} /></button>
-              </div>
               <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
                 <img src={selectedUser.avatar || 'https://i.pravatar.cc/150?u=' + selectedUser.id} style={{ width: 90, height: 90, borderRadius: '50%', marginBottom: '0.75rem' }} />
                 <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{selectedUser.name}</h2>

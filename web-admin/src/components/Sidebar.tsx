@@ -27,7 +27,7 @@ const Sidebar = () => {
 
         <NavLink to="/destinations" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           <MapPin size={18} />
-          Địa danh
+          Nội dung
         </NavLink>
 
         <NavLink to="/quizzes" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>

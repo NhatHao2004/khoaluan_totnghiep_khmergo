@@ -96,10 +96,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    // Listen for Firebase auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
       if (firebaseUser) {
-        await fetchAndSetUser(firebaseUser);
+        try {
+          await fetchAndSetUser(firebaseUser);
+        } catch (error: any) {
+          // Lỗi ACCOUNT_BLOCKED hoặc AUTH_FAILED đã được xử lý bên trong fetchAndSetUser
+          // (signOut đã được gọi, setUser(null) đã được gọi)
+          // Không cần làm gì thêm ở đây, chỉ đảm bảo setLoading được gọi
+          if (error.message !== 'ACCOUNT_BLOCKED' && error.message !== 'AUTH_FAILED') {
+            console.error("Unexpected auth error:", error);
+          }
+        }
       } else {
         setUser(null);
       }
