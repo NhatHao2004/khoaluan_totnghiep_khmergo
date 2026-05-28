@@ -472,10 +472,13 @@ const styles = StyleSheet.create({
     minHeight: 120,
   },
   phoneticText: {
-    fontSize: 14,
+    fontSize: 13,
+    lineHeight: 20,
     color: '#5F6368',
     fontStyle: 'italic',
     marginTop: 5,
+    paddingHorizontal: 20,
+    width: '100%',
   },
   inputFooter: {
     flexDirection: 'row',

@@ -126,7 +126,7 @@ export default function LanguageDetailScreen() {
 
               <View style={styles.wordContent}>
                 <ThemedText style={styles.khmerText} selectable={true}>{word.khm}</ThemedText>
-                <ThemedText style={styles.pronunciationText}>"{word.pronunciation}"</ThemedText>
+                <ThemedText style={styles.pronunciationText}>"{word.pronunciation}" </ThemedText>
 
                 <View style={styles.divider} />
 
@@ -230,11 +230,14 @@ const styles = StyleSheet.create({
   },
   pronunciationText: {
     fontSize: 16,
+    lineHeight: 24,
     color: '#3B82F6',
     fontWeight: '500',
     fontStyle: 'italic',
     marginBottom: 20,
     textAlign: 'center',
+    paddingHorizontal: 20,
+    width: '100%',
   },
   divider: {
     width: '50%',

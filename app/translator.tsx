@@ -380,9 +380,12 @@ const styles = StyleSheet.create({
   },
   phoneticText: {
     marginTop: 8,
-    fontSize: 16,
+    fontSize: 14,
+    lineHeight: 22,
     color: '#5F6368',
     fontStyle: 'italic',
+    paddingHorizontal: 20,
+    width: '100%',
   },
   resultFooter: {
     flexDirection: 'row',

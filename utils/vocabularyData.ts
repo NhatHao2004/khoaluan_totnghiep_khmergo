@@ -65,7 +65,7 @@ export const VOCABULARY_CATEGORIES: VocabularyCategory[] = [
       { id: "g6", vie: "Bạn có khỏe không?", khm: "តើអ្នកសុខសប្បាយទេ?", pronunciation: "Tae neak sok-sa-bai te?" },
       { id: "g7", vie: "Tôi khỏe", khm: "ខ្ញុំសុខសប្បាយ", pronunciation: "Khnhom sok-sa-bai" },
       { id: "g8", vie: "Bạn tên gì?", khm: "អ្នកឈ្មោះអ្វី?", pronunciation: "Neak chhmua ei?" },
-      { id: "g9", vie: "Tôi tên là...", khm: "khôngខ្ញុំឈ្មោះ...", pronunciation: "Khnhom chhmua..." },
+      { id: "g9", vie: "Tôi tên là...", khm: "ខ្ញុំឈ្មោះ...", pronunciation: "Khnhom chhmua..." },
       { id: "g10", vie: "Hẹn gặp lại", khm: "ជួបគ្នាម្តងទៀត", pronunciation: "Chuob knea mdong tiet" },
     ]
   },
