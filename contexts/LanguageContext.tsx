@@ -133,11 +133,11 @@ export const translations: any = {
     feedback_failed: 'Gửi phản hồi thất bại. Vui lòng thử lại.',
     // FAQ Extra
     faq_how_to_use: 'Cách sử dụng ứng dụng',
-    faq_how_to_quiz: 'Cách làm bài kiểm tra',
-    faq_how_to_learn: 'Cách học hiệu quả hơn',
+    faq_how_to_quiz: 'Cách làm bài thử thách',
+    faq_how_to_learn: 'Cách đăng ký và đăng nhập',
     faq_use_content: 'Chào mừng bạn đến với KhmerGo! Để sử dụng ứng dụng, bạn có thể bắt đầu bằng cách khám phá các ngôi chùa tại mục Trang chủ, tham gia trả lời câu đố tại mục Thử thách để tích lũy điểm và thăng hạng.',
-    faq_quiz_content: 'Mỗi bài trắc nghiệm sẽ có các câu hỏi về văn hóa và ngôn ngữ Khmer. Bạn cần chọn câu trả lời đúng trong thời gian quy định để nhận được điểm thưởng.',
-    faq_learn_content: 'Để học hiệu quả, hãy luyện tập hàng ngày và sử dụng tính năng nhắc nhở học tập trong phần Cài đặt. Việc kết hợp giữa học từ vựng và tham gia thử thách sẽ giúp bạn ghi nhớ lâu hơn.',
+    faq_quiz_content: 'Mỗi bài thử thách sẽ có các câu hỏi về văn hóa và ngôn ngữ Khmer. Bạn cần chọn câu trả lời đúng trong thời gian quy định để nhận được điểm thưởng.',
+    faq_learn_content: 'Bạn có thể đăng ký tài khoản mới bằng email tại màn hình Đăng ký. Sau khi có tài khoản, hãy sử dụng thông tin đó để Đăng nhập và trải nghiệm đầy đủ các tính năng của ứng dụng như tích lũy điểm và thăng hạng.',
 
     // Home Screen
     promotions: 'Khám phá ngay',
@@ -356,10 +356,10 @@ export const translations: any = {
     // FAQ Extra
     faq_how_to_use: 'របៀបប្រើកម្មវិធី',
     faq_how_to_quiz: 'របៀបធ្វើតេស្ត',
-    faq_how_to_learn: 'របៀបរៀនឱ្យមានប្រសិទ្ធភាព',
+    faq_how_to_learn: 'របៀបចុះឈ្មោះ និងចូលប្រើប្រាស់',
     faq_use_content: 'សូម chào មកកាន់ KhmerGo! ដើម្បីប្រើកម្មវិធី អ្នក có thể ចាប់ផ្តើមដោយការរុករកវត្តអារាមនានានៅក្នុងទំព័រដើម ចូលរួមឆ្លើយសំណួរក្នុងផ្នែកសាកល្បង ដើម្បីបង្កើនពិន្ទុ និងតម្លើងឋានៈ។',
-    faq_quiz_content: 'រាល់ការសាកល្បងនីមួយៗនឹងមានសំណួរអំពីវប្បធម៌ និងភាសាខ្មែរ។ អ្នកត្រូវជ្រើសរើសចម្លើយដែលត្រឹមត្រូវក្នុងរយៈពេលកំណត់ ដើម្បីទទួលបានពិន្ទុបន្ថែម។',
-    faq_learn_content: 'ដើម្បីរៀនបានយ៉ាងមានប្រសិទ្ធភាព សូមហាត់រៀនជារៀងរាល់ថ្ងៃ និងប្រើមុខងាររំលឹកការសិក្សានៅក្នុងការកំណត់។ ការរួមបញ្ចូលគ្នារវាងការរៀនពាក្យ និងការសាកល្បងនឹងជួយឱ្យអ្នកចងចាំបានយូរ។',
+    faq_quiz_content: 'រាល់ការសាកល្បងនីមួយៗនឹងមានសំណួរអំពីវប្បធម៌ និងភាសាខ្មែរbox។ អ្នកត្រូវជ្រើសរើសចម្លើយដែលត្រឹមត្រូវក្នុងរយៈពេលកំណត់ ដើម្បីទទួលបានពិន្ទុបន្ថែម។',
+    faq_learn_content: 'អ្នកអាចចុះឈ្មោះគណនីថ្មីដោយប្រើអ៊ីមែលនៅក្នុងទំព័រចុះឈ្មោះ។ បន្ទាប់ពីមានគណនីហើយ សូមប្រើព័ត៌មាននោះដើម្បីចូលប្រើប្រាស់ និងទទួលបានបទពិសោធន៍ពេញលេញពីកម្មវិធី ដូចជាការធ្វើតេស្ត និងការសន្សំពិន្ទុ។',
 
     // Home Screen
     promotions: 'ការផ្សព្វផ្សាយ',

@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: '#1A1A1A',
-    marginBottom: 15,
+    marginBottom: 0,
     lineHeight: 26,
   },
   faqItem: {
@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 15,
+    paddingLeft: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
   },
