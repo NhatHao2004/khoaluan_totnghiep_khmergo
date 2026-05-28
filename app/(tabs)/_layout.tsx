@@ -4,7 +4,7 @@ import { Tabs, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming, runOnJS } from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
 
@@ -63,15 +63,15 @@ export default function TabsLayout() {
   }, []);
 
   const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-  const BUTTON_SIZE = 60;
+  const BUTTON_SIZE = 50;
   const MARGIN = 10;
   const BTN_BOTTOM = 80;
   const BTN_RIGHT = 10;
 
   // X limits (Initial is right:10)
-  const MIN_X = -SCREEN_WIDTH + BUTTON_SIZE + (BTN_RIGHT * 2); 
-  const MAX_X = 0; 
-  
+  const MIN_X = -SCREEN_WIDTH + BUTTON_SIZE + (BTN_RIGHT * 2);
+  const MAX_X = 0;
+
   // Y limits (Initial is bottom:80)
   const MIN_Y = -SCREEN_HEIGHT + BTN_BOTTOM + BUTTON_SIZE + 40; // top limit
   const MAX_Y = 0; // bottom limit
@@ -84,7 +84,7 @@ export default function TabsLayout() {
     .onUpdate((event) => {
       let nextX = event.translationX + context.value.x;
       let nextY = event.translationY + context.value.y;
-      
+
       // Clamp values during dragging
       translateX.value = Math.min(Math.max(nextX, MIN_X), MAX_X);
       translateY.value = Math.min(Math.max(nextY, MIN_Y), MAX_Y);
@@ -285,7 +285,7 @@ export default function TabsLayout() {
                 router.push('/ai-chat' as any);
               }}
             >
-              <Ionicons name="chatbubble-ellipses" size={26} color="rgba(255,255,255,0.8)" />
+              <Ionicons name="chatbubble-ellipses" size={22} color="rgba(255,255,255,0.8)" />
             </TouchableOpacity>
           </Animated.View>
         </GestureDetector>
@@ -301,9 +301,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 80,
     right: 10,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: 'rgba(30, 41, 59, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
