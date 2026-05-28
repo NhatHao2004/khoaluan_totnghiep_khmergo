@@ -417,8 +417,8 @@ const Destinations = () => {
                   <InputField label="Mô tả ngắn (Khmer)" textarea value={isAddingNew ? newItem.description_khmer : editingItem?.description_khmer} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, description_khmer: v }) : setEditingItem({ ...editingItem!, description_khmer: v })} />
 
                   {/* Content Blocks */}
-                  <div style={{ borderTop: '2px dashed #f1f5f9', paddingTop: '1.5rem', marginTop: '0.5rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                  <div style={{ borderTop: '2px dashed #f1f5f9', paddingTop: '0.75rem', marginTop: '0rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                       <h3 style={{ fontSize: '0.85rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase' }}>Các khối nội dung chi tiết</h3>
                       <button type="button" onClick={handleAddContentBlock} style={{ padding: '0.5rem 1rem', background: 'var(--card-blue)', color: '#fff', borderRadius: '10px', border: 'none', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         Thêm khối mới
@@ -445,7 +445,7 @@ const Destinations = () => {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #f1f5f9' }}>
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '0', paddingTop: '0' }}>
                   <button type="button" onClick={() => { setEditingItem(null); setIsAddingNew(false); }} style={{ flex: 1, padding: '0.875rem', borderRadius: '14px', border: '1px solid #e2e8f0', background: '#ff0000ff', color: '#ffffffff', fontWeight: 700, cursor: 'pointer' }}>Hủy bỏ</button>
                   <button type="submit" style={{ flex: 1, padding: '0.875rem', borderRadius: '14px', border: 'none', background: 'var(--card-blue)', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(64, 153, 255, 0.2)' }}>
                     {isAddingNew ? 'Tạo mới ngay' : 'Cập nhật thay đổi'}
