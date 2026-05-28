@@ -18,22 +18,22 @@ export default function FAQDetailScreen() {
           icon: 'apps-outline',
           steps: [
             {
-              title: '1. Khám phá địa điểm',
+              title: '1. Khám phá ngay',
               desc: 'Bắt đầu hành trình tại Trang chủ. Bạn có thể tìm thấy các ngôi chùa cổ kính, danh lam thắng cảnh và lễ hội đặc sắc của người Khmer Nam Bộ.',
               image: require('@/assets/images/guide/guide_1.png')
             },
             {
-              title: '2. Tìm hiểu Văn hóa & Ẩm thực',
+              title: '2. Tìm hiểu thêm',
               desc: 'Mỗi địa điểm đều có thông tin chi tiết về lịch sử, kiến trúc và các món ăn đặc sản. Hãy đọc kỹ để hiểu sâu hơn về nét đẹp truyền thống.',
               image: require('@/assets/images/guide/guide_2.png')
             },
             {
-              title: '3. Chinh phục thử thách',
+              title: '3. Vượt thử thách',
               desc: 'Tham gia các bài trắc nghiệm vui tại mục Thử thách. Trả lời đúng để tích lũy điểm thưởng và thăng hạng trên bảng xếp hạng cộng đồng.',
               image: require('@/assets/images/guide/guide_3.png')
             },
             {
-              title: '4. Tương tác với Trợ lý AI',
+              title: '4. Trò chuyện AI',
               desc: 'Nếu có bất kỳ thắc mắc nào, hãy nhấn vào biểu tượng Chat để trò chuyện với Trợ lý AI thông minh của KhmerGo.',
               image: require('@/assets/images/guide/guide_4.png')
             }
@@ -50,17 +50,17 @@ export default function FAQDetailScreen() {
               image: require('@/assets/images/guide/guide_3.png')
             },
             {
-              title: '2. Trả lời trắc nghiệm',
+              title: '2. Chơi thử thách',
               desc: 'Mỗi câu hỏi sẽ có 4 lựa chọn. Hãy suy nghĩ kỹ và chọn đáp án chính xác nhất trong thời gian quy định.',
               image: require('@/assets/images/guide/guide_2.png')
             },
             {
-              title: '3. Tích lũy điểm thưởng',
+              title: '3. Nhận quà tặng',
               desc: 'Sau khi hoàn thành, bạn sẽ nhận được điểm thưởng dựa trên số câu trả lời đúng. Điểm này dùng để thăng hạng thành viên.',
               image: require('@/assets/images/guide/guide_1.png')
             },
             {
-              title: '4. Kiểm tra thứ hạng',
+              title: '4. Xem xếp hạng',
               desc: 'Xem thứ hạng của mình so với các người dùng khác tại bảng xếp hạng chung để nỗ lực đạt vị trí cao hơn mỗi ngày.',
               image: require('@/assets/images/guide/guide_4.png')
             }
@@ -72,22 +72,22 @@ export default function FAQDetailScreen() {
           icon: 'person-circle-outline',
           steps: [
             {
-              title: '1. Vào mục cá nhân',
+              title: '1. Vào hồ sơ',
               desc: 'Nhấn vào biểu tượng Hồ sơ ở thanh điều hướng phía dưới, sau đó chọn Đăng nhập hoặc Đăng ký tài khoản.',
               image: require('@/assets/images/guide/guide_4.png')
             },
             {
-              title: '2. Đăng ký tài khoản',
+              title: '2. Đăng ký ngay',
               desc: 'Nếu bạn chưa có tài khoản, hãy nhập Email và Mật khẩu để tạo mới. Sau đó bạn có thể chọn các chủ đề mình quan tâm.',
               image: require('@/assets/images/guide/guide_1.png')
             },
             {
-              title: '3. Tham gia cộng đồng',
+              title: '3. Cộng đồng Khmer',
               desc: 'Khi đã đăng nhập, bạn có thể tham gia bình luận, chia sẻ ảnh và lưu lại các địa điểm yêu thích của mình.',
               image: require('@/assets/images/guide/guide_2.png')
             },
             {
-              title: '4. Quản lý tài khoản',
+              title: '4. Đổi mật khẩu',
               desc: 'Bạn có thể thay đổi mật khẩu, cập nhật thông tin cá nhân hoặc quản lý quyền riêng tư trong mục Cài đặt tài khoản.',
               image: require('@/assets/images/guide/guide_3.png')
             }
