@@ -753,12 +753,12 @@ export default function CommunityScreen() {
         <TouchableOpacity style={styles.optionsOverlay} activeOpacity={1} onPress={() => setOptionsModalVisible(false)}>
           <View style={[styles.optionsContent, { paddingBottom: insets.bottom + 10 }]}>
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleEditPost(selectedPost); }}>
-              <View style={styles.optionIconContainer}><Ionicons name="create-outline" size={24} color="#0051ffff" /></View>
+              <View style={styles.optionIconContainer}><Ionicons name="create-outline" size={24} color="#FFF" /></View>
               <View><Text style={styles.optionText}>Chỉnh sửa bài viết</Text></View>
             </TouchableOpacity>
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleDeletePost(selectedPost.id, selectedPost.userId); }}>
-              <View style={styles.optionIconContainer}><Ionicons name="trash-outline" size={24} color="#FF3B30" /></View>
-              <View><Text style={[styles.optionText, { color: '#FF3B30' }]}>Xóa bỏ bài viết</Text></View>
+              <View style={styles.optionIconContainer}><Ionicons name="trash-outline" size={24} color="#FFF" /></View>
+              <View><Text style={styles.optionText}>Xóa bỏ bài viết</Text></View>
             </TouchableOpacity>
             <View style={{ height: 8 }} />
           </View>
@@ -923,11 +923,11 @@ const styles = StyleSheet.create({
   attachActionText: { fontSize: 14, fontWeight: '700', color: '#1877F2', marginRight: 2 },
   closeModalBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', borderRadius: 22, backgroundColor: '#FFF0F0' },
   optionsOverlay: { flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end' },
-  optionsContent: { backgroundColor: '#FFFFFF', borderRadius: 30, marginHorizontal: 15, marginBottom: 15, paddingHorizontal: 10, paddingTop: 20, paddingBottom: 5, shadowColor: '#000', shadowOffset: { width: 0, height: -10 }, shadowOpacity: 0.1, shadowRadius: 20, elevation: 20 },
+  optionsContent: { backgroundColor: '#000', borderRadius: 30, marginHorizontal: 15, marginBottom: 15, paddingHorizontal: 10, paddingTop: 20, paddingBottom: 5, shadowColor: '#000', shadowOffset: { width: 0, height: -10 }, shadowOpacity: 0.1, shadowRadius: 20, elevation: 20 },
   optionsHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: 12 },
   optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: 2, paddingHorizontal: 25, width: '100%' },
   optionIconContainer: { width: 30, height: 40, justifyContent: 'center', alignItems: 'center', marginRight: 15 },
-  optionText: { fontSize: 16, fontWeight: '600', color: '#1A1A1A' },
+  optionText: { fontSize: 16, fontWeight: '600', color: '#FFFFFF' },
 
   // --- Premium Login Modal Styles (Unique Names to avoid conflict) ---
   pModalOverlay: {
