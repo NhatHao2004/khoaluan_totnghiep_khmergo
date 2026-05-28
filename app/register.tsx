@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
   addBtnSmall: { position: 'absolute', bottom: 0, right: 0, width: 28, height: 28, borderRadius: 14, backgroundColor: '#10B981', justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: '#FFF' },
   avatarHint: { marginTop: 10, fontSize: 13, color: '#94A3B8', fontWeight: '600' },
 
-  form: { gap: 18, marginBottom: 10 },
+  form: { gap: 18, marginBottom: 12 },
   inputGroup: { gap: 8 },
   inputLabel: { fontSize: 14, fontWeight: '700', color: '#64748B', marginLeft: 4 },
   inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: 16, paddingHorizontal: 16, height: 56, borderWidth: 1, borderColor: '#F1F5F9' },
@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
   input: { flex: 1, fontSize: 16, color: '#1E293B', fontWeight: '600', paddingVertical: 10 },
 
   interestsBox: { marginBottom: 20 },
-  interestsHeader: { fontSize: 14, fontWeight: '700', color: '#64748B', marginBottom: 12, marginLeft: 4 },
+  interestsHeader: { fontSize: 14, fontWeight: '700', color: '#64748B', marginBottom: 15, marginLeft: 4 },
   interestsAsymmetricGrid: {
     flexDirection: 'row',
     gap: 12,
@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
   btnText: { fontSize: 16, fontWeight: '800', color: '#FFF', letterSpacing: 1, lineHeight: 24, includeFontPadding: false },
 
   footer: { marginTop: 20, alignItems: 'center' },
-  footerText: { fontSize: 13, color: '#94A3B8', textDecorationLine: 'underline' },
+  footerText: { fontSize: 13, color: '#94A3B8' },
 
   modalOverlay: { flex: 1, backgroundColor: 'rgba(15, 23, 42, 0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalContent: { backgroundColor: '#FFF', width: '100%', borderRadius: 32, padding: 24 },
