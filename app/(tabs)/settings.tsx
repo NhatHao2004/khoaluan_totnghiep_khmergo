@@ -229,6 +229,7 @@ export default function SettingsScreen() {
         visible={showIntro}
         animationType="fade"
         transparent={true}
+        statusBarTranslucent={true}
         onRequestClose={() => setShowIntro(false)}
       >
         <View style={styles.introOverlay}>
@@ -256,11 +257,10 @@ export default function SettingsScreen() {
               {/* Learning Goals */}
               <View style={styles.introSection}>
                 <Text style={styles.introSectionTitle}>KhmerGo giúp người dùng tìm hiểu về:</Text>
-                <Text style={styles.introBullet}>• Chùa Khmer</Text>
-                <Text style={styles.introBullet}>• Lễ hội truyền thống</Text>
+                <Text style={styles.introBullet}>• Ngôi chùa Khmer</Text>
+                <Text style={styles.introBullet}>• Văn hóa Khmer</Text>
                 <Text style={styles.introBullet}>• Ẩm thực Khmer</Text>
-                <Text style={styles.introBullet}>• Văn hóa dân gian</Text>
-                <Text style={styles.introBullet}>• Ngôn ngữ và chữ viết Khmer</Text>
+                <Text style={styles.introBullet}>• Học tiếng Khmer</Text>
               </View>
 
               {/* Objectives */}
@@ -525,17 +525,17 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: '#475569',
     textAlign: 'center',
-    marginBottom: 25,
+    marginBottom: 15,
     fontStyle: 'italic',
   },
   introSection: {
-    marginBottom: 20,
+    marginBottom: 8,
   },
   introSectionTitle: {
     fontSize: 15,
     fontWeight: '800',
     color: '#1E293B',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   introDetailRow: {
     flexDirection: 'row',
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
   introRow: {
     flexDirection: 'row',
     gap: 20,
-    marginBottom: 5,
+    marginBottom: 4,
   },
   actionGrid: {
     flexDirection: 'row',
@@ -586,7 +586,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#94A3B8',
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: 15,
   },
   // Toast Styles
   toastContainer: {
