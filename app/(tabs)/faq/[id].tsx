@@ -15,26 +15,25 @@ export default function FAQDetailScreen() {
       case 'use':
         return {
           title: t('faq_how_to_use'),
-          content: t('faq_use_content'),
           icon: 'apps-outline',
           steps: [
             {
-              title: '1. Khám phá',
+              title: '1. Khám phá địa điểm',
               desc: 'Bắt đầu hành trình tại Trang chủ. Bạn có thể tìm thấy các ngôi chùa cổ kính, danh lam thắng cảnh và lễ hội đặc sắc của người Khmer Nam Bộ.',
               image: require('@/assets/images/guide/guide_1.png')
             },
             {
-              title: '2. Tìm hiểu',
+              title: '2. Tìm hiểu Văn hóa & Ẩm thực',
               desc: 'Mỗi địa điểm đều có thông tin chi tiết về lịch sử, kiến trúc và các món ăn đặc sản. Hãy đọc kỹ để hiểu sâu hơn về nét đẹp truyền thống.',
               image: require('@/assets/images/guide/guide_2.png')
             },
             {
-              title: '3. Chinh phục',
+              title: '3. Chinh phục thử thách',
               desc: 'Tham gia các bài trắc nghiệm vui tại mục Thử thách. Trả lời đúng để tích lũy điểm thưởng và thăng hạng trên bảng xếp hạng cộng đồng.',
               image: require('@/assets/images/guide/guide_3.png')
             },
             {
-              title: '4. Tương tác',
+              title: '4. Tương tác với Trợ lý AI',
               desc: 'Nếu có bất kỳ thắc mắc nào, hãy nhấn vào biểu tượng Chat để trò chuyện với Trợ lý AI thông minh của KhmerGo.',
               image: require('@/assets/images/guide/guide_4.png')
             }
@@ -43,25 +42,66 @@ export default function FAQDetailScreen() {
       case 'quiz':
         return {
           title: t('faq_how_to_quiz'),
-          content: t('faq_quiz_content'),
-          icon: 'trophy-outline'
+          icon: 'trophy-outline',
+          steps: [
+            {
+              title: '1. Chọn chủ đề',
+              desc: 'Bạn có thể chọn các chủ đề như: Chùa Khmer, Văn hóa, Ẩm thực hoặc Học tiếng Khmer để bắt đầu thử thách kiến thức.',
+              image: require('@/assets/images/guide/guide_3.png')
+            },
+            {
+              title: '2. Trả lời trắc nghiệm',
+              desc: 'Mỗi câu hỏi sẽ có 4 lựa chọn. Hãy suy nghĩ kỹ và chọn đáp án chính xác nhất trong thời gian quy định.',
+              image: require('@/assets/images/guide/guide_2.png')
+            },
+            {
+              title: '3. Tích lũy điểm thưởng',
+              desc: 'Sau khi hoàn thành, bạn sẽ nhận được điểm thưởng dựa trên số câu trả lời đúng. Điểm này dùng để thăng hạng thành viên.',
+              image: require('@/assets/images/guide/guide_1.png')
+            },
+            {
+              title: '4. Kiểm tra thứ hạng',
+              desc: 'Xem thứ hạng của mình so với các người dùng khác tại bảng xếp hạng chung để nỗ lực đạt vị trí cao hơn mỗi ngày.',
+              image: require('@/assets/images/guide/guide_4.png')
+            }
+          ]
         };
       case 'learn':
         return {
           title: t('faq_how_to_learn'),
-          content: t('faq_learn_content'),
-          icon: 'person-add-outline'
+          icon: 'person-circle-outline',
+          steps: [
+            {
+              title: '1. Vào mục cá nhân',
+              desc: 'Nhấn vào biểu tượng Hồ sơ ở thanh điều hướng phía dưới, sau đó chọn Đăng nhập hoặc Đăng ký tài khoản.',
+              image: require('@/assets/images/guide/guide_4.png')
+            },
+            {
+              title: '2. Đăng ký tài khoản',
+              desc: 'Nếu bạn chưa có tài khoản, hãy nhập Email và Mật khẩu để tạo mới. Sau đó bạn có thể chọn các chủ đề mình quan tâm.',
+              image: require('@/assets/images/guide/guide_1.png')
+            },
+            {
+              title: '3. Tham gia cộng đồng',
+              desc: 'Khi đã đăng nhập, bạn có thể tham gia bình luận, chia sẻ ảnh và lưu lại các địa điểm yêu thích của mình.',
+              image: require('@/assets/images/guide/guide_2.png')
+            },
+            {
+              title: '4. Quản lý tài khoản',
+              desc: 'Bạn có thể thay đổi mật khẩu, cập nhật thông tin cá nhân hoặc quản lý quyền riêng tư trong mục Cài đặt tài khoản.',
+              image: require('@/assets/images/guide/guide_3.png')
+            }
+          ]
         };
       default:
         return {
           title: 'FAQ',
-          content: '',
           icon: 'help-outline'
         };
     }
   };
 
-  const { title, content, icon, steps } = getFAQContent() as any;
+  const { title, icon, steps } = getFAQContent() as any;
 
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right']}>
@@ -81,14 +121,9 @@ export default function FAQDetailScreen() {
             </View>
             <Text style={styles.contentTitle}>{title}</Text>
             <View style={styles.divider} />
-            <Text style={styles.description}>{content}</Text>
           </View>
         ) : (
           <View>
-            <View style={[styles.card, { marginBottom: 25 }]}>
-              <Text style={[styles.description, { textAlign: 'center' }]}>{content}</Text>
-            </View>
-
             {steps.map((step: any, index: number) => {
               const isEven = index % 2 === 0;
               return (

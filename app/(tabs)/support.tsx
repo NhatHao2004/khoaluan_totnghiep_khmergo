@@ -30,6 +30,17 @@ export default function SupportScreen() {
         {/* FAQ Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('faq')}</Text>
+          <TouchableOpacity style={styles.faqItem} onPress={() => router.push('/faq/learn' as any)}>
+            <View style={[styles.faqIconCircle, { backgroundColor: '#F0FDF4' }]}>
+              <Ionicons name="person-circle-outline" size={24} color="#22C55E" />
+            </View>
+            <View style={styles.faqInfo}>
+              <Text style={styles.faqText}>{t('faq_how_to_learn')}</Text>
+              <Text style={styles.faqSub}>{t('tap_to_see_guide')}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.faqItem} onPress={() => router.push('/faq/use' as any)}>
             <View style={[styles.faqIconCircle, { backgroundColor: '#EFF6FF' }]}>
               <Ionicons name="help-circle-outline" size={22} color="#3B82F6" />
@@ -47,17 +58,6 @@ export default function SupportScreen() {
             </View>
             <View style={styles.faqInfo}>
               <Text style={styles.faqText}>{t('faq_how_to_quiz')}</Text>
-              <Text style={styles.faqSub}>{t('tap_to_see_guide')}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.faqItem} onPress={() => router.push('/faq/learn' as any)}>
-            <View style={[styles.faqIconCircle, { backgroundColor: '#F0FDF4' }]}>
-              <Ionicons name="person-add-outline" size={22} color="#22C55E" />
-            </View>
-            <View style={styles.faqInfo}>
-              <Text style={styles.faqText}>{t('faq_how_to_learn')}</Text>
               <Text style={styles.faqSub}>{t('tap_to_see_guide')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
