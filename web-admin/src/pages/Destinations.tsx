@@ -450,11 +450,11 @@ const Destinations = () => {
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                    <InputField label="Địa chỉ" value={isAddingNew ? newItem.location : editingItem?.location} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, location: v }) : setEditingItem({ ...editingItem!, location: v })} />
-                    <InputField label="Địa chỉ (Khmer)" value={isAddingNew ? newItem.location_khmer : editingItem?.location_khmer} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, location_khmer: v }) : setEditingItem({ ...editingItem!, location_khmer: v })} />
+                    <InputField label={activeTab === 'Chùa' ? "Địa chỉ (Tiếng Việt)" : "Tiêu đề phụ (Tiếng Việt)"} value={isAddingNew ? newItem.location : editingItem?.location} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, location: v }) : setEditingItem({ ...editingItem!, location: v })} />
+                    <InputField label={activeTab === 'Chùa' ? "Địa chỉ (Tiếng Khmer)" : "Tiêu đề phụ (Tiếng Khmer)"} value={isAddingNew ? newItem.location_khmer : editingItem?.location_khmer} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, location_khmer: v }) : setEditingItem({ ...editingItem!, location_khmer: v })} />
                   </div>
 
-                  {activeTab !== 'Văn hóa' && (
+                  {activeTab === 'Chùa' && (
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                       <InputField label="Vĩ độ" value={isAddingNew ? newItem.latitude : editingItem?.latitude} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, latitude: v }) : setEditingItem({ ...editingItem!, latitude: v })} />
                       <InputField label="Kinh độ" value={isAddingNew ? newItem.longitude : editingItem?.longitude} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, longitude: v }) : setEditingItem({ ...editingItem!, longitude: v })} />
@@ -464,7 +464,7 @@ const Destinations = () => {
                   <div style={{ display: 'grid', gap: '1.25rem' }}>
                     <InputField label="Link ảnh chính" value={isAddingNew ? newItem.imageUrl : editingItem?.imageUrl} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl: v }) : setEditingItem({ ...editingItem!, imageUrl: v })} />
                     <InputField label="Link ảnh phụ 1" value={isAddingNew ? newItem.imageUrl1 : editingItem?.imageUrl1} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl1: v }) : setEditingItem({ ...editingItem!, imageUrl1: v })} />
-                    {activeTab === 'Văn hóa' && (
+                    {(activeTab === 'Văn hóa' || activeTab === 'Ẩm thực') && (
                       <>
                         <InputField label="Link ảnh phụ 2" value={isAddingNew ? newItem.imageUrl2 : editingItem?.imageUrl2} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl2: v }) : setEditingItem({ ...editingItem!, imageUrl2: v })} />
                         <InputField label="Link ảnh phụ 3" value={isAddingNew ? newItem.imageUrl3 : editingItem?.imageUrl3} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl3: v }) : setEditingItem({ ...editingItem!, imageUrl3: v })} />
