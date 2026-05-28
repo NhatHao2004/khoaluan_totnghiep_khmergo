@@ -1,7 +1,7 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Edit2, Search, Shield, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { db } from '../firebase/config';
 
 interface Destination {
@@ -165,11 +165,21 @@ const Destinations = () => {
   const currentTabMeta = TABS.find(t => t.key === activeTab)!;
 
   const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 'text', textarea = false }: any) => {
-    const handleTextareaChange = (e: any) => {
-      onChange(e.target.value);
-      e.target.style.height = 'auto';
-      e.target.style.height = e.target.scrollHeight + 'px';
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    const adjustHeight = () => {
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+      }
     };
+
+    useEffect(() => {
+      if (textarea) {
+        // Sử dụng requestAnimationFrame để đảm bảo DOM đã render xong và scrollHeight đã chính xác
+        requestAnimationFrame(adjustHeight);
+      }
+    }, [value, textarea]);
 
     return (
       <div className="input-group">
@@ -178,11 +188,11 @@ const Destinations = () => {
           {Icon && <Icon size={18} color="#94a3b8" style={{ position: 'absolute', left: '1rem', top: textarea ? '1rem' : '50%', transform: textarea ? 'none' : 'translateY(-50%)' }} />}
           {textarea ? (
             <textarea
+              ref={textareaRef}
               rows={1}
               style={{ width: '100%', padding: Icon ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 1rem', borderRadius: '12px', border: '1px solid #e2e8f0', outline: 'none', fontWeight: 600, resize: 'none', lineHeight: 1.6, overflow: 'hidden', minHeight: '80px', textAlign: 'justify' }}
               value={value || ''}
-              onChange={handleTextareaChange}
-              onFocus={(e) => { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }}
+              onChange={(e) => onChange(e.target.value)}
               placeholder={placeholder}
             />
           ) : (
