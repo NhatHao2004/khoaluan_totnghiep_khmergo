@@ -1,7 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTemples } from '@/hooks/use-temples';
-import { PAGODA_QUIZZES } from '@/utils/quizData';
+import { useQuizzes } from '@/hooks/use-quizzes';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -21,15 +21,18 @@ export default function QuizPagodaSelectScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const { language, t } = useLanguage();
-  const { temples, loading } = useTemples();
+  const { temples, loading: templesLoading } = useTemples();
+  const { quizzes, loading: quizzesLoading } = useQuizzes();
+  const loading = templesLoading || quizzesLoading;
+
   const isKm = language === 'km';
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  // Merge Firebase data với quiz metadata (màu, câu hỏi) từ quizData.ts
+  // Merge Firebase data với quiz metadata (màu, câu hỏi)
   const pagodas = temples
-    .filter(t => PAGODA_QUIZZES.some(q => q.pagodaId === t.id))
+    .filter(t => quizzes.some(q => q.pagodaId === t.id))
     .map(temple => {
-      const quiz = PAGODA_QUIZZES.find(q => q.pagodaId === temple.id)!;
+      const quiz = quizzes.find(q => q.pagodaId === temple.id)!;
       const imageSource = typeof temple.imageUrl === 'string' && temple.imageUrl
         ? { uri: temple.imageUrl }
         : quiz.image;
@@ -40,6 +43,7 @@ export default function QuizPagodaSelectScreen() {
         imageSource,
         imageUrl: temple.imageUrl || '',
         color: quiz.color,
+        questionCount: quiz.questions?.length || 0,
       };
     })
     .sort((a, b) => a.pagodaId.localeCompare(b.pagodaId));
@@ -106,7 +110,16 @@ export default function QuizPagodaSelectScreen() {
                   <View style={styles.quizFooter}>
                     <View style={styles.quizInfo}>
                       <Text style={styles.quizInfoText}>
-                        {isKm ? '៥ សំណួរ - បូក ៥ ពិន្ទុសម្រាប់រាល់ចម្លើយដែលត្រឹមត្រូវ' : '5 câu hỏi - cộng 5 điểm cho mỗi câu đúng'}
+                        {(() => {
+                          const count = pagoda.questionCount;
+                          const toKhmerNum = (n: number) => {
+                            const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+                            return n.toString().split('').map(d => khmerDigits[parseInt(d)] || d).join('');
+                          };
+                          return isKm 
+                            ? `${toKhmerNum(count)} សំណួរ - បូក ៥ ពិន្ទុសម្រាប់រាល់ចម្លើយដែលត្រឹមត្រូវ` 
+                            : `${count} câu hỏi - cộng 5 điểm cho mỗi câu đúng`;
+                        })()}
                       </Text>
                     </View>
 

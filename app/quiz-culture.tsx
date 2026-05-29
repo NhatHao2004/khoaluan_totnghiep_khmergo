@@ -1,7 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCultures } from '@/hooks/use-culture';
-import { PAGODA_QUIZZES } from '@/utils/quizData';
+import { useQuizzes } from '@/hooks/use-quizzes';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -21,7 +21,10 @@ export default function QuizCultureSelectScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const { language, t } = useLanguage();
-  const { cultures, loading } = useCultures();
+  const { cultures, loading: culturesLoading } = useCultures();
+  const { quizzes, loading: quizzesLoading } = useQuizzes();
+  const loading = culturesLoading || quizzesLoading;
+
   const isKm = language === 'km';
   const [showLoginModal, setShowLoginModal] = useState(false);
 
@@ -29,9 +32,9 @@ export default function QuizCultureSelectScreen() {
   const order = ['culture_2', 'culture_3', 'culture_4', 'culture_1', 'culture_5'];
   
   const items = cultures
-    .filter(c => PAGODA_QUIZZES.some(q => q.pagodaId === c.id))
+    .filter(c => quizzes.some(q => q.pagodaId === c.id))
     .map(culture => {
-      const quiz = PAGODA_QUIZZES.find(q => q.pagodaId === culture.id)!;
+      const quiz = quizzes.find(q => q.pagodaId === culture.id)!;
       const imageSource = typeof culture.imageUrl === 'string' && culture.imageUrl
         ? { uri: culture.imageUrl }
         : quiz.image;
@@ -61,6 +64,7 @@ export default function QuizCultureSelectScreen() {
         imageSource,
         imageUrl: culture.imageUrl || '',
         color: quiz.color,
+        questionCount: quiz.questions?.length || 0,
       };
     })
     .sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
@@ -127,7 +131,16 @@ export default function QuizCultureSelectScreen() {
                   <View style={styles.footer}>
                     <View style={styles.info}>
                       <Text style={styles.infoText}>
-                        {isKm ? '៥ សំណួរ - បូក ៥ ពិន្ទុសម្រាប់រាល់ចម្លើយដែលត្រឹមត្រូវ' : '5 câu hỏi - cộng 5 điểm cho mỗi câu đúng'}
+                        {(() => {
+                          const count = item.questionCount;
+                          const toKhmerNum = (n: number) => {
+                            const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+                            return n.toString().split('').map(d => khmerDigits[parseInt(d)] || d).join('');
+                          };
+                          return isKm 
+                            ? `${toKhmerNum(count)} សំណួរ - បូក ៥ ពិន្ទុសម្រាប់រាល់ចម្លើយដែលត្រឹមត្រូវ` 
+                            : `${count} câu hỏi - cộng 5 điểm cho mỗi câu đúng`;
+                        })()}
                       </Text>
                     </View>
 

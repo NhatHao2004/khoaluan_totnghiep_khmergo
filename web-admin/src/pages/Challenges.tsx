@@ -117,7 +117,7 @@ const Challenges = () => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [destinations, setDestinations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabKey>('Chùa');
+  const [activeTab, setActiveTab] = useState<TabKey | 'Khác'>('Chùa');
   const [editingItem, setEditingItem] = useState<Challenge | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -352,12 +352,15 @@ const Challenges = () => {
     }
   };
 
-  const filteredChallenges = challenges
-    .filter(c => c.id.startsWith(TABS.find(t => t.key === activeTab)!.prefix))
-    .filter(c =>
-      c.pagodaName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.pagodaId?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  const filteredChallenges = challenges.filter(c => {
+    const id = c.id || '';
+    const matchesSearch = c.pagodaName?.toLowerCase().includes(searchTerm.toLowerCase()) || c.pagodaId?.toLowerCase().includes(searchTerm.toLowerCase());
+    if (activeTab === 'Khác') return !TABS.some(t => id.startsWith(t.prefix)) && matchesSearch;
+    const tab = TABS.find(t => t.key === activeTab);
+    return id.startsWith(tab?.prefix || '') && matchesSearch;
+  });
+
+  const otherCount = challenges.filter(c => !TABS.some(t => c.id.startsWith(t.prefix))).length;
 
   const countByTab = (key: TabKey) => {
     const prefix = TABS.find(t => t.key === key)!.prefix;
@@ -387,7 +390,7 @@ const Challenges = () => {
         </div>
         <button
           onClick={() => {
-            const currentTabPrefix = TABS.find(t => t.key === activeTab)!.prefix;
+            const currentTabPrefix = TABS.find(t => t.key === activeTab)?.prefix || 'other_';
             const tabChallenges = challenges.filter(c => c.id.startsWith(currentTabPrefix));
             const nextNum = tabChallenges.length + 1;
             const nextId = `${currentTabPrefix}${nextNum}`;
@@ -426,6 +429,20 @@ const Challenges = () => {
             </button>
           );
         })}
+        {otherCount > 0 && (
+          <button
+            onClick={() => setActiveTab('Khác')}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.625rem', padding: '0.875rem 1rem', borderRadius: '12px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.9375rem', transition: 'all 0.25s ease',
+              background: activeTab === 'Khác' ? '#64748b' : 'transparent', color: activeTab === 'Khác' ? '#fff' : '#94a3b8',
+            }}
+          >
+            Khác
+            <span style={{ padding: '0.125rem 0.625rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, background: activeTab === 'Khác' ? '#fff' : '#e2e8f0', color: activeTab === 'Khác' ? '#64748b' : '#94a3b8', minWidth: '28px' }}>
+              {otherCount}
+            </span>
+          </button>
+        )}
       </div>
 
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>

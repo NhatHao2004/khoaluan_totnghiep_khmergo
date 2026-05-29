@@ -1,9 +1,9 @@
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
-import { db, auth } from '../firebase/config';
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
+import { auth, db } from '../firebase/config';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -15,32 +15,30 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const usersSnap = await getDocs(collection(db, 'users'));
-        const destSnap = await getDocs(collection(db, 'destinations'));
-        const quizSnap = await getDocs(collection(db, 'quizzes'));
-        const postsSnap = await getDocs(collection(db, 'posts'));
+    let unsubUsers: any, unsubDests: any, unsubQuizzes: any, unsubPosts: any;
 
-        setStats({
-          users: usersSnap.size,
-          destinations: destSnap.size,
-          quizzes: quizSnap.size,
-          posts: postsSnap.size
-        });
-      } catch (error) {
-        console.error("Error fetching stats:", error);
-      }
+    const startListening = () => {
+      unsubUsers = onSnapshot(collection(db, 'users'), (snap) => setStats(prev => ({ ...prev, users: snap.size })));
+      unsubDests = onSnapshot(collection(db, 'destinations'), (snap) => setStats(prev => ({ ...prev, destinations: snap.size })));
+      unsubQuizzes = onSnapshot(collection(db, 'quizzes'), (snap) => setStats(prev => ({ ...prev, quizzes: snap.size })));
+      unsubPosts = onSnapshot(collection(db, 'posts'), (snap) => setStats(prev => ({ ...prev, posts: snap.size })));
     };
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
-        fetchStats();
+        startListening();
       } else {
         signInAnonymously(auth).catch((err) => console.error("Auth error:", err));
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeAuth();
+      if (unsubUsers) unsubUsers();
+      if (unsubDests) unsubDests();
+      if (unsubQuizzes) unsubQuizzes();
+      if (unsubPosts) unsubPosts();
+    };
   }, []);
 
   const StatCard = ({ title, value, background, onClick }: any) => (
@@ -61,7 +59,7 @@ const Dashboard = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
         <StatCard title="Tổng người dùng" value={stats.users} background="var(--card-orange)" onClick={() => navigate('/users')} />
         <StatCard title="Nội dung" value={stats.destinations} background="var(--card-green)" />
-        <StatCard title="Câu đố" value={stats.quizzes} background="var(--card-pink)" />
+        <StatCard title="Thử thách" value={stats.quizzes} background="var(--card-pink)" />
         <StatCard title="Bài viết mới" value={stats.posts} background="var(--card-blue)" />
       </div>
 

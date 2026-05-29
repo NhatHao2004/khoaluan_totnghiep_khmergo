@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFoods } from '@/hooks/use-foods';
+import { useQuizzes } from '@/hooks/use-quizzes';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import {
@@ -18,16 +19,20 @@ export default function QuizFoodSelectScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const { language, t } = useLanguage();
-  const { foods, loading } = useFoods();
+  const { foods, loading: foodsLoading } = useFoods();
+  const { quizzes, loading: quizzesLoading } = useQuizzes();
+  const loading = foodsLoading || quizzesLoading;
+
   const isKm = language === 'km';
 
   const order = ['food_5', 'food_1', 'food_4', 'food_2', 'food_3'];
   
   const items = foods
     .map(food => {
+      const quiz = quizzes.find(q => q.pagodaId === food.id);
       const imageSource = typeof food.imageUrl === 'string' && food.imageUrl
         ? { uri: food.imageUrl }
-        : require('@/assets/images/amthuc.jpg');
+        : (quiz?.image || require('@/assets/images/amthuc.jpg'));
       
       let displayName = isKm ? (food.name_khmer || food.name) : food.name;
 
@@ -46,6 +51,7 @@ export default function QuizFoodSelectScreen() {
         imageSource,
         imageUrl: food.imageUrl || '',
         color: colors[food.id as keyof typeof colors] || '#0179e9ff',
+        questionCount: quiz?.questions?.length || 0,
       };
     })
     .sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
@@ -113,7 +119,16 @@ export default function QuizFoodSelectScreen() {
                   <View style={styles.footer}>
                     <View style={styles.info}>
                       <Text style={styles.infoText}>
-                        {isKm ? '៥ សំណួរ - បូក ៥ ពិន្ទុសម្រាប់រាល់ចម្លើយដែលត្រឹមត្រូវ' : '5 câu hỏi - cộng 5 điểm cho mỗi câu đúng'}
+                        {(() => {
+                          const count = item.questionCount;
+                          const toKhmerNum = (n: number) => {
+                            const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+                            return n.toString().split('').map(d => khmerDigits[parseInt(d)] || d).join('');
+                          };
+                          return isKm 
+                            ? `${toKhmerNum(count)} សំណួរ - បូក ៥ ពិន្ទុសម្រាប់រាល់ចម្លើយដែលត្រឹមត្រូវ` 
+                            : `${count} câu hỏi - cộng 5 điểm cho mỗi câu đúng`;
+                        })()}
                       </Text>
                     </View>
 

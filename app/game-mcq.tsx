@@ -18,7 +18,6 @@ import { getQuizData, updateQuizScore } from '../services/firebase-service';
 import { PAGODA_QUIZZES, PagodaQuizData } from '../utils/quizData';
 
 const { width } = Dimensions.get('window');
-const TOTAL_QUESTIONS = 5;
 const POINTS_PER_CORRECT = 5;
 
 type Phase = 'intro' | 'question' | 'result';
@@ -88,6 +87,7 @@ export default function GameMCQScreen() {
   }, [imageUrl, pagodaId]);
 
   const currentQuestion = quizData?.questions[questionIndex];
+  const TOTAL_QUESTIONS = quizData?.questions.length || 0;
   const isLastQuestion = questionIndex === TOTAL_QUESTIONS - 1;
 
   // Animations
@@ -296,7 +296,7 @@ export default function GameMCQScreen() {
         </View>
 
         <Text style={styles.resultTitle}>
-          {correctCount === 5 ? '🎉 Xuất sắc' : correctCount === 4 ? '👏 Tốt lắm' : '💪 Cố lên'}
+          {correctCount === TOTAL_QUESTIONS ? '🎉 Xuất sắc' : correctCount >= TOTAL_QUESTIONS * 0.8 ? '👏 Tốt lắm' : '💪 Cố lên'}
         </Text>
 
         {/* Score card */}
