@@ -1,8 +1,9 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from 'firebase/firestore';
+import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
+import { addDoc, collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle, Edit2, Search, Shield, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { db } from '../firebase/config';
+import { auth, db } from '../firebase/config';
 
 interface Destination {
   id: string;
@@ -137,6 +138,13 @@ const Destinations = () => {
 
   useEffect(() => {
     fetchDestinations();
+    // Đảm bảo người dùng đã đăng nhập (vô danh) để có quyền ghi dữ liệu
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        signInAnonymously(auth).catch(err => console.error("Auth error:", err));
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
   const fetchDestinations = async () => {
@@ -151,24 +159,54 @@ const Destinations = () => {
     setLoading(false);
   };
 
+  const validateDestination = (item: Partial<Destination>) => {
+    if (!item.name?.trim()) return 'Vui lòng nhập đầy đủ trường thông tin';
+    if (!item.name_khmer?.trim()) return 'Vui lòng nhập đầy đủ trường thông tin';
+    if (!item.location?.trim()) return 'Vui lòng nhập đầy đủ trường thông tin';
+    if (!item.location_khmer?.trim()) return 'Vui lòng nhập đầy đủ trường thông tin';
+    if (!item.description?.trim()) return 'Vui lòng nhập đầy đủ trường thông tin';
+    if (!item.description_khmer?.trim()) return 'Vui lòng nhập đầy đủ trường thông tin';
+    if (!item.imageUrl?.trim()) return 'Vui lòng nhập đầy đủ trường thông tin';
+    return null;
+  };
+
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingItem) return;
+
+    const error = validateDestination(editingItem);
+    if (error) {
+      showToast(error, 'error');
+      return;
+    }
+
     try {
       const { id, ...updateData } = editingItem;
       const docRef = doc(db, 'destinations', id);
-      await updateDoc(docRef, updateData);
+      // Sử dụng setDoc với merge: true thay vì updateDoc để đảm bảo quyền hạn tốt hơn
+      await setDoc(docRef, updateData, { merge: true });
       setDestinations(destinations.map(d => d.id === id ? editingItem : d));
       setEditingItem(null);
       showToast('Cập nhật nội dung thành công');
     } catch (error) {
       console.error("Error updating document:", error);
-      showToast('Lỗi: Không thể cập nhật nội dung', 'error');
+      if (error instanceof Error && error.message.includes('permissions')) {
+        showToast('Lỗi: Thiếu quyền ghi dữ liệu (Kiểm tra Rules)', 'error');
+      } else {
+        showToast('Lỗi: Không thể cập nhật nội dung', 'error');
+      }
     }
   };
 
   const handleAddNew = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const error = validateDestination(newItem);
+    if (error) {
+      showToast(error, 'error');
+      return;
+    }
+
     try {
       const itemToAdd = { ...newItem, category: activeTab };
       const docRef = await addDoc(collection(db, 'destinations'), itemToAdd);
@@ -403,7 +441,7 @@ const Destinations = () => {
                     <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{dest.location || 'Chưa cập nhật địa chỉ'}</span>
                   </div>
 
-                  <div style={{ marginTop: 'auto', display: 'flex', gap: '0.75rem', paddingTop: '1.25rem', borderTop: '1px solid #f1f5f9' }}>
+                  <div style={{ marginTop: 'auto', display: 'flex', gap: '0.75rem', paddingTop: '0.5rem' }}>
                     <button
                       onClick={() => setEditingItem(dest)}
                       style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.625rem', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#fff', color: '#1e293b', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }}
@@ -509,7 +547,7 @@ const Destinations = () => {
                 <div style={{ display: 'flex', gap: '1rem', marginTop: '0', paddingTop: '0' }}>
                   <button type="button" onClick={() => { setEditingItem(null); setIsAddingNew(false); }} style={{ flex: 1, padding: '0.875rem', borderRadius: '14px', border: '1px solid #e2e8f0', background: '#ff0000ff', color: '#ffffffff', fontWeight: 700, cursor: 'pointer' }}>Hủy bỏ</button>
                   <button type="submit" style={{ flex: 1, padding: '0.875rem', borderRadius: '14px', border: 'none', background: 'var(--card-blue)', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(64, 153, 255, 0.2)' }}>
-                    {isAddingNew ? 'Tạo mới ngay' : 'Cập nhật'}
+                    {isAddingNew ? 'Tạo mới ngay' : 'Cập nhật thay đổi'}
                   </button>
                 </div>
               </form>

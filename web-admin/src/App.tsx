@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Challenges from './pages/Challenges';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Destinations from './pages/Destinations';
@@ -36,12 +37,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/destinations" element={<RouteTransition><Destinations /></RouteTransition>} />
             <Route path="/users" element={<RouteTransition><Users /></RouteTransition>} />
-            <Route path="/quizzes" element={
-              <div className="card">
-                <h1>Quản lý Câu đố</h1>
-                <p style={{ color: 'var(--text-muted)', marginTop: '1rem' }}>Tính năng này đang được phát triển.</p>
-              </div>
-            } />
+            <Route path="/challenges" element={<RouteTransition><Challenges /></RouteTransition>} />
           </Routes>
         </main>
       </div>
