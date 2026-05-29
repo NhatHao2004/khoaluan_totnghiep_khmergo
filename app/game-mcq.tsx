@@ -340,7 +340,7 @@ export default function GameMCQScreen() {
             if (pagodaId?.startsWith('culture_')) {
               router.replace('/quiz-culture');
             } else if (pagodaId?.startsWith('food_')) {
-              router.replace('/food');
+              router.replace('/quiz-food');
             } else {
               router.replace('/quiz-pagoda');
             }

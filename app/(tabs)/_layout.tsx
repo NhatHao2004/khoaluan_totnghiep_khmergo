@@ -2,9 +2,9 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import * as Haptics from 'expo-haptics';
 import { Tabs, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
+import { Dimensions, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { interpolate, interpolateColor, runOnJS, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
 
@@ -42,39 +42,51 @@ export default function TabsLayout() {
     loadChatSetting();
   }, [pathname]);
 
-  // Position for draggable AI button
+  // Shared values for draggable AI button and animations
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const context = useSharedValue({ x: 0, y: 0 });
   const opacity = useSharedValue(1);
+  const scale = useSharedValue(1);
   const dimTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const resetIdleTimer = () => {
     opacity.value = withTiming(1, { duration: 200 });
     if (dimTimer.current) clearTimeout(dimTimer.current);
     dimTimer.current = setTimeout(() => {
-      opacity.value = withTiming(0.3, { duration: 600 });
+      opacity.value = withTiming(0.6, { duration: 600 });
     }, 5000);
   };
 
   useEffect(() => {
     resetIdleTimer();
+    
+    // Scale animation (3s cycle)
+    scale.value = withRepeat(
+      withSequence(
+        withTiming(1.1, { duration: 1500 }),
+        withTiming(1, { duration: 1500 })
+      ),
+      -1,
+      true
+    );
+
     return () => { if (dimTimer.current) clearTimeout(dimTimer.current); };
   }, []);
 
   const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-  const BUTTON_SIZE = 50;
-  const MARGIN = 10;
-  const BTN_BOTTOM = 80;
-  const BTN_RIGHT = 10;
+  const BUTTON_SIZE = 60;
+  const MARGIN = 15;
+  const BTN_BOTTOM = 85;
+  const BTN_RIGHT = 15;
 
-  // X limits (Initial is right:10)
+  // X limits
   const MIN_X = -SCREEN_WIDTH + BUTTON_SIZE + (BTN_RIGHT * 2);
   const MAX_X = 0;
 
-  // Y limits (Initial is bottom:80)
-  const MIN_Y = -SCREEN_HEIGHT + BTN_BOTTOM + BUTTON_SIZE + 40; // top limit
-  const MAX_Y = 0; // bottom limit
+  // Y limits
+  const MIN_Y = -SCREEN_HEIGHT + BTN_BOTTOM + BUTTON_SIZE + 40;
+  const MAX_Y = 0;
 
   const gesture = Gesture.Pan()
     .onStart(() => {
@@ -84,13 +96,10 @@ export default function TabsLayout() {
     .onUpdate((event) => {
       let nextX = event.translationX + context.value.x;
       let nextY = event.translationY + context.value.y;
-
-      // Clamp values during dragging
       translateX.value = Math.min(Math.max(nextX, MIN_X), MAX_X);
       translateY.value = Math.min(Math.max(nextY, MIN_Y), MAX_Y);
     })
     .onEnd(() => {
-      // Snap to nearest side (Left or Right)
       const threshold = MIN_X / 2;
       if (translateX.value < threshold) {
         translateX.value = withTiming(MIN_X, { duration: 300 });
@@ -101,11 +110,19 @@ export default function TabsLayout() {
     });
 
   const animatedChatStyle = useAnimatedStyle(() => {
+    // White breathing aura
+    const shadowRadius = interpolate(scale.value, [1, 1.1], [8, 18]);
+
     return {
       opacity: opacity.value,
+      backgroundColor: '#007AFF', 
+      shadowColor: '#FFFFFF', // Pure white glow
+      borderColor: '#0052cc',
+      shadowRadius,
       transform: [
         { translateX: translateX.value },
         { translateY: translateY.value },
+        { scale: scale.value },
       ],
     };
   });
@@ -280,12 +297,16 @@ export default function TabsLayout() {
           <Animated.View style={[styles.floatingChatBtn, animatedChatStyle]}>
             <TouchableOpacity
               style={styles.chatBtnInner}
+              activeOpacity={1}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 router.push('/ai-chat' as any);
               }}
             >
-              <Ionicons name="chatbubble-ellipses" size={22} color="rgba(255,255,255,0.8)" />
+              <Image 
+                source={require('@/assets/images/AI.jpg')} 
+                style={styles.chatIconImage} 
+              />
             </TouchableOpacity>
           </Animated.View>
         </GestureDetector>
@@ -299,21 +320,21 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   floatingChatBtn: {
     position: 'absolute',
-    bottom: 80,
-    right: 10,
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: 'rgba(30, 41, 59, 0.8)',
+    bottom: 85,
+    right: 15,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#007AFF', // Solid premium blue
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 25,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    shadowColor: '#FFFFFF', // Changed from blue to white
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 20,
+    borderWidth: 2,
+    borderColor: '#0052cc', // Dark blue border
     zIndex: 99999,
   },
   chatBtnInner: {
@@ -321,5 +342,12 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
+    borderRadius: 30,
+  },
+  chatIconImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
 });
