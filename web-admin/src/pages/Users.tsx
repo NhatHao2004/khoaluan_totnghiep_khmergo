@@ -46,11 +46,13 @@ const Users = () => {
     setLoading(true);
     try {
       const querySnapshot = await getDocs(collection(db, 'users'));
-      const docs = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        name: doc.data().name || doc.data()['tên'] || 'Anonymous'
-      } as UserProfile));
+      const docs = querySnapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          name: doc.data().name || doc.data()['tên'] || 'Anonymous'
+        } as UserProfile))
+        .filter(user => user.role !== 'Quản trị viên'); // Ẩn tài khoản admin
       setUsers(docs);
     } catch (error) {
       console.error("Error fetching users:", error);

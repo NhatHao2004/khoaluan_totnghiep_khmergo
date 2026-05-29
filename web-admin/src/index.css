@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap');
+
 :root {
   --primary: #4099ff;
   --sidebar-bg: #2b354e;
@@ -19,17 +21,24 @@
 }
 
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family);
 }
 
-body {
+body, html, #root {
   font-family: var(--font-family);
   background-color: var(--bg-main);
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
   font-size: 14px;
+  overflow-x: hidden;
+  height: 100%;
+}
+
+h1, h2, h3, h4, h5, h6, p, span, div, button, input, select, textarea {
+  font-family: var(--font-family);
 }
 
 /* Layout */
@@ -213,4 +222,18 @@ body {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }

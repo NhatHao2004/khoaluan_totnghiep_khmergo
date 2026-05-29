@@ -1,9 +1,22 @@
-import { BookOpen, HelpCircle, LayoutDashboard, LogOut, Users } from 'lucide-react';
+import { BookOpen, HelpCircle, LayoutDashboard, LogOut, User } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase/config';
 
 import icon from '../assets/icon.png';
 
 const Sidebar = () => {
+  const handleLogout = async () => {
+    if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+      try {
+        await signOut(auth);
+        window.location.href = '/'; // Or redirect using useNavigate
+      } catch (error) {
+        console.error("Lỗi khi đăng xuất:", error);
+      }
+    }
+  };
+
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -20,7 +33,7 @@ const Sidebar = () => {
         </NavLink>
 
         <NavLink to="/users" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-          <Users size={18} />
+          <User size={18} />
           Người dùng
         </NavLink>
 
@@ -36,7 +49,11 @@ const Sidebar = () => {
       </nav>
 
       <div style={{ marginTop: 'auto', padding: '1.5rem' }}>
-        <button className="nav-link" style={{ width: '100%', background: 'none', border: 'none', padding: '10px 0' }}>
+        <button 
+          className="nav-link" 
+          onClick={handleLogout}
+          style={{ width: '100%', background: 'none', border: 'none', padding: '10px 0', cursor: 'pointer' }}
+        >
           <LogOut size={18} color="#ff5370" />
           Đăng xuất
         </button>

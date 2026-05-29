@@ -1,7 +1,10 @@
 import { initializeApp, getApp, getApps } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, setLogLevel } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
+
+// Tắt hoàn toàn log nội bộ của Firestore để tránh hiện lỗi permission-denied khi đang auth
+setLogLevel('silent');
 
 const firebaseConfig = {
   apiKey: "AIzaSyDInHeTU4IWo4kVVsho62WcK6Vg9f83vfg",

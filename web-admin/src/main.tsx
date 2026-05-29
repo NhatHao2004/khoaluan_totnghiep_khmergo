@@ -5,10 +5,15 @@ import App from './App.tsx'
 
 // Chặn thông báo lỗi permission-denied của Firebase gây nhiễu Console
 const originalConsoleError = console.error;
-console.error = (...args) => {
-  if (args[0] && typeof args[0] === 'string' && args[0].includes('permission-denied')) {
-    return;
-  }
+console.error = (...args: any[]) => {
+  const isPermissionError = args.some(arg => {
+    const str = String(arg).toLowerCase();
+    return str.includes('permission-denied') || 
+           str.includes('insufficient permissions') ||
+           str.includes('missing or insufficient permissions');
+  });
+
+  if (isPermissionError) return;
   originalConsoleError.apply(console, args);
 };
 
