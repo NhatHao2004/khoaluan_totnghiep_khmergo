@@ -37,7 +37,7 @@ const CATEGORY_CARD_WIDTH = (SCREEN_WIDTH - 40 - (3 * 8)) / 4; // 20px padding e
 export default function HomeScreen() {
   const router = useRouter();
   const { t, language } = useLanguage();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [favorites, setFavorites] = useState<number[]>([]);
   const [featuredDestinations, setFeaturedDestinations] = useState<any[]>([]);
@@ -198,9 +198,10 @@ export default function HomeScreen() {
   };
 
   useEffect(() => {
+    if (authLoading) return;
     const unsubscribe = loadFeaturedData();
     return () => unsubscribe();
-  }, [language, t]);
+  }, [language, t, authLoading]);
 
   const onRefresh = React.useCallback(() => {
     if (refreshing) return;

@@ -18,7 +18,9 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // Khởi tạo và export Firestore
+import { setLogLevel } from "firebase/firestore";
 export const db = getFirestore(app);
+setLogLevel('silent'); // Chặn thông báo lỗi nền của Firestore gây nhiễu Console/App
 
 // Khởi tạo Auth
 // Ở React Native ta nên dùng persistence với AsyncStorage. Tuy thư viện firebase/auth có mặc định, 

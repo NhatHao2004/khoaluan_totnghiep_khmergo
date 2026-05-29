@@ -12,6 +12,15 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { registerForPushNotificationsAsync, scheduleDaily7AMReminder } from '@/utils/notification-handler';
 
+// Chặn thông báo lỗi permission-denied của Firebase gây nhiễu trên App di động
+const originalConsoleError = console.error;
+console.error = (...args) => {
+  if (args[0] && typeof args[0] === 'string' && args[0].includes('permission-denied')) {
+    return;
+  }
+  originalConsoleError.apply(console, args);
+};
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 

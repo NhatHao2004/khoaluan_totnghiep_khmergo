@@ -18,20 +18,22 @@ interface Challenge {
   pagodaId: string;
   pagodaName: string;
   pagodaNameKm: string;
+  imageUrl?: string;
   rental: string;
   color: string;
   accentColor: string;
   questions: Question[];
 }
 
-type TabKey = 'Chùa' | 'Văn hóa';
+type TabKey = 'Chùa' | 'Văn hóa' | 'Ẩm thực';
 
 const TABS: { key: TabKey; label: string; prefix: string; color: string; bg: string }[] = [
   { key: 'Chùa', label: 'Thử thách Chùa', prefix: 'pagoda_', color: '#ffffffff', bg: '#4099ff' },
   { key: 'Văn hóa', label: 'Thử thách Văn hóa', prefix: 'culture_', color: '#ffffffff', bg: '#8B5CF6' },
+  { key: 'Ẩm thực', label: 'Thử thách Ẩm thực', prefix: 'food_', color: '#ffffffff', bg: '#F59E0B' },
 ];
 
-const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 'text', textarea = false, disabled = false }: any) => {
+const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 'text', textarea = false, disabled = false, list }: any) => {
   const commonStyles: any = {
     padding: Icon ? '1.125rem 1.25rem 1.125rem 3rem' : '1.125rem 1.25rem',
     fontSize: '0.9375rem',
@@ -98,6 +100,7 @@ const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 't
         ) : (
           <input
             type={type}
+            list={list}
             style={{ ...commonStyles, width: '100%', borderRadius: '12px', border: '1px solid #e2e8f0', outline: 'none', fontWeight: 600 }}
             value={value || ''}
             onChange={(e) => onChange(e.target.value)}
@@ -112,6 +115,7 @@ const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 't
 
 const Challenges = () => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [destinations, setDestinations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabKey>('Chùa');
   const [editingItem, setEditingItem] = useState<Challenge | null>(null);
@@ -130,6 +134,7 @@ const Challenges = () => {
     pagodaId: '',
     pagodaName: '',
     pagodaNameKm: '',
+    imageUrl: '',
     rental: '',
     color: '#0179e9ff',
     accentColor: '#e0f2fe',
@@ -144,16 +149,16 @@ const Challenges = () => {
   };
 
   useEffect(() => {
-    fetchChallenges();
-    // Đảm bảo người dùng đã đăng nhập (vô danh) để có quyền ghi dữ liệu
+    // Đảm bảo người dùng đã đăng nhập (vô danh) để có quyền đọc/ghi dữ liệu
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
+      if (user) {
+        console.log("Đã xác thực người dùng:", user.uid);
+        fetchChallenges();
+      } else {
+        console.log("Đang thực hiện đăng nhập vô danh...");
         signInAnonymously(auth).catch(err => {
           console.error("Auth error details:", err);
-          if (err.code === 'auth/admin-restricted-operation') {
-            // Thông báo cụ thể cho người dùng để họ biết cần bật Anonymous Auth
-            showToast('Lỗi: Vui lòng bật "Anonymous Auth" trong Firebase Console', 'error');
-          }
+          showToast('Lỗi xác thực người dùng', 'error');
         });
       }
     });
@@ -163,9 +168,37 @@ const Challenges = () => {
   const fetchChallenges = async () => {
     setLoading(true);
     try {
+      // Tải thử thách
       const querySnapshot = await getDocs(collection(db, 'quizzes'));
-      const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Challenge));
-      setChallenges(docs);
+      const quizDocs = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return { 
+          id: doc.id, 
+          ...data,
+          // Chuẩn hóa dữ liệu nếu là thực phẩm
+          pagodaName: data.pagodaName || (data as any).foodName || '',
+          pagodaNameKm: data.pagodaNameKm || (data as any).foodNamekh || '',
+          pagodaId: data.pagodaId || (data as any).foodId || doc.id
+        } as Challenge;
+      });
+
+      // Tải địa danh để lấy ảnh
+      const destSnapshot = await getDocs(collection(db, 'destinations'));
+      const destDocs = destSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setDestinations(destDocs);
+
+      // Tự động gán ảnh nếu bị thiếu dựa trên tên (Khớp nối thông minh)
+      const updatedQuizzes = quizDocs.map(quiz => {
+        const name = (quiz.pagodaName || (quiz as any).foodName || '').trim().toLowerCase();
+        
+        if (!quiz.imageUrl && name) {
+          const match = destDocs.find((d: any) => (d.name || '').trim().toLowerCase() === name);
+          if (match) return { ...quiz, imageUrl: (match as any).imageUrl };
+        }
+        return quiz;
+      });
+
+      setChallenges(updatedQuizzes);
     } catch (error) {
       console.error("Error fetching challenges:", error);
       showToast('Lỗi khi tải dữ liệu', 'error');
@@ -350,10 +383,23 @@ const Challenges = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
         <div>
           <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#1e293b', letterSpacing: '-0.025em' }}>Quản lý Thử thách</h1>
-          <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem', fontSize: '0.9375rem' }}>Thiết lập bộ câu hỏi đố vui cho các địa danh</p>
+          <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem', fontSize: '0.9375rem' }}>Quản lý bộ câu hỏi đố vui cho các thử thách</p>
         </div>
         <button
-          onClick={() => { setIsAddingNew(true); setExpandedQuestion(0); }}
+          onClick={() => {
+            const currentTabPrefix = TABS.find(t => t.key === activeTab)!.prefix;
+            const tabChallenges = challenges.filter(c => c.id.startsWith(currentTabPrefix));
+            const nextNum = tabChallenges.length + 1;
+            const nextId = `${currentTabPrefix}${nextNum}`;
+
+            setIsAddingNew(true);
+            setNewItem({
+              ...newItem,
+              pagodaId: nextId,
+              questions: [{ id: 'q1', question: '', options: ['', '', '', ''], correctIndex: 0, explanation: '' }]
+            });
+            setExpandedQuestion(0);
+          }}
           style={{ padding: '0.625rem 1.5rem', background: 'var(--sidebar-bg)', color: '#fff', borderRadius: '12px', border: 'none', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
         >
           Thêm Thử thách
@@ -412,31 +458,40 @@ const Challenges = () => {
           {filteredChallenges.map(item => (
             <motion.div
               key={item.id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-              style={{ background: '#fff', borderRadius: '24px', padding: '1.5rem', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+              style={{ background: '#fff', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column' }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b', flex: 1, marginRight: '1rem' }}>{item.pagodaName || 'Chưa đặt tên'}</h3>
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>{item.id}</span>
-                  <div style={{ color: '#10b981', fontSize: '0.75rem', fontWeight: 700, marginTop: '0.25rem' }}>{item.questions?.length || 0} câu hỏi</div>
-                </div>
+              <div style={{ position: 'relative', height: '200px', overflow: 'hidden' }}>
+                <img
+                  src={item.imageUrl || 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600'}
+                  alt={item.pagodaName || (item as any).foodName}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
               </div>
 
-              <div style={{ marginTop: 'auto', display: 'flex', gap: '0.75rem', paddingTop: '0.5rem' }}>
-                <button
-                  onClick={() => { setEditingItem(item); setExpandedQuestion(0); }}
-                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.625rem', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#fff', color: '#1e293b', fontWeight: 700, cursor: 'pointer' }}
-                  title="Xem và chỉnh sửa chi tiết thử thách"
-                >
-                  <Edit2 size={16} /> Chi tiết
-                </button>
-                <button
-                  onClick={() => handleDelete(item.id)}
-                  style={{ padding: '0.625rem', borderRadius: '10px', border: 'none', background: '#fff5f5', color: '#ff5370', cursor: 'pointer' }}
-                  title="Xóa bộ thử thách này"
-                >
-                  <Trash2 size={18} />
-                </button>
+              <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#1e293b', flex: 1, marginRight: '1rem' }}>
+                    {item.pagodaName || (item as any).foodName || 'Chưa đặt tên'}
+                  </h3>
+                  <div style={{ color: '#10b981', fontSize: '0.75rem', fontWeight: 800, whiteSpace: 'nowrap' }}>{item.questions?.length || 0} câu hỏi</div>
+                </div>
+
+                <div style={{ marginTop: 'auto', display: 'flex', gap: '0.75rem', paddingTop: '0.5rem' }}>
+                  <button
+                    onClick={() => { setEditingItem(item); setExpandedQuestion(0); }}
+                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.625rem', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#fff', color: '#1e293b', fontWeight: 700, cursor: 'pointer' }}
+                    title="Chỉnh sửa thử thách"
+                  >
+                    <Edit2 size={16} /> Chỉnh sửa
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    style={{ padding: '0.625rem', borderRadius: '10px', border: 'none', background: '#fff5f5', color: '#ff5370', cursor: 'pointer' }}
+                    title="Xóa bộ thử thách"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               </div>
             </motion.div>
           ))}
@@ -461,7 +516,36 @@ const Challenges = () => {
                 <div style={{ display: 'grid', gap: '1.5rem', background: '#f8fafc', padding: '1.5rem', borderRadius: '20px' }}>
                   <InputField label="ID Thử thách" value={isAddingNew ? newItem.pagodaId : editingItem?.pagodaId} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, pagodaId: v }) : setEditingItem({ ...editingItem!, pagodaId: v })} disabled={!isAddingNew} />
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                    <InputField label="Tên Địa danh (Tiếng Việt)" value={isAddingNew ? newItem.pagodaName : editingItem?.pagodaName} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, pagodaName: v }) : setEditingItem({ ...editingItem!, pagodaName: v })} />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <InputField
+                        label="Tên Địa danh (Tiếng Việt)"
+                        list="destinations-list"
+                        value={isAddingNew ? newItem.pagodaName : editingItem?.pagodaName}
+                        onChange={(v: string) => {
+                          const match = destinations.find(d => d.name === v);
+                          if (isAddingNew) {
+                            setNewItem({
+                              ...newItem,
+                              pagodaName: v,
+                              pagodaNameKm: match?.name_khmer || newItem.pagodaNameKm,
+                              imageUrl: match?.imageUrl || newItem.imageUrl
+                            });
+                          } else {
+                            setEditingItem({
+                              ...editingItem!,
+                              pagodaName: v,
+                              pagodaNameKm: match?.name_khmer || editingItem?.pagodaNameKm,
+                              imageUrl: match?.imageUrl || editingItem?.imageUrl
+                            });
+                          }
+                        }}
+                      />
+                      <datalist id="destinations-list">
+                        {destinations.map((d, i) => (
+                          <option key={i} value={d.name} />
+                        ))}
+                      </datalist>
+                    </div>
                     <InputField label="Tên ngôi chùa (tiếng Khmer)" value={isAddingNew ? newItem.pagodaNameKm : editingItem?.pagodaNameKm} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, pagodaNameKm: v }) : setEditingItem({ ...editingItem!, pagodaNameKm: v })} />
                   </div>
                 </div>

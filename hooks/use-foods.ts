@@ -7,7 +7,11 @@ export const useFoods = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { loading: authLoading } = require('@/contexts/AuthContext').useAuth();
+
   useEffect(() => {
+    if (authLoading) return;
+
     // Truy vấn collection destinations để lọc ra những địa điểm thuộc loại "Ẩm thực"
     const q = query(
       collection(db, 'destinations'),

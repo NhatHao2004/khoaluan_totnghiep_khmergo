@@ -2,7 +2,8 @@ import { collection, getDocs } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
-import { db } from '../firebase/config';
+import { db, auth } from '../firebase/config';
+import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -31,7 +32,15 @@ const Dashboard = () => {
         console.error("Error fetching stats:", error);
       }
     };
-    fetchStats();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchStats();
+      } else {
+        signInAnonymously(auth).catch((err) => console.error("Auth error:", err));
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const StatCard = ({ title, value, background, onClick }: any) => (

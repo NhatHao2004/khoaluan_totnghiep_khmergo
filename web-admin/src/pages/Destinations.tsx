@@ -137,10 +137,11 @@ const Destinations = () => {
   };
 
   useEffect(() => {
-    fetchDestinations();
     // Đảm bảo người dùng đã đăng nhập (vô danh) để có quyền ghi dữ liệu
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
+      if (user) {
+        fetchDestinations();
+      } else {
         signInAnonymously(auth).catch(err => console.error("Auth error:", err));
       }
     });
