@@ -301,7 +301,7 @@ const Destinations = () => {
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   {dest.location || 'Chưa có địa chỉ'}
                 </p>
-                <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-light)', display: 'flex', gap: '0.75rem' }}>
+                <div style={{ marginTop: 'auto', paddingTop: '1rem', display: 'flex', gap: '0.75rem' }}>
                   <button className="btn btn-secondary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.75rem' }} onClick={() => { setViewingItem(dest); setViewLanguage('vi'); }}>Xem chi tiết</button>
                   <button className="btn" style={{ padding: '0.5rem', background: 'var(--bg-accent)', color: 'var(--text-primary)', borderRadius: '10px' }} onClick={() => setEditingItem(dest)} title="Chỉnh sửa"><Edit2 size={16} /></button>
                   <button className="btn" style={{ padding: '0.5rem', background: '#fef2f2', color: 'var(--danger)', borderRadius: '10px' }} onClick={() => setConfirmConfig({ isOpen: true, title: 'Xác nhận xóa', message: `Bạn có chắc chắn muốn xóa\n"${dest.name}"`, onConfirm: () => handleDelete(dest.id) })} title="Xóa"><Trash2 size={16} /></button>
