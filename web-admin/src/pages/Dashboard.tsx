@@ -16,6 +16,7 @@ const Dashboard = () => {
 
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
+  const [logs, setLogs] = useState<any[]>([]);
 
   useEffect(() => {
     const unsubUsers = onSnapshot(collection(db, 'users'), (snap) => setStats(prev => ({ ...prev, users: snap.size })));
@@ -23,11 +24,19 @@ const Dashboard = () => {
     const unsubQuizzes = onSnapshot(collection(db, 'quizzes'), (snap) => setStats(prev => ({ ...prev, quizzes: snap.size })));
     const unsubPosts = onSnapshot(collection(db, 'posts'), (snap) => setStats(prev => ({ ...prev, posts: snap.size })));
 
+    // Real-time listener for activities
+    const unsubLogs = onSnapshot(collection(db, 'logs'), (snap) => {
+      const logData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a: any, b: any) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+      setLogs(logData);
+    });
+
     return () => {
       unsubUsers();
       unsubDests();
       unsubQuizzes();
       unsubPosts();
+      unsubLogs();
     };
   }, []);
 
@@ -51,7 +60,7 @@ const Dashboard = () => {
     <div className="fade-in">
       <div style={{ marginBottom: '2.5rem' }}>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Tổng quan hệ thống</h1>
-        <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem', fontSize: '0.95rem' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo trong thời gian thực.</p>
+        <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem', fontSize: '0.95rem' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
@@ -65,7 +74,7 @@ const Dashboard = () => {
         <div className="card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
             <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Hoạt động gần đây</h2>
-            <button className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem' }} onClick={() => setIsHistoryOpen(true)}>
+            <button className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem' }} onClick={() => { setIsHistoryOpen(true); setActiveTab('all'); }}>
               Xem tất cả
             </button>
           </div>
@@ -99,18 +108,45 @@ const Dashboard = () => {
               </div>
 
               <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }} className="custom-scrollbar">
-                {[
-                  { id: 1, type: 'system', title: 'Đồng bộ cơ sở dữ liệu', time: '15 phút trước', desc: 'Dữ liệu Thử thách đã được cập nhật thành công lên Firestore.', icon: CheckCircle, color: '#10b981' },
-                  { id: 2, type: 'users', title: 'Người dùng mới', time: '2 giờ trước', desc: 'Thành viên \'Thanh Nam\' vừa đăng ký tài khoản qua Google.', icon: User, color: '#6366f1' },
-                  { id: 3, type: 'content', title: 'Cập nhật Địa danh', time: '4 giờ trước', desc: 'Thông tin \'Chùa Hang\' vừa được Admin chỉnh sửa nội dung Khmer.', icon: Info, color: '#f59e0b' },
-                  { id: 4, type: 'system', title: 'Bảo trì định kỳ', time: '1 ngày trước', desc: 'Hệ thống đã hoàn tất kiểm tra bảo mật hàng tuần.', icon: Shield, color: '#6366f1' }
-                ].filter(item => activeTab === 'all' || item.type === activeTab).map(item => (
-                  <ActivityItem key={item.id} title={item.title} time={item.time} desc={item.desc} icon={item.icon} color={item.color} />
-                ))}
+                {logs.length === 0 ? (
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.5, padding: '4rem 0' }}>
+                    <MessageSquare size={64} style={{ marginBottom: '2.5rem', opacity: 0.2 }} />
+                    <p style={{ fontSize: '1rem', fontWeight: 600 }}>Hệ thống chưa ghi nhận hoạt động nào</p>
+                  </div>
+                ) : (
+                  logs.filter(item => activeTab === 'all' || item.type === activeTab).map((item: any) => {
+                    const iconMap: any = { system: Shield, users: User, content: Info, default: CheckCircle };
+                    const colorMap: any = { system: '#6366f1', users: '#10b981', content: '#f59e0b', default: '#10b981' };
+                    const Icon = iconMap[item.type] || iconMap.default;
+                    const color = colorMap[item.type] || colorMap.default;
+
+                    const formatTime = (ts: any) => {
+                      if (!ts) return 'Vừa xong';
+                      const date = ts.toDate ? ts.toDate() : new Date(ts);
+                      const now = new Date();
+                      const diff = Math.floor((now.getTime() - date.getTime()) / 60000);
+                      if (diff < 1) return 'Vừa xong';
+                      if (diff < 60) return `${diff} phút trước`;
+                      if (diff < 1440) return `${Math.floor(diff / 60)} giờ trước`;
+                      return date.toLocaleDateString('vi-VN');
+                    };
+
+                    return (
+                      <ActivityItem
+                        key={item.id}
+                        title={item.title || 'Hoạt động hệ thống'}
+                        time={formatTime(item.timestamp)}
+                        desc={item.desc || 'Thao tác không có mô tả chi tiết.'}
+                        icon={Icon}
+                        color={color}
+                      />
+                    );
+                  })
+                )}
               </div>
 
               <div style={{ textAlign: 'center', padding: '1.5rem 0 0', opacity: 0.5, borderTop: '1px solid var(--border-light)', marginTop: '1rem' }}>
-                <p style={{ fontSize: '0.8125rem' }}>Đã hiển thị tất cả hoạt động trong 7 ngày qua</p>
+                <p style={{ fontSize: '0.8125rem' }}>Hiển thị tất cả hoạt động trong 7 ngày qua</p>
               </div>
             </motion.div>
           </div>
