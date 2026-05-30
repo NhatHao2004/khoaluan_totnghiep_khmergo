@@ -78,8 +78,8 @@ const Dashboard = () => {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
         <StatCard title="Người dùng" value={stats.users} icon={User} color="#ff0000ff" onClick={() => navigate('/users')} />
-        <StatCard title="Nội dung" value={stats.destinations} icon={BookOpen} color="#00875aff" />
-        <StatCard title="Thử thách" value={stats.quizzes} icon={HelpCircle} color="#ffa200ff" />
+        <StatCard title="Nội dung" value={stats.destinations} icon={BookOpen} color="#00875aff" onClick={() => navigate('/destinations')} />
+        <StatCard title="Thử thách" value={stats.quizzes} icon={HelpCircle} color="#ffa200ff" onClick={() => navigate('/challenges')} />
         <StatCard title="Bài viết" value={stats.posts} icon={MessageSquare} color="#ff0080ff" />
       </div>
 
