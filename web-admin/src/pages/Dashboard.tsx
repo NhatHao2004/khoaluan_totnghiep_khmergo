@@ -44,16 +44,26 @@ const Dashboard = () => {
   }, []);
 
   const StatCard = ({ title, value, icon: Icon, color, onClick }: any) => (
-    <div className="card glass-card stat-card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
-      <div style={{ padding: '0.75rem', borderRadius: '12px', background: `${color}15`, color: color, width: 'fit-content', marginBottom: '1.25rem' }}>
-        <Icon size={24} />
+    <div className="card glass-card stat-card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default', padding: '1.25rem' }}>
+      <div style={{ 
+        padding: '0.875rem', 
+        borderRadius: '14px', 
+        background: `${color}15`, 
+        color: color, 
+        width: 'fit-content', 
+        marginBottom: '1.25rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <Icon size={28} strokeWidth={2.5} />
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <span className="label" style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>{title}</span>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
-          <h3 className="value" style={{ margin: 0, fontSize: '1.75rem', fontWeight: 800 }}>{value}</h3>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>tổng cộng</span>
+        <span className="label" style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>{title}</span>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.3rem' }}>
+          <h3 className="value" style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800 }}>{value}</h3>
+          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 500 }}>tổng cộng</span>
         </div>
       </div>
     </div>
@@ -61,14 +71,14 @@ const Dashboard = () => {
 
   return (
     <div className="fade-in">
-      <div style={{ marginBottom: '2.5rem' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Tổng quan hệ thống</h1>
-        <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem', fontSize: '0.95rem' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo</p>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Tổng quan hệ thống</h1>
+        <p style={{ color: 'var(--text-secondary)', marginTop: '0.4rem', fontSize: '0.875rem' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
         <StatCard title="Người dùng" value={stats.users} icon={User} color="#ff0000ff" onClick={() => navigate('/users')} />
-        <StatCard title="Nội dung" value={stats.destinations} icon={BookOpen} color="#00ffaaff" />
+        <StatCard title="Nội dung" value={stats.destinations} icon={BookOpen} color="#00875aff" />
         <StatCard title="Thử thách" value={stats.quizzes} icon={HelpCircle} color="#ffa200ff" />
         <StatCard title="Bài viết" value={stats.posts} icon={MessageSquare} color="#ff0080ff" />
       </div>
