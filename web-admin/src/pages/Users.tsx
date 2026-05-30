@@ -114,23 +114,22 @@ const Users = () => {
 
   return (
     <div className="fade-in">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Quản lý người dùng</h1>
-          <p style={{ color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Quản lý cộng đồng và hỗ trợ người dùng KhmerGo.</p>
         </div>
-      </div>
 
-      <div className="input-group" style={{ maxWidth: '400px', marginBottom: '2.5rem' }}>
-        <div style={{ position: 'relative' }}>
-          <input
-            className="input-field"
-            type="text"
-            placeholder="Tìm theo tên hoặc email..."
-            style={{ paddingLeft: '1rem' }}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="input-group" style={{ maxWidth: '350px', marginBottom: 0 }}>
+          <div style={{ position: 'relative' }}>
+            <input
+              className="input-field"
+              type="text"
+              placeholder="Tìm theo tên hoặc email"
+              style={{ paddingLeft: '1rem' }}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Award, Brain, CheckCircle, ChevronDown, ChevronUp, Edit2, Plus, Shield, Trash2, Utensils, X } from 'lucide-react';
+import { Award, Brain, CheckCircle, ChevronDown, ChevronUp, Edit2, Shield, Trash2, Utensils, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { auth, db } from '../firebase/config';
 
@@ -187,6 +187,22 @@ const Challenges = () => {
     if (expandedQuestion === index) setExpandedQuestion(null);
   };
 
+  const handleOpenAddModal = () => {
+    const currentTab = TABS.find(t => t.key === activeTab);
+    const prefix = currentTab?.prefix || '';
+    
+    // Count existing items with this prefix to suggest next ID
+    const countInTab = challenges.filter(c => c.id?.startsWith(prefix)).length;
+    const nextId = `${prefix}${countInTab + 1}`;
+    
+    setNewItem({ 
+      questions: [], 
+      pagodaId: nextId 
+    });
+    setIsAddingNew(true);
+    setExpandedQuestion(0);
+  };
+
   const filteredChallenges = challenges.filter(c => {
     const search = searchTerm.toLowerCase();
     const matches = c.pagodaName?.toLowerCase().includes(search) || c.id?.toLowerCase().includes(search);
@@ -205,14 +221,30 @@ const Challenges = () => {
         )}
       </AnimatePresence>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Quản lý thử thách</h1>
-          <p style={{ color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Thiết kế các bộ câu hỏi tương tác cho người dùng.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => { setIsAddingNew(true); setExpandedQuestion(0); }}>
-          <Plus size={20} /> Tạo thử thách
-        </button>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div className="input-group" style={{ width: '300px', marginBottom: 0 }}>
+            <div style={{ position: 'relative' }}>
+              <input
+                className="input-field"
+                placeholder="Tìm kiếm nhanh..."
+                style={{ paddingLeft: '1rem' }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+          <button
+            className="btn"
+            onClick={handleOpenAddModal}
+            style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
+          >
+            Thêm mới thử thách
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2.5rem' }}>
@@ -226,9 +258,6 @@ const Challenges = () => {
             );
           })}
         </div>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <input className="input-field" placeholder="Tên thử thách..." style={{ paddingLeft: '1.25rem', height: '100%', borderRadius: '14px' }} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
@@ -237,8 +266,9 @@ const Challenges = () => {
             <div key={i} className="card glass-card skeleton" style={{ height: '300px' }} />
           ))
         ) : filteredChallenges.length === 0 ? (
-          <div className="card glass-card" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem' }}>
-            <p style={{ color: 'var(--text-secondary)' }}>Không tìm thấy thử thách nào khớp với tiêu chí tìm kiếm.</p>
+          <div className="card glass-card" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '5rem' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Không tìm thấy kết quả</h3>
+            <p style={{ color: 'var(--text-secondary)' }}>Thử tìm kiếm với một từ khóa khác</p>
           </div>
         ) : (
           filteredChallenges.map(item => (
@@ -273,14 +303,24 @@ const Challenges = () => {
               <div style={{ flex: 1, overflowY: 'auto', paddingRight: '1rem' }} className="custom-scrollbar">
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2.5rem' }}>
                   <InputField label="ID Thử thách" value={isAddingNew ? newItem.pagodaId : editingItem?.pagodaId} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, pagodaId: v }) : setEditingItem({ ...editingItem!, pagodaId: v })} disabled={!isAddingNew} />
-                  <InputField label="Tên Địa danh / Nội dung" value={isAddingNew ? newItem.pagodaName : editingItem?.pagodaName} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, pagodaName: v }) : setEditingItem({ ...editingItem!, pagodaName: v })} list="dest-list" />
+                  <InputField
+                    label={
+                      activeTab === 'Chùa' ? "Tên Ngôi chùa Khmer" :
+                        activeTab === 'Văn hóa' ? "Tên Văn hóa Khmer" :
+                          activeTab === 'Ẩm thực' ? "Tên Ẩm thực Khmer" :
+                            "Tên nội dung"
+                    }
+                    value={isAddingNew ? newItem.pagodaName : editingItem?.pagodaName}
+                    onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, pagodaName: v }) : setEditingItem({ ...editingItem!, pagodaName: v })}
+                    list="dest-list"
+                  />
                   <datalist id="dest-list">{destinations.map(d => <option key={d.id} value={d.name} />)}</datalist>
                 </div>
 
                 <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '2.5rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                     <h3 style={{ fontSize: '1rem', fontWeight: 800 }}>Câu hỏi ({(isAddingNew ? newItem.questions : editingItem?.questions)?.length})</h3>
-                    <button type="button" className="btn btn-secondary" onClick={handleAddQuestion} style={{ fontSize: '0.8rem' }}><Plus size={16} /> Thêm câu</button>
+                    <button type="button" className="btn btn-secondary" onClick={handleAddQuestion} style={{ fontSize: '0.8rem' }}>Thêm câu hỏi</button>
                   </div>
 
                   <div style={{ display: 'grid', gap: '1rem' }}>
@@ -289,7 +329,7 @@ const Challenges = () => {
                         <div style={{ padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setExpandedQuestion(expandedQuestion === idx ? null : idx)}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             <span style={{ width: '28px', height: '28px', background: 'var(--primary)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>{idx + 1}</span>
-                            <span style={{ fontWeight: 700 }}>{q.question || `Câu hỏi #${idx + 1}`}</span>
+                            <span style={{ fontWeight: 700 }}>{q.question || `Câu hỏi ${idx + 1}`}</span>
                           </div>
                           <div style={{ display: 'flex', gap: '0.5rem' }}>
                             <button className="btn" style={{ padding: '4px', color: 'var(--danger)' }} onClick={(e) => { e.stopPropagation(); handleRemoveQuestion(idx); }}><Trash2 size={16} /></button>

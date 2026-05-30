@@ -238,13 +238,30 @@ const Destinations = () => {
         )}
       </AnimatePresence>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Nội dung học tập</h1>
         </div>
-        <button onClick={() => { setIsAddingNew(true); setNewItem({ ...newItem, category: activeTab }); }} className="btn btn-primary">
-          Thêm mới
-        </button>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div className="input-group" style={{ width: '300px', marginBottom: 0 }}>
+            <div style={{ position: 'relative' }}>
+              <input
+                className="input-field"
+                placeholder="Tìm kiếm nhanh..."
+                style={{ paddingLeft: '1rem' }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+          <button 
+            className="btn" 
+            onClick={() => { setIsAddingNew(true); setNewItem({ ...newItem, category: activeTab }); }}
+            style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
+          >
+            Thêm mới nội dung
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2.5rem' }}>
@@ -258,10 +275,6 @@ const Destinations = () => {
             );
           })}
         </div>
-
-        <div style={{ flex: 1, position: 'relative' }}>
-          <input className="input-field" placeholder="Tìm kiếm nhanh..." style={{ paddingLeft: '1.25rem', height: '100%', borderRadius: '14px' }} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-        </div>
       </div>
 
       {loading ? (
@@ -271,8 +284,8 @@ const Destinations = () => {
       ) : filteredDestinations.length === 0 ? (
         <div className="card glass-card" style={{ textAlign: 'center', padding: '5rem' }}>
 
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Chưa có nội dung nào</h3>
-          <p style={{ color: 'var(--text-secondary)' }}>Bắt đầu bằng cách thêm một mục mới vào tab này.</p>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Không tìm thấy kết quả</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>Thử tìm kiếm với một từ khóa khác</p>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
@@ -396,9 +409,9 @@ const Destinations = () => {
                       <div key={idx} style={{ display: 'flex', flexDirection: isEven ? 'row' : 'row-reverse', gap: '5rem', alignItems: 'center' }}>
                         {/* Image Side */}
                         <div style={{ flex: 1.2 }}>
-                          <img 
-                            src={block.images} 
-                            style={{ width: '100%', height: '420px', objectFit: 'cover', borderRadius: '32px', boxShadow: 'var(--shadow-lg)' }} 
+                          <img
+                            src={block.images}
+                            style={{ width: '100%', height: '420px', objectFit: 'cover', borderRadius: '32px', boxShadow: 'var(--shadow-lg)' }}
                           />
                         </div>
 
