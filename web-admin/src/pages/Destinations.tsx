@@ -1,7 +1,7 @@
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { addDoc, collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle, Edit2, Search, Shield, Trash2, Plus, X, MapPin, Image as ImageIcon, AlignLeft, Info } from 'lucide-react';
+import { AlignLeft, CheckCircle, Edit2, Image as ImageIcon, Info, MapPin, Shield, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { auth, db } from '../firebase/config';
 
@@ -223,7 +223,7 @@ const Destinations = () => {
     .filter(d => d.category === activeTab)
     .filter(d => d.name?.toLowerCase().includes(searchTerm.toLowerCase()) || d.location?.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  const countByTab = (key: TabKey) => destinations.filter(d => d.category === key).length;
+
 
   return (
     <div className="fade-in">
@@ -239,10 +239,10 @@ const Destinations = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2.5rem' }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Nội dung học tập</h1>
-          <p style={{ color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Quản lý kho tàng di sản văn hóa và ẩm thực Khmer.</p>
+          <p style={{ color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Quản lý kho tàng di sản văn hóa</p>
         </div>
         <button onClick={() => { setIsAddingNew(true); setNewItem({ ...newItem, category: activeTab }); }} className="btn btn-primary">
-          <Plus size={20} /> Thêm mới
+          Thêm mới
         </button>
       </div>
 
@@ -252,16 +252,14 @@ const Destinations = () => {
             const isActive = activeTab === tab.key;
             return (
               <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ flex: 1, border: 'none', padding: '0.75rem', borderRadius: '10px', background: isActive ? 'white' : 'transparent', color: isActive ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: isActive ? 'var(--shadow-sm)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                <tab.icon size={18} /> {tab.label}
-                <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '6px', background: isActive ? 'var(--primary-soft)' : 'rgba(0,0,0,0.05)', color: isActive ? 'var(--primary)' : 'inherit' }}>{countByTab(tab.key)}</span>
+                {tab.label}
               </button>
             );
           })}
         </div>
-        
-        <div style={{ width: '320px', position: 'relative' }}>
-          <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-          <input className="input-field" placeholder="Tìm kiếm nhanh..." style={{ paddingLeft: '3rem' }} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+
+        <div style={{ flex: 1, position: 'relative' }}>
+          <input className="input-field" placeholder="Tìm kiếm nhanh..." style={{ paddingLeft: '1.25rem', height: '100%', borderRadius: '14px' }} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
       </div>
 
@@ -271,7 +269,7 @@ const Destinations = () => {
         </div>
       ) : filteredDestinations.length === 0 ? (
         <div className="card glass-card" style={{ textAlign: 'center', padding: '5rem' }}>
-          <Search size={48} color="var(--text-muted)" style={{ opacity: 0.3, marginBottom: '1.5rem' }} />
+
           <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Chưa có nội dung nào</h3>
           <p style={{ color: 'var(--text-secondary)' }}>Bắt đầu bằng cách thêm một mục mới vào tab này.</p>
         </div>
@@ -287,14 +285,14 @@ const Destinations = () => {
                 </div>
               </div>
               <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem', display: 'block' }}>{dest.category}</span>
+
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem', lineHeight: 1.3 }}>{dest.name}</h3>
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <MapPin size={14} /> {dest.location || 'Chưa có địa chỉ'}
+                  {dest.location || 'Chưa có địa chỉ'}
                 </p>
                 <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)' }}>Cập nhật 2 ngày trước</span>
-                  <button className="btn btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.75rem' }} onClick={() => setEditingItem(dest)}>Chi tiết</button>
+                  <button className="btn btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.75rem' }} onClick={() => setEditingItem(dest)}>Xem chi tiết</button>
                 </div>
               </div>
             </motion.div>
@@ -310,39 +308,39 @@ const Destinations = () => {
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="card" style={{ position: 'relative', width: '100%', maxWidth: '900px', padding: '3rem', borderRadius: '32px', maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
                 <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{isAddingNew ? `Thêm ${activeTab}` : `Sửa ${activeTab}`}</h2>
-                <button onClick={() => { setEditingItem(null); setIsAddingNew(false); }} style={{ border: 'none', background: 'var(--bg-accent)', padding: '10px', borderRadius: '12px', cursor: 'pointer' }}><X size={20}/></button>
+                <button onClick={() => { setEditingItem(null); setIsAddingNew(false); }} style={{ border: 'none', background: 'var(--bg-accent)', padding: '10px', borderRadius: '12px', cursor: 'pointer' }}><X size={20} /></button>
               </div>
 
               <div style={{ flex: 1, overflowY: 'auto', paddingRight: '1rem', display: 'grid', gap: '2rem' }} className="custom-scrollbar">
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                  <InputField label="Tên (Tiếng Việt)" value={isAddingNew ? newItem.name : editingItem?.name} onChange={(v: string) => isAddingNew ? setNewItem({...newItem, name:v}) : setEditingItem({...editingItem!, name:v})} icon={AlignLeft} />
-                  <InputField label="Tên (Tiếng Khmer)" value={isAddingNew ? newItem.name_khmer : editingItem?.name_khmer} onChange={(v: string) => isAddingNew ? setNewItem({...newItem, name_khmer:v}) : setEditingItem({...editingItem!, name_khmer:v})} />
-                </div>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                  <InputField label={activeTab === 'Chùa' ? "Địa chỉ" : "Mô tả phụ"} value={isAddingNew ? newItem.location : editingItem?.location} onChange={(v: string) => isAddingNew ? setNewItem({...newItem, location:v}) : setEditingItem({...editingItem!, location:v})} icon={MapPin} />
-                  <InputField label={activeTab === 'Chùa' ? "Địa chỉ (Khmer)" : "Mô tả phụ (Khmer)"} value={isAddingNew ? newItem.location_khmer : editingItem?.location_khmer} onChange={(v: string) => isAddingNew ? setNewItem({...newItem, location_khmer:v}) : setEditingItem({...editingItem!, location_khmer:v})} icon={MapPin} />
+                  <InputField label="Tên (Tiếng Việt)" value={isAddingNew ? newItem.name : editingItem?.name} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, name: v }) : setEditingItem({ ...editingItem!, name: v })} icon={AlignLeft} />
+                  <InputField label="Tên (Tiếng Khmer)" value={isAddingNew ? newItem.name_khmer : editingItem?.name_khmer} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, name_khmer: v }) : setEditingItem({ ...editingItem!, name_khmer: v })} />
                 </div>
 
-                <InputField label="Link ảnh nền chính" value={isAddingNew ? newItem.imageUrl : editingItem?.imageUrl} onChange={(v: string) => isAddingNew ? setNewItem({...newItem, imageUrl:v}) : setEditingItem({...editingItem!, imageUrl:v})} icon={ImageIcon} />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                  <InputField label={activeTab === 'Chùa' ? "Địa chỉ" : "Mô tả phụ"} value={isAddingNew ? newItem.location : editingItem?.location} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, location: v }) : setEditingItem({ ...editingItem!, location: v })} icon={MapPin} />
+                  <InputField label={activeTab === 'Chùa' ? "Địa chỉ (Khmer)" : "Mô tả phụ (Khmer)"} value={isAddingNew ? newItem.location_khmer : editingItem?.location_khmer} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, location_khmer: v }) : setEditingItem({ ...editingItem!, location_khmer: v })} icon={MapPin} />
+                </div>
+
+                <InputField label="Link ảnh nền chính" value={isAddingNew ? newItem.imageUrl : editingItem?.imageUrl} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl: v }) : setEditingItem({ ...editingItem!, imageUrl: v })} icon={ImageIcon} />
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                  <InputField label="Mô tả tóm tắt" textarea value={isAddingNew ? newItem.description : editingItem?.description} onChange={(v: string) => isAddingNew ? setNewItem({...newItem, description:v}) : setEditingItem({...editingItem!, description:v})} />
-                  <InputField label="Mô tả tóm tắt (Khmer)" textarea value={isAddingNew ? newItem.description_khmer : editingItem?.description_khmer} onChange={(v: string) => isAddingNew ? setNewItem({...newItem, description_khmer:v}) : setEditingItem({...editingItem!, description_khmer:v})} />
+                  <InputField label="Mô tả tóm tắt" textarea value={isAddingNew ? newItem.description : editingItem?.description} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, description: v }) : setEditingItem({ ...editingItem!, description: v })} />
+                  <InputField label="Mô tả tóm tắt (Khmer)" textarea value={isAddingNew ? newItem.description_khmer : editingItem?.description_khmer} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, description_khmer: v }) : setEditingItem({ ...editingItem!, description_khmer: v })} />
                 </div>
 
                 <div style={{ borderTop: '2px dashed var(--border-light)', paddingTop: '2.5rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                     <h3 style={{ fontSize: '1rem', fontWeight: 800 }}>Các khối nội dung chi tiết</h3>
-                    <button type="button" onClick={handleAddContentBlock} className="btn btn-secondary" style={{ fontSize: '0.8rem' }}><Plus size={16}/> Thêm khối</button>
+                    <button type="button" onClick={handleAddContentBlock} className="btn btn-secondary" style={{ fontSize: '0.8rem' }}>Thêm khối</button>
                   </div>
-                  
+
                   <div style={{ display: 'grid', gap: '1.5rem' }}>
                     {(isAddingNew ? newItem.contentBlocks : editingItem?.contentBlocks)?.map((block, idx) => (
                       <div key={idx} className="card" style={{ background: 'var(--bg-main)', border: 'none', padding: '1.5rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
                           <span style={{ fontWeight: 800, fontSize: '0.75rem', color: 'var(--primary)', textTransform: 'uppercase' }}>KHỐI NỘI DUNG #{idx + 1}</span>
-                          <button type="button" onClick={() => handleRemoveContentBlock(idx)} style={{ border: 'none', background: 'transparent', color: '#ef4444', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem' }}><Trash2 size={14}/> Xóa</button>
+                          <button type="button" onClick={() => handleRemoveContentBlock(idx)} style={{ border: 'none', background: 'transparent', color: '#ef4444', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem' }}><Trash2 size={14} /> Xóa</button>
                         </div>
                         <div style={{ display: 'grid', gap: '1rem' }}>
                           <InputField label="Link ảnh khối này" value={block.images} onChange={(v: string) => handleUpdateContentBlock(idx, 'images', v)} />
@@ -356,8 +354,8 @@ const Destinations = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '1rem', marginTop: '2.5rem' }}>
-                <button type="button" className="btn btn-secondary" style={{ flex: 1, padding: '1rem' }} onClick={() => { setEditingItem(null); setIsAddingNew(false); }}>Hủy bỏ</button>
-                <button type="button" className="btn btn-primary" style={{ flex: 2, padding: '1rem' }} onClick={isAddingNew ? handleAddNew : handleUpdate}>Lưu nội dung</button>
+                <button type="button" className="btn" style={{ flex: 1, padding: '1rem', background: 'var(--danger)', color: '#fff' }} onClick={() => { setEditingItem(null); setIsAddingNew(false); }}>Hủy bỏ</button>
+                <button type="button" className="btn" style={{ flex: 2, padding: '1rem', background: '#3b82f6', color: '#fff' }} onClick={isAddingNew ? handleAddNew : handleUpdate}>Lưu nội dung</button>
               </div>
             </motion.div>
           </div>

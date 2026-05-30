@@ -1,7 +1,7 @@
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle, ChevronDown, ChevronUp, Edit2, Search, Shield, Trash2, Plus, X, Award, Brain, Utensils } from 'lucide-react';
+import { Award, Brain, CheckCircle, ChevronDown, ChevronUp, Edit2, Plus, Shield, Trash2, Utensils, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { auth, db } from '../firebase/config';
 
@@ -104,7 +104,7 @@ const Challenges = () => {
     setLoading(true);
     try {
       const quizSnapshot = await getDocs(collection(db, 'quizzes'));
-      const quizDocs = quizSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Challenge)); 
+      const quizDocs = quizSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Challenge));
       const destSnapshot = await getDocs(collection(db, 'destinations'));
       const destDocs = destSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setDestinations(destDocs);
@@ -207,7 +207,7 @@ const Challenges = () => {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2.5rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Quản lý Thử thách</h1>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Quản lý thử thách</h1>
           <p style={{ color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Thiết kế các bộ câu hỏi tương tác cho người dùng.</p>
         </div>
         <button className="btn btn-primary" onClick={() => { setIsAddingNew(true); setExpandedQuestion(0); }}>
@@ -221,14 +221,13 @@ const Challenges = () => {
             const isActive = activeTab === tab.key;
             return (
               <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ flex: 1, border: 'none', padding: '0.75rem', borderRadius: '10px', background: isActive ? 'white' : 'transparent', color: isActive ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: isActive ? 'var(--shadow-sm)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                <tab.icon size={18} /> {tab.label}
+                {tab.label}
               </button>
             );
           })}
         </div>
-        <div style={{ width: '320px', position: 'relative' }}>
-          <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-          <input className="input-field" placeholder="Tìm ID hoặc Tên thử thách..." style={{ paddingLeft: '3rem' }} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        <div style={{ flex: 1, position: 'relative' }}>
+          <input className="input-field" placeholder="Tên thử thách..." style={{ paddingLeft: '1.25rem', height: '100%', borderRadius: '14px' }} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
       </div>
 
@@ -244,21 +243,21 @@ const Challenges = () => {
         ) : (
           filteredChallenges.map(item => (
             <motion.div layout key={item.id} className="card glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-            <div style={{ height: '180px', background: 'var(--bg-accent)', position: 'relative' }}>
-              <img src={item.imageUrl || 'https://images.unsplash.com/photo-1577563908411-5077b6dc7624?q=80&w=600'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              <div style={{ position: 'absolute', bottom: '1rem', left: '1rem', padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', borderRadius: '10px', fontWeight: 800, fontSize: '0.7rem', color: 'var(--primary)' }}>{item.questions?.length} CÂU HỎI</div>
-            </div>
-            <div style={{ padding: '1.5rem' }}>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: 800, marginBottom: '1rem' }}>{item.pagodaName || 'Chưa đặt tên'}</h3>
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <button className="btn btn-secondary" style={{ flex: 1, fontSize: '0.8rem' }} onClick={() => { setEditingItem(item); setExpandedQuestion(0); }}><Edit2 size={14} /> Sửa</button>
-                <button className="btn" style={{ background: 'var(--danger-soft)', color: 'var(--danger)', padding: '0.5rem' }} onClick={() => handleDelete(item.id)}><Trash2 size={16} /></button>
+              <div style={{ height: '180px', background: 'var(--bg-accent)', position: 'relative' }}>
+                <img src={item.imageUrl || 'https://images.unsplash.com/photo-1577563908411-5077b6dc7624?q=80&w=600'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ position: 'absolute', bottom: '1rem', left: '1rem', padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', borderRadius: '10px', fontWeight: 800, fontSize: '0.7rem', color: 'var(--primary)' }}>{item.questions?.length} CÂU HỎI</div>
               </div>
-            </div>
-          </motion.div>
-        ))
-      )}
-    </div>
+              <div style={{ padding: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: 800, marginBottom: '1rem' }}>{item.pagodaName || 'Chưa đặt tên'}</h3>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <button className="btn btn-secondary" style={{ flex: 1, fontSize: '0.8rem' }} onClick={() => { setEditingItem(item); setExpandedQuestion(0); }}><Edit2 size={14} /> Sửa</button>
+                  <button className="btn" style={{ background: 'var(--danger-soft)', color: 'var(--danger)', padding: '0.5rem' }} onClick={() => handleDelete(item.id)}><Trash2 size={16} /></button>
+                </div>
+              </div>
+            </motion.div>
+          ))
+        )}
+      </div>
 
       {/* Editor Modal */}
       <AnimatePresence>
@@ -280,10 +279,10 @@ const Challenges = () => {
 
                 <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '2.5rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 800 }}>Câu hỏi ({ (isAddingNew ? newItem.questions : editingItem?.questions)?.length })</h3>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 800 }}>Câu hỏi ({(isAddingNew ? newItem.questions : editingItem?.questions)?.length})</h3>
                     <button type="button" className="btn btn-secondary" onClick={handleAddQuestion} style={{ fontSize: '0.8rem' }}><Plus size={16} /> Thêm câu</button>
                   </div>
-                  
+
                   <div style={{ display: 'grid', gap: '1rem' }}>
                     {(isAddingNew ? newItem.questions : editingItem?.questions)?.map((q, idx) => (
                       <div key={idx} style={{ border: '1px solid var(--border-light)', borderRadius: '16px', background: expandedQuestion === idx ? 'var(--bg-accent)' : 'transparent' }}>
@@ -299,16 +298,16 @@ const Challenges = () => {
                         </div>
                         {expandedQuestion === idx && (
                           <div style={{ padding: '1.5rem', borderTop: '1px solid var(--border-light)', display: 'grid', gap: '1.5rem', background: 'white' }}>
-                            <InputField label="Nội dung câu hỏi" textarea value={q.question} onChange={(v: string) => { const qs = [...(isAddingNew?newItem.questions!:editingItem!.questions)]; qs[idx].question=v; isAddingNew?setNewItem({...newItem, questions:qs}):setEditingItem({...editingItem!, questions:qs}) }} />
+                            <InputField label="Nội dung câu hỏi" textarea value={q.question} onChange={(v: string) => { const qs = [...(isAddingNew ? newItem.questions! : editingItem!.questions)]; qs[idx].question = v; isAddingNew ? setNewItem({ ...newItem, questions: qs }) : setEditingItem({ ...editingItem!, questions: qs }) }} />
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                               {q.options.map((opt, oIdx) => (
                                 <div key={oIdx} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                  <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: q.correctIndex === oIdx ? 'var(--primary)' : 'var(--bg-accent)', color: q.correctIndex === oIdx ? 'white' : 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, cursor: 'pointer' }} onClick={() => { const qs = [...(isAddingNew?newItem.questions!:editingItem!.questions)]; qs[idx].correctIndex=oIdx; isAddingNew?setNewItem({...newItem, questions:qs}):setEditingItem({...editingItem!, questions:qs}) }}>{String.fromCharCode(65+oIdx)}</div>
-                                  <input className="input-field" value={opt} onChange={(e) => { const qs = [...(isAddingNew?newItem.questions!:editingItem!.questions)]; qs[idx].options[oIdx]=e.target.value; isAddingNew?setNewItem({...newItem, questions:qs}):setEditingItem({...editingItem!, questions:qs}) }} style={{ padding: '8px 12px' }} />
+                                  <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: q.correctIndex === oIdx ? 'var(--primary)' : 'var(--bg-accent)', color: q.correctIndex === oIdx ? 'white' : 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, cursor: 'pointer' }} onClick={() => { const qs = [...(isAddingNew ? newItem.questions! : editingItem!.questions)]; qs[idx].correctIndex = oIdx; isAddingNew ? setNewItem({ ...newItem, questions: qs }) : setEditingItem({ ...editingItem!, questions: qs }) }}>{String.fromCharCode(65 + oIdx)}</div>
+                                  <input className="input-field" value={opt} onChange={(e) => { const qs = [...(isAddingNew ? newItem.questions! : editingItem!.questions)]; qs[idx].options[oIdx] = e.target.value; isAddingNew ? setNewItem({ ...newItem, questions: qs }) : setEditingItem({ ...editingItem!, questions: qs }) }} style={{ padding: '8px 12px' }} />
                                 </div>
                               ))}
                             </div>
-                            <InputField label="Giải thích đáp án" textarea value={q.explanation} onChange={(v: string) => { const qs = [...(isAddingNew?newItem.questions!:editingItem!.questions)]; qs[idx].explanation=v; isAddingNew?setNewItem({...newItem, questions:qs}):setEditingItem({...editingItem!, questions:qs}) }} />
+                            <InputField label="Giải thích đáp án" textarea value={q.explanation} onChange={(v: string) => { const qs = [...(isAddingNew ? newItem.questions! : editingItem!.questions)]; qs[idx].explanation = v; isAddingNew ? setNewItem({ ...newItem, questions: qs }) : setEditingItem({ ...editingItem!, questions: qs }) }} />
                           </div>
                         )}
                       </div>
@@ -318,8 +317,8 @@ const Challenges = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '1rem', marginTop: '2.5rem' }}>
-                <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => { setEditingItem(null); setIsAddingNew(false); }}>Hủy bỏ</button>
-                <button className="btn btn-primary" style={{ flex: 2 }} onClick={isAddingNew ? handleAddNew : handleUpdate}>Lưu thay đổi</button>
+                <button className="btn" style={{ flex: 1, padding: '1rem', background: 'var(--danger)', color: '#fff' }} onClick={() => { setEditingItem(null); setIsAddingNew(false); }}>Hủy bỏ</button>
+                <button className="btn" style={{ flex: 2, padding: '1rem', background: '#3b82f6', color: '#fff' }} onClick={isAddingNew ? handleAddNew : handleUpdate}>Lưu thay đổi</button>
               </div>
             </motion.div>
           </div>
@@ -329,16 +328,16 @@ const Challenges = () => {
       <AnimatePresence>
         {confirmConfig.isOpen && (
           <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
-             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} />
-             <div className="card" style={{ position: 'relative', width: '400px', textAlign: 'center', padding: '2.5rem', borderRadius: '28px' }}>
-                <Shield size={48} color="var(--danger)" style={{ margin: '0 auto 1.5rem' }} />
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>{confirmConfig.title}</h3>
-                <p style={{ color: 'var(--text-secondary)', margin: '1rem 0 2rem' }}>{confirmConfig.message}</p>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}>Đóng</button>
-                  <button className="btn" style={{ flex: 1, background: 'var(--danger)', color: 'white' }} onClick={confirmConfig.onConfirm}>Xóa</button>
-                </div>
-             </div>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} />
+            <div className="card" style={{ position: 'relative', width: '400px', textAlign: 'center', padding: '2.5rem', borderRadius: '28px' }}>
+              <Shield size={48} color="var(--danger)" style={{ margin: '0 auto 1.5rem' }} />
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>{confirmConfig.title}</h3>
+              <p style={{ color: 'var(--text-secondary)', margin: '1rem 0 2rem' }}>{confirmConfig.message}</p>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}>Đóng</button>
+                <button className="btn" style={{ flex: 1, background: 'var(--danger)', color: 'white' }} onClick={confirmConfig.onConfirm}>Xóa</button>
+              </div>
+            </div>
           </div>
         )}
       </AnimatePresence>

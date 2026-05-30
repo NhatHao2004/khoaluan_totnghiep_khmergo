@@ -67,7 +67,7 @@ const Dashboard = () => {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
-        <StatCard title="Người dùng" value={stats.users} icon={User} color="#6366f1" onClick={() => navigate('/users')} />
+        <StatCard title="Người dùng" value={stats.users} icon={User} color="#1e293b" onClick={() => navigate('/users')} />
         <StatCard title="Nội dung" value={stats.destinations} icon={BookOpen} color="#10b981" />
         <StatCard title="Thử thách" value={stats.quizzes} icon={HelpCircle} color="#f59e0b" />
         <StatCard title="Bài viết" value={stats.posts} icon={MessageSquare} color="#ec4899" />
@@ -119,7 +119,7 @@ const Dashboard = () => {
                 ) : (
                   logs.filter(item => activeTab === 'all' || item.type === activeTab).map((item: any) => {
                     const iconMap: any = { system: Shield, users: User, content: Info, default: CheckCircle };
-                    const colorMap: any = { system: '#6366f1', users: '#10b981', content: '#f59e0b', default: '#10b981' };
+                    const colorMap: any = { system: '#1e293b', users: '#10b981', content: '#f59e0b', default: '#10b981' };
                     const Icon = iconMap[item.type] || iconMap.default;
                     const color = colorMap[item.type] || colorMap.default;
 

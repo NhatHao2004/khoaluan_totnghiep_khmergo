@@ -71,7 +71,7 @@ const TopBar = ({ user }: { user: User }) => {
               animate={{ rotate: [0, 20, 0, 20, 0] }}
               transition={{ repeat: Infinity, duration: 1.5, repeatDelay: 2 }}
               style={{ display: 'inline-block', transformOrigin: '70% 70%', cursor: 'default' }}
-            >👋</motion.span>
+            ></motion.span>
           </h2>
         </div>
 

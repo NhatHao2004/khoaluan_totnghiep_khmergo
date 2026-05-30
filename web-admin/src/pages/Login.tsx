@@ -40,8 +40,8 @@ const Login = () => {
       padding: '2rem'
     }}>
       {/* Decorative Orbs */}
-      <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '40%', height: '40%', background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)', borderRadius: '50%' }} />
-      <div style={{ position: 'absolute', bottom: '-10%', left: '-10%', width: '40%', height: '40%', background: 'radial-gradient(circle, rgba(79, 70, 229, 0.1) 0%, transparent 70%)', borderRadius: '50%' }} />
+      <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '40%', height: '40%', background: 'radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%)', borderRadius: '50%' }} />
+      <div style={{ position: 'absolute', bottom: '-10%', left: '-10%', width: '40%', height: '40%', background: 'radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%)', borderRadius: '50%' }} />
 
       <div style={{
         width: '100%',
@@ -59,15 +59,15 @@ const Login = () => {
           <div style={{
             width: '72px',
             height: '72px',
-            background: 'rgba(99, 102, 241, 0.1)',
+            background: 'rgba(255, 255, 255, 0.05)',
             borderRadius: '24px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             margin: '0 auto 1.5rem',
-            border: '1px solid rgba(99, 102, 241, 0.2)'
+            border: '1px solid rgba(255, 255, 255, 0.1)'
           }}>
-            <ShieldCheck color="#6366f1" size={36} strokeWidth={1.5} />
+            <ShieldCheck color="#fff" size={36} strokeWidth={1.5} />
           </div>
           <h1 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#fff', marginBottom: '0.75rem', letterSpacing: '-0.025em' }}>KhmerGo Admin</h1>
           <p style={{ color: '#94a3b8', fontWeight: 500, fontSize: '0.925rem' }}>Hệ thống quản lý nội dung & người dùng</p>
@@ -94,7 +94,7 @@ const Login = () => {
 
         <form onSubmit={handleLogin}>
           <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#6366f1', textTransform: 'uppercase', marginBottom: '10px', marginLeft: '4px', letterSpacing: '0.05em' }}>Email quản trị</label>
+            <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '10px', marginLeft: '4px', letterSpacing: '0.05em' }}>Email quản trị</label>
             <div style={{ position: 'relative' }}>
               <div style={{ position: 'absolute', left: '18px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}>
                 <Mail size={20} strokeWidth={2} />
@@ -111,7 +111,7 @@ const Login = () => {
           </div>
 
           <div style={{ marginBottom: '2.5rem' }}>
-            <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#6366f1', textTransform: 'uppercase', marginBottom: '10px', marginLeft: '4px', letterSpacing: '0.05em' }}>Mật khẩu bảo mật</label>
+            <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '10px', marginLeft: '4px', letterSpacing: '0.05em' }}>Mật khẩu bảo mật</label>
             <div style={{ position: 'relative' }}>
               <div style={{ position: 'absolute', left: '18px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}>
                 <Lock size={20} strokeWidth={2} />
@@ -132,8 +132,8 @@ const Login = () => {
             disabled={loading}
             style={{
               width: '100%',
-              background: '#6366f1',
-              color: '#fff',
+              background: '#fff',
+              color: '#0f172a',
               padding: '16px',
               borderRadius: '18px',
               border: 'none',
@@ -145,7 +145,7 @@ const Login = () => {
               justifyContent: 'center',
               gap: '12px',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: '0 10px 15px -3px rgba(99, 102, 241, 0.4)'
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.2)'
             }}
             className="hover-bright"
           >
@@ -164,9 +164,9 @@ const Login = () => {
       
       <style>{`
         .hover-bright:hover {
-          background: #4f46e5 !important;
+          background: #f1f5f9 !important;
           transform: translateY(-2px);
-          box-shadow: 0 12px 20px -3px rgba(99, 102, 241, 0.5) !important;
+          box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.3) !important;
         }
         .hover-bright:active {
           transform: translateY(0);

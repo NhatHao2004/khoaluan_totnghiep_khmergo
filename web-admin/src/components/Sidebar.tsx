@@ -42,7 +42,7 @@ const Sidebar = () => {
 
         <NavLink to="/challenges" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           <HelpCircle size={20} strokeWidth={2} />
-          <span>Thử thách & Quiz</span>
+          <span>Thử thách</span>
         </NavLink>
 
         <div className="sidebar-label" style={{ marginTop: '1.5rem' }}>Hệ thống</div>

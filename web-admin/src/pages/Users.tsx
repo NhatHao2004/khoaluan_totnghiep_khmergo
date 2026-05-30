@@ -1,7 +1,7 @@
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Ban, CheckCircle, Mail, MessageCircleMore, Search, Shield } from 'lucide-react';
+import { Ban, CheckCircle, Mail, MessageCircleMore, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { auth, db } from '../firebase/config';
 
@@ -123,12 +123,11 @@ const Users = () => {
 
       <div className="input-group" style={{ maxWidth: '400px', marginBottom: '2.5rem' }}>
         <div style={{ position: 'relative' }}>
-          <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             className="input-field"
             type="text"
             placeholder="Tìm theo tên hoặc email..."
-            style={{ paddingLeft: '3rem' }}
+            style={{ paddingLeft: '1rem' }}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -147,7 +146,7 @@ const Users = () => {
         </div>
       ) : filteredUsers.length === 0 ? (
         <div className="card glass-card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-          <Search size={40} color="var(--text-muted)" style={{ marginBottom: '1rem', opacity: 0.5 }} />
+
           <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Không tìm thấy kết quả</h3>
           <p style={{ color: 'var(--text-secondary)' }}>Thử tìm kiếm với một từ khóa khác</p>
         </div>
@@ -306,7 +305,7 @@ const Users = () => {
               <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.75rem' }}>{confirmConfig.title}</h3>
               <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2.5rem' }}>{confirmConfig.message}</p>
               <div style={{ display: 'flex', gap: '1rem' }}>
-                <button className="btn" style={{ flex: 1, padding: '0.875rem', background: 'var(--secondary)', color: 'white' }} onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}>Hủy bỏ</button>
+                <button className="btn" style={{ flex: 1, padding: '0.875rem', background: 'var(--danger)', color: 'white' }} onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}>Hủy bỏ</button>
                 <button className="btn" style={{ flex: 1, background: '#ef4444', color: 'white', padding: '0.875rem' }} onClick={confirmConfig.onConfirm}>Xác nhận</button>
               </div>
             </motion.div>
