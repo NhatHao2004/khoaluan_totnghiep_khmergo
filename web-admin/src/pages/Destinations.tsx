@@ -78,6 +78,7 @@ const Destinations = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabKey>('Chùa');
   const [editingItem, setEditingItem] = useState<Destination | null>(null);
+  const [viewingItem, setViewingItem] = useState<Destination | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' }>({
@@ -290,15 +291,99 @@ const Destinations = () => {
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   {dest.location || 'Chưa có địa chỉ'}
                 </p>
-                <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)' }}>Cập nhật 2 ngày trước</span>
-                  <button className="btn btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.75rem' }} onClick={() => setEditingItem(dest)}>Xem chi tiết</button>
+                <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-light)', display: 'flex', gap: '0.75rem' }}>
+                  <button className="btn btn-secondary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.75rem' }} onClick={() => setViewingItem(dest)}>Xem chi tiết</button>
+                  <button className="btn" style={{ padding: '0.5rem', background: 'var(--bg-accent)', color: 'var(--text-primary)', borderRadius: '10px' }} onClick={() => setEditingItem(dest)} title="Chỉnh sửa"><Edit2 size={16} /></button>
+                  <button className="btn" style={{ padding: '0.5rem', background: '#fef2f2', color: 'var(--danger)', borderRadius: '10px' }} onClick={() => setConfirmConfig({ isOpen: true, title: 'Xác nhận xóa', message: `Bạn có chắc chắn muốn xóa "${dest.name}"?`, onConfirm: () => handleDelete(dest.id) })} title="Xóa"><Trash2 size={16} /></button>
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
       )}
+
+      {/* Detail View Modal */}
+      <AnimatePresence>
+        {viewingItem && (
+          <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '2rem' }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} onClick={() => setViewingItem(null)} />
+            <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className="card" style={{ position: 'relative', width: '100%', maxWidth: '800px', padding: 0, borderRadius: '32px', maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ position: 'relative', height: '300px', flexShrink: 0 }}>
+                <img src={viewingItem.imageUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent, rgba(15, 23, 42, 0.8))' }} />
+                <button onClick={() => setViewingItem(null)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', border: 'none', background: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(8px)', color: 'white', padding: '10px', borderRadius: '14px', cursor: 'pointer' }}><X size={20} /></button>
+                
+                <div style={{ position: 'absolute', bottom: '2rem', left: '2.5rem', right: '2.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                    <span style={{ padding: '4px 12px', background: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(4px)', borderRadius: '8px', color: 'white', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase' }}>{activeTab}</span>
+                  </div>
+                  <h2 style={{ fontSize: '2rem', fontWeight: 900, color: 'white' }}>{viewingItem.name}</h2>
+                  <p style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '1.1rem', fontWeight: 500 }}>{viewingItem.name_khmer}</p>
+                </div>
+              </div>
+
+              <div style={{ flex: 1, overflowY: 'auto', padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '2.5rem' }} className="custom-scrollbar">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                  <div>
+                    <h4 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Thông tin mô tả</h4>
+                    <p style={{ fontSize: '1rem', lineHeight: 1.7, color: 'var(--text-primary)' }}>{viewingItem.description}</p>
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Mô tả (Khmer)</h4>
+                    <p style={{ fontSize: '1rem', lineHeight: 1.7, color: 'var(--text-primary)' }}>{viewingItem.description_khmer}</p>
+                  </div>
+                </div>
+
+                <div style={{ padding: '1.5rem', background: 'var(--bg-accent)', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{ width: '48px', height: '48px', background: 'white', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-sm)' }}>
+                    <MapPin size={24} color="var(--primary)" />
+                  </div>
+                  <div>
+                    <span style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Địa điểm & Vị trí</span>
+                    <p style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{viewingItem.location}</p>
+                  </div>
+                </div>
+
+                <div style={{ borderTop: '2px dashed var(--border-light)', paddingTop: '2.5rem' }}>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '2rem' }}>Nội dung chi tiết</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4rem' }}>
+                    {viewingItem.contentBlocks?.map((block, idx) => (
+                      <div key={idx} style={{ display: 'grid', gridTemplateColumns: idx % 2 === 0 ? '1fr 1.5fr' : '1.5fr 1fr', gap: '3rem', alignItems: 'center' }}>
+                        {idx % 2 === 0 ? (
+                          <>
+                            <img src={block.images} style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: '24px', boxShadow: 'var(--shadow-md)' }} />
+                            <div>
+                               <p style={{ fontSize: '1.05rem', lineHeight: 1.8, color: 'var(--text-secondary)', marginBottom: '1rem' }}>{block.value}</p>
+                               <div style={{ padding: '1.5rem', background: 'var(--bg-accent)', borderRadius: '20px', borderLeft: '4px solid var(--primary)' }}>
+                                 <p style={{ fontSize: '1rem', fontStyle: 'italic', color: 'var(--text-primary)' }}>{block.value_khmer || 'Nội dung chưa có bản dịch Khmer'}</p>
+                               </div>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div>
+                               <p style={{ fontSize: '1.05rem', lineHeight: 1.8, color: 'var(--text-secondary)', marginBottom: '1rem' }}>{block.value}</p>
+                               <div style={{ padding: '1.5rem', background: 'var(--bg-accent)', borderRadius: '20px', borderRight: '4px solid var(--primary)' }}>
+                                 <p style={{ fontSize: '1rem', fontStyle: 'italic', color: 'var(--text-primary)' }}>{block.value_khmer || 'Nội dung chưa có bản dịch Khmer'}</p>
+                               </div>
+                            </div>
+                            <img src={block.images} style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: '24px', boxShadow: 'var(--shadow-md)' }} />
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ padding: '1.5rem 2.5rem', background: 'var(--bg-accent)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', fontWeight: 500 }}>ID: {viewingItem.id}</span>
+                <button onClick={() => { setEditingItem(viewingItem); setViewingItem(null); }} className="btn" style={{ padding: '0.75rem 1.5rem', background: 'var(--primary)', color: 'white', fontWeight: 700, borderRadius: '12px' }}>Chỉnh sửa thông tin</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Editor Modal */}
       <AnimatePresence>
