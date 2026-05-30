@@ -1,5 +1,5 @@
 import { signOut } from 'firebase/auth';
-import { BookOpen, HelpCircle, LayoutDashboard, LogOut, Settings, User } from 'lucide-react';
+import { BookOpen, HelpCircle, LayoutDashboard, Power, Settings, User } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { auth } from '../firebase/config';
 
@@ -48,7 +48,7 @@ const Sidebar = () => {
         <div className="sidebar-label" style={{ marginTop: '1.5rem' }}>Hệ thống</div>
         <NavLink to="/profile" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           <Settings size={20} strokeWidth={2} />
-          <span>Hồ sơ</span>
+          <span>Cài đặt</span>
         </NavLink>
       </nav>
 
@@ -67,8 +67,8 @@ const Sidebar = () => {
             gap: '0.875rem'
           }}
         >
-          <LogOut size={20} strokeWidth={2} />
-          <span style={{ fontWeight: 600 }}>Đăng xuất</span>
+          <Power size={20} strokeWidth={2} />
+          <span style={{ fontWeight: 600 }}>Đăng xuất tài khoản</span>
         </button>
       </div>
     </aside>
