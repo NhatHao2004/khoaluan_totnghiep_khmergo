@@ -1,6 +1,7 @@
-import { onAuthStateChanged, type User } from 'firebase/auth';
-import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore';
-import { Bell } from 'lucide-react';
+import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
+import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot } from 'firebase/firestore';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Bell, LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
@@ -10,154 +11,154 @@ import Challenges from './pages/Challenges';
 import Dashboard from './pages/Dashboard';
 import Destinations from './pages/Destinations';
 import Login from './pages/Login';
-import Profile from './pages/Profile';
+import ProfilePage from './pages/Profile';
 import Users from './pages/Users';
 
-import { AnimatePresence, motion } from 'framer-motion';
-
-const TopBar = ({ user }: { user: User }) => {
+const TopBar = ({ notifications, clearNotifications }: any) => {
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState<any[]>([]);
-
-  useEffect(() => {
-    // Fetch notifications (logs + feedback)
-    const unsubLogs = onSnapshot(collection(db, 'logs'), (snap) => {
-      const logs = snap.docs.map(doc => ({ id: doc.id, type: 'system', ...doc.data() }));
-      setNotifications(prev => mergeAndSortLogs(logs, prev));
-    });
-
-    const unsubFeedback = onSnapshot(collection(db, 'feedback'), (snap) => {
-      const feedbacks = snap.docs.map(doc => ({
-        id: doc.id,
-        type: 'users',
-        title: 'Phản hồi mới',
-        desc: `Người dùng ${doc.data().userName || 'Khách'} vừa gửi phản hồi.`,
-        timestamp: doc.data().timestamp
-      }));
-      setNotifications(prev => mergeAndSortLogs(feedbacks, prev));
-    });
-
-    const mergeAndSortLogs = (newData: any[], existingData: any[]) => {
-      const merged = [...newData, ...existingData].filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
-      return merged
-        .sort((a: any, b: any) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0))
-        .slice(0, 10);
-    };
-
-    return () => {
-      unsubLogs();
-      unsubFeedback();
-    };
-  }, [user]);
 
   return (
     <header className="top-bar">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-        <div style={{ flex: 1 }}>
-        </div>
-
-        <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', position: 'relative' }}>
-          <div
+      <div style={{ flex: 1 }}></div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+        <div style={{ position: 'relative' }}>
+          <button
             onClick={() => setShowNotifications(!showNotifications)}
             style={{
-              position: 'relative',
-              color: 'var(--danger)',
+              padding: '0.75rem',
+              borderRadius: '20px',
+              border: '1.5px solid #000000',
+              background: '#eff6ff',
+              color: '#f63b3bff',
               cursor: 'pointer',
-              padding: '10px',
-              borderRadius: '12px',
-              background: 'white',
-              border: '1.5px solid #0f172a',
+              position: 'relative',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              transition: 'all 0.2s'
-            }} className="hover-scale">
-            <motion.div
-              animate={notifications.length > 0 ? {
-                rotate: [0, -20, 20, -20, 20, 0],
-              } : {}}
-              transition={{
-                duration: 0.5,
-                repeat: Infinity,
-                repeatDelay: 2
-              }}
-              style={{ display: 'flex' }}
-            >
-              <Bell size={24} color="var(--danger)" />
-            </motion.div>
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
+            }}
+            className="hover-scale"
+          >
+            <Bell size={22} strokeWidth={2.5} />
             {notifications.length > 0 && (
-              <span style={{ position: 'absolute', top: 10, right: 10, width: 9, height: 9, background: 'var(--danger)', borderRadius: '50%', border: '2px solid white' }}></span>
+              <span style={{
+                position: 'absolute',
+                top: '-5px',
+                right: '-5px',
+                minWidth: '20px',
+                height: '20px',
+                background: '#ef4444',
+                color: 'white',
+                borderRadius: '10px',
+                border: '2px solid white',
+                fontSize: '0.7rem',
+                fontWeight: 800,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0 4px',
+                boxShadow: '0 2px 4px rgba(239, 68, 68, 0.4)',
+                pointerEvents: 'none'
+              }}>
+                {notifications.length}
+              </span>
             )}
-          </div>
+          </button>
 
           <AnimatePresence>
             {showNotifications && (
               <>
                 <motion.div
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  style={{ position: 'fixed', inset: 0, zIndex: 90 }}
                   onClick={() => setShowNotifications(false)}
+                  style={{ position: 'fixed', inset: 0, zIndex: 998 }}
                 />
                 <motion.div
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  style={{
-                    position: 'absolute', top: '120%', right: 0, width: '320px',
-                    background: 'white', borderRadius: '16px', boxShadow: 'var(--shadow-lg)',
-                    border: '1px solid var(--border-light)', zIndex: 100, overflow: 'hidden'
-                  }}
+                  style={{ position: 'absolute', top: '100%', right: 0, marginTop: '0.75rem', width: '320px', background: 'white', borderRadius: '20px', boxShadow: '0 20px 40px rgba(0,0,0,0.12)', border: '1px solid #f1f5f9', padding: '1.25rem', zIndex: 999 }}
                 >
-                  <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 style={{ fontSize: '0.95rem', fontWeight: 800 }}>Thông báo</h3>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 700, cursor: 'pointer' }}>Đánh dấu đã đọc</span>
-                  </div>
-                  <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                    {notifications.length === 0 ? (
-                      <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.5 }}>
-                        <p style={{ fontSize: '0.8125rem' }}>Không có thông báo mới</p>
-                      </div>
-                    ) : (
-                      notifications.map((notif: any) => (
-                        <div key={notif.id} style={{ padding: '1rem', borderBottom: '1px solid var(--border-light)', display: 'flex', gap: '0.75rem', cursor: 'pointer' }} className="hover-accent">
-                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--primary)', marginTop: '0.4rem', flexShrink: 0 }}></div>
-                          <div>
-                            <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.2rem' }}>{notif.title}</p>
-                            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>{notif.desc}</p>
-                          </div>
-                        </div>
-                      ))
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <h4 style={{ fontWeight: 700, fontSize: '0.925rem' }}>Thông báo</h4>
+                    {notifications.length > 0 && (
+                      <button onClick={clearNotifications} style={{ fontSize: '0.75rem', color: '#3b82f6', border: 'none', background: 'none', cursor: 'pointer', fontWeight: 600 }}>Xóa tất cả</button>
                     )}
                   </div>
-                  <div style={{ padding: '1rem', textAlign: 'center', borderTop: '1px solid var(--border-light)', background: 'var(--bg-main)' }}>
-                    <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-secondary)', cursor: 'pointer' }}>Xem tất cả</span>
+                  <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                    {notifications.length === 0 ? (
+                      <p style={{ textAlign: 'center', padding: '2rem 1rem', color: '#94a3b8', fontSize: '0.875rem' }}>Không có thông báo mới</p>
+                    ) : (
+                      <>
+                        {notifications.map((n: any) => (
+                          <div key={n.id} style={{ padding: '0.875rem', borderRadius: '12px', background: '#f8fafc', marginBottom: '0.5rem', fontSize: '0.8125rem', border: '1px solid transparent', transition: 'all 0.2s' }} className="notification-item">
+                            <p style={{ color: '#1e293b', fontWeight: 600, marginBottom: '0.25rem' }}>{n.title}</p>
+                            <p style={{ color: '#64748b', lineHeight: 1.4 }}>{n.message}</p>
+                          </div>
+                        ))}
+                        <button style={{ width: '100%', padding: '0.75rem', marginTop: '0.5rem', border: 'none', background: '#f1f5f9', borderRadius: '12px', color: '#3b82f6', fontSize: '0.8125rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }} className="hover-bright">
+                          Xem tất cả thông báo
+                        </button>
+                      </>
+                    )}
                   </div>
                 </motion.div>
               </>
             )}
           </AnimatePresence>
-
-          {/* Profile link removed as per user request */}
         </div>
       </div>
     </header>
   );
 };
 
-const RouteTransition = ({ children }: { children: React.ReactNode }) => (
-  <div className="fade-in">{children}</div>
-);
-
 function App() {
-  const [authState, setAuthState] = useState<{
-    user: User | null;
-    isAdmin: boolean;
-    loading: boolean;
-  }>({
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [authState, setAuthState] = useState<{ user: User | null, isAdmin: boolean, loading: boolean }>({
     user: null,
     isAdmin: false,
     loading: true
   });
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  useEffect(() => {
+    // Lắng nghe bảng notifications
+    const unsubNotifications = onSnapshot(collection(db, 'notifications'), (snap) => {
+      const notifsData = snap.docs.map(doc => ({ 
+        id: doc.id, 
+        type: 'general',
+        ...doc.data() 
+      }));
+      
+      // Lắng nghe bảng feedback và hợp nhất
+      const unsubFeedback = onSnapshot(collection(db, 'feedback'), (fbSnap) => {
+        const feedbackData = fbSnap.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            type: 'feedback',
+            title: `Phản hồi từ ${data.userName || 'Người dùng'}`,
+            message: data.message || data.nội_dung || 'Đã gửi một phản hồi mới',
+            createdAt: data.createdAt
+          };
+        });
+
+        // Hợp nhất và sắp xếp (giả sử có trường createdAt)
+        const combined = [...notifsData, ...feedbackData].sort((a: any, b: any) => {
+          const timeA = a.createdAt?.seconds || 0;
+          const timeB = b.createdAt?.seconds || 0;
+          return timeB - timeA;
+        });
+
+        setNotifications(combined);
+      });
+
+      return () => unsubFeedback();
+    });
+
+    return () => unsubNotifications();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
@@ -168,44 +169,35 @@ function App() {
           if (data?.role === 'Quản trị viên') {
             setAuthState({ user: u, isAdmin: true, loading: false });
           } else {
-            console.error("Access denied: Not an admin");
-            await auth.signOut();
+            console.error("Access denied: Not an administrator");
+            await signOut(auth);
             setAuthState({ user: null, isAdmin: false, loading: false });
-            alert('Tài khoản này không có quyền truy cập.');
           }
-        } catch (error) {
-          console.error("Auth verification error:", error);
+        } catch (err) {
+          console.error("Error fetching user data:", err);
           setAuthState({ user: null, isAdmin: false, loading: false });
         }
       } else {
         setAuthState({ user: null, isAdmin: false, loading: false });
       }
     });
+
     return () => unsubscribe();
   }, []);
 
-  // Màn hình chờ chuyên nghiệp
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setIsLogoutModalOpen(false);
+    } catch (error) {
+      console.error("Lỗi khi đăng xuất:", error);
+    }
+  };
+
   if (authState.loading) {
     return (
-      <div style={{
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#0f172a',
-        color: '#fff',
-        zIndex: 9999
-      }}>
-        <div style={{
-          width: '48px',
-          height: '48px',
-          border: '3px solid rgba(255,255,255,0.1)',
-          borderTop: '3px solid #6366f1',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite'
-        }}></div>
-        <p style={{ marginTop: '20px', color: '#94a3b8', fontWeight: 600, fontSize: '0.925rem', letterSpacing: '0.05em' }}>KHMERGO ADMIN</p>
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
+        <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid #e2e8f0', borderTopColor: '#3b82f6', borderRadius: '50%' }}></div>
       </div>
     );
   }
@@ -221,27 +213,107 @@ function App() {
     );
   }
 
+  const clearNotifications = async () => {
+    try {
+      const snap = await getDocs(collection(db, 'notifications'));
+      const deletePromises = snap.docs.map(d => deleteDoc(doc(db, 'notifications', d.id)));
+      await Promise.all(deletePromises);
+      setNotifications([]);
+    } catch (error) {
+      console.error("Lỗi khi xóa thông báo:", error);
+    }
+  };
+
   return (
     <Router>
       <div className="app-container">
-        <Sidebar />
-        <main className="main-content">
-          <TopBar user={authState.user} />
-          <div style={{ padding: '2rem', maxWidth: '1440px', margin: '0 auto' }}>
+        <Sidebar onLogout={() => setIsLogoutModalOpen(true)} />
+        <div className="main-content">
+          <TopBar 
+            notifications={notifications} 
+            clearNotifications={clearNotifications} 
+            adminName={authState.user?.displayName || 'Admin'} 
+          />
+          <div style={{ padding: '2.5rem' }}>
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/destinations" element={<RouteTransition><Destinations /></RouteTransition>} />
-              <Route path="/users" element={<RouteTransition><Users /></RouteTransition>} />
-              <Route path="/challenges" element={<RouteTransition><Challenges /></RouteTransition>} />
-              <Route path="/profile" element={<RouteTransition><Profile /></RouteTransition>} />
+              <Route path="/users" element={<Users />} />
+              <Route path="/destinations" element={<Destinations />} />
+              <Route path="/challenges" element={<Challenges />} />
+              <Route path="/profile" element={<ProfilePage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>
-        </main>
+        </div>
+
+        {/* Global Logout Confirmation Modal */}
+        <AnimatePresence>
+          {isLogoutModalOpen && (
+            <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '1.5rem' }}>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }}
+                onClick={() => setIsLogoutModalOpen(false)}
+              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  maxWidth: '400px',
+                  padding: '2.5rem',
+                  textAlign: 'center',
+                  borderRadius: '32px',
+                  background: 'white',
+                  boxShadow: '0 20px 50px rgba(0,0,0,0.15)',
+                  zIndex: 10001
+                }}
+              >
+                <div style={{
+                  width: '70px',
+                  height: '70px',
+                  background: '#fef2f2',
+                  borderRadius: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 1.5rem'
+                }}>
+                  <LogOut size={32} color="#ef4444" strokeWidth={2.5} />
+                </div>
+
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b', marginBottom: '0.75rem' }}>Xác nhận đăng xuất</h3>
+                <p style={{ color: '#64748b', lineHeight: 1.6, marginBottom: '2.5rem' }}>
+                  Bạn có chắc chắn muốn rời khỏi hệ thống quản trị KhmerGo không
+                </p>
+
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <button
+                    className="btn"
+                    style={{ flex: 1, background: '#0080ffff', color: '#ffffffff', fontWeight: 700, borderRadius: '14px', border: 'none', padding: '0.875rem' }}
+                    onClick={() => setIsLogoutModalOpen(false)}
+                  >
+                    Hủy bỏ
+                  </button>
+                  <button
+                    className="btn"
+                    style={{ flex: 1.5, background: '#ef4444', color: 'white', fontWeight: 700, borderRadius: '14px', border: 'none', padding: '0.875rem', boxShadow: '0 8px 16px rgba(239, 68, 68, 0.2)' }}
+                    onClick={handleLogout}
+                  >
+                    Đăng xuất
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     </Router>
   );
 }
-
 
 export default App;
