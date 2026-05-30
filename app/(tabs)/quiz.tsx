@@ -156,7 +156,7 @@ export default function QuizScreen() {
                   router.push('/quiz-culture');
                 }}
               >
-                <View style={[styles.bentoTitleContainer, { height: 55 }]}>
+                <View style={[styles.bentoTitleContainer, { height: 25 }]}>
                   <Text style={[styles.bentoTitleSmall, { lineHeight: 34 }]} numberOfLines={1}>{t('culture_quiz')}</Text>
                 </View>
                 <View style={[styles.bentoImageContainerSmall, { flex: 1 }]}>
@@ -175,7 +175,7 @@ export default function QuizScreen() {
                   router.push('/quiz-food');
                 }}
               >
-                <View style={[styles.bentoTitleContainer, { height: 55 }]}>
+                <View style={[styles.bentoTitleContainer, { height: 25 }]}>
                   <Text style={[styles.bentoTitleSmall, { lineHeight: 34 }]} numberOfLines={1}>{t('food_quiz')}</Text>
                 </View>
                 <View style={[styles.bentoImageContainerSmall, { flex: 1 }]}>
@@ -434,17 +434,17 @@ const styles = StyleSheet.create({
   },
 
   bentoTitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#1E293B',
-    lineHeight: 32,
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#0F172A',
+    lineHeight: 28,
     textAlign: 'center',
   },
   bentoTitleSmall: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#1E293B',
-    lineHeight: 28, // Tăng lên để chứa đủ dấu tiếng Khmer
+    fontSize: 14,
+    fontWeight: '900',
+    color: '#0F172A',
+    lineHeight: 24,
     textAlign: 'center',
   },
   bentoSubtitle: {
@@ -463,18 +463,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 0,
-    borderRadius: 20,
+    borderRadius: 25,
     overflow: 'hidden',
   },
   bentoImageContainerSmall: {
-    width: 50,
-    height: 50,
+    width: 70,
+    height: 70,
     opacity: 1,
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 0,
-    borderRadius: 10,
+    marginTop: 5,
+    borderRadius: 15,
     overflow: 'hidden',
   },
   bentoImageContainerFull: {
