@@ -16,21 +16,10 @@ import Users from './pages/Users';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const TopBar = ({ user }: { user: User }) => {
-  const [adminName, setAdminName] = useState('Admin');
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
-    const unsubAuth = onAuthStateChanged(auth, async (u) => {
-      if (u) {
-        try {
-          const snap = await getDoc(doc(db, 'users', u.uid));
-          const data = snap.data();
-          setAdminName(data?.name || data?.['tên'] || u.displayName || 'Admin');
-        } catch { /* ignore */ }
-      }
-    });
-
     // Fetch notifications (logs + feedback)
     const unsubLogs = onSnapshot(collection(db, 'logs'), (snap) => {
       const logs = snap.docs.map(doc => ({ id: doc.id, type: 'system', ...doc.data() }));
@@ -56,7 +45,6 @@ const TopBar = ({ user }: { user: User }) => {
     };
 
     return () => {
-      unsubAuth();
       unsubLogs();
       unsubFeedback();
     };
@@ -66,13 +54,6 @@ const TopBar = ({ user }: { user: User }) => {
     <header className="top-bar">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
         <div style={{ flex: 1 }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            Chào, {adminName} <motion.span
-              animate={{ rotate: [0, 20, 0, 20, 0] }}
-              transition={{ repeat: Infinity, duration: 1.5, repeatDelay: 2 }}
-              style={{ display: 'inline-block', transformOrigin: '70% 70%', cursor: 'default' }}
-            ></motion.span>
-          </h2>
         </div>
 
         <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', position: 'relative' }}>
@@ -80,19 +61,32 @@ const TopBar = ({ user }: { user: User }) => {
             onClick={() => setShowNotifications(!showNotifications)}
             style={{
               position: 'relative',
-              color: showNotifications ? 'var(--primary)' : 'var(--text-secondary)',
+              color: 'var(--danger)',
               cursor: 'pointer',
-              padding: '8px',
-              borderRadius: '10px',
-              background: showNotifications ? 'var(--primary-soft)' : 'var(--bg-accent)',
+              padding: '10px',
+              borderRadius: '12px',
+              background: 'white',
+              border: '1.5px solid #0f172a',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               transition: 'all 0.2s'
             }} className="hover-scale">
-            <Bell size={20} />
+            <motion.div
+              animate={notifications.length > 0 ? {
+                rotate: [0, -20, 20, -20, 20, 0],
+              } : {}}
+              transition={{
+                duration: 0.5,
+                repeat: Infinity,
+                repeatDelay: 2
+              }}
+              style={{ display: 'flex' }}
+            >
+              <Bell size={24} color="var(--danger)" />
+            </motion.div>
             {notifications.length > 0 && (
-              <span style={{ position: 'absolute', top: 8, right: 8, width: 8, height: 8, background: 'var(--danger)', borderRadius: '50%', border: '2px solid white' }}></span>
+              <span style={{ position: 'absolute', top: 10, right: 10, width: 9, height: 9, background: 'var(--danger)', borderRadius: '50%', border: '2px solid white' }}></span>
             )}
           </div>
 

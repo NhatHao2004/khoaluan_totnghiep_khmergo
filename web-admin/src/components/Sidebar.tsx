@@ -18,9 +18,9 @@ const Sidebar = () => {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-logo">
-        <img src={icon} alt="KhmerGo Logo" style={{ width: 32, height: 32, marginRight: '12px', borderRadius: '8px' }} />
-        <span style={{ background: 'linear-gradient(to right, #ffffff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>KhmerGo</span>
+      <div className="sidebar-logo" style={{ background: 'white' }}>
+        <img src={icon} alt="KhmerGo Logo" style={{ width: 50, height: 50, marginRight: '12px', borderRadius: '10px' }} />
+        <span style={{ fontWeight: 800, fontSize: '1.4rem', color: '#000000ff' }}>KhmerGo</span>
       </div>
 
       <nav className="sidebar-nav">
@@ -37,7 +37,7 @@ const Sidebar = () => {
 
         <NavLink to="/destinations" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           <BookOpen size={20} strokeWidth={2} />
-          <span>Nội dung học tập</span>
+          <span>Nội dung</span>
         </NavLink>
 
         <NavLink to="/challenges" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
@@ -48,7 +48,7 @@ const Sidebar = () => {
         <div className="sidebar-label" style={{ marginTop: '1.5rem' }}>Hệ thống</div>
         <NavLink to="/profile" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           <Settings size={20} strokeWidth={2} />
-          <span>Cài đặt cá nhân</span>
+          <span>Hồ sơ</span>
         </NavLink>
       </nav>
 
@@ -58,10 +58,10 @@ const Sidebar = () => {
           onClick={handleLogout}
           style={{
             width: '100%',
-            background: 'rgba(239, 68, 68, 0.1)',
+            background: '#0f172a',
             border: 'none',
             cursor: 'pointer',
-            color: '#ef4444',
+            color: '#ffffffff',
             display: 'flex',
             alignItems: 'center',
             gap: '0.875rem'

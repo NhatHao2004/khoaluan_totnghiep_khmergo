@@ -88,7 +88,7 @@ body {
   flex-direction: column;
   z-index: 100;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+  box-shadow: none;
 }
 
 .sidebar-logo {
@@ -153,7 +153,7 @@ body {
 
 .top-bar {
   height: var(--header-height);
-  background: rgba(255, 255, 255, 0.8);
+  background: #ffffff;
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-light);
   display: flex;

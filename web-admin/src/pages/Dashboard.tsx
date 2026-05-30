@@ -67,17 +67,17 @@ const Dashboard = () => {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
-        <StatCard title="Người dùng" value={stats.users} icon={User} color="#1e293b" onClick={() => navigate('/users')} />
-        <StatCard title="Nội dung" value={stats.destinations} icon={BookOpen} color="#10b981" />
-        <StatCard title="Thử thách" value={stats.quizzes} icon={HelpCircle} color="#f59e0b" />
-        <StatCard title="Bài viết" value={stats.posts} icon={MessageSquare} color="#ec4899" />
+        <StatCard title="Người dùng" value={stats.users} icon={User} color="#ff0000ff" onClick={() => navigate('/users')} />
+        <StatCard title="Nội dung" value={stats.destinations} icon={BookOpen} color="#00ffaaff" />
+        <StatCard title="Thử thách" value={stats.quizzes} icon={HelpCircle} color="#ffa200ff" />
+        <StatCard title="Bài viết" value={stats.posts} icon={MessageSquare} color="#ff0080ff" />
       </div>
 
       <div>
         <div className="card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
             <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Hoạt động gần đây</h2>
-            <button className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem' }} onClick={() => { setIsHistoryOpen(true); setActiveTab('all'); }}>
+            <button className="btn" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem', background: '#eff6ff', color: '#2563eb', borderRadius: '10px', fontWeight: 700 }} onClick={() => { setIsHistoryOpen(true); setActiveTab('all'); }}>
               Xem tất cả
             </button>
           </div>
