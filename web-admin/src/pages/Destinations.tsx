@@ -1,9 +1,8 @@
-import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { addDoc, collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlignLeft, CheckCircle, Edit2, Image as ImageIcon, Info, MapPin, Shield, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { auth, db } from '../firebase/config';
+import { db } from '../firebase/config';
 
 interface Destination {
   id: string;
@@ -106,14 +105,7 @@ const Destinations = () => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        fetchDestinations();
-      } else {
-        signInAnonymously(auth).catch(err => console.error("Auth error:", err));
-      }
-    });
-    return () => unsubscribe();
+    fetchDestinations();
   }, []);
 
   useEffect(() => {

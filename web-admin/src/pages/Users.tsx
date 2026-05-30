@@ -1,9 +1,8 @@
-import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Ban, CheckCircle, Mail, MessageCircleMore, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { auth, db } from '../firebase/config';
+import { db } from '../firebase/config';
 
 interface UserProfile {
   id: string;
@@ -31,15 +30,7 @@ const Users = () => {
   }>({ isOpen: false, title: '', message: '', onConfirm: () => { } });
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        fetchUsers();
-      } else {
-        signInAnonymously(auth).catch(err => console.error("Auth error:", err));
-      }
-    });
-
-    return () => unsubscribe();
+    fetchUsers();
   }, []);
 
   const fetchUsers = async () => {

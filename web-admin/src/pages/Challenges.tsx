@@ -1,9 +1,8 @@
-import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Award, Brain, CheckCircle, Shield, Trash2, Utensils } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { auth, db } from '../firebase/config';
+import { db } from '../firebase/config';
 
 interface Question {
   id: string;
@@ -108,11 +107,7 @@ const Challenges = () => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) fetchChallengesData();
-      else signInAnonymously(auth).catch(err => console.error("Auth error:", err));
-    });
-    return () => unsubscribe();
+    fetchChallengesData();
   }, []);
 
   useEffect(() => {
