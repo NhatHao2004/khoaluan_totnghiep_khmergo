@@ -312,16 +312,11 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#FFFFFF', // Set to white as requested
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#007AFF', // Blue shadow for contrast on white
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 20,
     borderWidth: 2,
-    borderColor: '#1E3A8A', // Dark blue border (xanh đậm)
+    borderColor: '#3b82f6',
     zIndex: 99999,
   },
   chatBtnInner: {
