@@ -1,6 +1,6 @@
-import { BookOpen, HelpCircle, LayoutDashboard, LogOut, User, Settings } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
+import { BookOpen, HelpCircle, LayoutDashboard, LogOut, Settings, User } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 import { auth } from '../firebase/config';
 
 import icon from '../assets/icon.png';
@@ -24,7 +24,6 @@ const Sidebar = () => {
       </div>
 
       <nav className="sidebar-nav">
-        <div className="sidebar-label">Chính</div>
         <NavLink to="/" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           <LayoutDashboard size={20} strokeWidth={2} />
           <span>Bảng điều khiển</span>
@@ -45,7 +44,7 @@ const Sidebar = () => {
           <HelpCircle size={20} strokeWidth={2} />
           <span>Thử thách & Quiz</span>
         </NavLink>
-        
+
         <div className="sidebar-label" style={{ marginTop: '1.5rem' }}>Hệ thống</div>
         <NavLink to="/profile" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           <Settings size={20} strokeWidth={2} />
@@ -54,13 +53,13 @@ const Sidebar = () => {
       </nav>
 
       <div style={{ padding: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
-        <button 
-          className="nav-link" 
+        <button
+          className="nav-link"
           onClick={handleLogout}
-          style={{ 
-            width: '100%', 
-            background: 'rgba(239, 68, 68, 0.1)', 
-            border: 'none', 
+          style={{
+            width: '100%',
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: 'none',
             cursor: 'pointer',
             color: '#ef4444',
             display: 'flex',

@@ -19,7 +19,10 @@ const Dashboard = () => {
   const [logs, setLogs] = useState<any[]>([]);
 
   useEffect(() => {
-    const unsubUsers = onSnapshot(collection(db, 'users'), (snap) => setStats(prev => ({ ...prev, users: snap.size })));
+    const unsubUsers = onSnapshot(collection(db, 'users'), (snap) => {
+      const nonAdminCount = snap.docs.filter(doc => doc.data().role !== 'Quản trị viên').length;
+      setStats(prev => ({ ...prev, users: nonAdminCount }));
+    });
     const unsubDests = onSnapshot(collection(db, 'destinations'), (snap) => setStats(prev => ({ ...prev, destinations: snap.size })));
     const unsubQuizzes = onSnapshot(collection(db, 'quizzes'), (snap) => setStats(prev => ({ ...prev, quizzes: snap.size })));
     const unsubPosts = onSnapshot(collection(db, 'posts'), (snap) => setStats(prev => ({ ...prev, posts: snap.size })));

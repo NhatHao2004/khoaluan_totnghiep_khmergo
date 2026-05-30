@@ -1,9 +1,8 @@
-import type { User } from 'firebase/auth';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { onAuthStateChanged, type User } from 'firebase/auth';
+import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { Bell } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Link, Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import { auth, db } from './firebase/config';
 import './index.css';
@@ -14,24 +13,53 @@ import Login from './pages/Login';
 import Profile from './pages/Profile';
 import Users from './pages/Users';
 
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const TopBar = ({ user }: { user: User }) => {
   const [adminName, setAdminName] = useState('Admin');
-  const [adminAvatar, setAdminAvatar] = useState('https://i.pravatar.cc/150?u=admin');
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (u) => {
+    const unsubAuth = onAuthStateChanged(auth, async (u) => {
       if (u) {
         try {
           const snap = await getDoc(doc(db, 'users', u.uid));
           const data = snap.data();
           setAdminName(data?.name || data?.['tên'] || u.displayName || 'Admin');
-          setAdminAvatar(data?.avatar || data?.['hình đại diện'] || u.photoURL || `https://i.pravatar.cc/150?u=${u.uid}`);
         } catch { /* ignore */ }
       }
     });
-    return () => unsub();
+
+    // Fetch notifications (logs + feedback)
+    const unsubLogs = onSnapshot(collection(db, 'logs'), (snap) => {
+      const logs = snap.docs.map(doc => ({ id: doc.id, type: 'system', ...doc.data() }));
+      setNotifications(prev => mergeAndSortLogs(logs, prev));
+    });
+
+    const unsubFeedback = onSnapshot(collection(db, 'feedback'), (snap) => {
+      const feedbacks = snap.docs.map(doc => ({
+        id: doc.id,
+        type: 'users',
+        title: 'Phản hồi mới',
+        desc: `Người dùng ${doc.data().userName || 'Khách'} vừa gửi phản hồi.`,
+        timestamp: doc.data().timestamp
+      }));
+      setNotifications(prev => mergeAndSortLogs(feedbacks, prev));
+    });
+
+    const mergeAndSortLogs = (newData: any[], existingData: any[]) => {
+      const merged = [...newData, ...existingData].filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+      return merged
+        .sort((a: any, b: any) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0))
+        .slice(0, 10);
+    };
+
+    return () => {
+      unsubAuth();
+      unsubLogs();
+      unsubFeedback();
+    };
   }, [user]);
 
   return (
@@ -39,7 +67,7 @@ const TopBar = ({ user }: { user: User }) => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
         <div style={{ flex: 1 }}>
           <h2 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            Chào, {adminName}<motion.span
+            Chào, {adminName} <motion.span
               animate={{ rotate: [0, 20, 0, 20, 0] }}
               transition={{ repeat: Infinity, duration: 1.5, repeatDelay: 2 }}
               style={{ display: 'inline-block', transformOrigin: '70% 70%', cursor: 'default' }}
@@ -47,36 +75,75 @@ const TopBar = ({ user }: { user: User }) => {
           </h2>
         </div>
 
-        <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
-          <div style={{
-            position: 'relative',
-            color: 'var(--text-secondary)',
-            cursor: 'pointer',
-            padding: '8px',
-            borderRadius: '10px',
-            background: 'var(--bg-accent)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.2s'
-          }} className="hover-scale">
+        <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', position: 'relative' }}>
+          <div
+            onClick={() => setShowNotifications(!showNotifications)}
+            style={{
+              position: 'relative',
+              color: showNotifications ? 'var(--primary)' : 'var(--text-secondary)',
+              cursor: 'pointer',
+              padding: '8px',
+              borderRadius: '10px',
+              background: showNotifications ? 'var(--primary-soft)' : 'var(--bg-accent)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s'
+            }} className="hover-scale">
             <Bell size={20} />
-            <span style={{ position: 'absolute', top: 8, right: 8, width: 6, height: 6, background: 'var(--danger)', borderRadius: '50%', border: '2px solid white' }}></span>
+            {notifications.length > 0 && (
+              <span style={{ position: 'absolute', top: 8, right: 8, width: 8, height: 8, background: 'var(--danger)', borderRadius: '50%', border: '2px solid white' }}></span>
+            )}
           </div>
 
-          <Link to="/profile" style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            cursor: 'pointer', 
-            padding: '4px',
-            borderRadius: '12px',
-            background: 'var(--bg-accent)',
-            textDecoration: 'none', 
-            color: 'inherit',
-            transition: 'all 0.2s'
-          }} className="hover-scale">
-            <img src={adminAvatar} style={{ width: 40, height: 40, borderRadius: '10px', objectFit: 'cover' }} alt="Admin" />
-          </Link>
+          <AnimatePresence>
+            {showNotifications && (
+              <>
+                <motion.div
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  style={{ position: 'fixed', inset: 0, zIndex: 90 }}
+                  onClick={() => setShowNotifications(false)}
+                />
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  style={{
+                    position: 'absolute', top: '120%', right: 0, width: '320px',
+                    background: 'white', borderRadius: '16px', boxShadow: 'var(--shadow-lg)',
+                    border: '1px solid var(--border-light)', zIndex: 100, overflow: 'hidden'
+                  }}
+                >
+                  <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 style={{ fontSize: '0.95rem', fontWeight: 800 }}>Thông báo</h3>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 700, cursor: 'pointer' }}>Đánh dấu đã đọc</span>
+                  </div>
+                  <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                    {notifications.length === 0 ? (
+                      <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.5 }}>
+                        <p style={{ fontSize: '0.8125rem' }}>Không có thông báo mới</p>
+                      </div>
+                    ) : (
+                      notifications.map((notif: any) => (
+                        <div key={notif.id} style={{ padding: '1rem', borderBottom: '1px solid var(--border-light)', display: 'flex', gap: '0.75rem', cursor: 'pointer' }} className="hover-accent">
+                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--primary)', marginTop: '0.4rem', flexShrink: 0 }}></div>
+                          <div>
+                            <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.2rem' }}>{notif.title}</p>
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>{notif.desc}</p>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div style={{ padding: '1rem', textAlign: 'center', borderTop: '1px solid var(--border-light)', background: 'var(--bg-main)' }}>
+                    <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-secondary)', cursor: 'pointer' }}>Xem tất cả</span>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+
+          {/* Profile link removed as per user request */}
         </div>
       </div>
     </header>
