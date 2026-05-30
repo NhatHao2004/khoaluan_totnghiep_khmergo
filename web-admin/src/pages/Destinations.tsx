@@ -1,7 +1,7 @@
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { addDoc, collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlignLeft, CheckCircle, Edit2, Image as ImageIcon, Info, MapPin, Shield, Trash2, X } from 'lucide-react';
+import { AlignLeft, CheckCircle, Edit2, Image as ImageIcon, Info, MapPin, Shield, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { auth, db } from '../firebase/config';
 
@@ -79,6 +79,7 @@ const Destinations = () => {
   const [activeTab, setActiveTab] = useState<TabKey>('Chùa');
   const [editingItem, setEditingItem] = useState<Destination | null>(null);
   const [viewingItem, setViewingItem] = useState<Destination | null>(null);
+  const [viewLanguage, setViewLanguage] = useState<'vi' | 'km'>('vi');
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' }>({
@@ -240,7 +241,6 @@ const Destinations = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2.5rem' }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Nội dung học tập</h1>
-          <p style={{ color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Quản lý kho tàng di sản văn hóa</p>
         </div>
         <button onClick={() => { setIsAddingNew(true); setNewItem({ ...newItem, category: activeTab }); }} className="btn btn-primary">
           Thêm mới
@@ -280,10 +280,7 @@ const Destinations = () => {
             <motion.div layout key={dest.id} className="card glass-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ height: '220px', position: 'relative' }}>
                 <img src={dest.imageUrl || 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600'} alt={dest.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                <div style={{ position: 'absolute', top: '1rem', right: '1rem', display: 'flex', gap: '0.5rem' }}>
-                  <button onClick={() => setEditingItem(dest)} style={{ border: 'none', background: 'white', padding: '10px', borderRadius: '10px', cursor: 'pointer', boxShadow: 'var(--shadow-md)', color: 'var(--text-primary)' }}><Edit2 size={16} /></button>
-                  <button onClick={() => handleDelete(dest.id)} style={{ border: 'none', background: '#fef2f2', padding: '10px', borderRadius: '10px', cursor: 'pointer', boxShadow: 'var(--shadow-md)', color: '#dc2626' }}><Trash2 size={16} /></button>
-                </div>
+
               </div>
               <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
 
@@ -292,9 +289,9 @@ const Destinations = () => {
                   {dest.location || 'Chưa có địa chỉ'}
                 </p>
                 <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-light)', display: 'flex', gap: '0.75rem' }}>
-                  <button className="btn btn-secondary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.75rem' }} onClick={() => setViewingItem(dest)}>Xem chi tiết</button>
+                  <button className="btn btn-secondary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.75rem' }} onClick={() => { setViewingItem(dest); setViewLanguage('vi'); }}>Xem chi tiết</button>
                   <button className="btn" style={{ padding: '0.5rem', background: 'var(--bg-accent)', color: 'var(--text-primary)', borderRadius: '10px' }} onClick={() => setEditingItem(dest)} title="Chỉnh sửa"><Edit2 size={16} /></button>
-                  <button className="btn" style={{ padding: '0.5rem', background: '#fef2f2', color: 'var(--danger)', borderRadius: '10px' }} onClick={() => setConfirmConfig({ isOpen: true, title: 'Xác nhận xóa', message: `Bạn có chắc chắn muốn xóa "${dest.name}"?`, onConfirm: () => handleDelete(dest.id) })} title="Xóa"><Trash2 size={16} /></button>
+                  <button className="btn" style={{ padding: '0.5rem', background: '#fef2f2', color: 'var(--danger)', borderRadius: '10px' }} onClick={() => setConfirmConfig({ isOpen: true, title: 'Xác nhận xóa', message: `Bạn có chắc chắn muốn xóa\n"${dest.name}"`, onConfirm: () => handleDelete(dest.id) })} title="Xóa"><Trash2 size={16} /></button>
                 </div>
               </div>
             </motion.div>
@@ -302,86 +299,148 @@ const Destinations = () => {
         </div>
       )}
 
-      {/* Detail View Modal */}
+      {/* Full Page Detail View */}
       <AnimatePresence>
         {viewingItem && (
-          <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '2rem' }}>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} onClick={() => setViewingItem(null)} />
-            <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className="card" style={{ position: 'relative', width: '100%', maxWidth: '800px', padding: 0, borderRadius: '32px', maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ position: 'relative', height: '300px', flexShrink: 0 }}>
-                <img src={viewingItem.imageUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent, rgba(15, 23, 42, 0.8))' }} />
-                <button onClick={() => setViewingItem(null)} style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', border: 'none', background: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(8px)', color: 'white', padding: '10px', borderRadius: '14px', cursor: 'pointer' }}><X size={20} /></button>
-                
-                <div style={{ position: 'absolute', bottom: '2rem', left: '2.5rem', right: '2.5rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                    <span style={{ padding: '4px 12px', background: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(4px)', borderRadius: '8px', color: 'white', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase' }}>{activeTab}</span>
-                  </div>
-                  <h2 style={{ fontSize: '2rem', fontWeight: 900, color: 'white' }}>{viewingItem.name}</h2>
-                  <p style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '1.1rem', fontWeight: 500 }}>{viewingItem.name_khmer}</p>
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 'var(--sidebar-width)',
+              right: 0,
+              bottom: 0,
+              background: 'white',
+              zIndex: 2000,
+              overflowY: 'auto'
+            }}
+            className="custom-scrollbar"
+          >
+            <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '2rem 1.5rem', position: 'relative' }}>
+              {/* Language Toggle - Fixed at top right of the detail area */}
+              <div style={{ position: 'fixed', top: '1.5rem', right: '1.5rem', zIndex: 3000, display: 'flex', gap: '4px' }}>
+                <div style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(10px)', padding: '6px', borderRadius: '100px', border: '1px solid var(--border-light)', display: 'flex', gap: '4px', boxShadow: 'var(--shadow-lg)' }}>
+                  {[
+                    { id: 'vi', label: 'Tiếng Việt' },
+                    { id: 'km', label: 'Tiếng Khmer' }
+                  ].map((lang) => (
+                    <button
+                      key={lang.id}
+                      onClick={() => setViewLanguage(lang.id as any)}
+                      style={{
+                        border: 'none',
+                        background: viewLanguage === lang.id ? 'var(--primary)' : 'transparent',
+                        color: viewLanguage === lang.id ? 'white' : 'var(--text-secondary)',
+                        padding: '8px 16px',
+                        borderRadius: '100px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      {lang.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              <div style={{ flex: 1, overflowY: 'auto', padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '2.5rem' }} className="custom-scrollbar">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-                  <div>
-                    <h4 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Thông tin mô tả</h4>
-                    <p style={{ fontSize: '1rem', lineHeight: 1.7, color: 'var(--text-primary)' }}>{viewingItem.description}</p>
-                  </div>
-                  <div>
-                    <h4 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Mô tả (Khmer)</h4>
-                    <p style={{ fontSize: '1rem', lineHeight: 1.7, color: 'var(--text-primary)' }}>{viewingItem.description_khmer}</p>
-                  </div>
+              {/* Hero Section - Single Column with Multi-column Descriptions */}
+              <div style={{ marginBottom: '4rem', textAlign: 'center' }}>
+
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                  <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.03em' }}>{viewingItem.name}</h1>
+                  <h2 style={{ fontSize: '1.3rem', fontWeight: 500, color: 'var(--text-muted)', fontFamily: 'serif' }}>{viewingItem.name_khmer}</h2>
                 </div>
 
-                <div style={{ padding: '1.5rem', background: 'var(--bg-accent)', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ width: '48px', height: '48px', background: 'white', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-sm)' }}>
-                    <MapPin size={24} color="var(--primary)" />
-                  </div>
-                  <div>
-                    <span style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Địa điểm & Vị trí</span>
-                    <p style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{viewingItem.location}</p>
-                  </div>
+                <div style={{ position: 'relative', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 10px 20px rgba(0,0,0,0.06)', marginBottom: '2.5rem', maxWidth: '700px', margin: '0 auto 2.5rem' }}>
+                  <img src={viewingItem.imageUrl} style={{ width: '100%', maxHeight: '400px', objectFit: 'cover' }} />
                 </div>
 
-                <div style={{ borderTop: '2px dashed var(--border-light)', paddingTop: '2.5rem' }}>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '2rem' }}>Nội dung chi tiết</h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4rem' }}>
-                    {viewingItem.contentBlocks?.map((block, idx) => (
-                      <div key={idx} style={{ display: 'grid', gridTemplateColumns: idx % 2 === 0 ? '1fr 1.5fr' : '1.5fr 1fr', gap: '3rem', alignItems: 'center' }}>
-                        {idx % 2 === 0 ? (
-                          <>
-                            <img src={block.images} style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: '24px', boxShadow: 'var(--shadow-md)' }} />
-                            <div>
-                               <p style={{ fontSize: '1.05rem', lineHeight: 1.8, color: 'var(--text-secondary)', marginBottom: '1rem' }}>{block.value}</p>
-                               <div style={{ padding: '1.5rem', background: 'var(--bg-accent)', borderRadius: '20px', borderLeft: '4px solid var(--primary)' }}>
-                                 <p style={{ fontSize: '1rem', fontStyle: 'italic', color: 'var(--text-primary)' }}>{block.value_khmer || 'Nội dung chưa có bản dịch Khmer'}</p>
-                               </div>
+                <div style={{ textAlign: 'left' }}>
+                  {/* Location Info - Always in Vietnamese for administrative clarity */}
+                  <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', padding: '0.6rem 1.25rem', background: 'var(--bg-accent)', borderRadius: '100px', width: 'fit-content', margin: '0 auto 1.5rem' }}>
+                    <div>
+                      <p style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--text-primary)' }}>
+                        {viewLanguage === 'vi' ? viewingItem.location : (viewingItem.location_khmer || viewingItem.location)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {viewLanguage === 'vi' && (
+                    <div style={{ padding: '1.5rem', background: 'var(--bg-accent)', borderRadius: '20px' }}>
+                      <h4 style={{ fontSize: '0.55rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '1.2rem', letterSpacing: '0.05em' }}>Bản tiếng Việt</h4>
+                      <p style={{ fontSize: '0.925rem', lineHeight: 1.7, color: '#000', textAlign: 'justify' }}>{viewingItem.description}</p>
+                    </div>
+                  )}
+
+                  {viewLanguage === 'km' && (
+                    <div style={{ padding: '1.5rem', background: '#f8fafc', borderRadius: '20px', border: '1px solid var(--border-light)' }}>
+                      <h4 style={{ fontSize: '0.55rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '1.2rem', letterSpacing: '0.05em' }}>Bản tiếng Khmer</h4>
+                      <p style={{ fontSize: '0.925rem', lineHeight: 1.9, color: '#000', fontStyle: 'italic' }}>{viewingItem.description_khmer}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Detailed Sections */}
+              <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '3rem' }}>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 900, textAlign: 'center', marginBottom: '3rem', letterSpacing: '-0.02em' }}>Khám phá chi tiết</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8rem' }}>
+                  {viewingItem.contentBlocks?.map((block, idx) => {
+                    const isEven = idx % 2 === 0;
+                    return (
+                      <div key={idx} style={{ display: 'flex', flexDirection: isEven ? 'row' : 'row-reverse', gap: '5rem', alignItems: 'center' }}>
+                        {/* Image Side */}
+                        <div style={{ flex: 1.2 }}>
+                          <img 
+                            src={block.images} 
+                            style={{ width: '100%', height: '420px', objectFit: 'cover', borderRadius: '32px', boxShadow: 'var(--shadow-lg)' }} 
+                          />
+                        </div>
+
+                        {/* Text Side */}
+                        <div style={{ flex: 1, textAlign: 'left' }}>
+                          {viewLanguage === 'vi' && (
+                            <div style={{ padding: '2rem', background: 'var(--bg-accent)', borderRadius: '24px' }}>
+                              <h4 style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '1.5rem', letterSpacing: '0.1em' }}>Bản tiếng Việt</h4>
+                              <p style={{ fontSize: '1rem', lineHeight: 1.8, color: '#000', textAlign: 'justify' }}>{block.value}</p>
                             </div>
-                          </>
-                        ) : (
-                          <>
-                            <div>
-                               <p style={{ fontSize: '1.05rem', lineHeight: 1.8, color: 'var(--text-secondary)', marginBottom: '1rem' }}>{block.value}</p>
-                               <div style={{ padding: '1.5rem', background: 'var(--bg-accent)', borderRadius: '20px', borderRight: '4px solid var(--primary)' }}>
-                                 <p style={{ fontSize: '1rem', fontStyle: 'italic', color: 'var(--text-primary)' }}>{block.value_khmer || 'Nội dung chưa có bản dịch Khmer'}</p>
-                               </div>
+                          )}
+                          {viewLanguage === 'km' && (
+                            <div style={{ padding: '2rem', background: '#f8fafc', borderRadius: '24px', border: '1px solid var(--border-light)' }}>
+                              <h4 style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '1.5rem', letterSpacing: '0.1em' }}>Bản tiếng Khmer</h4>
+                              <p style={{ fontSize: '1rem', lineHeight: 1.8, color: '#000', fontStyle: 'italic' }}>{block.value_khmer || 'Nội dung chưa có bản dịch Khmer'}</p>
                             </div>
-                            <img src={block.images} style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: '24px', boxShadow: 'var(--shadow-md)' }} />
-                          </>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
               </div>
+            </div>
 
-              <div style={{ padding: '1.5rem 2.5rem', background: 'var(--bg-accent)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', fontWeight: 500 }}>ID: {viewingItem.id}</span>
-                <button onClick={() => { setEditingItem(viewingItem); setViewingItem(null); }} className="btn" style={{ padding: '0.75rem 1.5rem', background: 'var(--primary)', color: 'white', fontWeight: 700, borderRadius: '12px' }}>Chỉnh sửa thông tin</button>
+            <footer style={{ marginTop: '6rem', padding: '3rem 2rem', background: 'var(--bg-sidebar)', color: 'white', textAlign: 'center' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+                <button
+                  onClick={() => setViewingItem(null)}
+                  style={{ border: '1px solid rgba(0, 140, 255, 0.4)', background: 'rgba(30, 49, 255, 1)', color: '#ffffffff', padding: '0.75rem 2rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Quay lại danh sách
+                </button>
+                <button
+                  onClick={() => { setEditingItem(viewingItem); setViewingItem(null); }}
+                  style={{ border: 'none', background: 'white', color: 'var(--bg-sidebar)', padding: '0.75rem 2rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Chỉnh sửa nội dung
+                </button>
               </div>
-            </motion.div>
-          </div>
+            </footer>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -393,7 +452,6 @@ const Destinations = () => {
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="card" style={{ position: 'relative', width: '100%', maxWidth: '900px', padding: '3rem', borderRadius: '32px', maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
                 <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{isAddingNew ? `Thêm ${activeTab}` : `Sửa ${activeTab}`}</h2>
-                <button onClick={() => { setEditingItem(null); setIsAddingNew(false); }} style={{ border: 'none', background: 'var(--bg-accent)', padding: '10px', borderRadius: '12px', cursor: 'pointer' }}><X size={20} /></button>
               </div>
 
               <div style={{ flex: 1, overflowY: 'auto', paddingRight: '1rem', display: 'grid', gap: '2rem' }} className="custom-scrollbar">
@@ -403,8 +461,8 @@ const Destinations = () => {
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                  <InputField label={activeTab === 'Chùa' ? "Địa chỉ" : "Mô tả phụ"} value={isAddingNew ? newItem.location : editingItem?.location} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, location: v }) : setEditingItem({ ...editingItem!, location: v })} icon={MapPin} />
-                  <InputField label={activeTab === 'Chùa' ? "Địa chỉ (Khmer)" : "Mô tả phụ (Khmer)"} value={isAddingNew ? newItem.location_khmer : editingItem?.location_khmer} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, location_khmer: v }) : setEditingItem({ ...editingItem!, location_khmer: v })} icon={MapPin} />
+                  <InputField label={activeTab === 'Chùa' ? "Địa chỉ (Tiếng Việt)" : "Mô tả phụ (Tiếng Việt)"} value={isAddingNew ? newItem.location : editingItem?.location} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, location: v }) : setEditingItem({ ...editingItem!, location: v })} />
+                  <InputField label={activeTab === 'Chùa' ? "Địa chỉ (Tiếng Khmer)" : "Mô tả phụ (Tiếng Khmer)"} value={isAddingNew ? newItem.location_khmer : editingItem?.location_khmer} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, location_khmer: v }) : setEditingItem({ ...editingItem!, location_khmer: v })} />
                 </div>
 
                 <InputField label="Link ảnh nền chính" value={isAddingNew ? newItem.imageUrl : editingItem?.imageUrl} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl: v }) : setEditingItem({ ...editingItem!, imageUrl: v })} icon={ImageIcon} />
@@ -424,8 +482,8 @@ const Destinations = () => {
                     {(isAddingNew ? newItem.contentBlocks : editingItem?.contentBlocks)?.map((block, idx) => (
                       <div key={idx} className="card" style={{ background: 'var(--bg-main)', border: 'none', padding: '1.5rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                          <span style={{ fontWeight: 800, fontSize: '0.75rem', color: 'var(--primary)', textTransform: 'uppercase' }}>KHỐI NỘI DUNG #{idx + 1}</span>
-                          <button type="button" onClick={() => handleRemoveContentBlock(idx)} style={{ border: 'none', background: 'transparent', color: '#ef4444', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem' }}><Trash2 size={14} /> Xóa</button>
+                          <span style={{ fontWeight: 800, fontSize: '0.75rem', color: 'var(--primary)', textTransform: 'uppercase' }}>KHỐI NỘI DUNG {idx + 1}</span>
+                          <button type="button" onClick={() => handleRemoveContentBlock(idx)} style={{ border: '1px solid var(--border-light)', background: '#fff', padding: '6px 12px', borderRadius: '10px', color: '#ef4444', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', transition: 'all 0.2s' }}><Trash2 size={14} /> Xóa</button>
                         </div>
                         <div style={{ display: 'grid', gap: '1rem' }}>
                           <InputField label="Link ảnh khối này" value={block.images} onChange={(v: string) => handleUpdateContentBlock(idx, 'images', v)} />
@@ -457,7 +515,7 @@ const Destinations = () => {
                 <Shield size={32} color="#dc2626" />
               </div>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.75rem' }}>{confirmConfig.title}</h3>
-              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2.5rem' }}>{confirmConfig.message}</p>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2.5rem', whiteSpace: 'pre-line' }}>{confirmConfig.message}</p>
               <div style={{ display: 'flex', gap: '1rem' }}>
                 <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}>Đóng</button>
                 <button className="btn" style={{ flex: 1, background: '#ef4444', color: 'white' }} onClick={confirmConfig.onConfirm}>Đồng ý xóa</button>
