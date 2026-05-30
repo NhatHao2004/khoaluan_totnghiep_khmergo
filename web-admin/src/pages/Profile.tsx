@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { auth, db } from '../firebase/config';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { onAuthStateChanged, updateProfile } from 'firebase/auth';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const Profile = () => {
   const [loading, setLoading] = useState(true);
@@ -103,10 +103,10 @@ const Profile = () => {
     <div className="fade-in" style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '3rem' }}>
       <AnimatePresence>
         {showSuccess && (
-          <div style={{ position: 'fixed', top: '2rem', right: '2rem', background: 'var(--success)', color: '#fff', padding: '1rem 1.5rem', borderRadius: '12px', boxShadow: 'var(--shadow-lg)', display: 'flex', alignItems: 'center', gap: '0.75rem', zIndex: 1000, fontWeight: 700 }}>
+          <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }} style={{ position: 'fixed', top: '2rem', right: '2rem', background: 'var(--success)', color: '#fff', padding: '1rem 1.5rem', borderRadius: '12px', boxShadow: 'var(--shadow-lg)', display: 'flex', alignItems: 'center', gap: '0.75rem', zIndex: 1000, fontWeight: 700 }}>
             <CheckCircle2 size={20} />
             Hồ sơ đã được cập nhật
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
 

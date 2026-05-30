@@ -227,7 +227,6 @@ const Destinations = () => {
 
   return (
     <div className="fade-in">
-      {/* Toast Notification */}
       <AnimatePresence>
         {toast.isOpen && (
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 10000, padding: '1rem 1.5rem', background: toast.type === 'success' ? 'var(--success)' : 'var(--danger)', color: '#fff', borderRadius: '12px', boxShadow: 'var(--shadow-lg)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -322,7 +321,7 @@ const Destinations = () => {
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                   <InputField label={activeTab === 'Chùa' ? "Địa chỉ" : "Mô tả phụ"} value={isAddingNew ? newItem.location : editingItem?.location} onChange={(v: string) => isAddingNew ? setNewItem({...newItem, location:v}) : setEditingItem({...editingItem!, location:v})} icon={MapPin} />
-                  <InputField label={activeTab === 'Chùa' ? "Địa chỉ (Khmer)" : "Mô tả phụ (Khmer)"} value={isAddingNew ? newItem.location_khmer : editingItem?.location_khmer} onChange={(v: string) => isAddingNew ? setNewItem({...newItem, location_khmer:v}) : setEditingItem({...editingItem!, location_khmer:v})} />
+                  <InputField label={activeTab === 'Chùa' ? "Địa chỉ (Khmer)" : "Mô tả phụ (Khmer)"} value={isAddingNew ? newItem.location_khmer : editingItem?.location_khmer} onChange={(v: string) => isAddingNew ? setNewItem({...newItem, location_khmer:v}) : setEditingItem({...editingItem!, location_khmer:v})} icon={MapPin} />
                 </div>
 
                 <InputField label="Link ảnh nền chính" value={isAddingNew ? newItem.imageUrl : editingItem?.imageUrl} onChange={(v: string) => isAddingNew ? setNewItem({...newItem, imageUrl:v}) : setEditingItem({...editingItem!, imageUrl:v})} icon={ImageIcon} />
@@ -389,4 +388,3 @@ const Destinations = () => {
 };
 
 export default Destinations;
-
