@@ -34,18 +34,49 @@ const TopBar = ({ user }: { user: User }) => {
 
   return (
     <header className="top-bar">
-      <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', justifyContent: 'flex-end', padding: '1rem 2rem', width: '100%' }}>
-        <div style={{ position: 'relative', color: 'var(--text-muted)', cursor: 'pointer' }}>
-          <Bell size={20} />
-          <span style={{ position: 'absolute', top: -2, right: -2, width: 8, height: 8, background: '#ff5370', borderRadius: '50%', border: '2px solid white' }}></span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+        <div style={{ flex: 1 }}>
+          <h2 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+            Chào buổi sáng, {adminName.split(' ').pop()} 👋
+          </h2>
         </div>
-        <Link to="/profile" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}>
-          <img src={adminAvatar} style={{ width: 35, height: 35, borderRadius: '12px', objectFit: 'cover', border: '1px solid #f1f5f9' }} alt="Admin" />
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontWeight: 700, fontSize: '0.875rem', color: '#1e293b', lineHeight: 1 }}>{adminName}</span>
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 500 }}>Admin</span>
+        
+        <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
+          <div style={{ 
+            position: 'relative', 
+            color: 'var(--text-secondary)', 
+            cursor: 'pointer',
+            padding: '8px',
+            borderRadius: '10px',
+            background: 'var(--bg-accent)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.2s'
+          }} className="hover-scale">
+            <Bell size={20} />
+            <span style={{ position: 'absolute', top: 8, right: 8, width: 6, height: 6, background: 'var(--danger)', borderRadius: '50%', border: '2px solid white' }}></span>
           </div>
-        </Link>
+          
+          <Link to="/profile" style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.75rem', 
+            cursor: 'pointer', 
+            padding: '4px 12px 4px 4px',
+            borderRadius: '12px',
+            background: 'var(--bg-accent)',
+            textDecoration: 'none', 
+            color: 'inherit',
+            transition: 'all 0.2s'
+          }} className="hover-scale">
+            <img src={adminAvatar} style={{ width: 34, height: 34, borderRadius: '10px', objectFit: 'cover' }} alt="Admin" />
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontWeight: 700, fontSize: '0.8125rem', color: 'var(--text-primary)', lineHeight: 1.2 }}>{adminName}</span>
+              <span style={{ fontSize: '0.6875rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.025em' }}>Quản trị viên</span>
+            </div>
+          </Link>
+        </div>
       </div>
     </header>
   );
@@ -91,7 +122,7 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  // Màn hình chờ khởi tạo (Splash Screen) chuyên nghiệp
+  // Màn hình chờ chuyên nghiệp
   if (authState.loading) {
     return (
       <div style={{ 
@@ -100,23 +131,23 @@ function App() {
         flexDirection: 'column', 
         alignItems: 'center', 
         justifyContent: 'center', 
-        background: '#fff',
+        background: '#0f172a',
+        color: '#fff',
         zIndex: 9999
       }}>
         <div style={{ 
-          width: '40px', 
-          height: '40px', 
-          border: '3px solid #f3f3f3', 
-          borderTop: '3px solid #3b82f6', 
+          width: '48px', 
+          height: '48px', 
+          border: '3px solid rgba(255,255,255,0.1)', 
+          borderTop: '3px solid #6366f1', 
           borderRadius: '50%',
           animation: 'spin 1s linear infinite'
         }}></div>
-        <p style={{ marginTop: '16px', color: '#64748b', fontWeight: 600, fontSize: '0.875rem' }}>KhmerGo Admin</p>
+        <p style={{ marginTop: '20px', color: '#94a3b8', fontWeight: 600, fontSize: '0.925rem', letterSpacing: '0.05em' }}>KHMERGO ADMIN</p>
       </div>
     );
   }
 
-  // Nếu không phải admin hoặc chưa đăng nhập -> LUÔN VÀO LOGIN
   if (!authState.user || !authState.isAdmin) {
     return (
       <Router>
@@ -128,14 +159,13 @@ function App() {
     );
   }
 
-  // Luồng vào trang quản trị sau khi đã xác thực Admin
   return (
     <Router>
-      <div className="app-container" style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc' }}>
+      <div className="app-container">
         <Sidebar />
-        <main className="main-content" style={{ flex: 1, position: 'relative' }}>
+        <main className="main-content">
           <TopBar user={authState.user} />
-          <div style={{ padding: '1.5rem', minHeight: 'calc(100vh - 60px)' }}>
+          <div style={{ padding: '2rem', maxWidth: '1440px', margin: '0 auto' }}>
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/destinations" element={<RouteTransition><Destinations /></RouteTransition>} />
@@ -150,5 +180,6 @@ function App() {
     </Router>
   );
 }
+
 
 export default App;

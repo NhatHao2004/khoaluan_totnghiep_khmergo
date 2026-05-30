@@ -1,8 +1,9 @@
-import { User, Mail, Shield, Calendar, MapPin, Camera, Settings, Save, X, Loader2, CheckCircle2, Award } from 'lucide-react';
+import { User, Mail, Shield, Calendar, MapPin, Camera, Save, Loader2, CheckCircle2, Award, BadgeCheck } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { auth, db } from '../firebase/config';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { onAuthStateChanged, updateProfile } from 'firebase/auth';
+import { AnimatePresence } from 'framer-motion';
 
 const Profile = () => {
   const [loading, setLoading] = useState(true);
@@ -23,7 +24,6 @@ const Profile = () => {
   const [editForm, setEditForm] = useState({
     name: '',
     location: '',
-    avatar: ''
   });
 
   useEffect(() => {
@@ -47,7 +47,6 @@ const Profile = () => {
           setEditForm({
             name: info.name,
             location: info.location,
-            avatar: info.avatar
           });
         } catch (error) {
           console.error("Lỗi khi tải thông tin admin:", error);
@@ -75,18 +74,17 @@ const Profile = () => {
         });
       }
 
-      setAdminInfo({
-        ...adminInfo,
+      setAdminInfo(prev => ({
+        ...prev,
         name: editForm.name,
         location: editForm.location
-      });
+      }));
       
       setIsEditing(false);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (error) {
       console.error("Lỗi khi cập nhật profile:", error);
-      alert("Có lỗi xảy ra khi cập nhật thông tin.");
     } finally {
       setUpdating(false);
     }
@@ -94,116 +92,122 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-        <Loader2 className="animate-spin" size={32} color="#3b82f6" />
-        <p style={{ color: '#64748b', fontWeight: 600, marginLeft: '12px' }}>Đang tải thông tin cá nhân...</p>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '60vh', gap: '1rem' }}>
+        <Loader2 className="animate-spin" size={32} color="var(--primary)" />
+        <p style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Tải thông tin cá nhân...</p>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto', animation: 'fadeIn 0.6s ease-out' }}>
-      {showSuccess && (
-        <div style={{ 
-          position: 'fixed', 
-          top: '30px', 
-          right: '30px', 
-          background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', 
-          color: '#fff', 
-          padding: '16px 28px', 
-          borderRadius: '16px', 
-          boxShadow: '0 20px 40px rgba(5,150,105,0.25)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          zIndex: 1000,
-          animation: 'slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards'
-        }}>
-          <CheckCircle2 size={18} />
-          <span style={{ fontWeight: 700 }}>Đã lưu thay đổi thành công!</span>
-        </div>
-      )}
-
-      <div style={{ 
-        background: '#fff', 
-        borderRadius: '32px', 
-        boxShadow: '0 25px 80px rgba(0,0,0,0.06)',
-        border: '1px solid #f1f5f9',
-        position: 'relative',
-      }}>
-        {/* Banner */}
-        <div style={{ 
-          height: '220px', 
-          background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 40%, #60a5fa 100%)', 
-          position: 'relative',
-          borderTopLeftRadius: '32px',
-          borderTopRightRadius: '32px',
-        }}>
-          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', borderTopLeftRadius: '32px', borderTopRightRadius: '32px' }}>
-            <div style={{ position: 'absolute', top: '-50%', right: '-10%', width: '400px', height: '400px', background: 'rgba(255,255,255,0.1)', borderRadius: '50%', filter: 'blur(80px)' }}></div>
-            <div style={{ position: 'absolute', bottom: '-20%', left: '10%', width: '300px', height: '300px', background: 'rgba(59,130,246,0.3)', borderRadius: '50%', filter: 'blur(60px)' }}></div>
+    <div className="fade-in" style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '3rem' }}>
+      <AnimatePresence>
+        {showSuccess && (
+          <div style={{ position: 'fixed', top: '2rem', right: '2rem', background: 'var(--success)', color: '#fff', padding: '1rem 1.5rem', borderRadius: '12px', boxShadow: 'var(--shadow-lg)', display: 'flex', alignItems: 'center', gap: '0.75rem', zIndex: 1000, fontWeight: 700 }}>
+            <CheckCircle2 size={20} />
+            Hồ sơ đã được cập nhật
           </div>
+        )}
+      </AnimatePresence>
+
+      <div className="card glass-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border-light)' }}>
+        {/* Banner Section */}
+        <div style={{ 
+          height: '240px', 
+          background: 'linear-gradient(135deg, var(--primary) 0%, #4338ca 100%)', 
+          position: 'relative',
+        }}>
+          <div style={{ position: 'absolute', inset: 0, opacity: 0.2, backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
           
-          <div style={{ position: 'absolute', bottom: '-60px', left: '50px', display: 'flex', alignItems: 'flex-end', gap: '28px', zIndex: 10 }}>
+          <div style={{ position: 'absolute', bottom: '-4rem', left: '3rem', display: 'flex', alignItems: 'flex-end', gap: '2rem' }}>
             <div style={{ position: 'relative' }}>
-              <div style={{ width: '150px', height: '150px', borderRadius: '40px', padding: '8px', background: '#fff', boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }}>
-                <img src={adminInfo.avatar} style={{ width: '100%', height: '100%', borderRadius: '32px', objectFit: 'cover' }} alt="Profile" />
+              <div style={{ 
+                width: '160px', 
+                height: '160px', 
+                borderRadius: '32px', 
+                padding: '6px', 
+                background: 'white', 
+                boxShadow: 'var(--shadow-lg)',
+                border: '1px solid var(--border-light)'
+              }}>
+                <img src={adminInfo.avatar} style={{ width: '100%', height: '100%', borderRadius: '26px', objectFit: 'cover' }} alt="Avatar" />
               </div>
-              <button style={{ position: 'absolute', bottom: '12px', right: '-10px', background: '#3b82f6', border: '4px solid #fff', width: '44px', height: '44px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 8px 20px rgba(59,130,246,0.3)', color: '#fff', zIndex: 11 }}>
-                <Camera size={20} />
+              <button className="btn btn-primary" style={{ position: 'absolute', bottom: '0.5rem', right: '-0.5rem', width: '40px', height: '40px', padding: 0, borderRadius: '12px', border: '3px solid white' }}>
+                <Camera size={18} />
               </button>
             </div>
-            <div style={{ paddingBottom: '70px', color: '#fff' }}>
-              <h1 style={{ fontSize: '2.25rem', fontWeight: 900, margin: 0, textShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>{adminInfo.name}</h1>
-              <p style={{ opacity: 0.9, fontWeight: 600, margin: '8px 0 0 0', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.05rem' }}>
-                <Shield size={18} /> {adminInfo.role}
+            <div style={{ paddingBottom: '4.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <h1 style={{ fontSize: '2.25rem', fontWeight: 900, color: 'white', margin: 0, letterSpacing: '-0.025em' }}>{adminInfo.name}</h1>
+                <BadgeCheck size={28} color="white" fill="var(--primary)" />
+              </div>
+              <p style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 600, margin: '0.25rem 0 0 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Shield size={16} /> {adminInfo.role}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Content */}
-        <div style={{ paddingTop: '100px', paddingLeft: '40px', paddingRight: '40px', paddingBottom: '50px' }}>
-          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b', margin: 0 }}>Hồ sơ chi tiết</h3>
-              {isEditing ? (
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <button onClick={() => setIsEditing(false)} style={{ ...modernBtnStyle, background: '#f8fafc', color: '#64748b', border: '1px solid #e2e8f0' }}>Hủy</button>
-                  <button onClick={handleSave} disabled={updating} style={{ ...modernBtnStyle, background: '#3b82f6', color: '#fff' }}>{updating ? 'Đang lưu...' : 'Lưu'}</button>
-                </div>
-              ) : (
-                <button onClick={() => setIsEditing(true)} style={{ ...modernBtnStyle, background: '#f0f7ff', color: '#3b82f6', border: '1px solid #dbeafe' }}>Chỉnh sửa</button>
-              )}
-            </div>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
+        {/* Form Content */}
+        <div style={{ padding: '6rem 3rem 3rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)' }}>Thông tin tài khoản</h2>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
               {isEditing ? (
                 <>
-                  <div style={{ gridColumn: 'span 2' }}>
-                    <EditItem icon={<User size={18} />} label="Họ và tên" value={editForm.name} onChange={(v : any) => setEditForm({...editForm, name: v})} />
-                  </div>
-                  <InfoCard icon={<Mail size={18} />} label="Email" value={adminInfo.email} />
-                  <EditItem icon={<MapPin size={18} />} label="Vị trí" value={editForm.location} onChange={(v : any) => setEditForm({...editForm, location: v})} />
+                  <button className="btn btn-secondary" onClick={() => setIsEditing(false)} disabled={updating}>Hủy</button>
+                  <button className="btn btn-primary" onClick={handleSave} disabled={updating}>
+                    {updating ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />} Lưu thay đổi
+                  </button>
                 </>
               ) : (
-                <>
-                  <InfoCard icon={<User size={20} />} label="Họ và tên" value={adminInfo.name} />
-                  <InfoCard icon={<Mail size={18} />} label="Email liên hệ" value={adminInfo.email} />
-                  <InfoCard icon={<MapPin size={20} />} label="Vị trí làm việc" value={adminInfo.location} />
-                  <InfoCard icon={<Calendar size={20} />} label="Ngày tham gia" value={adminInfo.joinDate} />
-                </>
+                <button className="btn btn-primary" onClick={() => setIsEditing(true)}>Chỉnh sửa hồ sơ</button>
               )}
             </div>
+          </div>
 
-            <div style={{ marginTop: '40px', padding: '30px', background: '#f8fafc', borderRadius: '24px', border: '1px solid #f1f5f9' }}>
-               <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#1e293b', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Award size={20} color="#3b82f6" /> Giới thiệu
-              </h3>
-              <p style={{ color: '#64748b', lineHeight: 1.8, margin: 0, fontWeight: 500 }}>
-                Quản trị viên cấp cao của hệ thống KhmerGo.
-              </p>
-            </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+            {isEditing ? (
+              <>
+                <div className="input-group" style={{ gridColumn: 'span 2' }}>
+                  <label className="input-label">Họ và tên</label>
+                  <div style={{ position: 'relative' }}>
+                    <User size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                    <input className="input-field" style={{ paddingLeft: '3rem' }} value={editForm.name} onChange={(e) => setEditForm({...editForm, name: e.target.value})} />
+                  </div>
+                </div>
+                <div className="input-group">
+                  <label className="input-label">Vị trí công tác</label>
+                  <div style={{ position: 'relative' }}>
+                    <MapPin size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                    <input className="input-field" style={{ paddingLeft: '3rem' }} value={editForm.location} onChange={(e) => setEditForm({...editForm, location: e.target.value})} />
+                  </div>
+                </div>
+                <div className="input-group">
+                  <label className="input-label">Địa chỉ Email (Không thể thay đổi)</label>
+                  <div style={{ position: 'relative' }}>
+                    <Mail size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                    <input className="input-field" style={{ paddingLeft: '3rem', background: 'var(--bg-accent)', color: 'var(--text-muted)', cursor: 'not-allowed' }} value={adminInfo.email} disabled />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <ProfileItem icon={User} label="Họ và tên" value={adminInfo.name} />
+                <ProfileItem icon={Mail} label="Email liên hệ" value={adminInfo.email} />
+                <ProfileItem icon={MapPin} label="Địa điểm làm việc" value={adminInfo.location} />
+                <ProfileItem icon={Calendar} label="Ngày gia nhập" value={adminInfo.joinDate} />
+              </>
+            )}
+          </div>
+
+          <div style={{ marginTop: '3rem', padding: '2rem', background: 'var(--bg-accent)', borderRadius: '24px', border: '1px solid var(--border-light)' }}>
+            <h3 style={{ fontSize: '1rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+              <Award size={20} color="var(--primary)" /> Giới thiệu quản trị viên
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7, margin: 0, fontSize: '0.9375rem' }}>
+              Bạn đang đăng nhập với tư cách là <strong>Quản trị viên cấp cao</strong> của hệ thống KhmerGo. Bạn có toàn quyền quản lý địa danh, người dùng và các bộ câu hỏi thử thách trên toàn hệ thống.
+            </p>
           </div>
         </div>
       </div>
@@ -211,37 +215,16 @@ const Profile = () => {
   );
 };
 
-const InfoCard = ({ icon, label, value }: any) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: '20px', padding: '24px', borderRadius: '24px', background: '#fff', border: '1px solid #f1f5f9', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-    <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{icon}</div>
-    <div style={{ flex: 1 }}>
-      <p style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700, margin: '0 0 2px 0', textTransform: 'uppercase' }}>{label}</p>
-      <p style={{ fontSize: '1rem', color: '#1e293b', fontWeight: 800, margin: 0, wordBreak: 'break-all' }}>{value}</p>
+const ProfileItem = ({ icon: Icon, label, value }: any) => (
+  <div style={{ padding: '1.5rem', borderRadius: '20px', background: 'white', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+    <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'var(--bg-accent)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      <Icon size={20} />
+    </div>
+    <div style={{ minWidth: 0, flex: 1 }}>
+      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, margin: '0 0 0.25rem 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</p>
+      <p style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</p>
     </div>
   </div>
 );
-
-const EditItem = ({ icon, label, value, onChange }: any) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px', borderRadius: '20px', background: '#fff', border: '2.5px solid #3b82f6' }}>
-    <div style={{ color: '#3b82f6' }}>{icon}</div>
-    <div style={{ flex: 1 }}>
-      <p style={{ fontSize: '0.7rem', color: '#3b82f6', fontWeight: 800, margin: '0 0 4px 0', textTransform: 'uppercase' }}>{label}</p>
-      <input type="text" value={value} onChange={(e) => onChange(e.target.value)} style={{ width: '100%', border: 'none', outline: 'none', fontSize: '1rem', color: '#1e293b', fontWeight: 800, padding: 0 }} />
-    </div>
-  </div>
-);
-
-const modernBtnStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-  padding: '10px 20px',
-  borderRadius: '14px',
-  border: 'none',
-  fontWeight: 800,
-  fontSize: '0.875rem',
-  cursor: 'pointer',
-  transition: 'all 0.25s ease'
-};
 
 export default Profile;

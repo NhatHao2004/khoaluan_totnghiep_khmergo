@@ -1,4 +1,4 @@
-import { BookOpen, HelpCircle, LayoutDashboard, LogOut, User } from 'lucide-react';
+import { BookOpen, HelpCircle, LayoutDashboard, LogOut, User, Settings } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase/config';
@@ -10,7 +10,6 @@ const Sidebar = () => {
     if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
       try {
         await signOut(auth);
-        window.location.href = '/'; // Or redirect using useNavigate
       } catch (error) {
         console.error("Lỗi khi đăng xuất:", error);
       }
@@ -20,42 +19,57 @@ const Sidebar = () => {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <img src={icon} alt="KhmerGo Logo" style={{ width: 28, height: 28, marginRight: '10px', borderRadius: '6px' }} />
-        <span>KhmerGo</span>
+        <img src={icon} alt="KhmerGo Logo" style={{ width: 32, height: 32, marginRight: '12px', borderRadius: '8px' }} />
+        <span style={{ background: 'linear-gradient(to right, #ffffff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>KhmerGo</span>
       </div>
 
-      <div style={{ height: '1px', background: 'rgba(0,0,0,0.1)', width: '100%' }}></div>
-
       <nav className="sidebar-nav">
+        <div className="sidebar-label">Chính</div>
         <NavLink to="/" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-          <LayoutDashboard size={18} />
-          Trang chủ
+          <LayoutDashboard size={20} strokeWidth={2} />
+          <span>Bảng điều khiển</span>
         </NavLink>
 
+        <div className="sidebar-label" style={{ marginTop: '1.5rem' }}>Quản lý</div>
         <NavLink to="/users" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-          <User size={18} />
-          Người dùng
+          <User size={20} strokeWidth={2} />
+          <span>Người dùng</span>
         </NavLink>
 
         <NavLink to="/destinations" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-          <BookOpen size={18} />
-          Nội dung
+          <BookOpen size={20} strokeWidth={2} />
+          <span>Nội dung học tập</span>
         </NavLink>
 
         <NavLink to="/challenges" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-          <HelpCircle size={18} />
-          Thử thách
+          <HelpCircle size={20} strokeWidth={2} />
+          <span>Thử thách & Quiz</span>
+        </NavLink>
+        
+        <div className="sidebar-label" style={{ marginTop: '1.5rem' }}>Hệ thống</div>
+        <NavLink to="/profile" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+          <Settings size={20} strokeWidth={2} />
+          <span>Cài đặt cá nhân</span>
         </NavLink>
       </nav>
 
-      <div style={{ marginTop: 'auto', padding: '1.5rem' }}>
+      <div style={{ padding: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
         <button 
           className="nav-link" 
           onClick={handleLogout}
-          style={{ width: '100%', background: 'none', border: 'none', padding: '10px 0', cursor: 'pointer' }}
+          style={{ 
+            width: '100%', 
+            background: 'rgba(239, 68, 68, 0.1)', 
+            border: 'none', 
+            cursor: 'pointer',
+            color: '#ef4444',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.875rem'
+          }}
         >
-          <LogOut size={18} color="#ff5370" />
-          Đăng xuất
+          <LogOut size={20} strokeWidth={2} />
+          <span style={{ fontWeight: 600 }}>Đăng xuất</span>
         </button>
       </div>
     </aside>
@@ -63,3 +77,4 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+
