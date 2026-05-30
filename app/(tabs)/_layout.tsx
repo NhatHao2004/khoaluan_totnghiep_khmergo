@@ -50,17 +50,8 @@ export default function TabsLayout() {
   const scale = useSharedValue(1);
   const dimTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const resetIdleTimer = () => {
-    opacity.value = withTiming(1, { duration: 200 });
-    if (dimTimer.current) clearTimeout(dimTimer.current);
-    dimTimer.current = setTimeout(() => {
-      opacity.value = withTiming(0.6, { duration: 600 });
-    }, 5000);
-  };
-
+  // Removed resetIdleTimer to keep button fully visible at all times
   useEffect(() => {
-    resetIdleTimer();
-    
     // Scale animation (3s cycle)
     scale.value = withRepeat(
       withSequence(
@@ -70,8 +61,6 @@ export default function TabsLayout() {
       -1,
       true
     );
-
-    return () => { if (dimTimer.current) clearTimeout(dimTimer.current); };
   }, []);
 
   const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -91,7 +80,6 @@ export default function TabsLayout() {
   const gesture = Gesture.Pan()
     .onStart(() => {
       context.value = { x: translateX.value, y: translateY.value };
-      opacity.value = withTiming(1, { duration: 150 });
     })
     .onUpdate((event) => {
       let nextX = event.translationX + context.value.x;
@@ -106,18 +94,17 @@ export default function TabsLayout() {
       } else {
         translateX.value = withTiming(MAX_X, { duration: 300 });
       }
-      runOnJS(resetIdleTimer)();
     });
 
   const animatedChatStyle = useAnimatedStyle(() => {
-    // White breathing aura
+    // Breathing aura
     const shadowRadius = interpolate(scale.value, [1, 1.1], [8, 18]);
 
     return {
-      opacity: opacity.value,
-      backgroundColor: '#007AFF', 
-      shadowColor: '#FFFFFF', // Pure white glow
-      borderColor: '#0052cc',
+      opacity: 1, // Always fully visible
+      backgroundColor: '#FFFFFF', // Set to white as requested
+      shadowColor: '#007AFF', // Blue shadow to pop on white background
+      borderColor: '#1E3A8A', // Dark blue border (xanh đậm)
       shadowRadius,
       transform: [
         { translateX: translateX.value },
@@ -325,16 +312,16 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#007AFF', // Solid premium blue
+    backgroundColor: '#FFFFFF', // Set to white as requested
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#FFFFFF', // Changed from blue to white
+    shadowColor: '#007AFF', // Blue shadow for contrast on white
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.4,
     shadowRadius: 12,
     elevation: 20,
     borderWidth: 2,
-    borderColor: '#0052cc', // Dark blue border
+    borderColor: '#1E3A8A', // Dark blue border (xanh đậm)
     zIndex: 99999,
   },
   chatBtnInner: {

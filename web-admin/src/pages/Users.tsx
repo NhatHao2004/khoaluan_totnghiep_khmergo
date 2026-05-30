@@ -150,87 +150,166 @@ const Users = () => {
           <p style={{ color: 'var(--text-secondary)' }}>Thử tìm kiếm với một từ khóa khác</p>
         </div>
       ) : (
-        <div className="card glass-card" style={{ padding: '0', overflow: 'hidden', border: '1px solid var(--border-light)' }}>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ background: 'var(--bg-accent)', borderBottom: '1px solid var(--border-light)' }}>
-                  <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Người dùng</th>
-                  <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Trạng thái</th>
-                  <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'center' }}>Điểm số</th>
-                  <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'center' }}>Hoàn thành</th>
-                  <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map((user, idx) => (
-                  <motion.tr
-                    key={user.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    onClick={() => setSelectedUser(user)}
-                    style={{ borderBottom: '1px solid var(--border-light)', transition: 'background 0.2s', cursor: 'pointer' }}
-                    className="hover-accent"
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
+          gap: '2rem' 
+        }}>
+          {filteredUsers.map((user, idx) => (
+            <motion.div
+              key={user.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.05 }}
+              onClick={() => setSelectedUser(user)}
+              className="card glass-card hover-lift"
+              style={{ 
+                padding: '1.5rem', 
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.5rem',
+                border: '1px solid var(--border-light)',
+                borderRadius: '24px',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+            >
+
+
+              {/* User Identity Section */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                <div style={{ position: 'relative' }}>
+                  <img
+                    src={user.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.id}
+                    style={{ 
+                      width: 64, 
+                      height: 64, 
+                      borderRadius: '18px', 
+                      objectFit: 'cover', 
+                      background: 'var(--bg-accent)',
+                      border: '2px solid white',
+                      boxShadow: 'var(--shadow-sm)'
+                    }}
+                  />
+                  <div style={{
+                    position: 'absolute',
+                    bottom: -2,
+                    right: -2,
+                    width: 14,
+                    height: 14,
+                    borderRadius: '50%',
+                    background: user.isBlocked ? '#ef4444' : '#10b981',
+                    border: '2px solid white'
+                  }} />
+                </div>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <h3 style={{ 
+                    fontWeight: 800, 
+                    fontSize: '1rem', 
+                    color: 'var(--text-primary)', 
+                    marginBottom: '4px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {user.name}
+                  </h3>
+                  <p style={{ 
+                    fontSize: '0.8rem', 
+                    color: 'var(--text-muted)', 
+                    overflow: 'hidden', 
+                    textOverflow: 'ellipsis',
+                    fontWeight: 500
+                  }}>
+                    {user.email || 'Anonymous Account'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Stats Grid */}
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: '1fr 1fr', 
+                gap: '1rem',
+                padding: '1rem',
+                background: 'rgba(248, 250, 252, 0.5)',
+                borderRadius: '16px',
+                border: '1px solid rgba(226, 232, 240, 0.5)'
+              }}>
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px', letterSpacing: '0.025em' }}>Điểm số</p>
+                  <p style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-primary)' }}>{user.points || 0}</p>
+                </div>
+                <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(226, 232, 240, 1)' }}>
+                  <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px', letterSpacing: '0.025em' }}>Hoàn thành</p>
+                  <p style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-primary)' }}>{user.completedQuizzes || 0}</p>
+                </div>
+              </div>
+
+              {/* Actions & Status Badge Content */}
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                marginTop: 'auto'
+              }}>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <button
+                    className="btn hover-lift"
+                    style={{ 
+                      width: '40px', 
+                      height: '40px', 
+                      padding: 0, 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      borderRadius: '12px',
+                      background: '#eff6ff',
+                      color: '#3b82f6',
+                      border: 'none'
+                    }}
+                    title="Xem phản hồi"
+                    onClick={(e) => { e.stopPropagation(); handleOpenFeedback(user); }}
                   >
-                    <td style={{ padding: '1rem 1.5rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <img
-                          src={user.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.id}
-                          style={{ width: 42, height: 42, borderRadius: '12px', objectFit: 'cover', background: 'var(--bg-accent)' }}
-                        />
-                        <div style={{ minWidth: 0 }}>
-                          <p style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--text-primary)', marginBottom: '2px' }}>{user.name}</p>
-                          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email || '—'}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ padding: '1rem 1.5rem' }}>
-                      {user.isBlocked ? (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', fontSize: '0.6875rem', fontWeight: 700, padding: '4px 10px', borderRadius: '6px', background: '#fef2f2', color: '#dc2626' }}>
-                          BỊ KHÓA
-                        </span>
-                      ) : (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', fontSize: '0.6875rem', fontWeight: 700, padding: '4px 10px', borderRadius: '6px', background: '#ecfdf5', color: '#059669' }}>
-                          HOẠT ĐỘNG
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ padding: '1rem 1.5rem', textAlign: 'center' }}>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', fontWeight: 700, color: 'var(--text-primary)' }}>
-                        {user.points || 0}
-                      </div>
-                    </td>
-                    <td style={{ padding: '1rem 1.5rem', textAlign: 'center' }}>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', fontWeight: 700, color: 'var(--text-primary)' }}>
-                        {user.completedQuizzes || 0}
-                      </div>
-                    </td>
-                    <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                        <button
-                          className="btn btn-secondary"
-                          style={{ padding: '8px' }}
-                          title="Phản hồi"
-                          onClick={(e) => { e.stopPropagation(); handleOpenFeedback(user); }}
-                        >
-                          <MessageCircleMore size={18} />
-                        </button>
-                        <button
-                          className="btn"
-                          style={{ padding: '8px', background: user.isBlocked ? 'var(--success)' : '#fef2f2', color: user.isBlocked ? 'white' : '#dc2626' }}
-                          title={user.isBlocked ? 'Bỏ khóa' : 'Khóa'}
-                          onClick={(e) => { e.stopPropagation(); toggleBlock(user); }}
-                        >
-                          {user.isBlocked ? <CheckCircle size={18} /> : <Ban size={18} />}
-                        </button>
-                      </div>
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    <MessageCircleMore size={20} />
+                  </button>
+                  <button
+                    className="btn hover-lift"
+                    style={{ 
+                      width: '40px', 
+                      height: '40px', 
+                      padding: 0, 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      borderRadius: '12px',
+                      background: user.isBlocked ? 'var(--success)' : '#fff1f2', 
+                      color: user.isBlocked ? 'white' : '#e11d48' 
+                    }}
+                    title={user.isBlocked ? 'Bỏ khóa người dùng' : 'Khóa người dùng'}
+                    onClick={(e) => { e.stopPropagation(); toggleBlock(user); }}
+                  >
+                    {user.isBlocked ? <CheckCircle size={20} /> : <Ban size={20} />}
+                  </button>
+                </div>
+                
+                <span style={{ 
+                  fontSize: '0.7rem', 
+                  fontWeight: 800, 
+                  padding: '6px 12px', 
+                  borderRadius: '10px', 
+                  letterSpacing: '0.025em',
+                  background: user.isBlocked ? '#fef2f2' : '#ecfdf5', 
+                  color: user.isBlocked ? '#dc2626' : '#059669',
+                  textTransform: 'uppercase'
+                }}>
+                  {user.isBlocked ? 'Bị khóa' : 'Hoạt động'}
+                </span>
+              </div>
+            </motion.div>
+          ))}
         </div>
       )}
 
@@ -276,7 +355,22 @@ const Users = () => {
                 </div>
               </div>
 
-              <button onClick={() => setSelectedUser(null)} className="btn btn-primary" style={{ width: '100%', marginTop: '2.5rem', padding: '1rem' }}>Đóng</button>
+              <button 
+                onClick={() => setSelectedUser(null)} 
+                className="btn hover-lift" 
+                style={{ 
+                  width: '100%', 
+                  marginTop: '2.5rem', 
+                  padding: '1rem', 
+                  background: '#0ea5e9', 
+                  color: 'white',
+                  fontWeight: 700,
+                  borderRadius: '14px',
+                  border: 'none'
+                }}
+              >
+                Đóng
+              </button>
             </motion.div>
           </div>
         )}
@@ -345,7 +439,22 @@ const Users = () => {
                 )}
               </div>
 
-              <button onClick={() => setSelectedFeedbackUser(null)} className="btn btn-primary" style={{ width: '100%', marginTop: '2rem', padding: '1rem' }}>Đóng</button>
+              <button 
+                onClick={() => setSelectedFeedbackUser(null)} 
+                className="btn hover-lift" 
+                style={{ 
+                  width: '100%', 
+                  marginTop: '2rem', 
+                  padding: '1rem', 
+                  background: '#0ea5e9', 
+                  color: 'white',
+                  fontWeight: 700,
+                  borderRadius: '14px',
+                  border: 'none'
+                }}
+              >
+                Đóng
+              </button>
             </motion.div>
           </div>
         )}
