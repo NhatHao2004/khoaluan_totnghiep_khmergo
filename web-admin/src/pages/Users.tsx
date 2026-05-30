@@ -123,7 +123,7 @@ const Users = () => {
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Quản lý người dùng</h1>
         </div>
 
-        <div className="input-group" style={{ maxWidth: '450px', marginBottom: 0 }}>
+        <div className="input-group" style={{ width: '400px', marginBottom: 0 }}>
           <div style={{ position: 'relative' }}>
             <input
               className="input-field"
