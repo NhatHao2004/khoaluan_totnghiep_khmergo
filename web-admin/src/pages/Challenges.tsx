@@ -115,6 +115,15 @@ const Challenges = () => {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (editingItem || isAddingNew) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [editingItem, isAddingNew]);
+
   const validateChallenge = (item: Partial<Challenge>) => {
     if (!item.pagodaId?.trim() || !item.pagodaName?.trim()) return 'Vui lòng nhập đầy đủ thông tin định danh Thử thách';
     const qs = item.questions || [];
@@ -322,7 +331,7 @@ const Challenges = () => {
                 <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '2.5rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                     <h3 style={{ fontSize: '1rem', fontWeight: 800 }}>Câu hỏi ({(isAddingNew ? newItem.questions : editingItem?.questions)?.length})</h3>
-                    <button type="button" className="btn btn-secondary" onClick={handleAddQuestion}>Thêm câu hỏi</button>
+                    <button type="button" className="btn" onClick={handleAddQuestion} style={{ padding: '0.5rem 1.25rem', background: '#eff6ff', color: '#2563eb', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 700 }}>Thêm câu hỏi</button>
                   </div>
                   <div style={{ display: 'grid', gap: '1rem' }}>
                     {(isAddingNew ? newItem.questions : editingItem?.questions)?.map((q, idx) => (
@@ -341,11 +350,11 @@ const Challenges = () => {
                                   <div
                                     style={{
                                       width: '36px', height: '36px', borderRadius: '12px',
-                                      background: q.correctIndex === oIdx ? 'var(--primary)' : 'var(--bg-accent)',
+                                      background: q.correctIndex === oIdx ? 'var(--danger)' : 'var(--bg-accent)',
                                       color: q.correctIndex === oIdx ? 'white' : 'var(--text-muted)',
                                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                                       fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s',
-                                      boxShadow: q.correctIndex === oIdx ? '0 4px 12px rgba(59, 130, 246, 0.3)' : 'none'
+                                      boxShadow: q.correctIndex === oIdx ? '0 4px 12px rgba(239, 68, 68, 0.3)' : 'none'
                                     }}
                                     onClick={() => { const qs = [...(isAddingNew ? newItem.questions! : editingItem!.questions)]; qs[idx].correctIndex = oIdx; isAddingNew ? setNewItem({ ...newItem, questions: qs }) : setEditingItem({ ...editingItem!, questions: qs }) }}
                                   >

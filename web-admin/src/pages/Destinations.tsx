@@ -116,6 +116,15 @@ const Destinations = () => {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (editingItem || isAddingNew || viewingItem) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [editingItem, isAddingNew, viewingItem]);
+
   const fetchDestinations = async () => {
     setLoading(true);
     try {
@@ -254,8 +263,8 @@ const Destinations = () => {
               />
             </div>
           </div>
-          <button 
-            className="btn" 
+          <button
+            className="btn"
             onClick={() => { setIsAddingNew(true); setNewItem({ ...newItem, category: activeTab }); }}
             style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
           >
@@ -303,7 +312,7 @@ const Destinations = () => {
                 </p>
                 <div style={{ marginTop: 'auto', paddingTop: '1rem', display: 'flex', gap: '0.75rem' }}>
                   <button className="btn btn-secondary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.75rem' }} onClick={() => { setViewingItem(dest); setViewLanguage('vi'); }}>Xem chi tiết</button>
-                  <button className="btn" style={{ padding: '0.5rem 1rem', background: 'var(--bg-accent)', color: 'var(--text-primary)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.75rem' }} onClick={() => setEditingItem(dest)}><Edit2 size={14} /> Sửa</button>
+                  <button className="btn" style={{ padding: '0.5rem 1rem', background: '#eff6ff', color: '#2563eb', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.75rem' }} onClick={() => setEditingItem(dest)}><Edit2 size={14} /> Sửa</button>
                   <button className="btn" style={{ padding: '0.5rem 1rem', background: '#fef2f2', color: 'var(--danger)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.75rem' }} onClick={() => setConfirmConfig({ isOpen: true, title: 'Xác nhận xóa', message: `Bạn có chắc chắn muốn xóa\n"${dest.name}"`, onConfirm: () => handleDelete(dest.id) })}><Trash2 size={14} /> Xóa</button>
                 </div>
               </div>
@@ -488,7 +497,7 @@ const Destinations = () => {
                 <div style={{ borderTop: '2px dashed var(--border-light)', paddingTop: '2.5rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                     <h3 style={{ fontSize: '1rem', fontWeight: 800 }}>Các khối nội dung chi tiết</h3>
-                    <button type="button" onClick={handleAddContentBlock} className="btn btn-secondary" style={{ fontSize: '0.8rem' }}>Thêm khối</button>
+                    <button type="button" onClick={handleAddContentBlock} className="btn" style={{ padding: '0.5rem 1.25rem', background: '#eff6ff', color: '#2563eb', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 700 }}>Thêm khối</button>
                   </div>
 
                   <div style={{ display: 'grid', gap: '1.5rem' }}>
