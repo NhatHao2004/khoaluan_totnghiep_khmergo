@@ -220,7 +220,7 @@ export default function CultureDetailScreen() {
                   <TouchableOpacity
                     style={styles.quizStartBtn}
                     onPress={() => {
-                      if (!user) {
+                      if (!user || user.isAnonymous) {
                         setShowLoginModal(true);
                         return;
                       }

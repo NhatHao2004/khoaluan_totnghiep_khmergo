@@ -84,12 +84,12 @@ export default function CommunityScreen() {
 
   // Tự động mở bình luận từ thông báo
   useEffect(() => {
-    if (openPostId) {
+    if (openPostId && openPostId !== 'undefined' && openPostId !== '') {
       setActivePostId(openPostId as string);
       setModalVisible(true);
 
       // Xóa params sau khi đã mở để có thể trigger lại lần sau
-      router.setParams({ openPostId: undefined });
+      router.setParams({ openPostId: '' });
 
       // Tự động cuộn xuống cuối sau khi dữ liệu tải (đợi 1 chút cho animation modal và dữ liệu FB)
       setTimeout(() => {
@@ -168,12 +168,34 @@ export default function CommunityScreen() {
   useEffect(() => {
     const q = Firestore.query(Firestore.collection(db, 'posts'), Firestore.orderBy('createdAt', 'desc'));
     const unsubscribe = Firestore.onSnapshot(q, (snapshot) => {
-      const postsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        time: doc.data().createdAt?.toDate()?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || 'Vừa xong'
-      })) as Post[];
-      setPosts(postsData);
+      try {
+        const postsData = snapshot.docs.map(doc => {
+          const data = doc.data();
+          let timeDisplay = 'Vừa xong';
+          
+          if (data.createdAt) {
+            try {
+              const date = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+              timeDisplay = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } catch (e) {
+              timeDisplay = 'Vừa xong';
+            }
+          }
+
+          return {
+            id: doc.id,
+            ...data,
+            time: timeDisplay
+          };
+        }) as Post[];
+        setPosts(postsData);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error processing posts snapshot:", err);
+        setLoading(false);
+      }
+    }, (error) => {
+      console.error("Firestore onSnapshot error (posts):", error);
       setLoading(false);
     });
 
@@ -188,12 +210,32 @@ export default function CommunityScreen() {
       Firestore.orderBy('createdAt', 'asc')
     );
     const unsubscribe = Firestore.onSnapshot(q, (snapshot) => {
-      const commentsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        time: doc.data().createdAt?.toDate()?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || 'Vừa xong'
-      })) as Comment[];
-      setComments(commentsData);
+      try {
+        const commentsData = snapshot.docs.map(doc => {
+          const data = doc.data();
+          let timeDisplay = 'Vừa xong';
+
+          if (data.createdAt) {
+            try {
+              const date = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+              timeDisplay = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } catch (e) {
+              timeDisplay = 'Vừa xong';
+            }
+          }
+
+          return {
+            id: doc.id,
+            ...data,
+            time: timeDisplay
+          };
+        }) as Comment[];
+        setComments(commentsData);
+      } catch (err) {
+        console.error("Error processing comments snapshot:", err);
+      }
+    }, (error) => {
+      console.error("Firestore onSnapshot error (comments):", error);
     });
     return () => unsubscribe();
   }, [activePostId]);
@@ -299,7 +341,7 @@ export default function CommunityScreen() {
   };
 
   const handleLike = async (postId: string, likedBy: string[] = []) => {
-    if (!user) {
+    if (!user || user.isAnonymous) {
       setShowLoginModal(true);
       return;
     }
@@ -324,7 +366,7 @@ export default function CommunityScreen() {
   };
 
   const handleComment = (id: string) => {
-    if (!user) {
+    if (!user || user.isAnonymous) {
       setShowLoginModal(true);
       return;
     }
@@ -519,7 +561,7 @@ export default function CommunityScreen() {
         <TouchableOpacity
           style={styles.plusBtn}
           onPress={() => {
-            if (!user) {
+            if (!user || user.isAnonymous) {
               setShowLoginModal(true);
               return;
             }

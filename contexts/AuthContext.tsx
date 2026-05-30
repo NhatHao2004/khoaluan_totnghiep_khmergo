@@ -14,6 +14,7 @@ export interface UserProfile {
   completedQuizzes?: number;
   interests?: string[];
   isBlocked?: boolean;
+  isAnonymous?: boolean;
 }
 
 
@@ -61,12 +62,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           completedQuizzes: data.completedQuizzes ?? 0,
           interests: data.interests || [],
           isBlocked: data.isBlocked || false,
+          isAnonymous: firebaseUser.isAnonymous,
         });
 
       } else {
         setUser({
           uid: firebaseUser.uid,
           email: firebaseUser.email,
+          isAnonymous: firebaseUser.isAnonymous,
         });
       }
     } catch (error: any) {

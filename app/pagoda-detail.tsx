@@ -286,7 +286,7 @@ export default function PagodaDetailScreen() {
                 <TouchableOpacity
                   style={styles.quizStartBtn}
                   onPress={() => {
-                    if (!user) {
+                    if (!user || user.isAnonymous) {
                       setShowLoginModal(true);
                       return;
                     }

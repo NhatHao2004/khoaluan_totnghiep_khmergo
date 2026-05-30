@@ -70,7 +70,7 @@ export default function QuizCultureSelectScreen() {
     .sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
 
   const handleSelect = (pagodaId: string, imageUrl: string, pagodaLocation: string) => {
-    if (!user) {
+    if (!user || user.isAnonymous) {
       setShowLoginModal(true);
       return;
     }

@@ -1,4 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
+import React, { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFoods } from '@/hooks/use-foods';
 import { useQuizzes } from '@/hooks/use-quizzes';
@@ -8,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -24,6 +26,7 @@ export default function QuizFoodSelectScreen() {
   const loading = foodsLoading || quizzesLoading;
 
   const isKm = language === 'km';
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const order = ['food_5', 'food_1', 'food_4', 'food_2', 'food_3'];
   
@@ -57,15 +60,8 @@ export default function QuizFoodSelectScreen() {
     .sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
 
   const handleSelect = (foodId: string, imageUrl: string, foodLocation: string) => {
-    if (!user) {
-      Alert.alert(
-        isKm ? 'តម្រូវឱ្យចូល' : 'Yêu cầu đăng nhập',
-        isKm ? 'អ្នកត្រូវចូលដើម្បីចូលរួមក្នុងបញ្ហាប្រឈមនេះ' : 'Bạn cần đăng nhập để tham gia thử thách và tích luỵ điểm xếp hạng',
-        [
-          { text: isKm ? 'បោះបង់' : 'Huỷ', style: 'cancel' },
-          { text: isKm ? 'ចូល' : 'Đăng nhập', onPress: () => router.push('/login') },
-        ]
-      );
+    if (!user || user.isAnonymous) {
+      setShowLoginModal(true);
       return;
     }
     router.push({ pathname: '/game-mcq' as any, params: { pagodaId: foodId, imageUrl, pagodaLocation: foodLocation } });
@@ -146,6 +142,46 @@ export default function QuizFoodSelectScreen() {
           </View>
         </ScrollView>
       )}
+
+      {/* Custom Login Modal */}
+      <Modal
+        visible={showLoginModal}
+        transparent={true}
+        animationType="fade"
+        statusBarTranslucent={true}
+        onRequestClose={() => setShowLoginModal(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalIconCircle}>
+              <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
+            </View>
+            <Text style={styles.modalTitle}>{isKm ? 'តម្រូវឱ្យចូល' : 'Yêu cầu đăng nhập'}</Text>
+            <Text style={styles.modalSub}>
+              {isKm ? 'អ្នកត្រូវចូលដើម្បីចូលរួមក្នុងបញ្ហាប្រឈមនេះ' : 'Bạn cần đăng nhập để tham gia thử thách và tích luỵ điểm xếp hạng'}
+            </Text>
+
+            <View style={styles.modalActionRow}>
+              <TouchableOpacity
+                style={styles.modalPrimaryBtn}
+                onPress={() => {
+                  setShowLoginModal(false);
+                  router.push('/login');
+                }}
+              >
+                <Text style={styles.modalPrimaryBtnText}>{isKm ? 'ចូល' : 'Đăng nhập'}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalSecondaryBtn}
+                onPress={() => setShowLoginModal(false)}
+              >
+                <Text style={styles.modalSecondaryBtnText}>{isKm ? 'បោះបង់' : 'Huỷ'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -207,5 +243,87 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
+  },
+
+  // --- Premium Modal Styles ---
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalContent: {
+    backgroundColor: '#FFF',
+    borderRadius: 32,
+    padding: 30,
+    width: '100%',
+    maxWidth: 340,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  modalIconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#EFF6FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#DBEAFE',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#1E293B',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalSub: {
+    fontSize: 15,
+    color: '#64748B',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  modalActionRow: {
+    width: '100%',
+    gap: 12,
+  },
+  modalPrimaryBtn: {
+    backgroundColor: '#3B82F6',
+    height: 56,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  modalPrimaryBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  modalSecondaryBtn: {
+    backgroundColor: '#EF4444',
+    height: 56,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  modalSecondaryBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });

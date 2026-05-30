@@ -27,16 +27,16 @@ export default function QuizScreen() {
   }, []);
 
   const fetchRank = async (force = false) => {
-    // Only fetch if forced or it's been more than 30 seconds
+    if (!user || user.isAnonymous) {
+      if (userRank !== 0) setUserRank(0);
+      return;
+    }
+
     const now = Date.now();
     if (!force && lastFetchTime.current && now - lastFetchTime.current < 30000) {
       return;
     }
 
-    if (!user) {
-      if (userRank !== '') setUserRank('');
-      return;
-    }
     try {
       const users = await getLeaderboardUsers(100);
       const index = users.findIndex(u => u.uid === user.uid);
@@ -47,7 +47,7 @@ export default function QuizScreen() {
       lastFetchTime.current = Date.now();
     } catch (error) {
       console.log('Error fetching rank:', error);
-      if (userRank !== '') setUserRank('');
+      setUserRank('---');
     }
   };
 
@@ -100,12 +100,12 @@ export default function QuizScreen() {
 
           <View style={styles.cardStats}>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{user?.points || 0}</Text>
+              <Text style={styles.statValue}>{(user && !user.isAnonymous) ? (user.points || 0) : 0}</Text>
               <Text style={styles.statLabel} numberOfLines={1}>{t('points')}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{user?.completedQuizzes || 0}</Text>
+              <Text style={styles.statValue}>{(user && !user.isAnonymous) ? (user.completedQuizzes || 0) : 0}</Text>
               <Text style={styles.statLabel} numberOfLines={1}>{t('completed')}</Text>
             </View>
           </View>
@@ -127,7 +127,7 @@ export default function QuizScreen() {
                 activeOpacity={0.85}
                 style={[styles.bentoCard, { height: 295 }]}
                 onPress={() => {
-                  if (!user) {
+                  if (!user || user.isAnonymous) {
                     setShowLoginModal(true);
                     return;
                   }
@@ -149,7 +149,7 @@ export default function QuizScreen() {
                 activeOpacity={0.7}
                 style={[styles.bentoCard, { height: 140 }]}
                 onPress={() => {
-                  if (!user) {
+                  if (!user || user.isAnonymous) {
                     setShowLoginModal(true);
                     return;
                   }
@@ -168,7 +168,7 @@ export default function QuizScreen() {
                 activeOpacity={0.7}
                 style={[styles.bentoCard, { height: 140 }]}
                 onPress={() => {
-                  if (!user) {
+                  if (!user || user.isAnonymous) {
                     setShowLoginModal(true);
                     return;
                   }
@@ -190,7 +190,7 @@ export default function QuizScreen() {
             activeOpacity={0.7}
             style={[styles.bentoCardFull, { marginTop: 10 }]}
             onPress={() => {
-              if (!user) {
+              if (!user || user.isAnonymous) {
                 setShowLoginModal(true);
                 return;
               }

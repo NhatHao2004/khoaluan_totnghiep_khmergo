@@ -243,7 +243,7 @@ export default function FoodDetailScreen() {
                   <TouchableOpacity
                     style={styles.quizStartBtn}
                     onPress={() => {
-                      if (!user) {
+                      if (!user || user.isAnonymous) {
                         setShowLoginModal(true);
                         return;
                       }

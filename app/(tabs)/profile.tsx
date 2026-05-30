@@ -46,16 +46,16 @@ export default function ProfileScreen() {
   const lastFetchTime = useRef<number>(0);
 
   const fetchRank = async (force = false) => {
-    // Only fetch if forced or it's been more than 30 seconds
+    if (!user || user.isAnonymous) {
+      if (userRank !== 0) setUserRank(0);
+      return;
+    }
+
     const now = Date.now();
     if (!force && lastFetchTime.current && now - lastFetchTime.current < 30000) {
       return;
     }
 
-    if (!user) {
-      if (userRank !== '---') setUserRank('---');
-      return;
-    }
     try {
       const users = await getLeaderboardUsers(100);
       const index = users.findIndex(u => u.uid === user.uid);
@@ -66,7 +66,7 @@ export default function ProfileScreen() {
       lastFetchTime.current = Date.now();
     } catch (error) {
       console.log('Error fetching rank:', error);
-      if (userRank !== '---') setUserRank('---');
+      setUserRank('---');
     }
   };
 
@@ -89,8 +89,9 @@ export default function ProfileScreen() {
   };
 
   const handleMenuPress = (id: string) => {
-    // Nếu chưa đăng nhập, chỉ cho phép nhấn vào 'login'
-    if (!user && id !== 'login') {
+    const isGuest = !user || user.isAnonymous;
+    // Nếu chưa đăng nhập (hoặc là khách), chỉ cho phép nhấn vào 'login' và một số mục công khai
+    if (isGuest && id !== 'login') {
       setLoginRequiredVisible(true);
       return;
     }
@@ -107,8 +108,9 @@ export default function ProfileScreen() {
 
   // Lọc các menu item dựa trên trạng thái đăng nhập
   const filteredMenuItems = menuItems.filter(item => {
-    if (item.id === 'logout') return !!user && !isLoggingOut;
-    if (item.id === 'login') return !user || isLoggingOut;
+    const isGuest = !user || user.isAnonymous;
+    if (item.id === 'logout') return !isGuest && !isLoggingOut;
+    if (item.id === 'login') return isGuest || isLoggingOut;
     return true;
   });
 
@@ -136,7 +138,7 @@ export default function ProfileScreen() {
 
             {/* Info */}
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>{(user && !isLoggingOut) ? user?.name : t('guest')}</Text>
+              <Text style={styles.profileName}>{(user && !user.isAnonymous && !isLoggingOut) ? user?.name : t('guest')}</Text>
             </View>
           </View>
         </Animated.View>
@@ -149,7 +151,7 @@ export default function ProfileScreen() {
               style={[
                 styles.menuItem,
                 index < filteredMenuItems.length - 1 && styles.menuItemBorder,
-                (!user || isLoggingOut) && item.id !== 'login' && { opacity: 0.5 }
+                (!user || user.isAnonymous || isLoggingOut) && item.id !== 'login' && { opacity: 0.5 }
               ]}
               onPress={() => handleMenuPress(item.id)}
               activeOpacity={0.6}
@@ -157,7 +159,7 @@ export default function ProfileScreen() {
               <Ionicons
                 name={item.icon as any}
                 size={22}
-                color={((!user || isLoggingOut) && item.id !== 'login') ? '#94A3B8' : (item.color || '#555')}
+                color={((!user || user.isAnonymous || isLoggingOut) && item.id !== 'login') ? '#94A3B8' : (item.color || '#555')}
                 style={[
                   styles.menuIcon,
                   item.id === 'login' && { marginLeft: 3, marginRight: 12 }
@@ -165,14 +167,14 @@ export default function ProfileScreen() {
               />
               <Text style={[
                 styles.menuTitle,
-                ((!user || isLoggingOut) && item.id !== 'login') ? { color: '#94A3B8' } : (item.color ? { color: item.color } : {})
+                ((!user || user.isAnonymous || isLoggingOut) && item.id !== 'login') ? { color: '#94A3B8' } : (item.color ? { color: item.color } : {})
               ]}>
                 {t(item.titleKey)}
               </Text>
               <Ionicons
                 name="chevron-forward"
                 size={18}
-                color={((!user || isLoggingOut) && item.id !== 'login') ? '#E2E8F0' : (item.color || '#CCC')}
+                color={((!user || user.isAnonymous || isLoggingOut) && item.id !== 'login') ? '#E2E8F0' : (item.color || '#CCC')}
               />
             </TouchableOpacity>
           ))}

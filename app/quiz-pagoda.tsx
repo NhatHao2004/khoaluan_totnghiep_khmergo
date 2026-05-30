@@ -49,7 +49,7 @@ export default function QuizPagodaSelectScreen() {
     .sort((a, b) => a.pagodaId.localeCompare(b.pagodaId));
 
   const handleSelect = (pagodaId: string, imageUrl: string, pagodaLocation: string) => {
-    if (!user) {
+    if (!user || user.isAnonymous) {
       setShowLoginModal(true);
       return;
     }
