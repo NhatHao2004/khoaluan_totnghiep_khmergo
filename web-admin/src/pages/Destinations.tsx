@@ -303,8 +303,8 @@ const Destinations = () => {
                 </p>
                 <div style={{ marginTop: 'auto', paddingTop: '1rem', display: 'flex', gap: '0.75rem' }}>
                   <button className="btn btn-secondary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.75rem' }} onClick={() => { setViewingItem(dest); setViewLanguage('vi'); }}>Xem chi tiết</button>
-                  <button className="btn" style={{ padding: '0.5rem', background: 'var(--bg-accent)', color: 'var(--text-primary)', borderRadius: '10px' }} onClick={() => setEditingItem(dest)} title="Chỉnh sửa"><Edit2 size={16} /></button>
-                  <button className="btn" style={{ padding: '0.5rem', background: '#fef2f2', color: 'var(--danger)', borderRadius: '10px' }} onClick={() => setConfirmConfig({ isOpen: true, title: 'Xác nhận xóa', message: `Bạn có chắc chắn muốn xóa\n"${dest.name}"`, onConfirm: () => handleDelete(dest.id) })} title="Xóa"><Trash2 size={16} /></button>
+                  <button className="btn" style={{ padding: '0.5rem 1rem', background: 'var(--bg-accent)', color: 'var(--text-primary)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.75rem' }} onClick={() => setEditingItem(dest)}><Edit2 size={14} /> Sửa</button>
+                  <button className="btn" style={{ padding: '0.5rem 1rem', background: '#fef2f2', color: 'var(--danger)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.75rem' }} onClick={() => setConfirmConfig({ isOpen: true, title: 'Xác nhận xóa', message: `Bạn có chắc chắn muốn xóa\n"${dest.name}"`, onConfirm: () => handleDelete(dest.id) })}><Trash2 size={14} /> Xóa</button>
                 </div>
               </div>
             </motion.div>
@@ -496,7 +496,7 @@ const Destinations = () => {
                       <div key={idx} className="card" style={{ background: 'var(--bg-main)', border: 'none', padding: '1.5rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
                           <span style={{ fontWeight: 800, fontSize: '0.75rem', color: 'var(--primary)', textTransform: 'uppercase' }}>KHỐI NỘI DUNG {idx + 1}</span>
-                          <button type="button" onClick={() => handleRemoveContentBlock(idx)} style={{ border: '1px solid var(--border-light)', background: '#fff', padding: '6px 12px', borderRadius: '10px', color: '#ef4444', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', transition: 'all 0.2s' }}><Trash2 size={14} /> Xóa</button>
+                          <button type="button" onClick={() => handleRemoveContentBlock(idx)} style={{ border: '1px solid #fee2e2', background: '#fef2f2', padding: '6px 12px', borderRadius: '10px', color: 'var(--danger)', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', transition: 'all 0.2s' }}><Trash2 size={14} /> Xóa</button>
                         </div>
                         <div style={{ display: 'grid', gap: '1rem' }}>
                           <InputField label="Link ảnh khối này" value={block.images} onChange={(v: string) => handleUpdateContentBlock(idx, 'images', v)} />

@@ -1,7 +1,7 @@
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Award, Brain, CheckCircle, ChevronDown, ChevronUp, Shield, Trash2, Utensils } from 'lucide-react';
+import { Award, Brain, CheckCircle, Shield, Trash2, Utensils } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { auth, db } from '../firebase/config';
 
@@ -28,9 +28,9 @@ interface Challenge {
 type TabKey = 'Chùa' | 'Văn hóa' | 'Ẩm thực';
 
 const TABS: { key: TabKey; label: string; prefix: string; icon: any }[] = [
-  { key: 'Chùa', label: 'Thử thách Chùa', prefix: 'pagoda_', icon: Brain },
-  { key: 'Văn hóa', label: 'Thử thách Văn hóa', prefix: 'culture_', icon: Award },
-  { key: 'Ẩm thực', label: 'Thử thách Ẩm thực', prefix: 'food_', icon: Utensils },
+  { key: 'Chùa', label: 'Ngôi chùa Khmer', prefix: 'pagoda_', icon: Brain },
+  { key: 'Văn hóa', label: 'Văn hóa Khmer', prefix: 'culture_', icon: Award },
+  { key: 'Ẩm thực', label: 'Ẩm thực khmer', prefix: 'food_', icon: Utensils },
 ];
 
 const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 'text', textarea = false, disabled = false, list }: any) => {
@@ -260,8 +260,8 @@ const Challenges = () => {
           </div>
         ) : (
           filteredChallenges.map(item => {
-            const matchedDest = destinations.find(d => 
-              (item.pagodaId && d.id === item.pagodaId) || 
+            const matchedDest = destinations.find(d =>
+              (item.pagodaId && d.id === item.pagodaId) ||
               (d.id === item.id) ||
               (item.pagodaName && normalizeStr(d.name) === normalizeStr(item.pagodaName))
             );
@@ -269,9 +269,9 @@ const Challenges = () => {
             return (
               <motion.div layout key={item.id} className="card glass-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ height: '220px', background: 'var(--bg-accent)', position: 'relative' }}>
-                  <img 
-                    src={item.imageUrl || matchedDest?.imageUrl || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?q=80&w=600'} 
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  <img
+                    src={item.imageUrl || matchedDest?.imageUrl || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?q=80&w=600'}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     alt={item.pagodaName}
                   />
                   <div style={{ position: 'absolute', bottom: '1rem', left: '1rem', padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', borderRadius: '10px', fontWeight: 800, fontSize: '0.7rem', color: 'var(--primary)' }}>
@@ -287,7 +287,7 @@ const Challenges = () => {
                   </p>
                   <div style={{ marginTop: 'auto', paddingTop: '1rem', display: 'flex', gap: '0.75rem' }}>
                     <button className="btn btn-secondary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.75rem' }} onClick={() => { setEditingItem(item); setExpandedQuestion(0); }}>Chỉnh sửa câu hỏi</button>
-                    <button className="btn" style={{ padding: '0.5rem', background: '#fef2f2', color: 'var(--danger)', borderRadius: '10px' }} onClick={() => handleDelete(item.id)}><Trash2 size={16} /></button>
+                    <button className="btn" style={{ padding: '0.5rem 1rem', background: '#fef2f2', color: 'var(--danger)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.75rem' }} onClick={() => handleDelete(item.id)}><Trash2 size={14} /> Xóa</button>
                   </div>
                 </div>
               </motion.div>
@@ -329,34 +329,34 @@ const Challenges = () => {
                       <div key={idx} style={{ border: '1px solid var(--border-light)', borderRadius: '16px', background: expandedQuestion === idx ? 'var(--bg-accent)' : 'transparent' }}>
                         <div style={{ padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setExpandedQuestion(expandedQuestion === idx ? null : idx)}>
                           <span>{q.question || `Câu hỏi ${idx + 1}`}</span>
-                          <button className="btn" onClick={(e) => { e.stopPropagation(); handleRemoveQuestion(idx); }}><Trash2 size={16} /></button>
+                          <button className="btn" style={{ padding: '0.5rem 1rem', background: '#fef2f2', color: 'var(--danger)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.75rem' }} onClick={(e) => { e.stopPropagation(); handleRemoveQuestion(idx); }}><Trash2 size={14} /> Xóa</button>
                         </div>
                         {expandedQuestion === idx && (
                           <div style={{ padding: '2rem', borderTop: '1px solid var(--border-light)', display: 'grid', gap: '2rem', background: 'white' }}>
                             <InputField label="Nội dung câu hỏi" textarea value={q.question} onChange={(v: string) => { const qs = [...(isAddingNew ? newItem.questions! : editingItem!.questions)]; qs[idx].question = v; isAddingNew ? setNewItem({ ...newItem, questions: qs }) : setEditingItem({ ...editingItem!, questions: qs }) }} />
-                            
+
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                               {q.options.map((opt, oIdx) => (
                                 <div key={oIdx} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                  <div 
-                                    style={{ 
-                                      width: '36px', height: '36px', borderRadius: '12px', 
-                                      background: q.correctIndex === oIdx ? 'var(--primary)' : 'var(--bg-accent)', 
-                                      color: q.correctIndex === oIdx ? 'white' : 'var(--text-muted)', 
-                                      display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                                  <div
+                                    style={{
+                                      width: '36px', height: '36px', borderRadius: '12px',
+                                      background: q.correctIndex === oIdx ? 'var(--primary)' : 'var(--bg-accent)',
+                                      color: q.correctIndex === oIdx ? 'white' : 'var(--text-muted)',
+                                      display: 'flex', alignItems: 'center', justifyContent: 'center',
                                       fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s',
                                       boxShadow: q.correctIndex === oIdx ? '0 4px 12px rgba(59, 130, 246, 0.3)' : 'none'
-                                    }} 
+                                    }}
                                     onClick={() => { const qs = [...(isAddingNew ? newItem.questions! : editingItem!.questions)]; qs[idx].correctIndex = oIdx; isAddingNew ? setNewItem({ ...newItem, questions: qs }) : setEditingItem({ ...editingItem!, questions: qs }) }}
                                   >
                                     {String.fromCharCode(65 + oIdx)}
                                   </div>
-                                  <input 
-                                    className="input-field" 
-                                    value={opt} 
+                                  <input
+                                    className="input-field"
+                                    value={opt}
                                     placeholder={`Đáp án ${String.fromCharCode(65 + oIdx)}`}
-                                    onChange={(e) => { const qs = [...(isAddingNew ? newItem.questions! : editingItem!.questions)]; qs[idx].options[oIdx] = e.target.value; isAddingNew ? setNewItem({ ...newItem, questions: qs }) : setEditingItem({ ...editingItem!, questions: qs }) }} 
-                                    style={{ padding: '10px 15px' }} 
+                                    onChange={(e) => { const qs = [...(isAddingNew ? newItem.questions! : editingItem!.questions)]; qs[idx].options[oIdx] = e.target.value; isAddingNew ? setNewItem({ ...newItem, questions: qs }) : setEditingItem({ ...editingItem!, questions: qs }) }}
+                                    style={{ padding: '10px 15px' }}
                                   />
                                 </div>
                               ))}
