@@ -13,6 +13,7 @@ import Destinations from './pages/Destinations';
 import Login from './pages/Login';
 import ProfilePage from './pages/Profile';
 import Users from './pages/Users';
+import Article from './pages/Article';
 
 const TopBar = ({ notifications, clearNotifications }: any) => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -240,6 +241,7 @@ function App() {
               <Route path="/users" element={<Users />} />
               <Route path="/destinations" element={<Destinations />} />
               <Route path="/challenges" element={<Challenges />} />
+              <Route path="/article" element={<Article />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

@@ -217,7 +217,7 @@ const Dashboard = () => {
 
               <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid var(--border-light)', paddingBottom: '1rem' }}>
                 {['all', 'users', 'feedback', 'system'].map((tab) => (
-                   <button key={tab} onClick={() => setActiveTab(tab)} style={{ border: 'none', background: 'transparent', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.875rem', fontWeight: 700, color: activeTab === tab ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', position: 'relative', transition: 'all 0.2s' }}>
+                  <button key={tab} onClick={() => setActiveTab(tab)} style={{ border: 'none', background: 'transparent', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.875rem', fontWeight: 700, color: activeTab === tab ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', position: 'relative', transition: 'all 0.2s' }}>
                     {tab === 'all' ? 'Tất cả' : tab === 'users' ? 'Người dùng' : tab === 'feedback' ? 'Phản hồi' : 'Hệ thống'}
                     {activeTab === tab && <motion.div layoutId="tab-underline" style={{ position: 'absolute', bottom: '-1rem', left: 0, right: 0, height: '3px', background: 'var(--primary)', borderRadius: '10px' }} />}
                   </button>
@@ -242,7 +242,7 @@ const Dashboard = () => {
                         key={item.id}
                         title={item.title || 'Hoạt động hệ thống'}
                         time={formatTime(item.timestamp)}
-                        desc={item.desc || 'Thao tác không có mô tả chi tiết.'}
+                        desc={item.desc || 'Thao tác không có mô tả chi tiết'}
                         icon={Icon}
                         color={color}
                         onDelete={() => handleDeleteLog(item.id)}

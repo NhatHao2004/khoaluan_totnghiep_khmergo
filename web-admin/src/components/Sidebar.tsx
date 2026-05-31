@@ -1,4 +1,4 @@
-import { LayoutDashboard, BookOpen, HelpCircle, Power, User } from 'lucide-react';
+import { LayoutDashboard, BookOpen, HelpCircle, Power, User, FileText } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import icon from '../assets/icon.png';
 
@@ -30,6 +30,11 @@ const Sidebar = ({ onLogout }: { onLogout: () => void }) => {
         <NavLink to="/challenges" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           <HelpCircle size={20} strokeWidth={2} />
           <span>Thử thách</span>
+        </NavLink>
+
+        <NavLink to="/article" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+          <FileText size={20} strokeWidth={2} />
+          <span>Bài viết</span>
         </NavLink>
 
 
