@@ -1,4 +1,4 @@
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDocs, onSnapshot, writeBatch } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BookOpen, CheckCircle, HelpCircle, Info, MessageSquare, Shield, User, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -17,6 +17,12 @@ const Dashboard = () => {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const [logs, setLogs] = useState<any[]>([]);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({ isOpen: false, title: '', message: '', onConfirm: () => { } });
 
   useEffect(() => {
     const unsubUsers = onSnapshot(collection(db, 'users'), (snap) => {
@@ -54,14 +60,51 @@ const Dashboard = () => {
     return date.toLocaleDateString('vi-VN');
   };
 
+  const handleClearLogs = async () => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Xác nhận xóa tất cả',
+      message: 'Bạn có chắc chắn muốn xóa toàn bộ nhật ký hoạt động không. Hành động này không thể hoàn tác',
+      onConfirm: async () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        try {
+          const batch = writeBatch(db);
+          const querySnapshot = await getDocs(collection(db, 'logs'));
+          querySnapshot.forEach((docSnap) => {
+            batch.delete(docSnap.ref);
+          });
+          await batch.commit();
+        } catch (error) {
+          console.error("Error clearing logs:", error);
+        }
+      }
+    });
+  };
+
+  const handleDeleteLog = async (id: string) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Xác nhận xóa',
+      message: 'Bạn có chắc chắn muốn xóa hoạt động này không?',
+      onConfirm: async () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        try {
+          await deleteDoc(doc(db, 'logs', id));
+        } catch (error) {
+          console.error("Error deleting log:", error);
+        }
+      }
+    });
+  };
+
   const StatCard = ({ title, value, icon: Icon, color, onClick }: any) => (
     <div className="card glass-card stat-card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default', padding: '1.25rem' }}>
-      <div style={{ 
-        padding: '0.875rem', 
-        borderRadius: '14px', 
-        background: `${color}15`, 
-        color: color, 
-        width: 'fit-content', 
+      <div style={{
+        padding: '0.875rem',
+        borderRadius: '14px',
+        background: `${color}15`,
+        color: color,
+        width: 'fit-content',
         marginBottom: '1.25rem',
         display: 'flex',
         alignItems: 'center',
@@ -102,14 +145,24 @@ const Dashboard = () => {
               Xem tất cả
             </button>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <div
+            className="custom-scrollbar"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem',
+              height: '200px',
+              overflowY: 'auto',
+              paddingRight: '0.5rem'
+            }}
+          >
             {logs.length === 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', justifyContent: 'center', minHeight: '200px', opacity: 0.5 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', justifyContent: 'center', height: '100%', opacity: 0.5 }}>
                 <MessageSquare size={32} style={{ marginBottom: '1rem' }} />
                 <p style={{ fontSize: '0.875rem' }}>Chưa có hoạt động mới nào được ghi lại</p>
               </div>
             ) : (
-              logs.slice(0, 4).map((item: any) => {
+              logs.map((item: any) => {
                 const iconMap: any = { system: Shield, users: User, content: Info, default: CheckCircle };
                 const colorMap: any = { system: '#1e293b', users: '#10b981', content: '#f59e0b', default: '#10b981' };
                 const Icon = iconMap[item.type] || iconMap.default;
@@ -140,14 +193,32 @@ const Dashboard = () => {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Nhật ký hoạt động</h2>
+                  {logs.length > 0 && (
+                    <button
+                      onClick={handleClearLogs}
+                      style={{
+                        marginLeft: '1rem',
+                        padding: '6px 12px',
+                        borderRadius: '8px',
+                        background: '#fee2e2',
+                        color: '#ef4444',
+                        border: 'none',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Xóa tất cả
+                    </button>
+                  )}
                 </div>
                 <button onClick={() => setIsHistoryOpen(false)} className="btn" style={{ padding: '8px', background: 'var(--bg-accent)', color: 'var(--danger)' }}><X size={25} /></button>
               </div>
 
               <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid var(--border-light)', paddingBottom: '1rem' }}>
-                {['all', 'users', 'content', 'system'].map((tab) => (
-                  <button key={tab} onClick={() => setActiveTab(tab)} style={{ border: 'none', background: 'transparent', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.875rem', fontWeight: 700, color: activeTab === tab ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', position: 'relative', transition: 'all 0.2s' }}>
-                    {tab === 'all' ? 'Tất cả' : tab === 'users' ? 'Người dùng' : tab === 'content' ? 'Nội dung' : 'Hệ thống'}
+                {['all', 'users', 'feedback', 'system'].map((tab) => (
+                   <button key={tab} onClick={() => setActiveTab(tab)} style={{ border: 'none', background: 'transparent', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.875rem', fontWeight: 700, color: activeTab === tab ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', position: 'relative', transition: 'all 0.2s' }}>
+                    {tab === 'all' ? 'Tất cả' : tab === 'users' ? 'Người dùng' : tab === 'feedback' ? 'Phản hồi' : 'Hệ thống'}
                     {activeTab === tab && <motion.div layoutId="tab-underline" style={{ position: 'absolute', bottom: '-1rem', left: 0, right: 0, height: '3px', background: 'var(--primary)', borderRadius: '10px' }} />}
                   </button>
                 ))}
@@ -160,9 +231,9 @@ const Dashboard = () => {
                     <p style={{ fontSize: '1rem', fontWeight: 600 }}>Hệ thống chưa ghi nhận hoạt động nào</p>
                   </div>
                 ) : (
-                  logs.filter(item => activeTab === 'all' || item.type === activeTab).map((item: any) => {
-                    const iconMap: any = { system: Shield, users: User, content: Info, default: CheckCircle };
-                    const colorMap: any = { system: '#1e293b', users: '#10b981', content: '#f59e0b', default: '#10b981' };
+                  logs.filter(item => activeTab === 'all' || item.type === activeTab || (activeTab === 'feedback' && item.type === 'content')).map((item: any) => {
+                    const iconMap: any = { system: Shield, users: User, feedback: Info, content: Info, default: CheckCircle };
+                    const colorMap: any = { system: '#1e293b', users: '#10b981', feedback: '#f59e0b', content: '#f59e0b', default: '#10b981' };
                     const Icon = iconMap[item.type] || iconMap.default;
                     const color = colorMap[item.type] || colorMap.default;
 
@@ -174,6 +245,7 @@ const Dashboard = () => {
                         desc={item.desc || 'Thao tác không có mô tả chi tiết.'}
                         icon={Icon}
                         color={color}
+                        onDelete={() => handleDeleteLog(item.id)}
                       />
                     );
                   })
@@ -187,19 +259,99 @@ const Dashboard = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Custom Confirmation Dialog */}
+      <AnimatePresence>
+        {confirmDialog.isOpen && (
+          <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '1.5rem' }}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }}
+              onClick={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="card"
+              style={{
+                position: 'relative',
+                width: '100%',
+                maxWidth: '400px',
+                padding: '2.5rem',
+                textAlign: 'center',
+                borderRadius: '32px'
+              }}
+            >
+              <div style={{ width: '60px', height: '60px', background: '#fee2e2', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                <Shield size={28} color="#ef4444" />
+              </div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>{confirmDialog.title}</h3>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2rem' }}>{confirmDialog.message}</p>
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <button
+                  className="btn"
+                  style={{ flex: 1, background: 'var(--bg-accent)', color: 'var(--text-primary)', fontWeight: 600, borderRadius: '14px' }}
+                  onClick={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  className="btn"
+                  style={{ flex: 1, background: '#ef4444', color: 'white', fontWeight: 600, borderRadius: '14px' }}
+                  onClick={confirmDialog.onConfirm}
+                >
+                  Xác nhận
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
 
-const ActivityItem = ({ title, time, desc, icon: Icon, color }: any) => (
-  <div style={{ display: 'flex', gap: '1.25rem', padding: '1.25rem', borderRadius: '20px', background: 'var(--bg-main)', border: '1px solid var(--border-light)' }}>
+const ActivityItem = ({ title, time, desc, icon: Icon, color, onDelete }: any) => (
+  <div style={{ display: 'flex', gap: '1.25rem', padding: '1.25rem', borderRadius: '20px', background: 'var(--bg-main)', border: '1px solid var(--border-light)', position: 'relative' }}>
     <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: 'var(--shadow-sm)' }}>
       <Icon size={22} color={color} />
     </div>
     <div style={{ flex: 1 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.25rem' }}>
         <h4 style={{ fontWeight: 800, fontSize: '0.95rem' }}>{title}</h4>
-        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{time}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{time}</span>
+          {onDelete && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onDelete(); }}
+              style={{
+                border: 'none',
+                background: '#fee2e2',
+                color: '#ef4444',
+                cursor: 'pointer',
+                padding: '6px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e: any) => {
+                e.currentTarget.style.background = '#ef4444';
+                e.currentTarget.style.color = '#ffffff';
+              }}
+              onMouseOut={(e: any) => {
+                e.currentTarget.style.background = '#fee2e2';
+                e.currentTarget.style.color = '#ef4444';
+              }}
+            >
+              <X size={12} strokeWidth={3} />
+            </button>
+          )}
+        </div>
       </div>
       <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{desc}</p>
     </div>

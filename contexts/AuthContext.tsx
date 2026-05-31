@@ -114,12 +114,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       } else {
         setUser(null);
-        // Tự động đăng nhập vô danh nếu không có người dùng
-        try {
-          await signInAnonymously(auth);
-        } catch (error) {
-          console.error("Anonymous login failed:", error);
-        }
       }
       setLoading(false);
     });
