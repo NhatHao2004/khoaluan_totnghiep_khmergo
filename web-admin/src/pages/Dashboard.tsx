@@ -43,6 +43,17 @@ const Dashboard = () => {
     };
   }, []);
 
+  const formatTime = (ts: any) => {
+    if (!ts) return 'Vừa xong';
+    const date = ts.toDate ? ts.toDate() : new Date(ts);
+    const now = new Date();
+    const diff = Math.floor((now.getTime() - date.getTime()) / 60000);
+    if (diff < 1) return 'Vừa xong';
+    if (diff < 60) return `${diff} phút trước`;
+    if (diff < 1440) return `${Math.floor(diff / 60)} giờ trước`;
+    return date.toLocaleDateString('vi-VN');
+  };
+
   const StatCard = ({ title, value, icon: Icon, color, onClick }: any) => (
     <div className="card glass-card stat-card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default', padding: '1.25rem' }}>
       <div style={{ 
@@ -91,9 +102,31 @@ const Dashboard = () => {
               Xem tất cả
             </button>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', justifyContent: 'center', minHeight: '200px', opacity: 0.5 }}>
-            <MessageSquare size={32} style={{ marginBottom: '1rem' }} />
-            <p style={{ fontSize: '0.875rem' }}>Chưa có hoạt động mới nào được ghi lại</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {logs.length === 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', justifyContent: 'center', minHeight: '200px', opacity: 0.5 }}>
+                <MessageSquare size={32} style={{ marginBottom: '1rem' }} />
+                <p style={{ fontSize: '0.875rem' }}>Chưa có hoạt động mới nào được ghi lại</p>
+              </div>
+            ) : (
+              logs.slice(0, 4).map((item: any) => {
+                const iconMap: any = { system: Shield, users: User, content: Info, default: CheckCircle };
+                const colorMap: any = { system: '#1e293b', users: '#10b981', content: '#f59e0b', default: '#10b981' };
+                const Icon = iconMap[item.type] || iconMap.default;
+                const color = colorMap[item.type] || colorMap.default;
+
+                return (
+                  <ActivityItem
+                    key={item.id}
+                    title={item.title || 'Hoạt động hệ thống'}
+                    time={formatTime(item.timestamp)}
+                    desc={item.desc || 'Thao tác không có mô tả chi tiết.'}
+                    icon={Icon}
+                    color={color}
+                  />
+                );
+              })
+            )}
           </div>
         </div>
       </div>
@@ -132,17 +165,6 @@ const Dashboard = () => {
                     const colorMap: any = { system: '#1e293b', users: '#10b981', content: '#f59e0b', default: '#10b981' };
                     const Icon = iconMap[item.type] || iconMap.default;
                     const color = colorMap[item.type] || colorMap.default;
-
-                    const formatTime = (ts: any) => {
-                      if (!ts) return 'Vừa xong';
-                      const date = ts.toDate ? ts.toDate() : new Date(ts);
-                      const now = new Date();
-                      const diff = Math.floor((now.getTime() - date.getTime()) / 60000);
-                      if (diff < 1) return 'Vừa xong';
-                      if (diff < 60) return `${diff} phút trước`;
-                      if (diff < 1440) return `${Math.floor(diff / 60)} giờ trước`;
-                      return date.toLocaleDateString('vi-VN');
-                    };
 
                     return (
                       <ActivityItem

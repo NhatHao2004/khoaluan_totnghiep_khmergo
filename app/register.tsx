@@ -115,14 +115,29 @@ export default function RegisterScreen() {
         ? avatarUri
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00CFA3&color=fff&size=128`;
 
-      await setDoc(doc(db, 'users', user.uid), {
+      const userRef = doc(db, 'users', user.uid);
+      const userData = {
         name: name.trim(),
         email: email.trim().toLowerCase(),
         avatar: avatarUrl,
         points: 0,
         interests: selectedInterests,
         createdAt: new Date().toISOString(),
-      });
+      };
+
+      await setDoc(userRef, userData);
+
+      // Ghi log hoạt động cho Admin Dashboard
+      try {
+        await setDoc(doc(db, 'logs', `reg_${user.uid}`), {
+          title: 'Người dùng mới đăng ký',
+          desc: `Người dùng ${name.trim()} (${email.trim().toLowerCase()}) vừa tạo tài khoản thành công`,
+          type: 'users',
+          timestamp: new Date()
+        });
+      } catch (logError) {
+        console.error("Lỗi khi ghi log đăng ký:", logError);
+      }
 
       triggerToast(t('register_success'), 'success');
       setTimeout(() => router.replace('/(tabs)'), 2000);
