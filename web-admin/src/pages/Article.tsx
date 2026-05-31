@@ -1,12 +1,14 @@
 import { collection, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Eye, Filter, Plus, Search, Shield, Trash2 } from 'lucide-react';
+import { Eye, Filter, Plus, Search, Shield, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { db } from '../firebase/config';
 
 const Article = () => {
   const [posts, setPosts] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedPost, setSelectedPost] = useState<any | null>(null);
+  const [comments, setComments] = useState<any[]>([]);
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
     postId: string;
@@ -23,6 +25,24 @@ const Article = () => {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!selectedPost) {
+      setComments([]);
+      return;
+    }
+
+    // Lắng nghe bình luận của bài viết được chọn (giả định sub-collection 'comments')
+    const unsubComments = onSnapshot(collection(db, 'posts', selectedPost.id, 'comments'), (snap) => {
+      const commentData = snap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })).sort((a: any, b: any) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+      setComments(commentData);
+    });
+
+    return () => unsubComments();
+  }, [selectedPost]);
 
   const handleDeletePost = async () => {
     if (!confirmDialog.postId) return;
@@ -119,36 +139,37 @@ const Article = () => {
                   </td>
                   <td style={{ padding: '1.25rem', textAlign: 'right' }}>
                     <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-                      <button 
+                      <button
                         title="Xem chi tiết"
-                        style={{ 
-                          border: 'none', 
-                          background: '#eff6ff', 
-                          color: '#3b82f6', 
-                          cursor: 'pointer', 
-                          padding: '8px', 
+                        onClick={() => setSelectedPost(post)}
+                        style={{
+                          border: 'none',
+                          background: '#eff6ff',
+                          color: '#3b82f6',
+                          cursor: 'pointer',
+                          padding: '8px',
                           borderRadius: '12px',
-                          display: 'flex', 
-                          alignItems: 'center', 
+                          display: 'flex',
+                          alignItems: 'center',
                           justifyContent: 'center',
-                          transition: 'opacity 0.2s' 
+                          transition: 'opacity 0.2s'
                         }}
                       >
                         <Eye size={18} strokeWidth={2.5} />
                       </button>
                       <button
                         title="Xóa bài viết"
-                        style={{ 
-                          border: 'none', 
-                          background: '#fee2e2', 
-                          color: '#ef4444', 
-                          cursor: 'pointer', 
-                          padding: '8px', 
+                        style={{
+                          border: 'none',
+                          background: '#fee2e2',
+                          color: '#ef4444',
+                          cursor: 'pointer',
+                          padding: '8px',
                           borderRadius: '12px',
-                          display: 'flex', 
-                          alignItems: 'center', 
+                          display: 'flex',
+                          alignItems: 'center',
                           justifyContent: 'center',
-                          transition: 'opacity 0.2s' 
+                          transition: 'opacity 0.2s'
                         }}
                         onClick={() => setConfirmDialog({ isOpen: true, postId: post.id })}
                       >
@@ -208,6 +229,176 @@ const Article = () => {
                 >
                   Xác nhận xóa
                 </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Post Details Modal */}
+      <AnimatePresence>
+        {selectedPost && (
+          <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '2rem' }}>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }}
+              onClick={() => setSelectedPost(null)}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              className="card"
+              style={{
+                position: 'relative',
+                width: '100%',
+                maxWidth: '500px',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                padding: '0',
+                borderRadius: '32px',
+                display: 'flex',
+                flexDirection: 'column',
+                scrollbarWidth: 'none', /* Firefox */
+                msOverflowStyle: 'none' /* IE and Edge */
+              }}
+            >
+              {/* CSS to hide webkit scrollbar */}
+              <style>{`
+                .card::-webkit-scrollbar {
+                  display: none;
+                }
+              `}</style>
+              {/* Header: Content on Left, Close on Right */}
+              <div style={{ padding: '2rem 2rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: 'white', position: 'sticky', top: 0, zIndex: 20 }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.4, margin: 0, flex: 1, paddingRight: '1rem' }}>
+                  {selectedPost.content || 'Chi tiết bài viết'}
+                </h2>
+                <button
+                  onClick={() => setSelectedPost(null)}
+                  style={{ border: 'none', background: 'var(--bg-accent)', color: 'var(--danger)', padding: '8px', borderRadius: '12px', cursor: 'pointer', flexShrink: 0 }}
+                >
+                  <X size={22} />
+                </button>
+              </div>
+
+              {/* Image Section below Title */}
+              {selectedPost.image && (
+                <div style={{ width: '100%', background: 'white', position: 'relative', padding: '0 2rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <img
+                    src={selectedPost.image}
+                    alt="post content"
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '300px',
+                      objectFit: 'contain',
+                      borderRadius: '20px',
+                      boxShadow: '0 10px 40px rgba(0,0,0,0.08)'
+                    }}
+                  />
+                </div>
+              )}
+
+              <div style={{ padding: '0 2rem 2.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--bg-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                      {selectedPost.userAvatar ? (
+                        <img src={selectedPost.userAvatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <span style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--primary)' }}>{selectedPost.user?.charAt(0)}</span>
+                      )}
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: '0.95rem', fontWeight: 800 }}>{selectedPost.user || 'Ẩn danh'}</h3>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{formatTime(selectedPost.createdAt)}</p>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)' }}>
+                      <span style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '0.9rem' }}>{selectedPost.likes || 0}</span>
+                      <span style={{ fontSize: '0.8125rem', fontWeight: 600 }}>Thích</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)' }}>
+                      <span style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '0.9rem' }}>{selectedPost.comments?.length || selectedPost.comments || 0}</span>
+                      <span style={{ fontSize: '0.8125rem', fontWeight: 600 }}>Bình luận</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Comments Section */}
+                <div style={{ background: 'var(--bg-main)', padding: '1.5rem', borderRadius: '24px', marginTop: '1rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                    <p style={{ fontSize: '0.8125rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Bình luận ({comments.length})
+                    </p>
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                    {comments.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '1rem 0', opacity: 0.6 }}>
+                        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Chưa có bình luận nào cho bài viết này.</p>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        {comments
+                          .filter(c => !c.parentId && !c.replyTo) // Lấy bình luận gốc
+                          .map((rootComment) => (
+                            <div key={rootComment.id} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                              {/* Bình luận gốc */}
+                              <div style={{ display: 'flex', gap: '0.875rem' }}>
+                                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, border: '1px solid var(--border-light)' }}>
+                                  {(rootComment.userAvatar || rootComment.userImage || rootComment.avatar || rootComment.photoURL) ? (
+                                    <img src={rootComment.userAvatar || rootComment.userImage || rootComment.avatar || rootComment.photoURL} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                  ) : (
+                                    (rootComment.userId === selectedPost.userId || rootComment.userName === selectedPost.user) && selectedPost.userAvatar ? (
+                                      <img src={selectedPost.userAvatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    ) : (
+                                      <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: 'var(--primary)' }}>{rootComment.userName?.charAt(0) || rootComment.user?.charAt(0) || '?'}</span>
+                                    )
+                                  )}
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.25rem' }}>
+                                    <h4 style={{ fontSize: '0.875rem', fontWeight: 700 }}>{rootComment.userName || rootComment.user || 'Người dùng'}</h4>
+                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{formatTime(rootComment.createdAt)}</span>
+                                  </div>
+                                  <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{rootComment.text || rootComment.content}</p>
+                                </div>
+                              </div>
+
+                              {/* Danh sách phản hồi (Replies) */}
+                              {comments
+                                .filter(reply => reply.parentId === rootComment.id || reply.replyTo === rootComment.id)
+                                .map((reply) => (
+                                  <div key={reply.id} style={{ display: 'flex', gap: '0.875rem', marginLeft: '2.5rem', paddingLeft: '1rem', borderLeft: '2px solid var(--border-light)' }}>
+                                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, border: '1px solid var(--border-light)' }}>
+                                      {(reply.userAvatar || reply.userImage || reply.avatar || reply.photoURL) ? (
+                                        <img src={reply.userAvatar || reply.userImage || reply.avatar || reply.photoURL} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                      ) : (
+                                        (reply.userId === selectedPost.userId || reply.userName === selectedPost.user) && selectedPost.userAvatar ? (
+                                          <img src={selectedPost.userAvatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                          <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--primary)' }}>{reply.userName?.charAt(0) || reply.user?.charAt(0) || '?'}</span>
+                                        )
+                                      )}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.125rem' }}>
+                                        <h4 style={{ fontSize: '0.8125rem', fontWeight: 700 }}>{reply.userName || reply.user || 'Người dùng'}</h4>
+                                        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{formatTime(reply.createdAt)}</span>
+                                      </div>
+                                      <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>{reply.text || reply.content}</p>
+                                    </div>
+                                  </div>
+                                ))}
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </motion.div>
           </div>
