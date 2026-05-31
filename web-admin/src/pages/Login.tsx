@@ -153,6 +153,7 @@ const Login = () => {
             )}
           </button>
         </form>
+      </div>
 
       <style>{`
         .hover-lift:hover {

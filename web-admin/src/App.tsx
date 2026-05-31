@@ -11,7 +11,6 @@ import Challenges from './pages/Challenges';
 import Dashboard from './pages/Dashboard';
 import Destinations from './pages/Destinations';
 import Login from './pages/Login';
-import Register from './pages/Register';
 import ProfilePage from './pages/Profile';
 import Users from './pages/Users';
 
@@ -208,7 +207,6 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>
