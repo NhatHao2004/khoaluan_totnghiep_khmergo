@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { auth } from '../firebase/config';
 
 const Login = () => {
-  const [email, setEmail] = useState('lamhao860@gmail.com');
+  const [email, setEmail] = useState('lamnhathao@gmail.com');
   const [password, setPassword] = useState('123456789');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -19,9 +19,9 @@ const Login = () => {
     } catch (err: any) {
       console.error("Firebase Auth Error:", err.code, err.message);
       if (err.code === 'auth/invalid-credential') {
-        setError('Email hoặc mật khẩu không chính xác.');
+        setError('Email hoặc mật khẩu không chính xác');
       } else {
-        setError('Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.');
+        setError('Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại');
       }
     } finally {
       setLoading(false);
@@ -88,7 +88,6 @@ const Login = () => {
             alignItems: 'center',
             gap: '0.75rem'
           }}>
-            <span style={{ fontSize: '1.25rem' }}>⚠️</span>
             {error}
           </div>
         )}
@@ -154,7 +153,6 @@ const Login = () => {
             )}
           </button>
         </form>
-      </div>
 
       <style>{`
         .hover-lift:hover {
