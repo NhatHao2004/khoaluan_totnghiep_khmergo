@@ -82,7 +82,7 @@ export const translations: any = {
     culture_quiz: 'Văn hóa Khmer',
     food_quiz: 'Ẩm thực Khmer',
     vocab_quiz: 'Học tiếng Khmer',
-    vocab_quiz_subtitle: 'Thử thách từ vựng qua hình ảnh',
+    vocab_quiz_subtitle: 'Ghép từ Khmer - Tiếng Việt',
     vocab_challenge_questions: 'câu hỏi thử thách từ vựng',
     correct_answer_points_msg: 'Cộng 5 điểm cho mỗi câu đúng',
     login_required_long_msg: 'Bạn cần đăng nhập để tham gia thử thách và tích luỵ điểm xếp hạng',
@@ -98,6 +98,13 @@ export const translations: any = {
     excellent: '🎉 Xuất sắc',
     well_done: '👏 Tốt lắm',
     keep_it_up: '💪 Cố lên',
+
+    // Matching Game
+    matching_challenge: 'Ghép từ vựng',
+    matching_challenge_title: 'Thử thách Ghép từ',
+    matching_challenge_desc: 'Hãy ghép các cặp từ Khmer và nghĩa tiếng Việt tương ứng thật nhanh nhé!',
+    match_words_instruction: 'Chạm vào một từ Khmer và nghĩa tiếng Việt để ghép đôi',
+    start_matching: 'Bắt đầu ghép từ',
 
     // Personal Info
     personal_info: 'Thông tin cá nhân',
@@ -305,7 +312,7 @@ export const translations: any = {
     culture_quiz: 'វប្បធម៌ខ្មែរ',
     food_quiz: 'ម្ហូបខ្មែរ',
     vocab_quiz: 'រៀនភាសាខ្មែរ',
-    vocab_quiz_subtitle: 'រៀនវាក្យសព្ទតាមរូបភាព',
+    vocab_quiz_subtitle: 'ផ្គូផ្គងពាក្យខ្មែរ - វៀតណាម',
     vocab_challenge_questions: 'សំណួរសាកល្បងវាក្យសព្ទ',
     correct_answer_points_msg: '+5 ពិន្ទុសម្រាប់ចម្លើយត្រឹមត្រូវ',
     login_required_long_msg: 'អ្នកត្រូវចូលដើម្បីចូលរួមការសាកល្បង និងសន្សំពិន្ទុចំណាត់ថ្នាក់',
@@ -321,6 +328,13 @@ export const translations: any = {
     excellent: '🎉 ពូកែណាស់',
     well_done: '👏 ល្អណាស់',
     keep_it_up: '💪 ខិតខំឡើង',
+
+    // Matching Game
+    matching_challenge: 'ផ្គូផ្គងពាក្យ',
+    matching_challenge_title: 'ការសាកល្បងផ្គូផ្គង',
+    matching_challenge_desc: 'សូមផ្គូផ្គងពាក្យខ្មែរ និងអត្ថន័យភាសាវៀតណាមឱ្យបានលឿន!',
+    match_words_instruction: 'ចុចលើពាក្យខ្មែរ និងអត្ថន័យភាសាវៀតណាមដើម្បីផ្គូផ្គង',
+    start_matching: 'ចាប់ផ្តើមផ្គូផ្គង',
 
 
     // Personal Info
