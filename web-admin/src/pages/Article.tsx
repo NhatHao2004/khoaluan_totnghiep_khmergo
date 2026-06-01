@@ -88,104 +88,107 @@ const Article = () => {
       </div>
 
 
-      {/* Table */}
-      <div className="card" style={{ borderRadius: '24px', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ background: 'var(--bg-main)', borderBottom: '1px solid var(--border-light)' }}>
-              <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '120px', whiteSpace: 'nowrap' }}>Hình ảnh</th>
-              <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nội dung bài viết</th>
-              <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Người đăng</th>
-              <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Thời gian</th>
-              <th style={{ textAlign: 'right', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredPosts.length === 0 ? (
-              <tr>
-                <td colSpan={5} style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
-                  Không tìm thấy bài viết nào
-                </td>
+      {posts.length === 0 ? (
+        null
+      ) : (
+        <div className="card" style={{ borderRadius: '24px', overflow: 'hidden' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: 'var(--bg-main)', borderBottom: '1px solid var(--border-light)' }}>
+                <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '120px', whiteSpace: 'nowrap' }}>Hình ảnh</th>
+                <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nội dung bài viết</th>
+                <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Người đăng</th>
+                <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Thời gian</th>
+                <th style={{ textAlign: 'right', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Thao tác</th>
               </tr>
-            ) : (
-              filteredPosts.map((post) => (
-                <tr key={post.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
-                  <td style={{ padding: '1.25rem' }}>
-                    {post.image ? (
-                      <img
-                        src={post.image}
-                        alt="post content"
-                        style={{ width: '60px', height: '60px', borderRadius: '12px', objectFit: 'cover', background: 'var(--bg-accent)' }}
-                      />
-                    ) : (
-                      <div style={{ width: '60px', height: '60px', borderRadius: '12px', background: 'var(--bg-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-                        <ImageIcon size={20} />
-                      </div>
-                    )}
-                  </td>
-                  <td style={{ padding: '1.25rem' }}>
-                    <div style={{ maxWidth: '450px' }}>
-                      <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem', fontSize: '1rem' }}>
-                        {post.content || 'Không có nội dung'}
-                      </div>
-                    </div>
-                  </td>
-                  <td style={{ padding: '1.25rem', fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                    {post.user || 'Ẩn danh'}
-                  </td>
-                  <td style={{ padding: '1.25rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                    {formatTime(post.createdAt)}
-                  </td>
-                  <td style={{ padding: '1.25rem', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-                      <button
-                        title="Xem chi tiết"
-                        onClick={() => setSelectedPost(post)}
-                        style={{
-                          border: 'none',
-                          background: '#eff6ff',
-                          color: '#3b82f6',
-                          cursor: 'pointer',
-                          padding: '8px 16px',
-                          borderRadius: '12px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.5rem',
-                          transition: 'opacity 0.2s'
-                        }}
-                      >
-                        <Eye size={18} strokeWidth={2.5} />
-                        <span style={{ fontWeight: 700, fontSize: '0.75rem' }}>Xem</span>
-                      </button>
-                      <button
-                        title="Xóa bài viết"
-                        style={{
-                          border: 'none',
-                          background: '#fef2f2',
-                          color: '#ef4444',
-                          cursor: 'pointer',
-                          padding: '8px 16px',
-                          borderRadius: '12px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.5rem',
-                          transition: 'opacity 0.2s'
-                        }}
-                        onClick={() => setConfirmDialog({ isOpen: true, postId: post.id })}
-                      >
-                        <Trash2 size={18} strokeWidth={2.5} />
-                        <span style={{ fontWeight: 700, fontSize: '0.75rem' }}>Xóa</span>
-                      </button>
-                    </div>
+            </thead>
+            <tbody>
+              {filteredPosts.length === 0 ? (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+                    Không tìm thấy bài viết phù hợp với tìm kiếm
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                filteredPosts.map((post) => (
+                  <tr key={post.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                    <td style={{ padding: '1.25rem' }}>
+                      {post.image ? (
+                        <img
+                          src={post.image}
+                          alt="post content"
+                          style={{ width: '60px', height: '60px', borderRadius: '12px', objectFit: 'cover', background: 'var(--bg-accent)' }}
+                        />
+                      ) : (
+                        <div style={{ width: '60px', height: '60px', borderRadius: '12px', background: 'var(--bg-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+                          <ImageIcon size={20} />
+                        </div>
+                      )}
+                    </td>
+                    <td style={{ padding: '1.25rem' }}>
+                      <div style={{ maxWidth: '450px' }}>
+                        <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem', fontSize: '1rem' }}>
+                          {post.content || 'Không có nội dung'}
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ padding: '1.25rem', fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                      {post.user || 'Ẩn danh'}
+                    </td>
+                    <td style={{ padding: '1.25rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+                      {formatTime(post.createdAt)}
+                    </td>
+                    <td style={{ padding: '1.25rem', textAlign: 'right' }}>
+                      <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                        <button
+                          title="Xem chi tiết"
+                          onClick={() => setSelectedPost(post)}
+                          style={{
+                            border: 'none',
+                            background: '#eff6ff',
+                            color: '#3b82f6',
+                            cursor: 'pointer',
+                            padding: '8px 16px',
+                            borderRadius: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem',
+                            transition: 'opacity 0.2s'
+                          }}
+                        >
+                          <Eye size={18} strokeWidth={2.5} />
+                          <span style={{ fontWeight: 700, fontSize: '0.75rem' }}>Xem</span>
+                        </button>
+                        <button
+                          title="Xóa bài viết"
+                          style={{
+                            border: 'none',
+                            background: '#fef2f2',
+                            color: '#ef4444',
+                            cursor: 'pointer',
+                            padding: '8px 16px',
+                            borderRadius: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem',
+                            transition: 'opacity 0.2s'
+                          }}
+                          onClick={() => setConfirmDialog({ isOpen: true, postId: post.id })}
+                        >
+                          <Trash2 size={18} strokeWidth={2.5} />
+                          <span style={{ fontWeight: 700, fontSize: '0.75rem' }}>Xóa</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       <AnimatePresence>

@@ -271,7 +271,7 @@ const Dashboard = () => {
         <div className="card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
             <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Hoạt động gần đây</h2>
-            <button className="btn" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem', background: '#eff6ff', color: '#2563eb', borderRadius: '10px', fontWeight: 700 }} onClick={() => { setIsHistoryOpen(true); setActiveTab('all'); }}>
+            <button className="btn" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem', background: '#006effff', color: '#ffffffff', borderRadius: '10px', fontWeight: 700 }} onClick={() => { setIsHistoryOpen(true); setActiveTab('all'); }}>
               Xem tất cả
             </button>
           </div>
@@ -289,7 +289,7 @@ const Dashboard = () => {
             {logs.length === 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', justifyContent: 'center', height: '100%', opacity: 0.5 }}>
                 <MessageSquare size={32} style={{ marginBottom: '1rem' }} />
-                <p style={{ fontSize: '0.875rem' }}>Chưa có hoạt động mới nào được ghi lại</p>
+                <p style={{ fontSize: '0.875rem' }}>Không có hoạt động mới nào được ghi nhận lại</p>
               </div>
             ) : (
               logs.map((item: any) => {
