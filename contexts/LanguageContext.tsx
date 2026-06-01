@@ -103,7 +103,6 @@ export const translations: any = {
     matching_challenge: 'Ghép từ vựng',
     matching_challenge_title: 'Thử thách Ghép từ',
     matching_challenge_desc: 'Hãy ghép các cặp từ Khmer và nghĩa tiếng Việt tương ứng thật nhanh nhé!',
-    match_words_instruction: 'Chạm vào một từ Khmer và nghĩa tiếng Việt để ghép đôi',
     start_matching: 'Bắt đầu ghép từ',
 
     // Personal Info
@@ -333,7 +332,6 @@ export const translations: any = {
     matching_challenge: 'ផ្គូផ្គងពាក្យ',
     matching_challenge_title: 'ការសាកល្បងផ្គូផ្គង',
     matching_challenge_desc: 'សូមផ្គូផ្គងពាក្យខ្មែរ និងអត្ថន័យភាសាវៀតណាមឱ្យបានលឿន!',
-    match_words_instruction: 'ចុចលើពាក្យខ្មែរ និងអត្ថន័យភាសាវៀតណាមដើម្បីផ្គូផ្គង',
     start_matching: 'ចាប់ផ្តើមផ្គូផ្គង',
 
 
