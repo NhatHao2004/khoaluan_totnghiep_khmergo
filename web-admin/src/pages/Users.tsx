@@ -147,10 +147,12 @@ const Users = () => {
             </div>
           ))}
         </div>
+      ) : users.length === 0 ? (
+        null
       ) : filteredUsers.length === 0 ? (
         <div className="card glass-card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
           <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Không tìm thấy kết quả</h3>
-          <p style={{ color: 'var(--text-secondary)' }}>Thử tìm kiếm với một từ khóa khác.</p>
+          <p style={{ color: 'var(--text-secondary)' }}>Thử tìm kiếm với một từ khóa khác</p>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>

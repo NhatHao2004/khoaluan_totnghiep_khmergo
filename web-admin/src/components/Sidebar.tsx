@@ -1,4 +1,4 @@
-import { LayoutDashboard, BookOpen, HelpCircle, Power, User, FileText } from 'lucide-react';
+import { BookOpen, FileText, HelpCircle, LayoutDashboard, Power, User } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import icon from '../assets/icon.png';
 
@@ -16,7 +16,7 @@ const Sidebar = ({ onLogout }: { onLogout: () => void }) => {
           <span>Bảng điều khiển</span>
         </NavLink>
 
-        <div className="sidebar-label" style={{ marginTop: '1.5rem' }}>Quản lý</div>
+        <div className="sidebar-label" style={{ marginTop: '1.5rem' }}>Quản lý ứng dụng</div>
         <NavLink to="/users" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           <User size={20} strokeWidth={2} />
           <span>Người dùng</span>

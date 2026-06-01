@@ -176,7 +176,7 @@ const Dashboard = () => {
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 cursor: 'pointer',
-                background: leaderboardType === 'weekly' ? 'var(--primary)' : 'transparent',
+                background: leaderboardType === 'weekly' ? '#3b82f6' : 'transparent',
                 color: leaderboardType === 'weekly' ? 'white' : 'var(--text-muted)',
                 transition: 'all 0.2s'
               }}
@@ -192,7 +192,7 @@ const Dashboard = () => {
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 cursor: 'pointer',
-                background: leaderboardType === 'all' ? 'var(--primary)' : 'transparent',
+                background: leaderboardType === 'all' ? '#3b82f6' : 'transparent',
                 color: leaderboardType === 'all' ? 'white' : 'var(--text-muted)',
                 transition: 'all 0.2s'
               }}
@@ -254,7 +254,7 @@ const Dashboard = () => {
                     initial={{ height: 0 }}
                     animate={{ height: '20%' }}
                     transition={{ duration: 0.5, delay: 0.5 + idx * 0.05 }}
-                    style={{ width: '100%', background: '#1e293b', borderRadius: '10px 10px 4px 4px', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 4px 10px rgba(30,41,59,0.1)' }}
+                    style={{ width: '100%', background: '#3b82f6', borderRadius: '10px 10px 4px 4px', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 4px 10px rgba(59,130,246,0.1)' }}
                   >
                     <div style={{ position: 'absolute', bottom: '0.75rem', color: 'white', fontWeight: 800, fontSize: '1.25rem', opacity: 0.8 }}>{rank}</div>
                   </motion.div>
@@ -382,9 +382,7 @@ const Dashboard = () => {
                 )}
               </div>
 
-              <div style={{ textAlign: 'center', padding: '1.5rem 0 0', opacity: 0.5, borderTop: '1px solid var(--border-light)', marginTop: '1rem' }}>
-                <p style={{ fontSize: '0.8125rem' }}>Hiển thị tất cả hoạt động trong 7 ngày qua</p>
-              </div>
+
             </motion.div>
           </div>
         )}
