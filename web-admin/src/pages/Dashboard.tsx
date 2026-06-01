@@ -176,9 +176,8 @@ const Dashboard = () => {
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 cursor: 'pointer',
-                background: leaderboardType === 'weekly' ? 'white' : 'transparent',
-                color: leaderboardType === 'weekly' ? 'var(--primary)' : 'var(--text-muted)',
-                boxShadow: leaderboardType === 'weekly' ? 'var(--shadow-sm)' : 'none',
+                background: leaderboardType === 'weekly' ? 'var(--primary)' : 'transparent',
+                color: leaderboardType === 'weekly' ? 'white' : 'var(--text-muted)',
                 transition: 'all 0.2s'
               }}
             >
@@ -193,9 +192,8 @@ const Dashboard = () => {
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 cursor: 'pointer',
-                background: leaderboardType === 'all' ? 'white' : 'transparent',
-                color: leaderboardType === 'all' ? 'var(--primary)' : 'var(--text-muted)',
-                boxShadow: leaderboardType === 'all' ? 'var(--shadow-sm)' : 'none',
+                background: leaderboardType === 'all' ? 'var(--primary)' : 'transparent',
+                color: leaderboardType === 'all' ? 'white' : 'var(--text-muted)',
                 transition: 'all 0.2s'
               }}
             >
@@ -222,7 +220,7 @@ const Dashboard = () => {
               return (
                 <div key={`${leaderboardType}-podium-${rank}`} style={{ flex: 1, maxWidth: '110px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
                   <div style={{ marginBottom: '1rem', textAlign: 'center', width: '100%' }}>
-                    <div style={{ width: rank === 1 ? '72px' : '56px', height: rank === 1 ? '72px' : '56px', borderRadius: '50%', border: `4px solid ${color}33`, overflow: 'hidden', margin: '0 auto 0.5rem', background: 'white' }}>
+                    <div style={{ width: rank === 1 ? '72px' : '56px', height: rank === 1 ? '72px' : '56px', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', overflow: 'hidden', margin: '0 auto 0.5rem', background: 'white' }}>
                       {user?.avatar ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={rank === 1 ? 32 : 24} style={{ margin: rank === 1 ? '16px' : '12px', color: '#94a3b8' }} />}
                     </div>
                     <p style={{ fontWeight: 800, fontSize: '0.8125rem', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.name || '---'}</p>
@@ -246,7 +244,7 @@ const Dashboard = () => {
               return (
                 <div key={`${leaderboardType}-rank-${rank}`} style={{ flex: 1, maxWidth: '90px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
                   <div style={{ marginBottom: '1rem', textAlign: 'center', width: '100%' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '2px solid #e2e8f0', overflow: 'hidden', margin: '0 auto 0.5rem', background: 'white' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', overflow: 'hidden', margin: '0 auto 0.5rem', background: 'white' }}>
                       {user?.avatar ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={18} style={{ margin: '9px', color: '#cbd5e1' }} />}
                     </div>
                     <p style={{ fontWeight: 700, fontSize: '0.7rem', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#64748b' }}>{user?.name || '---'}</p>
