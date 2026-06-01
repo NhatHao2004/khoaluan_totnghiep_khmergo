@@ -30,6 +30,7 @@ const TABS: { key: TabKey; label: string; prefix: string; icon: any }[] = [
   { key: 'Chùa', label: 'Ngôi chùa Khmer', prefix: 'pagoda_', icon: Brain },
   { key: 'Văn hóa', label: 'Văn hóa Khmer', prefix: 'culture_', icon: Award },
   { key: 'Ẩm thực', label: 'Ẩm thực khmer', prefix: 'food_', icon: Utensils },
+
 ];
 
 const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 'text', textarea = false, disabled = false, list }: any) => {
@@ -311,15 +312,15 @@ const Challenges = () => {
               <div style={{ flex: 1, overflowY: 'auto', paddingRight: '1rem' }} className="custom-scrollbar">
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2.5rem' }}>
                   <InputField label="ID Thử thách" value={isAddingNew ? newItem.pagodaId : editingItem?.pagodaId} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, pagodaId: v }) : setEditingItem({ ...editingItem!, pagodaId: v })} disabled={!isAddingNew} />
-                  <InputField
+                  <InputField 
                     label={activeTab === 'Chùa' ? "Tên Ngôi chùa Khmer" : activeTab === 'Văn hóa' ? "Tên Văn hóa Khmer" : "Tên Ẩm thực Khmer"}
-                    value={isAddingNew ? newItem.pagodaName : editingItem?.pagodaName}
+                    value={isAddingNew ? newItem.pagodaName : editingItem?.pagodaName} 
                     onChange={(v: string) => {
                       const matched = destinations.find(d => d.name === v);
                       if (isAddingNew) setNewItem({ ...newItem, pagodaName: v, ...(matched ? { pagodaId: matched.id, imageUrl: matched.imageUrl } : {}) });
                       else setEditingItem({ ...editingItem!, pagodaName: v, ...(matched ? { pagodaId: matched.id, imageUrl: matched.imageUrl } : {}) });
-                    }}
-                    list="dest-list"
+                    }} 
+                    list="dest-list" 
                   />
                   <datalist id="dest-list">{destinations.map(d => <option key={d.id} value={d.name} />)}</datalist>
                 </div>
@@ -338,13 +339,13 @@ const Challenges = () => {
                         {expandedQuestion === idx && (
                           <div style={{ padding: '2rem', borderTop: '1px solid var(--border-light)', display: 'grid', gap: '2rem', background: 'white' }}>
                             <InputField label="Nội dung câu hỏi" textarea value={q.question} onChange={(v: string) => { const qs = [...(isAddingNew ? newItem.questions! : editingItem!.questions)]; qs[idx].question = v; isAddingNew ? setNewItem({ ...newItem, questions: qs }) : setEditingItem({ ...editingItem!, questions: qs }) }} />
-
+                            
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                               {q.options.map((opt, oIdx) => (
                                 <div key={oIdx} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                  <div
-                                    style={{
-                                      width: '36px', height: '36px', borderRadius: '12px',
+                                  <div 
+                                    style={{ 
+                                      width: '36px', height: '36px', borderRadius: '12px', 
                                       background: q.correctIndex === oIdx ? 'var(--danger)' : 'var(--bg-accent)',
                                       color: q.correctIndex === oIdx ? 'white' : 'var(--text-muted)',
                                       display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -355,9 +356,9 @@ const Challenges = () => {
                                   >
                                     {String.fromCharCode(65 + oIdx)}
                                   </div>
-                                  <input
-                                    className="input-field"
-                                    value={opt}
+                                  <input 
+                                    className="input-field" 
+                                    value={opt} 
                                     placeholder={`Đáp án ${String.fromCharCode(65 + oIdx)}`}
                                     onChange={(e) => { const qs = [...(isAddingNew ? newItem.questions! : editingItem!.questions)]; qs[idx].options[oIdx] = e.target.value; isAddingNew ? setNewItem({ ...newItem, questions: qs }) : setEditingItem({ ...editingItem!, questions: qs }) }}
                                     style={{ padding: '10px 15px' }}
@@ -387,11 +388,11 @@ const Challenges = () => {
         {confirmConfig.isOpen && (
           <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '1.5rem' }}>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))} />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }} 
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="card"
+              className="card" 
               style={{ position: 'relative', width: '100%', maxWidth: '400px', textAlign: 'center', padding: '2.5rem', borderRadius: '32px' }}
             >
               <div style={{ width: '64px', height: '64px', background: '#fef2f2', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>

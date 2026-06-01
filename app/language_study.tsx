@@ -16,7 +16,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const CATEGORY_IMAGES = [
   require('@/assets/images/giadinh.jpg'),
@@ -174,7 +173,7 @@ export default function LanguageStudyScreen() {
         <View style={styles.tabsWrapper}>
           <View style={styles.tabsContainer}>
             <TouchableOpacity
-              style={styles.tabItem}
+              style={[styles.tabItem, activeTab === 'topics' && styles.activeTabItem]}
               onPress={() => setActiveTab('topics')}
             >
               <ThemedText style={[styles.tabText, activeTab === 'topics' && styles.activeTabText]}>
@@ -183,7 +182,7 @@ export default function LanguageStudyScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.tabItem}
+              style={[styles.tabItem, activeTab === 'translator' && styles.activeTabItem]}
               onPress={() => setActiveTab('translator')}
             >
               <ThemedText style={[styles.tabText, activeTab === 'translator' && styles.activeTabText]}>
@@ -261,8 +260,8 @@ export default function LanguageStudyScreen() {
                 </View>
 
                 <View style={styles.inputFooter}>
-                  <TouchableOpacity 
-                    onPress={() => playSound(inputText, isViToKm ? 'vi' : 'km', 'input')} 
+                  <TouchableOpacity
+                    onPress={() => playSound(inputText, isViToKm ? 'vi' : 'km', 'input')}
                     disabled={!inputText.trim() || isPlayingInput || isPlayingOutput}
                   >
                     <Ionicons name={isPlayingInput ? "volume-high" : "volume-medium"} size={28} color="#1A73E8" />
@@ -281,8 +280,8 @@ export default function LanguageStudyScreen() {
                       ) : null}
                     </View>
                     <View style={styles.resultFooter}>
-                      <TouchableOpacity 
-                        onPress={() => playSound(translatedText, isViToKm ? 'km' : 'vi', 'output')} 
+                      <TouchableOpacity
+                        onPress={() => playSound(translatedText, isViToKm ? 'km' : 'vi', 'output')}
                         disabled={isPlayingInput || isPlayingOutput}
                       >
                         <Ionicons name={isPlayingOutput ? "volume-high" : "volume-medium"} size={28} color="#1A73E8" />
@@ -346,16 +345,23 @@ const styles = StyleSheet.create({
   },
   tabItem: {
     flex: 1,
-    paddingVertical: 16,
+    paddingVertical: 14,
     alignItems: 'center',
+    borderBottomWidth: 3,
+    borderBottomColor: 'transparent',
+  },
+  activeTabItem: {
+    borderBottomColor: '#3B82F6',
+    backgroundColor: 'rgba(59, 130, 246, 0.05)',
   },
   tabText: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#94A3B8',
   },
   activeTabText: {
     color: '#3B82F6',
+    fontWeight: '800',
   },
   content: {
     flex: 1,
@@ -415,8 +421,8 @@ const styles = StyleSheet.create({
   },
   startStudyBtn: {
     backgroundColor: '#0179e9',
-    paddingVertical: 7,
-    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -428,7 +434,7 @@ const styles = StyleSheet.create({
   },
   startStudyBtnText: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '700',
   },
   translatorWrapper: {
