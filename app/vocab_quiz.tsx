@@ -50,7 +50,7 @@ export default function VocabQuizScreen() {
     const [isSaving, setIsSaving] = useState(false);
     const [hasSaved, setHasSaved] = useState(false);
     const [showExitModal, setShowExitModal] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(180);
+    const [timeLeft, setTimeLeft] = useState(120);
 
     // Fetch categories from Firebase
     useEffect(() => {
@@ -111,7 +111,7 @@ export default function VocabQuizScreen() {
         setScore(0);
         setGameState('playing');
         setHasSaved(false);
-        setTimeLeft(180);
+        setTimeLeft(120);
     };
 
     const handleMatch = (type: 'left' | 'right', id: string) => {
@@ -300,13 +300,27 @@ export default function VocabQuizScreen() {
         );
     }
 
+    const stars = leftItems.length > 0 ? Math.ceil((matches.length / leftItems.length) * 5) : 0;
+
     if (gameState === 'results') {
         return (
             <View style={styles.resultsContainer}>
                 <LinearGradient colors={['#F5F3FF', '#FFF', '#F5F3FF']} style={StyleSheet.absoluteFill} />
                 <SafeAreaView style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 25 }}>
-                    <Ionicons name={timeLeft === 0 ? "time" : "trophy"} size={80} color={timeLeft === 0 ? "#EF4444" : "#FBBF24"} style={{ marginBottom: 20 }} />
-                    <Text style={styles.resultTitle}>{timeLeft === 0 ? t('keep_it_up') : t('excellent')}</Text>
+                    <View style={styles.resultStarsRow}>
+                        {[1, 2, 3, 4, 5].map(s => (
+                            <Ionicons
+                                key={s}
+                                name={s <= stars ? 'star' : 'star-outline'}
+                                size={44}
+                                color={s <= stars ? '#FBBF24' : '#E2E8F0'}
+                                style={{ marginHorizontal: 4 }}
+                            />
+                        ))}
+                    </View>
+                    <Text style={styles.resultTitle}>
+                        {stars === 5 ? t('excellent') : stars >= 4 ? t('well_done') : t('keep_it_up')}
+                    </Text>
                     <View style={styles.resultScoreCard}>
                         <Text style={styles.resultScoreNum}>+{score}</Text>
                         <Text style={styles.resultScoreLabel}>{t('points_earned')}</Text>
@@ -473,6 +487,7 @@ const styles = StyleSheet.create({
     startQuizBtnText: { color: '#FFF', fontWeight: '800', fontSize: 13 },
     resultsContainer: { flex: 1 },
     resultTitle: { fontSize: 32, fontWeight: '900', color: '#1E293B', marginBottom: 20 },
+    resultStarsRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 24 },
     resultScoreCard: { width: '100%', backgroundColor: '#FFF', borderRadius: 32, padding: 30, alignItems: 'center', marginBottom: 30, elevation: 4 },
     resultScoreNum: { fontSize: 56, fontWeight: '900', color: '#7C3AED' },
     resultScoreLabel: { fontSize: 16, color: '#64748B', fontWeight: '600' },
