@@ -182,7 +182,7 @@ const Dashboard = () => {
                 transition: 'all 0.2s'
               }}
             >
-              Hàng tuần (10)
+              Hàng tuần
             </button>
             <button
               onClick={() => setLeaderboardType('all')}
@@ -199,7 +199,7 @@ const Dashboard = () => {
                 transition: 'all 0.2s'
               }}
             >
-              Tất cả (20)
+              Tất cả
             </button>
           </div>
         </div>
