@@ -1,6 +1,6 @@
 import { collection, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Eye, Filter, Plus, Search, Shield, Trash2, X } from 'lucide-react';
+import { Eye, Image as ImageIcon, Shield, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { db } from '../firebase/config';
 
@@ -70,41 +70,33 @@ const Article = () => {
     <div className="page-container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
         <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Quản lý Bài viết</h1>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Quản lý Bài viết</h1>
         </div>
-        <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.875rem 1.5rem', borderRadius: '16px' }}>
-          <Plus size={20} strokeWidth={2.5} />
-          <span>Tạo bài viết mới</span>
-        </button>
+
+        <div className="input-group" style={{ width: '400px', marginBottom: 0 }}>
+          <div style={{ position: 'relative' }}>
+            <input
+              className="input-field"
+              type="text"
+              placeholder="Tìm kiếm bài viết theo tiêu đề..."
+              style={{ paddingLeft: '1rem' }}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Filters & Search */}
-      <div className="card" style={{ marginBottom: '2rem', padding: '1.25rem', borderRadius: '24px', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-        <div style={{ position: 'relative', flex: 1 }}>
-          <Search size={18} style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-          <input
-            type="text"
-            placeholder="Tìm kiếm bài viết theo tiêu đề..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: '100%', padding: '0.875rem 1.25rem 0.875rem 3.25rem', borderRadius: '14px', border: '1px solid var(--border-light)', background: 'var(--bg-main)', fontSize: '0.925rem' }}
-          />
-        </div>
-        <button className="btn" style={{ background: 'var(--bg-main)', border: '1px solid var(--border-light)', padding: '0.875rem 1.25rem', borderRadius: '14px', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-primary)' }}>
-          <Filter size={18} />
-          <span style={{ fontWeight: 600 }}>Bộ lọc</span>
-        </button>
-      </div>
 
       {/* Table */}
       <div className="card" style={{ borderRadius: '24px', overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: 'var(--bg-main)', borderBottom: '1px solid var(--border-light)' }}>
+              <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '120px', whiteSpace: 'nowrap' }}>Hình ảnh</th>
               <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nội dung bài viết</th>
               <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Người đăng</th>
               <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Thời gian</th>
-              <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Trạng thái</th>
               <th style={{ textAlign: 'right', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Thao tác</th>
             </tr>
           </thead>
@@ -112,19 +104,29 @@ const Article = () => {
             {filteredPosts.length === 0 ? (
               <tr>
                 <td colSpan={5} style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
-                  Không tìm thấy bài viết nào.
+                  Không tìm thấy bài viết nào
                 </td>
               </tr>
             ) : (
               filteredPosts.map((post) => (
                 <tr key={post.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
                   <td style={{ padding: '1.25rem' }}>
+                    {post.image ? (
+                      <img
+                        src={post.image}
+                        alt="post content"
+                        style={{ width: '60px', height: '60px', borderRadius: '12px', objectFit: 'cover', background: 'var(--bg-accent)' }}
+                      />
+                    ) : (
+                      <div style={{ width: '60px', height: '60px', borderRadius: '12px', background: 'var(--bg-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+                        <ImageIcon size={20} />
+                      </div>
+                    )}
+                  </td>
+                  <td style={{ padding: '1.25rem' }}>
                     <div style={{ maxWidth: '450px' }}>
                       <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem', fontSize: '1rem' }}>
                         {post.content || 'Không có nội dung'}
-                      </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                        {post.location || 'Bản tin Cộng đồng'}
                       </div>
                     </div>
                   </td>
@@ -133,9 +135,6 @@ const Article = () => {
                   </td>
                   <td style={{ padding: '1.25rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
                     {formatTime(post.createdAt)}
-                  </td>
-                  <td style={{ padding: '1.25rem' }}>
-                    <span style={{ padding: '4px 12px', borderRadius: '20px', background: '#dcfce7', color: '#166534', fontSize: '0.75rem', fontWeight: 700 }}>Công khai</span>
                   </td>
                   <td style={{ padding: '1.25rem', textAlign: 'right' }}>
                     <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
@@ -147,33 +146,37 @@ const Article = () => {
                           background: '#eff6ff',
                           color: '#3b82f6',
                           cursor: 'pointer',
-                          padding: '8px',
+                          padding: '8px 16px',
                           borderRadius: '12px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
+                          gap: '0.5rem',
                           transition: 'opacity 0.2s'
                         }}
                       >
                         <Eye size={18} strokeWidth={2.5} />
+                        <span style={{ fontWeight: 700, fontSize: '0.75rem' }}>Xem</span>
                       </button>
                       <button
                         title="Xóa bài viết"
                         style={{
                           border: 'none',
-                          background: '#fee2e2',
+                          background: '#fef2f2',
                           color: '#ef4444',
                           cursor: 'pointer',
-                          padding: '8px',
+                          padding: '8px 16px',
                           borderRadius: '12px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
+                          gap: '0.5rem',
                           transition: 'opacity 0.2s'
                         }}
                         onClick={() => setConfirmDialog({ isOpen: true, postId: post.id })}
                       >
                         <Trash2 size={18} strokeWidth={2.5} />
+                        <span style={{ fontWeight: 700, fontSize: '0.75rem' }}>Xóa</span>
                       </button>
                     </div>
                   </td>
@@ -209,25 +212,25 @@ const Article = () => {
                 borderRadius: '32px'
               }}
             >
-              <div style={{ width: '60px', height: '60px', background: '#fee2e2', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-                <Shield size={28} color="#ef4444" />
+              <div style={{ width: '64px', height: '64px', background: '#fef2f2', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                <Shield size={32} color="#ef4444" />
               </div>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>Xác nhận xóa bài viết</h3>
-              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2rem' }}>Bạn có chắc chắn muốn xóa bài viết này không? Hành động này không thể hoàn tác.</p>
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2rem' }}>Bạn có chắc chắn muốn xóa bài viết này không. Hành động này không thể hoàn tác</p>
+              <div style={{ display: 'flex', gap: '1rem' }}>
                 <button
                   className="btn"
-                  style={{ flex: 1, background: 'var(--bg-accent)', color: 'var(--text-primary)', fontWeight: 600, borderRadius: '14px' }}
+                  style={{ flex: 1, background: '#3b82f6', color: 'white', fontWeight: 700, borderRadius: '14px' }}
                   onClick={() => setConfirmDialog({ isOpen: false, postId: '' })}
                 >
-                  Hủy bỏ
+                  Đóng
                 </button>
                 <button
                   className="btn"
-                  style={{ flex: 1, background: '#ef4444', color: 'white', fontWeight: 600, borderRadius: '14px' }}
+                  style={{ flex: 1, background: '#ef4444', color: 'white', fontWeight: 700, borderRadius: '14px' }}
                   onClick={handleDeletePost}
                 >
-                  Xác nhận xóa
+                  Xóa
                 </button>
               </div>
             </motion.div>
@@ -334,11 +337,11 @@ const Article = () => {
                       Bình luận ({comments.length})
                     </p>
                   </div>
-                  
+
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     {comments.length === 0 ? (
                       <div style={{ textAlign: 'center', padding: '1rem 0', opacity: 0.6 }}>
-                        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Chưa có bình luận nào cho bài viết này.</p>
+                        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Chưa có bình luận nào cho bài viết này</p>
                       </div>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

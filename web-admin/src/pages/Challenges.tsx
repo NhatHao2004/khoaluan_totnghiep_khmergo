@@ -163,7 +163,7 @@ const Challenges = () => {
     setConfirmConfig({
       isOpen: true,
       title: 'Xóa Thử thách',
-      message: 'Hành động này sẽ xóa vĩnh viễn bộ câu hỏi. Bạn có chắc chắn không?',
+      message: 'Hành động này sẽ xóa vĩnh viễn bộ câu hỏi. Bạn có chắc chắn không',
       onConfirm: async () => {
         try {
           await deleteDoc(doc(db, 'quizzes', id));
@@ -385,17 +385,25 @@ const Challenges = () => {
 
       <AnimatePresence>
         {confirmConfig.isOpen && (
-          <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} />
-            <div className="card" style={{ position: 'relative', width: '400px', textAlign: 'center', padding: '2.5rem', borderRadius: '28px' }}>
-              <Shield size={48} color="var(--danger)" style={{ margin: '0 auto 1.5rem' }} />
-              <h3>{confirmConfig.title}</h3>
-              <p>{confirmConfig.message}</p>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <button className="btn btn-secondary" onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}>Đóng</button>
-                <button className="btn" style={{ background: 'var(--danger)', color: 'white' }} onClick={confirmConfig.onConfirm}>Xóa</button>
+          <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '1.5rem' }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))} />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="card"
+              style={{ position: 'relative', width: '100%', maxWidth: '400px', textAlign: 'center', padding: '2.5rem', borderRadius: '32px' }}
+            >
+              <div style={{ width: '64px', height: '64px', background: '#fef2f2', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                <Shield size={32} color="var(--danger)" />
               </div>
-            </div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>{confirmConfig.title}</h3>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2rem' }}>{confirmConfig.message}</p>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button className="btn" style={{ flex: 1, background: '#3b82f6', color: 'white', fontWeight: 700, borderRadius: '14px' }} onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}>Đóng</button>
+                <button className="btn" style={{ flex: 1, background: 'var(--danger)', color: 'white', fontWeight: 700, borderRadius: '14px' }} onClick={confirmConfig.onConfirm}>Xóa</button>
+              </div>
+            </motion.div>
           </div>
         )}
       </AnimatePresence>

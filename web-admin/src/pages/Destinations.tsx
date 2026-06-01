@@ -528,11 +528,11 @@ const Destinations = () => {
               <div style={{ width: '64px', height: '64px', background: '#fef2f2', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
                 <Shield size={32} color="#dc2626" />
               </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.75rem' }}>{confirmConfig.title}</h3>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>{confirmConfig.title}</h3>
               <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2.5rem', whiteSpace: 'pre-line' }}>{confirmConfig.message}</p>
               <div style={{ display: 'flex', gap: '1rem' }}>
-                <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}>Đóng</button>
-                <button className="btn" style={{ flex: 1, background: '#ef4444', color: 'white' }} onClick={confirmConfig.onConfirm}>Đồng ý xóa</button>
+                <button className="btn" style={{ flex: 1, background: '#3b82f6', color: 'white', fontWeight: 700, borderRadius: '14px' }} onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}>Đóng</button>
+                <button className="btn" style={{ flex: 1, background: '#ef4444', color: 'white', fontWeight: 700, borderRadius: '14px' }} onClick={confirmConfig.onConfirm}>Xóa</button>
               </div>
             </motion.div>
           </div>
