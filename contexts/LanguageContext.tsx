@@ -92,7 +92,7 @@ export const translations: any = {
     choose_another_quiz: 'Chọn bộ câu hỏi khác',
     answered_correctly: 'Trả lời đúng',
     questions_count: 'câu',
-    points_earned: 'điểm vừa tích luỹ',
+    points_earned: 'Điểm vừa tích luỹ',
     saving_results: 'Đang lưu thành tích...',
     results_saved: 'Đã lưu thành tích',
     excellent: '🎉 Xuất sắc',

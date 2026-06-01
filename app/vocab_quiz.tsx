@@ -50,6 +50,7 @@ export default function VocabQuizScreen() {
     const [isSaving, setIsSaving] = useState(false);
     const [hasSaved, setHasSaved] = useState(false);
     const [showExitModal, setShowExitModal] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(180);
 
     // Fetch categories from Firebase
     useEffect(() => {
@@ -110,6 +111,7 @@ export default function VocabQuizScreen() {
         setScore(0);
         setGameState('playing');
         setHasSaved(false);
+        setTimeLeft(180);
     };
 
     const handleMatch = (type: 'left' | 'right', id: string) => {
@@ -161,6 +163,25 @@ export default function VocabQuizScreen() {
                 setSelectedRight(null);
             }, 600);
         }
+    };
+
+    // Timer Logic
+    useEffect(() => {
+        let timer: any;
+        if (gameState === 'playing' && timeLeft > 0) {
+            timer = setInterval(() => {
+                setTimeLeft(prev => prev - 1);
+            }, 1000);
+        } else if (timeLeft === 0 && gameState === 'playing') {
+            setGameState('results');
+        }
+        return () => clearInterval(timer);
+    }, [gameState, timeLeft]);
+
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
     };
 
     const resetGame = () => {
@@ -284,8 +305,8 @@ export default function VocabQuizScreen() {
             <View style={styles.resultsContainer}>
                 <LinearGradient colors={['#F5F3FF', '#FFF', '#F5F3FF']} style={StyleSheet.absoluteFill} />
                 <SafeAreaView style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 25 }}>
-                    <Ionicons name="trophy" size={80} color="#FBBF24" style={{ marginBottom: 20 }} />
-                    <Text style={styles.resultTitle}>{t('excellent')}</Text>
+                    <Ionicons name={timeLeft === 0 ? "time" : "trophy"} size={80} color={timeLeft === 0 ? "#EF4444" : "#FBBF24"} style={{ marginBottom: 20 }} />
+                    <Text style={styles.resultTitle}>{timeLeft === 0 ? t('keep_it_up') : t('excellent')}</Text>
                     <View style={styles.resultScoreCard}>
                         <Text style={styles.resultScoreNum}>+{score}</Text>
                         <Text style={styles.resultScoreLabel}>{t('points_earned')}</Text>
@@ -310,7 +331,10 @@ export default function VocabQuizScreen() {
                 <TouchableOpacity onPress={() => setShowExitModal(true)} style={styles.headerCloseBtn}>
                     <Ionicons name="arrow-back" size={28} color="#1E293B" />
                 </TouchableOpacity>
-                <Text style={styles.gameHeaderTitle}>{t('matching_challenge').toUpperCase()}</Text>
+                <View style={styles.timerContainer}>
+                    <Ionicons name="time-outline" size={20} color={timeLeft < 30 ? '#EF4444' : '#1E293B'} />
+                    <Text style={[styles.timerText, timeLeft < 30 && { color: '#EF4444' }]}>{formatTime(timeLeft)}</Text>
+                </View>
                 <View style={styles.scorePill}>
                     <Ionicons name="flash" size={16} color="#F59E0B" />
                     <Text style={styles.scorePillText}>{score}</Text>
@@ -388,15 +412,15 @@ export default function VocabQuizScreen() {
                         <View style={styles.exitIconCircle}>
                             <Ionicons name="exit-outline" size={40} color="#EF4444" />
                         </View>
-                        <Text style={styles.exitTitle}>Thoát khỏi trò chơi</Text>
-                        <Text style={styles.exitSub}>Tiến trình hiện tại của bạn sẽ{'\n'}không được lưu lại</Text>
+                        <Text style={styles.exitTitle}>{t('exit_game_title')}</Text>
+                        <Text style={styles.exitSub}>{t('exit_game_msg')}</Text>
 
                         <View style={styles.exitActionRow}>
                             <TouchableOpacity
                                 style={styles.stayBtn}
                                 onPress={() => setShowExitModal(false)}
                             >
-                                <Text style={styles.stayBtnText}>Tiếp tục chơi</Text>
+                                <Text style={styles.stayBtnText}>{t('continue')}</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity
@@ -406,7 +430,7 @@ export default function VocabQuizScreen() {
                                     router.back();
                                 }}
                             >
-                                <Text style={styles.confirmExitBtnText}>Thoát</Text>
+                                <Text style={styles.confirmExitBtnText}>{t('exit')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -461,6 +485,8 @@ const styles = StyleSheet.create({
     headerContainer: { paddingTop: 50, paddingHorizontal: 20, paddingBottom: 20, backgroundColor: '#FFF', borderBottomLeftRadius: 32, borderBottomRightRadius: 32, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', elevation: 4 },
     headerCloseBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
     gameHeaderTitle: { fontSize: 16, fontWeight: '800', color: '#334155' },
+    timerContainer: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#F1F5F9', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
+    timerText: { fontSize: 16, fontWeight: '800', color: '#1E293B', fontVariant: ['tabular-nums'] },
     scorePill: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFBEB', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, gap: 6, borderWidth: 1, borderColor: '#FEF3C7' },
     scorePillText: { fontSize: 16, fontWeight: '900', color: '#D97706' },
     matchCard: { backgroundColor: '#FFF', borderRadius: 20, padding: 12, height: 70, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#F1F5F9', elevation: 2 },
