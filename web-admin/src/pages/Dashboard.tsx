@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, getDocs, onSnapshot, writeBatch } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDocs, limit, onSnapshot, orderBy, query, writeBatch } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BookOpen, CheckCircle, HelpCircle, Info, MessageSquare, Shield, User, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -17,6 +17,13 @@ const Dashboard = () => {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const [logs, setLogs] = useState<any[]>([]);
+  const [leaderboardType, setLeaderboardType] = useState<'weekly' | 'all'>('weekly');
+  const [topUsers, setTopUsers] = useState<any[]>(Array(20).fill(null).map((_, i) => ({
+    id: `init-${i}`,
+    name: '---',
+    points: 0,
+    avatar: null
+  })));
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
     title: string;
@@ -40,14 +47,33 @@ const Dashboard = () => {
       setLogs(logData);
     });
 
+    const limitCount = leaderboardType === 'weekly' ? 10 : 20;
+    const unsubLeaderboard = onSnapshot(
+      query(collection(db, 'users'), orderBy('points', 'desc'), limit(limitCount)),
+      (snap) => {
+        const users = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
+        const paddedUsers = [...users];
+        while (paddedUsers.length < limitCount) {
+          paddedUsers.push({
+            id: `dummy-${paddedUsers.length}`,
+            name: '---',
+            points: 0,
+            avatar: null
+          });
+        }
+        setTopUsers(paddedUsers);
+      }
+    );
+
     return () => {
       unsubUsers();
       unsubDests();
       unsubQuizzes();
       unsubPosts();
       unsubLogs();
+      unsubLeaderboard();
     };
-  }, []);
+  }, [leaderboardType]);
 
   const formatTime = (ts: any) => {
     if (!ts) return 'Vừa xong';
@@ -131,10 +157,116 @@ const Dashboard = () => {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
-        <StatCard title="Người dùng" value={stats.users} icon={User} color="#ff0000ff" onClick={() => navigate('/users')} />
-        <StatCard title="Nội dung" value={stats.destinations} icon={BookOpen} color="#00875aff" onClick={() => navigate('/destinations')} />
-        <StatCard title="Thử thách" value={stats.quizzes} icon={HelpCircle} color="#ffa200ff" onClick={() => navigate('/challenges')} />
-        <StatCard title="Bài viết" value={stats.posts} icon={MessageSquare} color="#ff0080ff" onClick={() => navigate('/article')} />
+        <StatCard title="Người dùng" value={stats.users} icon={User} color="#ef4444" onClick={() => navigate('/users')} />
+        <StatCard title="Nội dung" value={stats.destinations} icon={BookOpen} color="#10b981" onClick={() => navigate('/destinations')} />
+        <StatCard title="Thử thách" value={stats.quizzes} icon={HelpCircle} color="#f59e0b" onClick={() => navigate('/challenges')} />
+        <StatCard title="Bài viết" value={stats.posts} icon={MessageSquare} color="#ec4899" onClick={() => navigate('/article')} />
+      </div>
+
+      <div style={{ marginBottom: '2.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Biểu đồ bảng xếp hạng</h2>
+          <div style={{ display: 'flex', background: 'var(--bg-accent)', padding: '4px', borderRadius: '12px', gap: '4px' }}>
+            <button
+              onClick={() => setLeaderboardType('weekly')}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '9px',
+                border: 'none',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                background: leaderboardType === 'weekly' ? 'white' : 'transparent',
+                color: leaderboardType === 'weekly' ? 'var(--primary)' : 'var(--text-muted)',
+                boxShadow: leaderboardType === 'weekly' ? 'var(--shadow-sm)' : 'none',
+                transition: 'all 0.2s'
+              }}
+            >
+              Hàng tuần (10)
+            </button>
+            <button
+              onClick={() => setLeaderboardType('all')}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '9px',
+                border: 'none',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                background: leaderboardType === 'all' ? 'white' : 'transparent',
+                color: leaderboardType === 'all' ? 'var(--primary)' : 'var(--text-muted)',
+                boxShadow: leaderboardType === 'all' ? 'var(--shadow-sm)' : 'none',
+                transition: 'all 0.2s'
+              }}
+            >
+              Tất cả (20)
+            </button>
+          </div>
+        </div>
+
+        <div className="card glass-card" style={{ padding: '3rem 2rem 1.5rem', overflowX: 'hidden' }}>
+          <div className="custom-scrollbar" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: '1rem', height: '380px', minWidth: '950px', paddingBottom: '1rem', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <style>{`
+              .custom-scrollbar::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+
+            {/* Sequential Ranking Logic (Rank 1, 2, 3) */}
+            {[0, 1, 2].map((uIdx) => {
+              const user = topUsers[uIdx];
+              const rank = uIdx + 1; // 0->1, 1->2, 2->3
+              const color = rank === 1 ? '#ef4444' : rank === 2 ? '#f8d330' : '#22c55e';
+              const height = rank === 1 ? '65%' : rank === 2 ? '48%' : '35%';
+
+              return (
+                <div key={`${leaderboardType}-podium-${rank}`} style={{ flex: 1, maxWidth: '110px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
+                  <div style={{ marginBottom: '1rem', textAlign: 'center', width: '100%' }}>
+                    <div style={{ width: rank === 1 ? '72px' : '56px', height: rank === 1 ? '72px' : '56px', borderRadius: '50%', border: `4px solid ${color}33`, overflow: 'hidden', margin: '0 auto 0.5rem', background: 'white' }}>
+                      {user?.avatar ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={rank === 1 ? 32 : 24} style={{ margin: rank === 1 ? '16px' : '12px', color: '#94a3b8' }} />}
+                    </div>
+                    <p style={{ fontWeight: 800, fontSize: '0.8125rem', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.name || '---'}</p>
+                    <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 800 }}>{user?.points || 0} Điểm</p>
+                  </div>
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height }}
+                    transition={{ duration: 1, delay: rank * 0.1 }}
+                    style={{ width: '100%', background: color, borderRadius: '14px 14px 4px 4px', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '1rem', boxShadow: `0 10px 20px ${color}22` }}
+                  >
+                    <div style={{ position: 'absolute', bottom: '0.75rem', color: 'white', fontWeight: 900, fontSize: '2rem' }}>{rank}</div>
+                  </motion.div>
+                </div>
+              );
+            })}
+
+            {/* Ranks 4+ (Black Bars) */}
+            {topUsers.slice(3, leaderboardType === 'weekly' ? 10 : 20).map((user, idx) => {
+              const rank = idx + 4;
+              return (
+                <div key={`${leaderboardType}-rank-${rank}`} style={{ flex: 1, maxWidth: '90px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
+                  <div style={{ marginBottom: '1rem', textAlign: 'center', width: '100%' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '2px solid #e2e8f0', overflow: 'hidden', margin: '0 auto 0.5rem', background: 'white' }}>
+                      {user?.avatar ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={18} style={{ margin: '9px', color: '#cbd5e1' }} />}
+                    </div>
+                    <p style={{ fontWeight: 700, fontSize: '0.7rem', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#64748b' }}>{user?.name || '---'}</p>
+                    <p style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 700 }}>{user?.points || 0} Điểm</p>
+                  </div>
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: '20%' }}
+                    transition={{ duration: 0.5, delay: 0.5 + idx * 0.05 }}
+                    style={{ width: '100%', background: '#1e293b', borderRadius: '10px 10px 4px 4px', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 4px 10px rgba(30,41,59,0.1)' }}
+                  >
+                    <div style={{ position: 'absolute', bottom: '0.75rem', color: 'white', fontWeight: 800, fontSize: '1.25rem', opacity: 0.8 }}>{rank}</div>
+                  </motion.div>
+                </div>
+              );
+            })}
+          </div>
+
+
+        </div>
       </div>
 
       <div>
