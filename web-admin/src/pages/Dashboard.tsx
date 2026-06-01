@@ -203,7 +203,7 @@ const Dashboard = () => {
         </div>
 
         <div className="card glass-card" style={{ padding: '3rem 2rem 1.5rem', overflowX: 'hidden' }}>
-          <div className="custom-scrollbar" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: '1rem', height: '380px', minWidth: '950px', paddingBottom: '1rem', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div className="custom-scrollbar" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: leaderboardType === 'all' ? '0.5rem' : '1.5rem', height: '380px', width: '100%', paddingBottom: '1rem', overflowX: 'hidden' }}>
             <style>{`
               .custom-scrollbar::-webkit-scrollbar {
                 display: none;
