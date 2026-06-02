@@ -109,6 +109,24 @@ const Destinations = () => {
     contentBlocks: []
   });
 
+  const resetNewItem = (category: TabKey = activeTab) => {
+    setNewItem({
+      name: '', name_khmer: '',
+      location: '', location_khmer: '',
+      description: '', description_khmer: '',
+      imageUrl: '', imageUrl1: '', imageUrl2: '', imageUrl3: '', imageUrl4: '', imageUrl5: '', imageUrl6: '', imageKey: '',
+      latitude: '', longitude: '', rental: '',
+      category: category,
+      favorite: false,
+      contentBlocks: []
+    });
+  };
+
+  const handleTabChange = (tab: TabKey) => {
+    setActiveTab(tab);
+    resetNewItem(tab);
+  };
+
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ isOpen: true, message, type });
     setTimeout(() => setToast(prev => ({ ...prev, isOpen: false })), 3000);
@@ -140,9 +158,21 @@ const Destinations = () => {
   };
 
   const validateDestination = (item: Partial<Destination>) => {
-    const fields = ['name', 'name_khmer', 'location', 'location_khmer', 'description', 'description_khmer', 'imageUrl'];
+    const isChua = activeTab === 'Chùa';
+    const fieldMapping: { [key: string]: string } = {
+      name: 'Tên',
+      name_khmer: 'Tên',
+      location: isChua ? 'Địa chỉ' : 'Mô tả phụ',
+      location_khmer: isChua ? 'Địa chỉ' : 'Mô tả phụ',
+      description: 'Mô tả',
+      description_khmer: 'Mô tả',
+    };
+
+    const fields = Object.keys(fieldMapping);
     for (const f of fields) {
-      if (!(item as any)[f]?.trim()) return `Trường "${f}" không được để trống`;
+      if (!(item as any)[f]?.trim()) {
+        return `Trường "${fieldMapping[f]}" không được để trống`;
+      }
     }
     return null;
   };
@@ -194,7 +224,7 @@ const Destinations = () => {
     setConfirmConfig({
       isOpen: true,
       title: 'Xóa nội dung',
-      message: 'Bạn có chắc chắn muốn xóa vĩnh viễn nội dung này? Thao tác này không thể hoàn tác.',
+      message: 'Bạn chắc chắn muốn xóa vĩnh viễn nội dung này. Thao tác này không thể hoàn tác.',
       onConfirm: async () => {
         try {
           await deleteDoc(doc(db, 'destinations', id));
@@ -282,7 +312,7 @@ const Destinations = () => {
           {TABS.map(tab => {
             const isActive = activeTab === tab.key;
             return (
-              <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ flex: 1, border: 'none', padding: '0.75rem', borderRadius: '10px', background: isActive ? 'white' : 'transparent', color: isActive ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: isActive ? 'var(--shadow-sm)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+              <button key={tab.key} onClick={() => handleTabChange(tab.key)} style={{ flex: 1, border: 'none', padding: '0.75rem', borderRadius: '10px', background: isActive ? 'white' : 'transparent', color: isActive ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: isActive ? 'var(--shadow-sm)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
                 {tab.label}
               </button>
             );
@@ -305,15 +335,15 @@ const Destinations = () => {
           {filteredDestinations.map(dest => (
             <motion.div layout key={dest.id} className="card glass-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ height: '220px', position: 'relative' }}>
-                <img 
-                  src={getProxiedImageUrl(dest.imageUrl) || 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600'} 
-                  alt={dest.name} 
+                <img
+                  src={getProxiedImageUrl(dest.imageUrl) || 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600'}
+                  alt={dest.name}
                   referrerPolicy="no-referrer"
                   onError={(e: any) => {
                     e.target.onerror = null;
                     e.target.src = 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600';
                   }}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
 
               </div>
@@ -392,14 +422,14 @@ const Destinations = () => {
                 </div>
 
                 <div style={{ position: 'relative', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 10px 20px rgba(0,0,0,0.06)', marginBottom: '2.5rem', maxWidth: '700px', margin: '0 auto 2.5rem' }}>
-                  <img 
-                    src={getProxiedImageUrl(viewingItem.imageUrl)} 
+                  <img
+                    src={getProxiedImageUrl(viewingItem.imageUrl)}
                     referrerPolicy="no-referrer"
                     onError={(e: any) => {
                       e.target.onerror = null;
                       e.target.src = 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600';
                     }}
-                    style={{ width: '100%', maxHeight: '400px', objectFit: 'cover' }} 
+                    style={{ width: '100%', maxHeight: '400px', objectFit: 'cover' }}
                   />
                 </div>
 
@@ -496,7 +526,7 @@ const Destinations = () => {
       <AnimatePresence>
         {(editingItem || isAddingNew) && (
           <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '2rem' }}>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} onClick={() => { setEditingItem(null); setIsAddingNew(false); }} />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} onClick={() => { setEditingItem(null); setIsAddingNew(false); resetNewItem(); }} />
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="card" style={{ position: 'relative', width: '100%', maxWidth: '900px', padding: '3rem', borderRadius: '32px', maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
                 <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{isAddingNew ? `Thêm ${activeTab}` : `Sửa ${activeTab}`}</h2>
@@ -545,7 +575,7 @@ const Destinations = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '1rem', marginTop: '2.5rem' }}>
-                <button type="button" className="btn" style={{ flex: 1, padding: '1rem', background: 'var(--danger)', color: '#fff' }} onClick={() => { setEditingItem(null); setIsAddingNew(false); }}>Hủy bỏ</button>
+                <button type="button" className="btn" style={{ flex: 1, padding: '1rem', background: 'var(--danger)', color: '#fff' }} onClick={() => { setEditingItem(null); setIsAddingNew(false); resetNewItem(); }}>Hủy bỏ</button>
                 <button type="button" className="btn" style={{ flex: 2, padding: '1rem', background: '#3b82f6', color: '#fff' }} onClick={isAddingNew ? handleAddNew : handleUpdate}>Lưu nội dung</button>
               </div>
             </motion.div>
@@ -558,7 +588,7 @@ const Destinations = () => {
         {confirmConfig.isOpen && (
           <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '1.5rem' }}>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} />
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="card" style={{ position: 'relative', width: '100%', maxWidth: '400px', padding: '2.5rem', textAlign: 'center', borderRadius: '28px' }}>
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="card" style={{ position: 'relative', width: '100%', maxWidth: '450px', padding: '2.5rem', textAlign: 'center', borderRadius: '28px' }}>
               <div style={{ width: '64px', height: '64px', background: '#fef2f2', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
                 <Shield size={32} color="#dc2626" />
               </div>

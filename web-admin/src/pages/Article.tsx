@@ -1,6 +1,6 @@
 import { collection, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Eye, Image as ImageIcon, Shield, Trash2, X } from 'lucide-react';
+import { CheckCircle, Eye, Image as ImageIcon, Shield, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { db } from '../firebase/config';
 
@@ -22,6 +22,14 @@ const Article = () => {
     isOpen: boolean;
     postId: string;
   }>({ isOpen: false, postId: '' });
+  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' }>({
+    isOpen: false, message: '', type: 'success'
+  });
+
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ isOpen: true, message, type });
+    setTimeout(() => setToast(prev => ({ ...prev, isOpen: false })), 3000);
+  };
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'posts'), (snap) => {
@@ -58,9 +66,10 @@ const Article = () => {
     try {
       await deleteDoc(doc(db, 'posts', confirmDialog.postId));
       setConfirmDialog({ isOpen: false, postId: '' });
+      showToast('Đã xóa nội dung');
     } catch (error) {
       console.error("Error deleting post:", error);
-      alert('Có lỗi xảy ra khi xóa bài viết.');
+      showToast('Lỗi khi xóa dữ liệu', 'error');
       setConfirmDialog({ isOpen: false, postId: '' });
     }
   };
@@ -421,6 +430,34 @@ const Article = () => {
               </div>
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {toast.isOpen && (
+          <motion.div 
+            initial={{ y: 20, opacity: 0 }} 
+            animate={{ y: 0, opacity: 1 }} 
+            exit={{ y: 20, opacity: 0 }} 
+            style={{ 
+              position: 'fixed', 
+              bottom: '2rem', 
+              right: '2rem', 
+              zIndex: 10000, 
+              padding: '1rem 1.5rem', 
+              background: toast.type === 'success' ? '#10b981' : '#ef4444', 
+              color: '#fff', 
+              borderRadius: '12px', 
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', 
+              fontWeight: 600, 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.75rem' 
+            }}
+          >
+            {toast.type === 'success' ? <CheckCircle size={20} /> : <Shield size={20} />}
+            {toast.message}
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
