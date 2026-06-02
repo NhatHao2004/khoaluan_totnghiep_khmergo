@@ -4,6 +4,15 @@ import { Eye, Image as ImageIcon, Shield, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { db } from '../firebase/config';
 
+const getProxiedImageUrl = (url: string) => {
+  if (!url) return '';
+  if (url.includes('googleusercontent.com') || url.includes('lh3.googleusercontent.com')) {
+    const cleanUrl = url.replace(/-rw$/, '');
+    return `https://images.weserv.nl/?url=${encodeURIComponent(cleanUrl)}`;
+  }
+  return url;
+};
+
 const Article = () => {
   const [posts, setPosts] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -117,8 +126,9 @@ const Article = () => {
                     <td style={{ padding: '1.25rem' }}>
                       {post.image ? (
                         <img
-                          src={post.image}
+                          src={getProxiedImageUrl(post.image)}
                           alt="post content"
+                          referrerPolicy="no-referrer"
                           style={{ width: '60px', height: '60px', borderRadius: '12px', objectFit: 'cover', background: 'var(--bg-accent)' }}
                         />
                       ) : (
@@ -294,8 +304,9 @@ const Article = () => {
               {selectedPost.image && (
                 <div style={{ width: '100%', background: 'white', position: 'relative', padding: '0 2rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <img
-                    src={selectedPost.image}
+                    src={getProxiedImageUrl(selectedPost.image)}
                     alt="post content"
+                    referrerPolicy="no-referrer"
                     style={{
                       maxWidth: '100%',
                       maxHeight: '300px',

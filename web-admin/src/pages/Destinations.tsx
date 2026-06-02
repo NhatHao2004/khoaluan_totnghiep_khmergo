@@ -72,6 +72,16 @@ const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 't
   );
 };
 
+const getProxiedImageUrl = (url: string) => {
+  if (!url) return '';
+  if (url.includes('googleusercontent.com') || url.includes('lh3.googleusercontent.com')) {
+    // Loại bỏ đuôi -rw (WebP) để tránh lỗi một số trình duyệt và proxy
+    const cleanUrl = url.replace(/-rw$/, '');
+    return `https://images.weserv.nl/?url=${encodeURIComponent(cleanUrl)}`;
+  }
+  return url;
+};
+
 const Destinations = () => {
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [loading, setLoading] = useState(true);
@@ -295,7 +305,16 @@ const Destinations = () => {
           {filteredDestinations.map(dest => (
             <motion.div layout key={dest.id} className="card glass-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ height: '220px', position: 'relative' }}>
-                <img src={dest.imageUrl || 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600'} alt={dest.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img 
+                  src={getProxiedImageUrl(dest.imageUrl) || 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600'} 
+                  alt={dest.name} 
+                  referrerPolicy="no-referrer"
+                  onError={(e: any) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600';
+                  }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
 
               </div>
               <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -373,7 +392,15 @@ const Destinations = () => {
                 </div>
 
                 <div style={{ position: 'relative', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 10px 20px rgba(0,0,0,0.06)', marginBottom: '2.5rem', maxWidth: '700px', margin: '0 auto 2.5rem' }}>
-                  <img src={viewingItem.imageUrl} style={{ width: '100%', maxHeight: '400px', objectFit: 'cover' }} />
+                  <img 
+                    src={getProxiedImageUrl(viewingItem.imageUrl)} 
+                    referrerPolicy="no-referrer"
+                    onError={(e: any) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600';
+                    }}
+                    style={{ width: '100%', maxHeight: '400px', objectFit: 'cover' }} 
+                  />
                 </div>
 
                 <div style={{ textAlign: 'left' }}>
@@ -413,7 +440,12 @@ const Destinations = () => {
                         {/* Image Side */}
                         <div style={{ flex: 1.2 }}>
                           <img
-                            src={block.images}
+                            src={getProxiedImageUrl(block.images)}
+                            referrerPolicy="no-referrer"
+                            onError={(e: any) => {
+                              e.target.onerror = null;
+                              e.target.src = 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600';
+                            }}
                             style={{ width: '100%', height: '420px', objectFit: 'cover', borderRadius: '32px', boxShadow: 'var(--shadow-lg)' }}
                           />
                         </div>

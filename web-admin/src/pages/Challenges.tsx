@@ -65,6 +65,15 @@ const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 't
   );
 };
 
+const getProxiedImageUrl = (url: string) => {
+  if (!url) return '';
+  if (url.includes('googleusercontent.com') || url.includes('lh3.googleusercontent.com')) {
+    const cleanUrl = url.replace(/-rw$/, '');
+    return `https://images.weserv.nl/?url=${encodeURIComponent(cleanUrl)}`;
+  }
+  return url;
+};
+
 const Challenges = () => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [destinations, setDestinations] = useState<any[]>([]);
@@ -277,9 +286,19 @@ const Challenges = () => {
               <motion.div layout key={item.id} className="card glass-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ height: '220px', background: 'var(--bg-accent)', position: 'relative' }}>
                   <img
-                    src={item.imageUrl || matchedDest?.imageUrl || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?q=80&w=600'}
+                    src={getProxiedImageUrl(item.imageUrl) || getProxiedImageUrl(matchedDest?.imageUrl) || 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600'}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     alt={item.pagodaName}
+                    referrerPolicy="no-referrer"
+                    onError={(e: any) => {
+                      e.target.onerror = null;
+                      // Nếu item.imageUrl lỗi, thử dùng ảnh từ destinations ngay lập tức
+                      if (matchedDest?.imageUrl && e.target.src !== getProxiedImageUrl(matchedDest.imageUrl)) {
+                        e.target.src = getProxiedImageUrl(matchedDest.imageUrl);
+                      } else {
+                        e.target.src = 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600';
+                      }
+                    }}
                   />
                   <div style={{ position: 'absolute', bottom: '1rem', left: '1rem', padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', borderRadius: '10px', fontWeight: 800, fontSize: '0.7rem', color: 'var(--primary)' }}>
                     {item.questions?.length} CÂU HỎI
