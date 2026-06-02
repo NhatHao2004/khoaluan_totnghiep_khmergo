@@ -221,8 +221,8 @@ const Article = () => {
               style={{
                 position: 'relative',
                 width: '100%',
-                maxWidth: '400px',
-                padding: '2.5rem',
+                maxWidth: '520px',
+                padding: '2.5rem 2rem',
                 textAlign: 'center',
                 borderRadius: '32px'
               }}
@@ -231,7 +231,7 @@ const Article = () => {
                 <Shield size={32} color="#ef4444" />
               </div>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>Xác nhận xóa bài viết</h3>
-              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2rem' }}>Bạn có chắc chắn muốn xóa bài viết này không. Hành động này không thể hoàn tác</p>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '2.5rem' }}>Bạn có chắc chắn muốn xóa bài viết này không.<br />Hành động này không thể hoàn tác</p>
               <div style={{ display: 'flex', gap: '1rem' }}>
                 <button
                   className="btn"
