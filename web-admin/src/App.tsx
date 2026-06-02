@@ -372,8 +372,8 @@ function App() {
                 {/* Modal Header */}
                 <div style={{ padding: '2rem 2.5rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b', marginBottom: '0.25rem' }}>Hệ thống khôi phục dữ liệu</h2>
-                    <p style={{ fontSize: '0.875rem', color: '#64748b' }}>Phục hồi các nội dung đã xóa trong 30 ngày gần đây</p>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b', marginBottom: '0.25rem' }}>Khôi phục dữ liệu</h2>
+                    <p style={{ fontSize: '0.875rem', color: '#64748b' }}>Phục hồi các nội dung đã xóa trong 30 ngày</p>
                   </div>
                   <button onClick={() => setShowTrash(false)} style={{ width: '44px', height: '44px', borderRadius: '14px', border: 'none', background: '#f8fafc', color: '#ff0000ff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="hover-bright"><X size={25} /></button>
                 </div>
@@ -400,7 +400,7 @@ function App() {
                   {trashItems.filter(item => item.type === trashActiveTab).length === 0 ? (
                     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
                       <Trash size={48} strokeWidth={1} style={{ marginBottom: '1.5rem', opacity: 0.5 }} />
-                      <p style={{ fontWeight: 600 }}>Thùng rác trống cho mục này</p>
+                      <p style={{ fontWeight: 600 }}>Thùng rác trống</p>
                     </div>
                   ) : (
                     <div style={{ display: 'grid', gap: '1rem' }}>
