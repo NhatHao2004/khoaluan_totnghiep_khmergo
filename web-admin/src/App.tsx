@@ -434,13 +434,11 @@ function App() {
                             </button>
                             <button
                               onClick={async () => {
-                                if (window.confirm('Xóa vĩnh viễn nội dung này?')) {
-                                  try {
-                                    await deleteDoc(doc(db, 'trash', item.id));
-                                    showToast('Đã xóa vĩnh viễn nội dung');
-                                  } catch (e) {
-                                    showToast('Lỗi khi xóa nội dung', 'error');
-                                  }
+                                try {
+                                  await deleteDoc(doc(db, 'trash', item.id));
+                                  showToast('Đã xóa vĩnh viễn nội dung');
+                                } catch (e) {
+                                  showToast('Lỗi khi xóa nội dung', 'error');
                                 }
                               }}
                               style={{ padding: '0.6rem 1rem', borderRadius: '10px', border: 'none', background: '#fef2f2', color: '#ef4444', fontWeight: 700, fontSize: '0.8125rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
