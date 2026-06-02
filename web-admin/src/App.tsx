@@ -1,5 +1,5 @@
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
-import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, setDoc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Bell, LogOut, RefreshCw, Trash, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -419,12 +419,15 @@ function App() {
                                 try {
                                   // Restore logic
                                   const collectionName = item.type === 'challenges' ? 'quizzes' : (item.type === 'destinations' ? 'destinations' : 'posts');
-                                  await setDoc(doc(db, collectionName, item.originalId), item.data);
+                                  await setDoc(doc(db, collectionName, item.originalId), {
+                                    ...item.data,
+                                    createdAt: serverTimestamp()
+                                  });
                                   await deleteDoc(doc(db, 'trash', item.id));
-                                  showToast('Đã khôi phục nội dung thành công');
-                                } catch (e) { 
-                                  console.error(e); 
-                                  showToast('Lỗi khi khôi phục nội dung', 'error');
+                                  showToast('Đã khôi phục dữ liệu thành công');
+                                } catch (e) {
+                                  console.error(e);
+                                  showToast('Lỗi khi khôi phục dữ liệu', 'error');
                                 }
                               }}
                               style={{ padding: '0.6rem 1rem', borderRadius: '10px', border: 'none', background: '#eff6ff', color: '#3b82f6', fontWeight: 700, fontSize: '0.8125rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
@@ -459,24 +462,24 @@ function App() {
       </div>
       <AnimatePresence>
         {toast.isOpen && (
-          <motion.div 
-            initial={{ y: 20, opacity: 0 }} 
-            animate={{ y: 0, opacity: 1 }} 
-            exit={{ y: 20, opacity: 0 }} 
-            style={{ 
-              position: 'fixed', 
-              bottom: '2rem', 
-              right: '2rem', 
-              zIndex: 20000, 
-              padding: '1rem 1.5rem', 
-              background: toast.type === 'success' ? '#10b981' : '#ef4444', 
-              color: '#fff', 
-              borderRadius: '12px', 
-              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', 
-              fontWeight: 700, 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.75rem' 
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 20, opacity: 0 }}
+            style={{
+              position: 'fixed',
+              bottom: '2rem',
+              right: '2rem',
+              zIndex: 20000,
+              padding: '1rem 1.5rem',
+              background: toast.type === 'success' ? '#10b981' : '#ef4444',
+              color: '#fff',
+              borderRadius: '12px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem'
             }}
           >
             <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

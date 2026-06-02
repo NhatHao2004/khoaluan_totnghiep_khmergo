@@ -27,6 +27,7 @@ interface Destination {
   rental?: string;
   favorite?: boolean;
   contentBlocks?: ContentBlock[];
+  createdAt?: any;
 }
 
 interface ContentBlock {
@@ -94,9 +95,6 @@ const Destinations = () => {
   const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' }>({
     isOpen: false, message: '', type: 'success'
   });
-  const [confirmConfig, setConfirmConfig] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({
-    isOpen: false, title: '', message: '', onConfirm: () => { }
-  });
 
   const [newItem, setNewItem] = useState<Partial<Destination>>({
     name: '', name_khmer: '',
@@ -136,7 +134,13 @@ const Destinations = () => {
     setLoading(true);
     const unsub = onSnapshot(collection(db, 'destinations'), (snap) => {
       const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Destination));
-      setDestinations(docs);
+      // Sắp xếp: Thời gian tạo mới nhất lên đầu
+      const sortedDocs = docs.sort((a, b) => {
+        const timeA = a.createdAt?.seconds || 0;
+        const timeB = b.createdAt?.seconds || 0;
+        return timeB - timeA;
+      });
+      setDestinations(sortedDocs);
       setLoading(false);
     }, (error) => {
       console.error("Error fetching destinations:", error);
@@ -205,9 +209,8 @@ const Destinations = () => {
     }
 
     try {
-      const itemToAdd = { ...newItem, category: activeTab };
-      const docRef = await addDoc(collection(db, 'destinations'), itemToAdd);
-      setDestinations([{ id: docRef.id, ...itemToAdd } as Destination, ...destinations]);
+      const itemToAdd = { ...newItem, category: activeTab, createdAt: serverTimestamp() };
+      await addDoc(collection(db, 'destinations'), itemToAdd);
       setIsAddingNew(false);
       setNewItem({ name: '', location: '', description: '', imageUrl: '', category: activeTab });
       showToast('Đã thêm nội dung mới');
@@ -221,30 +224,21 @@ const Destinations = () => {
     const itemToDelete = destinations.find(d => d.id === id);
     if (!itemToDelete) return;
 
-    setConfirmConfig({
-      isOpen: true,
-      title: 'Xóa nội dung',
-      message: 'Bạn chắc chắn muốn xóa vĩnh viễn nội dung này. Thao tác này không thể hoàn tác.',
-      onConfirm: async () => {
-        try {
-          // Lưu vào thùng rác trước khi xóa
-          await addDoc(collection(db, 'trash'), {
-            originalId: id,
-            type: 'destinations',
-            data: itemToDelete,
-            deletedAt: serverTimestamp()
-          });
+    try {
+      // Lưu vào thùng rác trước khi xóa
+      await addDoc(collection(db, 'trash'), {
+        originalId: id,
+        type: 'destinations',
+        data: itemToDelete,
+        deletedAt: serverTimestamp()
+      });
 
-          await deleteDoc(doc(db, 'destinations', id));
-          setDestinations(destinations.filter(d => d.id !== id));
-          setConfirmConfig(prev => ({ ...prev, isOpen: false }));
-          showToast('Đã chuyển vào thùng rác');
-        } catch (error) {
-          console.error("Error deleting:", error);
-          showToast('Lỗi khi xóa dữ liệu', 'error');
-        }
-      }
-    });
+      await deleteDoc(doc(db, 'destinations', id));
+      showToast('Đã chuyển vào thùng rác');
+    } catch (error) {
+      console.error("Error deleting:", error);
+      showToast('Lỗi khi xóa dữ liệu', 'error');
+    }
   };
 
   const handleAddContentBlock = () => {
@@ -364,7 +358,7 @@ const Destinations = () => {
                 <div style={{ marginTop: 'auto', paddingTop: '1rem', display: 'flex', gap: '0.75rem' }}>
                   <button className="btn btn-secondary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.75rem' }} onClick={() => { setViewingItem(dest); setViewLanguage('vi'); }}>Xem chi tiết</button>
                   <button className="btn" style={{ padding: '0.5rem 1rem', background: '#eff6ff', color: '#2563eb', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.75rem' }} onClick={() => setEditingItem(dest)}><Edit2 size={14} /> Sửa</button>
-                  <button className="btn" style={{ padding: '0.5rem 1rem', background: '#fef2f2', color: 'var(--danger)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.75rem' }} onClick={() => setConfirmConfig({ isOpen: true, title: 'Xác nhận xóa', message: `Bạn có chắc chắn muốn xóa\n"${dest.name}"`, onConfirm: () => handleDelete(dest.id) })}><Trash2 size={14} /> Xóa</button>
+                  <button className="btn" style={{ padding: '0.5rem 1rem', background: '#fef2f2', color: 'var(--danger)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.75rem' }} onClick={() => handleDelete(dest.id)}><Trash2 size={14} /> Xóa</button>
                 </div>
               </div>
             </motion.div>
@@ -591,25 +585,6 @@ const Destinations = () => {
         )}
       </AnimatePresence>
 
-      {/* Confirmation Modal */}
-      <AnimatePresence>
-        {confirmConfig.isOpen && (
-          <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '1.5rem' }}>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} />
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="card" style={{ position: 'relative', width: '100%', maxWidth: '450px', padding: '2.5rem', textAlign: 'center', borderRadius: '28px' }}>
-              <div style={{ width: '64px', height: '64px', background: '#fef2f2', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-                <Shield size={32} color="#dc2626" />
-              </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>{confirmConfig.title}</h3>
-              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2.5rem', whiteSpace: 'pre-line' }}>{confirmConfig.message}</p>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <button className="btn" style={{ flex: 1, background: '#3b82f6', color: 'white', fontWeight: 700, borderRadius: '14px' }} onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}>Đóng</button>
-                <button className="btn" style={{ flex: 1, background: '#ef4444', color: 'white', fontWeight: 700, borderRadius: '14px' }} onClick={confirmConfig.onConfirm}>Xóa</button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

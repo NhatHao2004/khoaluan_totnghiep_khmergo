@@ -22,6 +22,7 @@ interface Challenge {
   color: string;
   accentColor: string;
   questions: Question[];
+  createdAt?: any;
 }
 
 type TabKey = 'Chùa' | 'Văn hóa' | 'Ẩm thực';
@@ -87,9 +88,6 @@ const Challenges = () => {
   const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' }>({
     isOpen: false, message: '', type: 'success'
   });
-  const [confirmConfig, setConfirmConfig] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({
-    isOpen: false, title: '', message: '', onConfirm: () => { }
-  });
 
   const [newItem, setNewItem] = useState<Partial<Challenge>>({
     pagodaId: '', pagodaName: '', pagodaNameKm: '', imageUrl: '', rental: '', color: '#6366f1', accentColor: '#e0e7ff',
@@ -106,7 +104,13 @@ const Challenges = () => {
     // Real-time listener for quizzes
     const unsubQuizzes = onSnapshot(collection(db, 'quizzes'), (snap) => {
       const quizDocs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Challenge));
-      setChallenges(quizDocs);
+      // Sắp xếp: Thời gian tạo mới nhất lên đầu (createdAt)
+      const sortedDocs = quizDocs.sort((a, b) => {
+        const timeA = a.createdAt?.seconds || 0;
+        const timeB = b.createdAt?.seconds || 0;
+        return timeB - timeA;
+      });
+      setChallenges(sortedDocs);
       setLoading(false);
     }, (error) => {
       console.error("Error fetching challenges:", error);
@@ -164,8 +168,10 @@ const Challenges = () => {
     if (error) { showToast(error, 'error'); return; }
     try {
       const docRef = doc(db, 'quizzes', newItem.pagodaId!);
-      await setDoc(docRef, newItem);
-      setChallenges([{ id: newItem.pagodaId!, ...newItem } as Challenge, ...challenges]);
+      await setDoc(docRef, {
+        ...newItem,
+        createdAt: serverTimestamp()
+      });
       setIsAddingNew(false);
       showToast('Đã thêm Thử thách mới');
     } catch (error) {
@@ -178,29 +184,20 @@ const Challenges = () => {
     const itemToDelete = challenges.find(c => c.id === id);
     if (!itemToDelete) return;
 
-    setConfirmConfig({
-      isOpen: true,
-      title: 'Xóa Thử thách',
-      message: 'Hành động này sẽ xóa vĩnh viễn bộ câu hỏi. Bạn có chắc chắn không',
-      onConfirm: async () => {
-        try {
-          // Sao lưu vào thùng rác
-          await addDoc(collection(db, 'trash'), {
-            originalId: id,
-            type: 'challenges',
-            data: itemToDelete,
-            deletedAt: serverTimestamp()
-          });
+    try {
+      // Sao lưu vào thùng rác
+      await addDoc(collection(db, 'trash'), {
+        originalId: id,
+        type: 'challenges',
+        data: itemToDelete,
+        deletedAt: serverTimestamp()
+      });
 
-          await deleteDoc(doc(db, 'quizzes', id));
-          setChallenges(challenges.filter(c => c.id !== id));
-          setConfirmConfig(prev => ({ ...prev, isOpen: false }));
-          showToast('Đã chuyển Thử thách vào thùng rác');
-        } catch (error) {
-          showToast('Lỗi khi xóa Thử thách', 'error');
-        }
-      }
-    });
+      await deleteDoc(doc(db, 'quizzes', id));
+      showToast('Đã chuyển Thử thách vào thùng rác');
+    } catch (error) {
+      showToast('Lỗi khi xóa Thử thách', 'error');
+    }
   };
 
   const handleAddQuestion = () => {
@@ -415,31 +412,6 @@ const Challenges = () => {
               <div style={{ display: 'flex', gap: '1rem', marginTop: '2.5rem' }}>
                 <button className="btn" style={{ flex: 1, background: 'var(--danger)', color: '#fff' }} onClick={() => { setEditingItem(null); setIsAddingNew(false); }}>Hủy bỏ</button>
                 <button className="btn" style={{ flex: 2, background: '#3b82f6', color: '#fff' }} onClick={isAddingNew ? handleAddNew : handleUpdate}>Lưu thay đổi</button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {confirmConfig.isOpen && (
-          <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '1.5rem' }}>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))} />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="card"
-              style={{ position: 'relative', width: '100%', maxWidth: '400px', textAlign: 'center', padding: '2.5rem', borderRadius: '32px' }}
-            >
-              <div style={{ width: '64px', height: '64px', background: '#fef2f2', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-                <Shield size={32} color="var(--danger)" />
-              </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>{confirmConfig.title}</h3>
-              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2rem' }}>{confirmConfig.message}</p>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <button className="btn" style={{ flex: 1, background: '#3b82f6', color: 'white', fontWeight: 700, borderRadius: '14px' }} onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}>Đóng</button>
-                <button className="btn" style={{ flex: 1, background: 'var(--danger)', color: 'white', fontWeight: 700, borderRadius: '14px' }} onClick={confirmConfig.onConfirm}>Xóa</button>
               </div>
             </motion.div>
           </div>

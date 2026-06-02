@@ -18,10 +18,6 @@ const Article = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
   const [comments, setComments] = useState<any[]>([]);
-  const [confirmDialog, setConfirmDialog] = useState<{
-    isOpen: boolean;
-    postId: string;
-  }>({ isOpen: false, postId: '' });
   const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' }>({
     isOpen: false, message: '', type: 'success'
   });
@@ -61,27 +57,24 @@ const Article = () => {
     return () => unsubComments();
   }, [selectedPost]);
 
-  const handleDeletePost = async () => {
-    if (!confirmDialog.postId) return;
-    const itemToDelete = posts.find(p => p.id === confirmDialog.postId);
+  const handleDeletePost = async (id: string) => {
+    const itemToDelete = posts.find(p => p.id === id);
     if (!itemToDelete) return;
 
     try {
       // Sao lưu vào thùng rác
       await addDoc(collection(db, 'trash'), {
-        originalId: confirmDialog.postId,
+        originalId: id,
         type: 'posts',
         data: itemToDelete,
         deletedAt: serverTimestamp()
       });
 
-      await deleteDoc(doc(db, 'posts', confirmDialog.postId));
-      setConfirmDialog({ isOpen: false, postId: '' });
+      await deleteDoc(doc(db, 'posts', id));
       showToast('Đã chuyển bài viết vào thùng rác');
     } catch (error) {
       console.error("Error deleting post:", error);
       showToast('Lỗi khi xóa dữ liệu', 'error');
-      setConfirmDialog({ isOpen: false, postId: '' });
     }
   };
 
@@ -207,7 +200,7 @@ const Article = () => {
                             gap: '0.5rem',
                             transition: 'opacity 0.2s'
                           }}
-                          onClick={() => setConfirmDialog({ isOpen: true, postId: post.id })}
+                          onClick={() => handleDeletePost(post.id)}
                         >
                           <Trash2 size={18} strokeWidth={2.5} />
                           <span style={{ fontWeight: 700, fontSize: '0.75rem' }}>Xóa</span>
@@ -222,56 +215,6 @@ const Article = () => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
-      <AnimatePresence>
-        {confirmDialog.isOpen && (
-          <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '1.5rem' }}>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }}
-              onClick={() => setConfirmDialog({ isOpen: false, postId: '' })}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="card"
-              style={{
-                position: 'relative',
-                width: '100%',
-                maxWidth: '520px',
-                padding: '2.5rem 2rem',
-                textAlign: 'center',
-                borderRadius: '32px'
-              }}
-            >
-              <div style={{ width: '64px', height: '64px', background: '#fef2f2', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-                <Shield size={32} color="#ef4444" />
-              </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>Xác nhận xóa bài viết</h3>
-              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '2.5rem' }}>Bạn có chắc chắn muốn xóa bài viết này không.<br />Hành động này không thể hoàn tác</p>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <button
-                  className="btn"
-                  style={{ flex: 1, background: '#3b82f6', color: 'white', fontWeight: 700, borderRadius: '14px' }}
-                  onClick={() => setConfirmDialog({ isOpen: false, postId: '' })}
-                >
-                  Đóng
-                </button>
-                <button
-                  className="btn"
-                  style={{ flex: 1, background: '#ef4444', color: 'white', fontWeight: 700, borderRadius: '14px' }}
-                  onClick={handleDeletePost}
-                >
-                  Xóa
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
       {/* Post Details Modal */}
       <AnimatePresence>
