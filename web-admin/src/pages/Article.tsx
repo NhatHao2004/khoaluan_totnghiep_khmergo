@@ -70,7 +70,7 @@ const Article = () => {
     <div className="page-container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Quản lý Bài viết</h1>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Quản lý bài viết</h1>
         </div>
 
         <div className="input-group" style={{ width: '400px', marginBottom: 0 }}>
@@ -78,7 +78,7 @@ const Article = () => {
             <input
               className="input-field"
               type="text"
-              placeholder="Tìm kiếm bài viết theo tiêu đề..."
+              placeholder="Tìm kiếm bài viết..."
               style={{ paddingLeft: '1rem' }}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -86,6 +86,8 @@ const Article = () => {
           </div>
         </div>
       </div>
+
+      <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
 
 
       {posts.length === 0 ? (

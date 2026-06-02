@@ -118,7 +118,7 @@ const Users = () => {
 
   return (
     <div className="fade-in">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Quản lý người dùng</h1>
         </div>
@@ -136,6 +136,8 @@ const Users = () => {
           </div>
         </div>
       </div>
+
+      <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
 
       {loading ? (
         <div className="card glass-card" style={{ padding: '0', overflow: 'hidden' }}>

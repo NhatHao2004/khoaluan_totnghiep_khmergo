@@ -243,6 +243,8 @@ const Challenges = () => {
         </div>
       </div>
 
+      <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
+
       <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2.5rem' }}>
         <div style={{ flex: 1, display: 'flex', gap: '0.5rem', background: 'var(--bg-accent)', padding: '0.5rem', borderRadius: '14px' }}>
           {TABS.map(tab => (

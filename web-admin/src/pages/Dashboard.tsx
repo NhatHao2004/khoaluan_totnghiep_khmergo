@@ -156,6 +156,8 @@ const Dashboard = () => {
         <p style={{ color: 'var(--text-secondary)', marginTop: '0.4rem', fontSize: '0.875rem' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo</p>
       </div>
 
+      <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
+
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
         <StatCard title="Người dùng" value={stats.users} icon={User} color="#ef4444" onClick={() => navigate('/users')} />
         <StatCard title="Nội dung" value={stats.destinations} icon={BookOpen} color="#10b981" onClick={() => navigate('/destinations')} />
