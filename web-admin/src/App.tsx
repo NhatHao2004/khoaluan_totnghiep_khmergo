@@ -1,27 +1,27 @@
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
-import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, LogOut } from 'lucide-react';
+import { Bell, Calendar, LogOut, RefreshCw, Trash, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import { auth, db } from './firebase/config';
 import './index.css';
+import Article from './pages/Article';
 import Challenges from './pages/Challenges';
 import Dashboard from './pages/Dashboard';
 import Destinations from './pages/Destinations';
 import Login from './pages/Login';
 import ProfilePage from './pages/Profile';
 import Users from './pages/Users';
-import Article from './pages/Article';
 
-const TopBar = ({ notifications, clearNotifications }: any) => {
+const TopBar = ({ notifications, clearNotifications, setShowTrash, setTrashActiveTab }: any) => {
   const [showNotifications, setShowNotifications] = useState(false);
 
   return (
     <header className="top-bar">
       <div style={{ flex: 1 }}></div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
         <div style={{ position: 'relative' }}>
           <button
             onClick={() => setShowNotifications(!showNotifications)}
@@ -30,7 +30,7 @@ const TopBar = ({ notifications, clearNotifications }: any) => {
               borderRadius: '20px',
               border: '1.5px solid #000000',
               background: '#eff6ff',
-              color: '#f63b3bff',
+              color: '#3b82f6',
               cursor: 'pointer',
               position: 'relative',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -109,6 +109,30 @@ const TopBar = ({ notifications, clearNotifications }: any) => {
             )}
           </AnimatePresence>
         </div>
+
+        <button
+          onClick={() => {
+            setTrashActiveTab('destinations');
+            setShowTrash(true);
+          }}
+          style={{
+            padding: '0.75rem',
+            borderRadius: '20px',
+            border: '1.5px solid #000000',
+            background: '#eff6ff',
+            color: '#ef4444',
+            cursor: 'pointer',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
+          }}
+          className="hover-scale"
+          title="Thùng rác hệ thống"
+        >
+          <Trash2 size={22} strokeWidth={2.5} />
+        </button>
       </div>
     </header>
   );
@@ -122,16 +146,29 @@ function App() {
     loading: true
   });
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [showTrash, setShowTrash] = useState(false);
+  const [trashItems, setTrashItems] = useState<any[]>([]);
+  const [trashActiveTab, setTrashActiveTab] = useState('destinations');
+
+  useEffect(() => {
+    if (showTrash) {
+      const unsub = onSnapshot(collection(db, 'trash'), (snap) => {
+        const items = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setTrashItems(items.sort((a: any, b: any) => (b.deletedAt?.seconds || 0) - (a.deletedAt?.seconds || 0)));
+      });
+      return () => unsub();
+    }
+  }, [showTrash]);
 
   useEffect(() => {
     // Lắng nghe bảng notifications
     const unsubNotifications = onSnapshot(collection(db, 'notifications'), (snap) => {
-      const notifsData = snap.docs.map(doc => ({ 
-        id: doc.id, 
+      const notifsData = snap.docs.map(doc => ({
+        id: doc.id,
         type: 'general',
-        ...doc.data() 
+        ...doc.data()
       }));
-      
+
       // Lắng nghe bảng feedback và hợp nhất
       const unsubFeedback = onSnapshot(collection(db, 'feedback'), (fbSnap) => {
         const feedbackData = fbSnap.docs.map(doc => {
@@ -230,10 +267,12 @@ function App() {
       <div className="app-container">
         <Sidebar onLogout={() => setIsLogoutModalOpen(true)} />
         <div className="main-content">
-          <TopBar 
-            notifications={notifications} 
-            clearNotifications={clearNotifications} 
-            adminName={authState.user?.displayName || 'Admin'} 
+          <TopBar
+            notifications={notifications}
+            clearNotifications={clearNotifications}
+            adminName={authState.user?.displayName || 'Admin'}
+            setShowTrash={setShowTrash}
+            setTrashActiveTab={setTrashActiveTab}
           />
           <div style={{ padding: '2.5rem' }}>
             <Routes>
@@ -308,6 +347,97 @@ function App() {
                   >
                     Đăng xuất
                   </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* System Trash Modal */}
+        <AnimatePresence>
+          {showTrash && (
+            <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '1.5rem' }}>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(10px)' }} onClick={() => setShowTrash(false)} />
+              <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} style={{ position: 'relative', width: '100%', maxWidth: '900px', height: '80vh', background: 'white', borderRadius: '32px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+
+                {/* Modal Header */}
+                <div style={{ padding: '2rem 2.5rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b', marginBottom: '0.25rem' }}>Hệ thống khôi phục dữ liệu</h2>
+                    <p style={{ fontSize: '0.875rem', color: '#64748b' }}>Phục hồi các nội dung đã xóa trong 30 ngày gần đây</p>
+                  </div>
+                  <button onClick={() => setShowTrash(false)} style={{ width: '44px', height: '44px', borderRadius: '14px', border: 'none', background: '#f8fafc', color: '#ff0000ff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="hover-bright"><X size={25} /></button>
+                </div>
+
+                {/* Modal Tabs */}
+                <div style={{ padding: '1rem 2.5rem', background: '#f8fafc', display: 'flex', gap: '0.5rem' }}>
+                  {[
+                    { key: 'destinations', label: 'Nội dung học tập' },
+                    { key: 'challenges', label: 'Thử thách' },
+                    { key: 'posts', label: 'Bài viết cộng đồng' }
+                  ].map(tab => (
+                    <button
+                      key={tab.key}
+                      onClick={() => setTrashActiveTab(tab.key)}
+                      style={{ padding: '0.75rem 1.25rem', borderRadius: '12px', border: 'none', background: trashActiveTab === tab.key ? 'white' : 'transparent', color: trashActiveTab === tab.key ? '#3b82f6' : '#64748b', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.6rem', boxShadow: trashActiveTab === tab.key ? '0 4px 12px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Modal Content */}
+                <div style={{ flex: 1, overflowY: 'auto', padding: '2rem 2.5rem' }} className="custom-scrollbar">
+                  {trashItems.filter(item => item.type === trashActiveTab).length === 0 ? (
+                    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                      <Trash size={48} strokeWidth={1} style={{ marginBottom: '1.5rem', opacity: 0.5 }} />
+                      <p style={{ fontWeight: 600 }}>Thùng rác trống cho mục này</p>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'grid', gap: '1rem' }}>
+                      {trashItems.filter(item => item.type === trashActiveTab).map((item: any) => (
+                        <div key={item.id} style={{ padding: '1.25rem', borderRadius: '20px', border: '1px solid #f1f5f9', background: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.2s' }} className="hover-shadow">
+                          <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
+                            <div style={{ width: '56px', height: '56px', borderRadius: '16px', overflow: 'hidden', background: '#f8fafc' }}>
+                              <img src={item.data?.imageUrl || 'https://images.unsplash.com/photo-1590608897129-79da98d15969?q=80&w=200'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                            </div>
+                            <div>
+                              <h4 style={{ fontWeight: 700, color: '#1e293b', marginBottom: '0.25rem' }}>{item.data?.name || item.data?.title || item.data?.pagodaName || 'Không có tiêu đề'}</h4>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.75rem', color: '#64748b' }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Calendar size={14} /> Đã xóa: {item.deletedAt?.toDate().toLocaleString('vi-VN')}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', gap: '0.75rem' }}>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  // Restore logic
+                                  await setDoc(doc(db, item.type, item.originalId), item.data);
+                                  await deleteDoc(doc(db, 'trash', item.id));
+                                } catch (e) { console.error(e); }
+                              }}
+                              style={{ padding: '0.6rem 1rem', borderRadius: '10px', border: 'none', background: '#eff6ff', color: '#3b82f6', fontWeight: 700, fontSize: '0.8125rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                              className="hover-bright"
+                            >
+                              <RefreshCw size={14} /> Khôi phục
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (window.confirm('Xóa vĩnh viễn nội dung này?')) {
+                                  await deleteDoc(doc(db, 'trash', item.id));
+                                }
+                              }}
+                              style={{ padding: '0.6rem 1rem', borderRadius: '10px', border: 'none', background: '#fef2f2', color: '#ef4444', fontWeight: 700, fontSize: '0.8125rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                              className="hover-bright"
+                            >
+                              <Trash size={14} /> Xóa vĩnh viễn
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             </div>

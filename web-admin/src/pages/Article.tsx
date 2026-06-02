@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle, Eye, Image as ImageIcon, Shield, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -63,10 +63,21 @@ const Article = () => {
 
   const handleDeletePost = async () => {
     if (!confirmDialog.postId) return;
+    const itemToDelete = posts.find(p => p.id === confirmDialog.postId);
+    if (!itemToDelete) return;
+
     try {
+      // Sao lưu vào thùng rác
+      await addDoc(collection(db, 'trash'), {
+        originalId: confirmDialog.postId,
+        type: 'posts',
+        data: itemToDelete,
+        deletedAt: serverTimestamp()
+      });
+
       await deleteDoc(doc(db, 'posts', confirmDialog.postId));
       setConfirmDialog({ isOpen: false, postId: '' });
-      showToast('Đã xóa nội dung');
+      showToast('Đã chuyển bài viết vào thùng rác');
     } catch (error) {
       console.error("Error deleting post:", error);
       showToast('Lỗi khi xóa dữ liệu', 'error');

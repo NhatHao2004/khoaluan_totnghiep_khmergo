@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDocs, serverTimestamp, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlignLeft, CheckCircle, Edit2, Image as ImageIcon, Info, MapPin, Shield, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -221,16 +221,27 @@ const Destinations = () => {
   };
 
   const handleDelete = async (id: string) => {
+    const itemToDelete = destinations.find(d => d.id === id);
+    if (!itemToDelete) return;
+
     setConfirmConfig({
       isOpen: true,
       title: 'Xóa nội dung',
       message: 'Bạn chắc chắn muốn xóa vĩnh viễn nội dung này. Thao tác này không thể hoàn tác.',
       onConfirm: async () => {
         try {
+          // Lưu vào thùng rác trước khi xóa
+          await addDoc(collection(db, 'trash'), {
+            originalId: id,
+            type: 'destinations',
+            data: itemToDelete,
+            deletedAt: serverTimestamp()
+          });
+
           await deleteDoc(doc(db, 'destinations', id));
           setDestinations(destinations.filter(d => d.id !== id));
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
-          showToast('Đã xóa nội dung');
+          showToast('Đã chuyển vào thùng rác');
         } catch (error) {
           console.error("Error deleting:", error);
           showToast('Lỗi khi xóa dữ liệu', 'error');

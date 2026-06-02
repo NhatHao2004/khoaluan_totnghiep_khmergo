@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDocs, serverTimestamp, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Award, Brain, CheckCircle, Shield, Trash2, Utensils } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -170,16 +170,27 @@ const Challenges = () => {
   };
 
   const handleDelete = async (id: string) => {
+    const itemToDelete = challenges.find(c => c.id === id);
+    if (!itemToDelete) return;
+
     setConfirmConfig({
       isOpen: true,
       title: 'Xóa Thử thách',
       message: 'Hành động này sẽ xóa vĩnh viễn bộ câu hỏi. Bạn có chắc chắn không',
       onConfirm: async () => {
         try {
+          // Sao lưu vào thùng rác
+          await addDoc(collection(db, 'trash'), {
+            originalId: id,
+            type: 'challenges',
+            data: itemToDelete,
+            deletedAt: serverTimestamp()
+          });
+
           await deleteDoc(doc(db, 'quizzes', id));
           setChallenges(challenges.filter(c => c.id !== id));
           setConfirmConfig(prev => ({ ...prev, isOpen: false }));
-          showToast('Đã xóa Thử thách');
+          showToast('Đã chuyển Thử thách vào thùng rác');
         } catch (error) {
           showToast('Lỗi khi xóa Thử thách', 'error');
         }
