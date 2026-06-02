@@ -152,6 +152,7 @@ function App() {
   const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' }>({
     isOpen: false, message: '', type: 'success'
   });
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ isOpen: true, message, type });
@@ -407,7 +408,9 @@ function App() {
                         <div key={item.id} style={{ padding: '1.25rem', borderRadius: '20px', border: '1px solid #f1f5f9', background: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.2s' }} className="hover-shadow">
                           <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
                             <div>
-                              <h4 style={{ fontWeight: 700, color: '#1e293b', marginBottom: '0.25rem' }}>{item.data?.name || item.data?.title || item.data?.pagodaName || 'Không có tiêu đề'}</h4>
+                              <h4 style={{ fontWeight: 700, color: '#1e293b', marginBottom: '0.25rem', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {item.data?.name || item.data?.title || item.data?.pagodaName || item.data?.content || 'Không có tiêu đề'}
+                              </h4>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.75rem', color: '#64748b' }}>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>Đã xóa: {item.deletedAt?.toDate().toLocaleString('vi-VN')}</span>
                               </div>
@@ -416,8 +419,9 @@ function App() {
                           <div style={{ display: 'flex', gap: '0.75rem' }}>
                             <button
                               onClick={async () => {
+                                if (isProcessing) return;
+                                setIsProcessing(true);
                                 try {
-                                  // Restore logic
                                   const collectionName = item.type === 'challenges' ? 'quizzes' : (item.type === 'destinations' ? 'destinations' : 'posts');
                                   await setDoc(doc(db, collectionName, item.originalId), {
                                     ...item.data,
@@ -426,28 +430,35 @@ function App() {
                                   await deleteDoc(doc(db, 'trash', item.id));
                                   showToast('Đã khôi phục dữ liệu thành công');
                                 } catch (e) {
-                                  console.error(e);
                                   showToast('Lỗi khi khôi phục dữ liệu', 'error');
+                                } finally {
+                                  setIsProcessing(false);
                                 }
                               }}
-                              style={{ padding: '0.6rem 1rem', borderRadius: '10px', border: 'none', background: '#eff6ff', color: '#3b82f6', fontWeight: 700, fontSize: '0.8125rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                              disabled={isProcessing}
+                              style={{ padding: '0.6rem 1rem', borderRadius: '10px', border: 'none', background: '#eff6ff', color: '#3b82f6', fontWeight: 700, fontSize: '0.8125rem', cursor: isProcessing ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: isProcessing ? 0.7 : 1 }}
                               className="hover-bright"
                             >
-                              <RefreshCw size={14} /> Khôi phục
+                              <RefreshCw size={14} className={isProcessing ? 'animate-spin' : ''} /> {isProcessing ? 'Đang khôi phục...' : 'Khôi phục'}
                             </button>
                             <button
                               onClick={async () => {
+                                if (isProcessing) return;
+                                setIsProcessing(true);
                                 try {
                                   await deleteDoc(doc(db, 'trash', item.id));
                                   showToast('Đã xóa vĩnh viễn nội dung');
                                 } catch (e) {
                                   showToast('Lỗi khi xóa nội dung', 'error');
+                                } finally {
+                                  setIsProcessing(false);
                                 }
                               }}
-                              style={{ padding: '0.6rem 1rem', borderRadius: '10px', border: 'none', background: '#fef2f2', color: '#ef4444', fontWeight: 700, fontSize: '0.8125rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                              disabled={isProcessing}
+                              style={{ padding: '0.6rem 1rem', borderRadius: '10px', border: 'none', background: '#fef2f2', color: '#ef4444', fontWeight: 700, fontSize: '0.8125rem', cursor: isProcessing ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: isProcessing ? 0.7 : 1 }}
                               className="hover-bright"
                             >
-                              <Trash size={14} /> Xóa vĩnh viễn
+                              <Trash2 size={14} /> {isProcessing ? 'Đang xóa...' : 'Xóa vĩnh viễn'}
                             </button>
                           </div>
                         </div>

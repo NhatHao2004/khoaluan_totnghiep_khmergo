@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlignLeft, CheckCircle, Edit2, Image as ImageIcon, Info, MapPin, Shield, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -95,6 +95,10 @@ const Destinations = () => {
   const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' }>({
     isOpen: false, message: '', type: 'success'
   });
+  const [confirmConfig, setConfirmConfig] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({
+    isOpen: false, title: '', message: '', onConfirm: () => { }
+  });
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const [newItem, setNewItem] = useState<Partial<Destination>>({
     name: '', name_khmer: '',
@@ -224,21 +228,33 @@ const Destinations = () => {
     const itemToDelete = destinations.find(d => d.id === id);
     if (!itemToDelete) return;
 
-    try {
-      // Lưu vào thùng rác trước khi xóa
-      await addDoc(collection(db, 'trash'), {
-        originalId: id,
-        type: 'destinations',
-        data: itemToDelete,
-        deletedAt: serverTimestamp()
-      });
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Xóa nội dung',
+      message: `Bạn chắc chắn xóa nội dung này?\nNội dung sẽ được chuyển vào thùng rác.`,
+      onConfirm: async () => {
+        if (isProcessing) return;
+        setIsProcessing(true);
+        try {
+          // Lưu vào thùng rác trước khi xóa
+          await addDoc(collection(db, 'trash'), {
+            originalId: id,
+            type: 'destinations',
+            data: itemToDelete,
+            deletedAt: serverTimestamp()
+          });
 
-      await deleteDoc(doc(db, 'destinations', id));
-      showToast('Đã chuyển vào thùng rác');
-    } catch (error) {
-      console.error("Error deleting:", error);
-      showToast('Lỗi khi xóa dữ liệu', 'error');
-    }
+          await deleteDoc(doc(db, 'destinations', id));
+          setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+          showToast('Đã chuyển vào thùng rác');
+        } catch (error) {
+          console.error("Error deleting:", error);
+          showToast('Lỗi khi xóa dữ liệu', 'error');
+        } finally {
+          setIsProcessing(false);
+        }
+      }
+    });
   };
 
   const handleAddContentBlock = () => {
@@ -585,6 +601,25 @@ const Destinations = () => {
         )}
       </AnimatePresence>
 
+      {/* Confirmation Modal */}
+      <AnimatePresence>
+        {confirmConfig.isOpen && (
+          <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '1.5rem' }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))} />
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="card" style={{ position: 'relative', width: '100%', maxWidth: '450px', padding: '2.5rem', textAlign: 'center', borderRadius: '28px' }}>
+              <div style={{ width: '64px', height: '64px', background: '#fef2f2', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                <Shield size={32} color="#dc2626" />
+              </div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>{confirmConfig.title}</h3>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2.5rem', whiteSpace: 'pre-line' }}>{confirmConfig.message}</p>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button className="btn" style={{ flex: 1, background: '#3b82f6', color: 'white', fontWeight: 700, borderRadius: '14px', opacity: isProcessing ? 0.7 : 1 }} onClick={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))} disabled={isProcessing}>Đóng</button>
+                <button className="btn" style={{ flex: 1, background: '#ef4444', color: 'white', fontWeight: 700, borderRadius: '14px', opacity: isProcessing ? 0.7 : 1 }} onClick={confirmConfig.onConfirm} disabled={isProcessing}>{isProcessing ? 'Đang xóa...' : 'Xóa'}</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

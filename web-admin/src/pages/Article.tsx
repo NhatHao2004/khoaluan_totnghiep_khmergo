@@ -18,6 +18,11 @@ const Article = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
   const [comments, setComments] = useState<any[]>([]);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    postId: string;
+  }>({ isOpen: false, postId: '' });
+  const [isProcessing, setIsProcessing] = useState(false);
   const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' }>({
     isOpen: false, message: '', type: 'success'
   });
@@ -57,24 +62,30 @@ const Article = () => {
     return () => unsubComments();
   }, [selectedPost]);
 
-  const handleDeletePost = async (id: string) => {
-    const itemToDelete = posts.find(p => p.id === id);
-    if (!itemToDelete) return;
+  const handleDeletePost = async () => {
+    if (!confirmDialog.postId || isProcessing) return;
+    setIsProcessing(true);
+    const itemToDelete = posts.find(p => p.id === confirmDialog.postId);
+    if (!itemToDelete) { setIsProcessing(false); return; }
 
     try {
       // Sao lưu vào thùng rác
       await addDoc(collection(db, 'trash'), {
-        originalId: id,
+        originalId: confirmDialog.postId,
         type: 'posts',
         data: itemToDelete,
         deletedAt: serverTimestamp()
       });
 
-      await deleteDoc(doc(db, 'posts', id));
+      await deleteDoc(doc(db, 'posts', confirmDialog.postId));
+      setConfirmDialog({ isOpen: false, postId: '' });
       showToast('Đã chuyển bài viết vào thùng rác');
     } catch (error) {
       console.error("Error deleting post:", error);
       showToast('Lỗi khi xóa dữ liệu', 'error');
+      setConfirmDialog({ isOpen: false, postId: '' });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -200,7 +211,7 @@ const Article = () => {
                             gap: '0.5rem',
                             transition: 'opacity 0.2s'
                           }}
-                          onClick={() => handleDeletePost(post.id)}
+                          onClick={() => setConfirmDialog({ isOpen: true, postId: post.id })}
                         >
                           <Trash2 size={18} strokeWidth={2.5} />
                           <span style={{ fontWeight: 700, fontSize: '0.75rem' }}>Xóa</span>
@@ -214,6 +225,59 @@ const Article = () => {
           </table>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {confirmDialog.isOpen && (
+          <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '1.5rem' }}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }}
+              onClick={() => setConfirmDialog({ isOpen: false, postId: '' })}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="card"
+              style={{
+                position: 'relative',
+                width: '100%',
+                maxWidth: '400px',
+                padding: '2.5rem 2rem',
+                textAlign: 'center',
+                borderRadius: '32px'
+              }}
+            >
+              <div style={{ width: '64px', height: '64px', background: '#fef2f2', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                <Shield size={32} color="#ef4444" />
+              </div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>Xác nhận xóa bài viết</h3>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '2.5rem', whiteSpace: 'pre-line' }}>Bạn chắc chắn xóa bài viết này?{"\n"}Nội dung sẽ được chuyển vào thùng rác.</p>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button
+                  className="btn"
+                  style={{ flex: 1, background: '#3b82f6', color: 'white', fontWeight: 700, borderRadius: '14px', opacity: isProcessing ? 0.7 : 1 }}
+                  onClick={() => setConfirmDialog({ isOpen: false, postId: '' })}
+                  disabled={isProcessing}
+                >
+                  Đóng
+                </button>
+                <button
+                  className="btn"
+                  style={{ flex: 1, background: '#ef4444', color: 'white', fontWeight: 700, borderRadius: '14px', opacity: isProcessing ? 0.7 : 1 }}
+                  onClick={handleDeletePost}
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? 'Đang xóa...' : 'Xóa'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
 
       {/* Post Details Modal */}
@@ -335,7 +399,7 @@ const Article = () => {
                                     <img src={rootComment.userAvatar || rootComment.userImage || rootComment.avatar || rootComment.photoURL || 'https://i.pravatar.cc/150?u=comment'} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                   ) : (
                                     (rootComment.userId === selectedPost.userId || rootComment.userName === selectedPost.user) && selectedPost.userAvatar ? (
-                                          <img src={selectedPost.userAvatar || 'https://i.pravatar.cc/150?u=default'} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                      <img src={selectedPost.userAvatar || 'https://i.pravatar.cc/150?u=default'} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     ) : (
                                       <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: 'var(--primary)' }}>{rootComment.userName?.charAt(0) || rootComment.user?.charAt(0) || '?'}</span>
                                     )
@@ -360,7 +424,7 @@ const Article = () => {
                                         <img src={reply.userAvatar || reply.userImage || reply.avatar || reply.photoURL || 'https://i.pravatar.cc/150?u=reply'} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                       ) : (
                                         (reply.userId === selectedPost.userId || reply.userName === selectedPost.user) && selectedPost.userAvatar ? (
-                                              <img src={selectedPost.userAvatar || 'https://i.pravatar.cc/150?u=default'} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                          <img src={selectedPost.userAvatar || 'https://i.pravatar.cc/150?u=default'} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         ) : (
                                           <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--primary)' }}>{reply.userName?.charAt(0) || reply.user?.charAt(0) || '?'}</span>
                                         )
@@ -389,24 +453,24 @@ const Article = () => {
 
       <AnimatePresence>
         {toast.isOpen && (
-          <motion.div 
-            initial={{ y: 20, opacity: 0 }} 
-            animate={{ y: 0, opacity: 1 }} 
-            exit={{ y: 20, opacity: 0 }} 
-            style={{ 
-              position: 'fixed', 
-              bottom: '2rem', 
-              right: '2rem', 
-              zIndex: 10000, 
-              padding: '1rem 1.5rem', 
-              background: toast.type === 'success' ? '#10b981' : '#ef4444', 
-              color: '#fff', 
-              borderRadius: '12px', 
-              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', 
-              fontWeight: 600, 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.75rem' 
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 20, opacity: 0 }}
+            style={{
+              position: 'fixed',
+              bottom: '2rem',
+              right: '2rem',
+              zIndex: 10000,
+              padding: '1rem 1.5rem',
+              background: toast.type === 'success' ? '#10b981' : '#ef4444',
+              color: '#fff',
+              borderRadius: '12px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem'
             }}
           >
             {toast.type === 'success' ? <CheckCircle size={20} /> : <Shield size={20} />}
