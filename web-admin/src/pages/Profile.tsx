@@ -130,7 +130,7 @@ const Profile = () => {
                 boxShadow: 'var(--shadow-lg)',
                 border: '1px solid var(--border-light)'
               }}>
-                <img src={adminInfo.avatar} style={{ width: '100%', height: '100%', borderRadius: '26px', objectFit: 'cover' }} alt="Avatar" />
+                <img src={adminInfo.avatar || 'https://i.pravatar.cc/150?u=admin'} style={{ width: '100%', height: '100%', borderRadius: '26px', objectFit: 'cover' }} alt="Avatar" />
               </div>
               <button className="btn btn-primary" style={{ position: 'absolute', bottom: '0.5rem', right: '-0.5rem', width: '40px', height: '40px', padding: 0, borderRadius: '12px', border: '3px solid white' }}>
                 <Camera size={18} />

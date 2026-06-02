@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, serverTimestamp, setDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlignLeft, CheckCircle, Edit2, Image as ImageIcon, Info, MapPin, Shield, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -133,7 +133,16 @@ const Destinations = () => {
   };
 
   useEffect(() => {
-    fetchDestinations();
+    setLoading(true);
+    const unsub = onSnapshot(collection(db, 'destinations'), (snap) => {
+      const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Destination));
+      setDestinations(docs);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching destinations:", error);
+      setLoading(false);
+    });
+    return () => unsub();
   }, []);
 
   useEffect(() => {
@@ -144,18 +153,6 @@ const Destinations = () => {
     }
     return () => { document.body.style.overflow = 'unset'; };
   }, [editingItem, isAddingNew, viewingItem]);
-
-  const fetchDestinations = async () => {
-    setLoading(true);
-    try {
-      const querySnapshot = await getDocs(collection(db, 'destinations'));
-      const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Destination));
-      setDestinations(docs);
-    } catch (error) {
-      console.error("Error fetching destinations:", error);
-    }
-    setLoading(false);
-  };
 
   const validateDestination = (item: Partial<Destination>) => {
     const isChua = activeTab === 'Chùa';

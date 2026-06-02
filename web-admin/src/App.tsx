@@ -1,7 +1,7 @@
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, Calendar, LogOut, RefreshCw, Trash, Trash2, X } from 'lucide-react';
+import { Bell, LogOut, RefreshCw, Trash, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
@@ -149,6 +149,14 @@ function App() {
   const [showTrash, setShowTrash] = useState(false);
   const [trashItems, setTrashItems] = useState<any[]>([]);
   const [trashActiveTab, setTrashActiveTab] = useState('destinations');
+  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' }>({
+    isOpen: false, message: '', type: 'success'
+  });
+
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ isOpen: true, message, type });
+    setTimeout(() => setToast(prev => ({ ...prev, isOpen: false })), 3000);
+  };
 
   useEffect(() => {
     if (showTrash) {
@@ -398,13 +406,10 @@ function App() {
                       {trashItems.filter(item => item.type === trashActiveTab).map((item: any) => (
                         <div key={item.id} style={{ padding: '1.25rem', borderRadius: '20px', border: '1px solid #f1f5f9', background: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.2s' }} className="hover-shadow">
                           <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
-                            <div style={{ width: '56px', height: '56px', borderRadius: '16px', overflow: 'hidden', background: '#f8fafc' }}>
-                              <img src={item.data?.imageUrl || 'https://images.unsplash.com/photo-1590608897129-79da98d15969?q=80&w=200'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
-                            </div>
                             <div>
                               <h4 style={{ fontWeight: 700, color: '#1e293b', marginBottom: '0.25rem' }}>{item.data?.name || item.data?.title || item.data?.pagodaName || 'Không có tiêu đề'}</h4>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.75rem', color: '#64748b' }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Calendar size={14} /> Đã xóa: {item.deletedAt?.toDate().toLocaleString('vi-VN')}</span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>Đã xóa: {item.deletedAt?.toDate().toLocaleString('vi-VN')}</span>
                               </div>
                             </div>
                           </div>
@@ -413,9 +418,14 @@ function App() {
                               onClick={async () => {
                                 try {
                                   // Restore logic
-                                  await setDoc(doc(db, item.type, item.originalId), item.data);
+                                  const collectionName = item.type === 'challenges' ? 'quizzes' : (item.type === 'destinations' ? 'destinations' : 'posts');
+                                  await setDoc(doc(db, collectionName, item.originalId), item.data);
                                   await deleteDoc(doc(db, 'trash', item.id));
-                                } catch (e) { console.error(e); }
+                                  showToast('Đã khôi phục nội dung thành công');
+                                } catch (e) { 
+                                  console.error(e); 
+                                  showToast('Lỗi khi khôi phục nội dung', 'error');
+                                }
                               }}
                               style={{ padding: '0.6rem 1rem', borderRadius: '10px', border: 'none', background: '#eff6ff', color: '#3b82f6', fontWeight: 700, fontSize: '0.8125rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                               className="hover-bright"
@@ -425,7 +435,12 @@ function App() {
                             <button
                               onClick={async () => {
                                 if (window.confirm('Xóa vĩnh viễn nội dung này?')) {
-                                  await deleteDoc(doc(db, 'trash', item.id));
+                                  try {
+                                    await deleteDoc(doc(db, 'trash', item.id));
+                                    showToast('Đã xóa vĩnh viễn nội dung');
+                                  } catch (e) {
+                                    showToast('Lỗi khi xóa nội dung', 'error');
+                                  }
                                 }
                               }}
                               style={{ padding: '0.6rem 1rem', borderRadius: '10px', border: 'none', background: '#fef2f2', color: '#ef4444', fontWeight: 700, fontSize: '0.8125rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
@@ -444,6 +459,35 @@ function App() {
           )}
         </AnimatePresence>
       </div>
+      <AnimatePresence>
+        {toast.isOpen && (
+          <motion.div 
+            initial={{ y: 20, opacity: 0 }} 
+            animate={{ y: 0, opacity: 1 }} 
+            exit={{ y: 20, opacity: 0 }} 
+            style={{ 
+              position: 'fixed', 
+              bottom: '2rem', 
+              right: '2rem', 
+              zIndex: 20000, 
+              padding: '1rem 1.5rem', 
+              background: toast.type === 'success' ? '#10b981' : '#ef4444', 
+              color: '#fff', 
+              borderRadius: '12px', 
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', 
+              fontWeight: 700, 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.75rem' 
+            }}
+          >
+            <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {toast.type === 'success' ? <RefreshCw size={14} /> : <X size={14} />}
+            </div>
+            {toast.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Router>
   );
 }

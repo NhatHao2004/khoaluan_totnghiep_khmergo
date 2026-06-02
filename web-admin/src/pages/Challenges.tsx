@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, serverTimestamp, setDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Award, Brain, CheckCircle, Shield, Trash2, Utensils } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -101,23 +101,28 @@ const Challenges = () => {
     setTimeout(() => setToast(prev => ({ ...prev, isOpen: false })), 3000);
   };
 
-  const fetchChallengesData = async () => {
-    setLoading(true);
-    try {
-      const quizSnapshot = await getDocs(collection(db, 'quizzes'));
-      const quizDocs = quizSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Challenge));
-      const destSnapshot = await getDocs(collection(db, 'destinations'));
-      const destDocs = destSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setDestinations(destDocs);
-      setChallenges(quizDocs);
-    } catch (error) {
-      console.error("Error fetching challenges:", error);
-    }
-    setLoading(false);
-  };
-
   useEffect(() => {
-    fetchChallengesData();
+    setLoading(true);
+    // Real-time listener for quizzes
+    const unsubQuizzes = onSnapshot(collection(db, 'quizzes'), (snap) => {
+      const quizDocs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Challenge));
+      setChallenges(quizDocs);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching challenges:", error);
+      setLoading(false);
+    });
+
+    // Real-time listener for destinations
+    const unsubDestinations = onSnapshot(collection(db, 'destinations'), (snap) => {
+      const destDocs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setDestinations(destDocs);
+    });
+
+    return () => {
+      unsubQuizzes();
+      unsubDestinations();
+    };
   }, []);
 
   useEffect(() => {

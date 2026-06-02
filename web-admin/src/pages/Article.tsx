@@ -343,7 +343,7 @@ const Article = () => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--bg-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                       {selectedPost.userAvatar ? (
-                        <img src={selectedPost.userAvatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={selectedPost.userAvatar || 'https://i.pravatar.cc/150?u=default'} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       ) : (
                         <span style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--primary)' }}>{selectedPost.user?.charAt(0)}</span>
                       )}
@@ -389,10 +389,10 @@ const Article = () => {
                               <div style={{ display: 'flex', gap: '0.875rem' }}>
                                 <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, border: '1px solid var(--border-light)' }}>
                                   {(rootComment.userAvatar || rootComment.userImage || rootComment.avatar || rootComment.photoURL) ? (
-                                    <img src={rootComment.userAvatar || rootComment.userImage || rootComment.avatar || rootComment.photoURL} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    <img src={rootComment.userAvatar || rootComment.userImage || rootComment.avatar || rootComment.photoURL || 'https://i.pravatar.cc/150?u=comment'} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                   ) : (
                                     (rootComment.userId === selectedPost.userId || rootComment.userName === selectedPost.user) && selectedPost.userAvatar ? (
-                                      <img src={selectedPost.userAvatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                          <img src={selectedPost.userAvatar || 'https://i.pravatar.cc/150?u=default'} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     ) : (
                                       <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: 'var(--primary)' }}>{rootComment.userName?.charAt(0) || rootComment.user?.charAt(0) || '?'}</span>
                                     )
@@ -414,10 +414,10 @@ const Article = () => {
                                   <div key={reply.id} style={{ display: 'flex', gap: '0.875rem', marginLeft: '2.5rem', paddingLeft: '1rem', borderLeft: '2px solid var(--border-light)' }}>
                                     <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, border: '1px solid var(--border-light)' }}>
                                       {(reply.userAvatar || reply.userImage || reply.avatar || reply.photoURL) ? (
-                                        <img src={reply.userAvatar || reply.userImage || reply.avatar || reply.photoURL} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        <img src={reply.userAvatar || reply.userImage || reply.avatar || reply.photoURL || 'https://i.pravatar.cc/150?u=reply'} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                       ) : (
                                         (reply.userId === selectedPost.userId || reply.userName === selectedPost.user) && selectedPost.userAvatar ? (
-                                          <img src={selectedPost.userAvatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                              <img src={selectedPost.userAvatar || 'https://i.pravatar.cc/150?u=default'} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         ) : (
                                           <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--primary)' }}>{reply.userName?.charAt(0) || reply.user?.charAt(0) || '?'}</span>
                                         )

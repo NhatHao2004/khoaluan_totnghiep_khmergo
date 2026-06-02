@@ -223,7 +223,7 @@ const Dashboard = () => {
                 <div key={`${leaderboardType}-podium-${rank}`} style={{ flex: 1, maxWidth: '110px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
                   <div style={{ marginBottom: '1rem', textAlign: 'center', width: '100%' }}>
                     <div style={{ width: rank === 1 ? '72px' : '56px', height: rank === 1 ? '72px' : '56px', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', overflow: 'hidden', margin: '0 auto 0.5rem', background: 'white' }}>
-                      {user?.avatar ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={rank === 1 ? 32 : 24} style={{ margin: rank === 1 ? '16px' : '12px', color: '#94a3b8' }} />}
+                      {user?.avatar && user.avatar !== "" ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={rank === 1 ? 32 : 24} style={{ margin: rank === 1 ? '16px' : '12px', color: '#94a3b8' }} />}
                     </div>
                     <p style={{ fontWeight: 800, fontSize: '0.8125rem', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.name || '---'}</p>
                     <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 800 }}>{user?.points || 0} Điểm</p>
@@ -247,7 +247,7 @@ const Dashboard = () => {
                 <div key={`${leaderboardType}-rank-${rank}`} style={{ flex: 1, maxWidth: '90px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
                   <div style={{ marginBottom: '1rem', textAlign: 'center', width: '100%' }}>
                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', overflow: 'hidden', margin: '0 auto 0.5rem', background: 'white' }}>
-                      {user?.avatar ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={18} style={{ margin: '9px', color: '#cbd5e1' }} />}
+                      {user?.avatar && user.avatar !== "" ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={18} style={{ margin: '9px', color: '#cbd5e1' }} />}
                     </div>
                     <p style={{ fontWeight: 700, fontSize: '0.7rem', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#64748b' }}>{user?.name || '---'}</p>
                     <p style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 700 }}>{user?.points || 0} Điểm</p>
