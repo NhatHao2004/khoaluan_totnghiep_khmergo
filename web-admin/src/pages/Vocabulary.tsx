@@ -1,6 +1,6 @@
 import { addDoc, collection, deleteDoc, doc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle, Languages, Shield, Trash2, Type } from 'lucide-react';
+import { CheckCircle, Languages, Pencil, Shield, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { db } from '../firebase/config';
 
@@ -291,13 +291,15 @@ const Vocabulary = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Quản lý từ vựng {activeCategoryId ? `(${formatCategoryName(activeCategory!)})` : ''}</h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <input
-            className="input-field"
-            placeholder="Tìm kiếm nhanh..."
-            style={{ width: '250px' }}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          {!activeCategoryId && (
+            <input
+              className="input-field"
+              placeholder="Tìm kiếm nhanh..."
+              style={{ width: '250px' }}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          )}
 
           {!activeCategoryId && (
             <button className="btn" onClick={() => setIsAddingCategory(true)} style={{ background: '#3b82f6', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 700 }}>
@@ -445,8 +447,8 @@ const Vocabulary = () => {
                         <td style={{ padding: '0.75rem 1.5rem', fontWeight: 700, color: 'var(--text-primary)' }}>{word.life}</td>
                         <td style={{ padding: '0.75rem 1.5rem', textAlign: 'right' }}>
                           <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                            <button onClick={() => { setEditingWord(word); setIsAddingWord(false); }} className="btn-icon" style={{ background: '#eff6ff', color: 'var(--primary)', border: 'none', cursor: 'pointer' }} title="Sửa"><Type size={16} /></button>
-                            <button onClick={() => handleDeleteWord(word.id)} className="btn-icon" style={{ background: '#fef2f2', color: 'var(--danger)', border: 'none', cursor: 'pointer' }} title="Xóa"><Trash2 size={16} /></button>
+                            <button onClick={() => { setEditingWord(word); setIsAddingWord(false); }} style={{ background: '#ebf3ff', color: '#3b82f6', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.8rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.85rem' }} className="hover-bright" title="Sửa"><Pencil size={16} /> Sửa</button>
+                            <button onClick={() => handleDeleteWord(word.id)} style={{ background: '#fef2f2', color: 'var(--danger)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.8rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.85rem' }} className="hover-bright" title="Xóa"><Trash2 size={16} /> Xóa</button>
                           </div>
                         </td>
                       </tr>
