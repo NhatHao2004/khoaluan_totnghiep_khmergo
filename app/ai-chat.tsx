@@ -21,7 +21,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import { analyzeImage, chatWithAI } from '../services/ai-service';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -65,7 +65,7 @@ export default function AIAssistantScreen() {
     setToastType(type);
     setShowToast(true);
     toastY.value = withTiming(Platform.OS === 'ios' ? 50 : 40, { duration: 400 });
-    
+
     setTimeout(() => {
       toastY.value = withTiming(-120, { duration: 400 });
       setTimeout(() => setShowToast(false), 400);
@@ -329,7 +329,13 @@ export default function AIAssistantScreen() {
                               const match = msg.text.match(/\[LINK:(.*?)\]/);
                               if (match) {
                                 const id = match[1];
-                                if (id.startsWith('pagoda_')) {
+                                if (id === 'food_all') {
+                                  router.push('/food');
+                                } else if (id === 'pagoda_all') {
+                                  router.push('/pagoda');
+                                } else if (id === 'culture_all') {
+                                  router.push('/culture');
+                                } else if (id.startsWith('pagoda_')) {
                                   router.push({ pathname: '/pagoda-detail', params: { id } });
                                 } else if (id.startsWith('culture_')) {
                                   router.push({ pathname: '/culture-detail', params: { id } });
@@ -339,7 +345,9 @@ export default function AIAssistantScreen() {
                               }
                             }}
                           >
-                            <Text style={styles.detailBtnText}>Xem chi tiết</Text>
+                            <Text style={styles.detailBtnText}>
+                              {msg.text.includes('_all]') ? 'Khám phá ngay' : 'Xem chi tiết'}
+                            </Text>
                           </TouchableOpacity>
                         )}
                         <Text style={styles.chatTime}>
@@ -533,11 +541,11 @@ const styles = StyleSheet.create({
   tabContainer: { paddingHorizontal: 20, paddingVertical: 10, backgroundColor: '#FFF' },
   tabWrapper: { flexDirection: 'row', backgroundColor: '#F1F5F9', borderRadius: 25, padding: 4 },
   tab: { flex: 1, flexDirection: 'row', height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', gap: 6 },
-  activeTab: { 
-    backgroundColor: '#1877F2', 
-    shadowColor: '#1877F2', 
-    shadowOffset: { width: 0, height: 4 }, 
-    shadowOpacity: 0.4, 
+  activeTab: {
+    backgroundColor: '#1877F2',
+    shadowColor: '#1877F2',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 8,
   },
