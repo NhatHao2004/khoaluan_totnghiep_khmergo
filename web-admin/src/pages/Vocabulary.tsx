@@ -1,6 +1,6 @@
 import { collection, doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Book, CheckCircle, Languages, Search, Shield, Trash2, Type, Volume2 } from 'lucide-react';
+import { Book, CheckCircle, Languages, Shield, Trash2, Type, Volume2 } from 'lucide-react';
 import { useEffect, useState, useMemo } from 'react';
 import { db } from '../firebase/config';
 
@@ -68,11 +68,18 @@ const Vocabulary = () => {
     const unsub = onSnapshot(collection(db, 'vocab_categories'), (snap) => {
       const cats = snap.docs.map(doc => {
         const data = doc.data();
+        const rawWords = Array.isArray(data.words) ? data.words : [];
+        const normalizedWords = rawWords.map((w: any) => ({
+          id: w.id || `w_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          khm: w.khm || '',
+          life: w.life || w.vie || '',
+          pronunciation: w.pronunciation || w.pro || '',
+        }));
         return {
           id: doc.id,
           title: data.title || '',
           order: data.order || 0,
-          words: Array.isArray(data.words) ? data.words : []
+          words: normalizedWords
         } as Category;
       });
       setCategories(cats.sort((a, b) => (a.order || 0) - (b.order || 0)));
@@ -157,7 +164,7 @@ const Vocabulary = () => {
   );
 
   return (
-    <div className="fade-in">
+    <div className="fade-in" style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '0.5rem 2rem 2rem 2rem' }}>
       <AnimatePresence>
         {toast.isOpen && (
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 10000, padding: '1rem 1.5rem', background: toast.type === 'success' ? 'var(--success)' : 'var(--danger)', color: '#fff', borderRadius: '12px', boxShadow: 'var(--shadow-lg)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -169,12 +176,9 @@ const Vocabulary = () => {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Quản lý từ vựng</h1>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <div style={{ position: 'relative' }}>
-            <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-            <input className="input-field" placeholder="Tìm kiếm từ vựng..." style={{ width: '250px', paddingLeft: '3rem', borderRadius: '10px', border: '1.5px solid #e2e8f0', padding: '0.75rem 1rem 0.75rem 3rem' }} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-          </div>
-          <button className="btn" onClick={() => { setEditingWord({ id: `w_${Date.now()}`, khm: '', life: '', pronunciation: '' }); setIsAddingWord(true); }} style={{ background: 'var(--primary)', color: 'white', borderRadius: '12px', display: 'flex', alignItems: 'center', fontWeight: 700, padding: '0.75rem 1.5rem', border: 'none', cursor: 'pointer' }}>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <input className="input-field" placeholder="Tìm kiếm nhanh..." style={{ width: '300px' }} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <button className="btn" onClick={() => { setEditingWord({ id: `w_${Date.now()}`, khm: '', life: '', pronunciation: '' }); setIsAddingWord(true); }} style={{ background: 'rgb(59, 130, 246)', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 700 }}>
             Thêm từ mới
           </button>
         </div>
@@ -182,9 +186,9 @@ const Vocabulary = () => {
 
       <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '100px', marginBottom: '2.5rem', boxShadow: 'rgba(0, 0, 0, 0.05) 0px 1px 2px' }}></div>
 
-      <div style={{ display: 'flex', gap: '2rem', height: 'calc(100vh - 250px)' }}>
+      <div style={{ display: 'flex', gap: '2rem', flex: 1, minHeight: 0 }}>
         {/* Category List */}
-        <div style={{ width: '280px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div style={{ width: '280px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem', overflowY: 'auto' }} className="custom-scrollbar">
           {loading ? (
             Array.from({ length: 5 }).map((_, i) => <div key={i} className="skeleton" style={{ height: '60px', borderRadius: '16px' }} />)
           ) : (
@@ -223,7 +227,7 @@ const Vocabulary = () => {
         </div>
 
         {/* Word Table */}
-        <div className="card glass-card" style={{ flex: 1, padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
+        <div className="card glass-card" style={{ flex: 1, padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', borderRadius: '24px', border: '1px solid #e2e8f0', minHeight: 0 }}>
           <div style={{ flex: 1, overflowY: 'auto' }} className="custom-scrollbar">
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10 }}>
