@@ -147,7 +147,7 @@ export default function LoginScreen() {
                 resizeMode="contain"
               />
               <View style={styles.logoHintRow}>
-                <Text style={styles.logoHint}>Chào mừng bạn quay lại</Text>
+                <Text style={styles.logoHint} numberOfLines={1} adjustsFontSizeToFit>Chào mừng bạn quay lại</Text>
                 <Animated.View style={[waveStyle, { marginLeft: 8 }]}>
                   <Text style={styles.waveEmoji}>👋</Text>
                 </Animated.View>
@@ -173,8 +173,8 @@ export default function LoginScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 4 }}>
-                  <Text style={styles.inputLabel}>{t('password_label')}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 4, gap: 10 }}>
+                  <Text style={[styles.inputLabel, { flex: 1 }]} numberOfLines={1}>{t('password_label')}</Text>
                   <TouchableOpacity>
                     <Text style={{ fontSize: 13, color: '#94A3B8', fontWeight: '500' }}>Quên mật khẩu</Text>
                   </TouchableOpacity>
@@ -279,12 +279,12 @@ const styles = StyleSheet.create({
   logoWrapper: { alignItems: 'center', marginBottom: 25 },
   logoImage: { width: 130, height: 130 },
   logoHintRow: { marginTop: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  logoHint: { fontSize: 16, color: '#64748B', fontWeight: '700' },
+  logoHint: { fontSize: 17, color: '#64748B', fontWeight: '700' },
   waveEmoji: { fontSize: 20 },
 
   form: { gap: 20, marginBottom: 30 },
   inputGroup: { gap: 8 },
-  inputLabel: { fontSize: 14, fontWeight: '700', color: '#64748B', marginLeft: 4 },
+  inputLabel: { fontSize: 14, fontWeight: '700', color: '#64748B', marginLeft: 4, flexShrink: 0 },
   inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: 16, paddingHorizontal: 16, height: 56, borderWidth: 1, borderColor: '#F1F5F9' },
   inputIcon: { marginRight: 12 },
   input: { flex: 1, fontSize: 16, color: '#1E293B', fontWeight: '600', paddingVertical: 10 },

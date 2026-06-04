@@ -291,14 +291,14 @@ export default function AIAssistantScreen() {
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('chat'); }}
           >
             <Ionicons name="chatbubbles" size={20} color={activeTab === 'chat' ? '#FFF' : '#6B7280'} />
-            <Text style={[styles.tabText, activeTab === 'chat' && styles.activeTabText]}>AI Chatbot</Text>
+            <Text style={[styles.tabText, activeTab === 'chat' && styles.activeTabText]} numberOfLines={1}>AI Chatbot</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'camera' && styles.activeTab]}
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('camera'); }}
           >
             <Ionicons name="camera" size={20} color={activeTab === 'camera' ? '#FFF' : '#6B7280'} />
-            <Text style={[styles.tabText, activeTab === 'camera' && styles.activeTabText]}>AI Camera</Text>
+            <Text style={[styles.tabText, activeTab === 'camera' && styles.activeTabText]} numberOfLines={1}>AI Camera</Text>
           </TouchableOpacity>
         </View>
       </View>

@@ -172,7 +172,7 @@ export default function FoodDetailScreen() {
                   activeTab === 'gallery' && { backgroundColor: '#3B82F6', borderColor: '#3B82F6' }
                 ]}
               >
-                <Text style={[styles.tabBtnText, activeTab === 'gallery' && styles.tabBtnTextActive]}>{isKm ? 'រូបភាព' : 'HÌNH ẢNH'}</Text>
+                <Text style={[styles.tabBtnText, activeTab === 'gallery' && styles.tabBtnTextActive]} numberOfLines={1} adjustsFontSizeToFit>{isKm ? 'រូបភាព' : 'HÌNH ẢNH'}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -182,7 +182,7 @@ export default function FoodDetailScreen() {
                   activeTab === 'quiz' && { backgroundColor: '#FF6B2C', borderColor: '#FF6B2C' }
                 ]}
               >
-                <Text style={[styles.tabBtnText, activeTab === 'quiz' && styles.tabBtnTextActive]}>{isKm ? 'ការប្រកួត' : 'THỬ THÁCH'}</Text>
+                <Text style={[styles.tabBtnText, activeTab === 'quiz' && styles.tabBtnTextActive]} numberOfLines={1} adjustsFontSizeToFit>{isKm ? 'ការប្រកួត' : 'THỬ THÁCH'}</Text>
               </TouchableOpacity>
             </View>
 

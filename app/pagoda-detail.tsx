@@ -230,7 +230,7 @@ export default function PagodaDetailScreen() {
                   activeTab === 'map' && { backgroundColor: '#3B82F6', borderColor: '#3B82F6' }
                 ]}
               >
-                <Text style={[styles.tabBtnText, activeTab === 'map' && styles.tabBtnTextActive]}>{t('map_location')}</Text>
+                <Text style={[styles.tabBtnText, activeTab === 'map' && styles.tabBtnTextActive]} numberOfLines={1} adjustsFontSizeToFit>{t('map_location')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -240,7 +240,7 @@ export default function PagodaDetailScreen() {
                   activeTab === 'quiz' && { backgroundColor: '#FF6B2C', borderColor: '#FF6B2C' }
                 ]}
               >
-                <Text style={[styles.tabBtnText, activeTab === 'quiz' && styles.tabBtnTextActive]}>{isKm ? 'ការប្រកួត' : 'THỬ THÁCH'}</Text>
+                <Text style={[styles.tabBtnText, activeTab === 'quiz' && styles.tabBtnTextActive]} numberOfLines={1} adjustsFontSizeToFit>{isKm ? 'ការប្រកួត' : 'THỬ THÁCH'}</Text>
               </TouchableOpacity>
             </View>
 

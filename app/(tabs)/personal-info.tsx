@@ -344,7 +344,7 @@ export default function PersonalInfoScreen() {
               {saving ? (
                 <ActivityIndicator color="#ffffffff" />
               ) : (
-                <Text style={styles.saveBtnText}>{t('save_changes')}</Text>
+                <Text style={styles.saveBtnText} numberOfLines={1} adjustsFontSizeToFit>{t('save_changes')}</Text>
               )}
             </TouchableOpacity>
           </View>
@@ -437,7 +437,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1A1A1A',
     marginBottom: 15,
-    lineHeight: 26,
   },
   menuItem: {
     flexDirection: 'row',
