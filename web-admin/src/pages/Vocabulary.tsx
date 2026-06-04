@@ -221,14 +221,16 @@ const Vocabulary = () => {
                   {/* Category Cover Image (Using provided assets) */}
                   <div style={{
                     width: '100%',
-                    aspectRatio: '16/10',
+                    height: '160px',
                     borderRadius: '18px',
                     overflow: 'hidden',
-                    background: '#f8fafc',
-                    position: 'relative'
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'transparent'
                   }}>
                     <img
-                      src={`/assets/${
+                      src={`/${
                         cat.title === 'cat_family' || cat.id === 'family' ? 'giadinh.jpg' :
                         cat.title === 'cat_food' || cat.id === 'food' ? 'monan.jpg' :
                         cat.title === 'cat_greetings' || cat.id === 'greetings' ? 'chaohoi.jpg' :
@@ -236,7 +238,7 @@ const Vocabulary = () => {
                         'giadinh.jpg' // mặc định
                       }`}
                       alt={formatCategoryName(cat)}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                       onError={(e: any) => {
                         // Fallback nếu không tìm thấy file
                         e.target.onerror = null;
