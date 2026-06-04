@@ -22,7 +22,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -110,10 +110,10 @@ export default function CommunityScreen() {
   const [replyToId, setReplyToId] = useState<string | null>(null);
   const [replyToName, setReplyToName] = useState<string | null>(null);
   const [replyToUserId, setReplyToUserId] = useState<string | null>(null);
-  
+
   // Animation for Options Menu
   const optionsX = useSharedValue(SCREEN_WIDTH);
-  
+
   useEffect(() => {
     if (isOptionsModalVisible) {
       optionsX.value = withTiming(0, {
@@ -146,7 +146,7 @@ export default function CommunityScreen() {
   const animatedCreatePostStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: createPostX.value }]
   }));
-  
+
   // Animation for Comments Modal
   const commentsX = useSharedValue(SCREEN_WIDTH);
 
@@ -228,7 +228,7 @@ export default function CommunityScreen() {
         const postsData = snapshot.docs.map(doc => {
           const data = doc.data();
           let timeDisplay = t('just_now');
-          
+
           if (data.createdAt) {
             try {
               const date = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
@@ -817,7 +817,7 @@ export default function CommunityScreen() {
                   </View>
                 );
               }}
-              ListEmptyComponent={<View style={{ padding: 40, alignItems: 'center' }}><Text style={{ color: '#999' }}>{t('first_comment_msg')}</Text></View>}
+              ListEmptyComponent={<View style={{ paddingTop: 215, paddingHorizontal: 40, alignItems: 'center' }}><Text style={{ color: '#999' }}>{t('first_comment_msg')}</Text></View>}
             />
 
             {replyToName && (
