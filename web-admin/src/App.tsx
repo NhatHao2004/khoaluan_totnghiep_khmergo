@@ -14,6 +14,7 @@ import Destinations from './pages/Destinations';
 import Login from './pages/Login';
 import ProfilePage from './pages/Profile';
 import Users from './pages/Users';
+import Vocabulary from './pages/Vocabulary';
 
 const TopBar = ({ notifications, clearNotifications, setShowTrash, setTrashActiveTab }: any) => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -290,6 +291,7 @@ function App() {
               <Route path="/destinations" element={<Destinations />} />
               <Route path="/challenges" element={<Challenges />} />
               <Route path="/article" element={<Article />} />
+              <Route path="/vocabulary" element={<Vocabulary />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
