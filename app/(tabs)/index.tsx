@@ -400,7 +400,7 @@ export default function HomeScreen() {
             <Image
               source={require('@/assets/images/banner.png')}
               style={styles.promoImage}
-              resizeMode="cover"
+              contentFit="cover"
             />
           </View>
 
@@ -906,7 +906,6 @@ const styles = RNStyleSheet.create({
   cardImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
   },
   cardOverlay: {
     ...StyleSheet.absoluteFillObject,

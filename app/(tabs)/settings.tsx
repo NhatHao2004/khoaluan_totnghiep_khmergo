@@ -3,6 +3,7 @@ import { translations, useLanguage } from '@/contexts/LanguageContext';
 import { scheduleDaily7AMReminder } from '@/utils/notification-handler';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import React, { useContext, useEffect, useState } from 'react';
@@ -75,7 +76,11 @@ export default function SettingsScreen() {
       await scheduleDaily7AMReminder();
       triggerToast(t('notif_on'), 'success');
     } else {
-      await Notifications.cancelAllScheduledNotificationsAsync();
+      // Bỏ qua trên Expo Go Android để tránh lỗi SDK 53+
+      const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+      if (!(isExpoGo && Platform.OS === 'android')) {
+        await Notifications.cancelAllScheduledNotificationsAsync();
+      }
       triggerToast(t('notif_off'), 'info');
     }
   };
