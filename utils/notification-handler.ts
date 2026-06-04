@@ -6,25 +6,19 @@ const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreCl
 const isAndroid = Platform.OS === 'android';
 const shouldSkip = isExpoGo && isAndroid;
 
-// Cấu hình Handler (Bỏ qua nếu là Expo Go Android)
-if (!shouldSkip) {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: true,
-      shouldSetBadge: true,
-      shouldShowBanner: true,
-      shouldShowList: true,
-    }),
-  });
-}
+// Cấu hình Handler (Luôn chạy để hỗ trợ thông báo nội bộ)
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
 export async function registerForPushNotificationsAsync() {
-  if (shouldSkip) {
-    console.log('Push notifications are disabled on Expo Go (Android)');
-    return;
-  }
-
+  // Chỉ cấu hình Channel và xin quyền, không lấy Push Token ở đây để tránh lỗi Expo Go SDK 53
   try {
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('default', {
@@ -47,7 +41,6 @@ export async function registerForPushNotificationsAsync() {
 }
 
 export async function scheduleStudyReminder(title: string, body: string, seconds: number = 2) {
-  if (shouldSkip) return;
   try {
     await Notifications.scheduleNotificationAsync({
       content: { title, body },
@@ -62,7 +55,6 @@ export async function scheduleStudyReminder(title: string, body: string, seconds
 }
 
 export async function scheduleDaily7AMReminder() {
-  if (shouldSkip) return;
   try {
     await Notifications.cancelAllScheduledNotificationsAsync();
     await Notifications.scheduleNotificationAsync({
