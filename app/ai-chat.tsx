@@ -319,37 +319,37 @@ export default function AIAssistantScreen() {
                             style={styles.aiMessageText}
                             textBreakStrategy="highQuality"
                           >
-                            {msg.text.replace(/\[LINK:.*?\]/g, '').trim()}
+                            {msg.text.replace(/\[LINK:.*?\]/g, '').replace(/\n\s*\n/g, '\n').replace(/\s\s+/g, ' ').trim()}
                           </Text>
-                        </View>
-                        {msg.text.includes('[LINK:') && (
-                          <TouchableOpacity
-                            style={styles.detailBtn}
-                            onPress={() => {
-                              const match = msg.text.match(/\[LINK:(.*?)\]/);
-                              if (match) {
-                                const id = match[1];
-                                if (id === 'food_all') {
-                                  router.push('/food');
-                                } else if (id === 'pagoda_all') {
-                                  router.push('/pagoda');
-                                } else if (id === 'culture_all') {
-                                  router.push('/culture');
-                                } else if (id.startsWith('pagoda_')) {
-                                  router.push({ pathname: '/pagoda-detail', params: { id } });
-                                } else if (id.startsWith('culture_')) {
-                                  router.push({ pathname: '/culture-detail', params: { id } });
-                                } else if (id.startsWith('food_')) {
-                                  router.push({ pathname: '/food-detail', params: { id } });
+                          {msg.text.includes('[LINK:') && (
+                            <TouchableOpacity
+                              style={styles.detailBtn}
+                              onPress={() => {
+                                const match = msg.text.match(/\[LINK:(.*?)\]/);
+                                if (match) {
+                                  const id = match[1];
+                                  if (id === 'food_all') {
+                                    router.push('/food');
+                                  } else if (id === 'pagoda_all') {
+                                    router.push('/pagoda');
+                                  } else if (id === 'culture_all') {
+                                    router.push('/culture');
+                                  } else if (id.startsWith('pagoda_')) {
+                                    router.push({ pathname: '/pagoda-detail', params: { id } });
+                                  } else if (id.startsWith('culture_')) {
+                                    router.push({ pathname: '/culture-detail', params: { id } });
+                                  } else if (id.startsWith('food_')) {
+                                    router.push({ pathname: '/food-detail', params: { id } });
+                                  }
                                 }
-                              }
-                            }}
-                          >
-                            <Text style={styles.detailBtnText}>
-                              {msg.text.includes('_all]') ? t('explore_now') : t('view_details')}
-                            </Text>
-                          </TouchableOpacity>
-                        )}
+                              }}
+                            >
+                              <Text style={styles.detailBtnText}>
+                                {msg.text.includes('_all]') ? t('explore_now') : t('view_details')}
+                              </Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
                         <Text style={styles.chatTime}>
                           {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </Text>
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 12,
-    marginTop: 8,
+    marginTop: 6,
     alignSelf: 'flex-start',
     gap: 6
   },
