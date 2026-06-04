@@ -189,12 +189,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerTitle: {
-    color: '#000000',
-    fontSize: 20,
-    fontWeight: '800',
-    textAlign: 'center',
-  },
+    headerTitle: { color: '#000000', fontSize: 20, fontWeight: '800', textAlign: 'center', lineHeight: 28 },
   content: {
     flex: 1,
   },

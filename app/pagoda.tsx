@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   header: { backgroundColor: '#ffffff', paddingTop: 45, paddingBottom: 15, paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', elevation: 5, zIndex: 100 },
   backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
   headerTitleContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { color: '#000000', fontSize: 20, fontWeight: '800' },
+  headerTitle: { color: '#000000', fontSize: 20, fontWeight: '800', lineHeight: 28 },
   content: { flex: 1 },
   scrollContent: { paddingBottom: 20, flexGrow: 1 },
   pagodaList: { padding: 15, gap: 15 },

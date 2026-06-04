@@ -15,7 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Animated, { FadeInUp, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, FadeInUp, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -53,7 +53,10 @@ export default function ProfileScreen() {
 
   React.useEffect(() => {
     if (isLogoutModalVisible) {
-      logoutX.value = withTiming(0, { duration: 300 });
+      logoutX.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.out(Easing.poly(4)),
+      });
     } else {
       logoutX.value = SCREEN_WIDTH;
     }

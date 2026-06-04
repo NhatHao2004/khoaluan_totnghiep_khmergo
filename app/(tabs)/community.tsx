@@ -21,7 +21,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -114,7 +114,10 @@ export default function CommunityScreen() {
   
   useEffect(() => {
     if (isOptionsModalVisible) {
-      optionsX.value = withTiming(0, { duration: 300 });
+      optionsX.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.out(Easing.poly(4)),
+      });
     } else {
       optionsX.value = SCREEN_WIDTH;
     }
@@ -129,7 +132,10 @@ export default function CommunityScreen() {
 
   useEffect(() => {
     if (isCreateModalVisible) {
-      createPostX.value = withTiming(0, { duration: 300 });
+      createPostX.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.out(Easing.poly(4)),
+      });
     } else {
       createPostX.value = SCREEN_WIDTH;
     }
@@ -144,7 +150,10 @@ export default function CommunityScreen() {
 
   useEffect(() => {
     if (isModalVisible) {
-      commentsX.value = withTiming(0, { duration: 300 });
+      commentsX.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.out(Easing.poly(4)),
+      });
     } else {
       commentsX.value = SCREEN_WIDTH;
     }

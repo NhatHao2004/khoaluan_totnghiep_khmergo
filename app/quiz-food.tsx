@@ -1,20 +1,19 @@
 import { useAuth } from '@/contexts/AuthContext';
-import React, { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFoods } from '@/hooks/use-foods';
 import { useQuizzes } from '@/hooks/use-quizzes';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Image,
   Modal,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
 export default function QuizFoodSelectScreen() {
@@ -29,14 +28,14 @@ export default function QuizFoodSelectScreen() {
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   const order = ['food_5', 'food_1', 'food_4', 'food_2', 'food_3'];
-  
+
   const items = foods
     .map(food => {
       const quiz = quizzes.find(q => q.pagodaId === food.id);
       const imageSource = typeof food.imageUrl === 'string' && food.imageUrl
         ? { uri: food.imageUrl }
         : (quiz?.image || require('@/assets/images/amthuc.jpg'));
-      
+
       let displayName = isKm ? (food.name_khmer || food.name) : food.name;
 
       const colors = {
@@ -121,8 +120,8 @@ export default function QuizFoodSelectScreen() {
                             const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
                             return n.toString().split('').map(d => khmerDigits[parseInt(d)] || d).join('');
                           };
-                          return isKm 
-                            ? `${toKhmerNum(count)} សំណួរ - បូក ៥ ពិន្ទុសម្រាប់រាល់ចម្លើយដែលត្រឹមត្រូវ` 
+                          return isKm
+                            ? `${toKhmerNum(count)} សំណួរ - បូក ៥ ពិន្ទុសម្រាប់រាល់ចម្លើយដែលត្រឹមត្រូវ`
                             : `${count} câu hỏi - cộng 5 điểm cho mỗi câu đúng`;
                         })()}
                       </Text>
@@ -200,7 +199,7 @@ const styles = StyleSheet.create({
   },
   backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
   headerTitleContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { color: '#000000', fontSize: 20, fontWeight: '800' },
+  headerTitle: { color: '#000000', fontSize: 20, fontWeight: '800', lineHeight: 32 },
   content: { flex: 1 },
   scrollContent: { paddingBottom: 20, flexGrow: 1 },
   list: { padding: 15, gap: 15 },
