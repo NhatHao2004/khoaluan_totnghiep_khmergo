@@ -443,10 +443,10 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F5F5F5',
   },
   listItemRankContainer: {
-    width: 25, // Increased from 19 to fit '10' better
+    width: 35, // Đảm bảo hiển thị tốt các số 2 chữ số (ví dụ: 10, 20)
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 15,
+    marginRight: 10,
   },
   listItemRank: {
     fontSize: 14,
