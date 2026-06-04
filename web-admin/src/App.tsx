@@ -384,8 +384,8 @@ function App() {
                 <div style={{ padding: '1rem 2.5rem', background: '#f8fafc', display: 'flex', gap: '0.5rem' }}>
                   {[
                     { key: 'destinations', label: 'Nội dung học tập' },
-                    { key: 'challenges', label: 'Thử thách' },
-                    { key: 'vocab_categories', label: 'Danh mục' },
+                    { key: 'challenges', label: 'Các bài thử thách' },
+                    { key: 'vocab_categories', label: 'Danh mục từ vựng' },
                     { key: 'posts', label: 'Bài viết cộng đồng' }
                   ].map(tab => (
                     <button

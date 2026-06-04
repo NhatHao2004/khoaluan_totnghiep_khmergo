@@ -453,7 +453,7 @@ const Destinations = () => {
 
                 <div style={{ textAlign: 'left' }}>
                   {/* Location Info - Always in Vietnamese for administrative clarity */}
-                  <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', padding: '0.6rem 1.25rem', background: 'var(--bg-accent)', borderRadius: '100px', width: 'fit-content', margin: '0 auto 1.5rem' }}>
+                  <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', justifySelf: 'center', marginBottom: '1.5rem', padding: '0.6rem 1.25rem', background: 'var(--bg-accent)', borderRadius: '100px', width: 'fit-content', margin: '0 auto 1.5rem' }}>
                     <div>
                       <p style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--text-primary)' }}>
                         {viewLanguage === 'vi' ? viewingItem.location : (viewingItem.location_khmer || viewingItem.location)}
@@ -474,13 +474,14 @@ const Destinations = () => {
                       <p style={{ fontSize: '0.925rem', lineHeight: 1.9, color: '#000', fontStyle: 'italic' }}>{viewingItem.description_khmer}</p>
                     </div>
                   )}
+
                 </div>
               </div>
 
               {/* Detailed Sections */}
-              <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '3rem' }}>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 900, textAlign: 'center', marginBottom: '3rem', letterSpacing: '-0.02em' }}>Khám phá chi tiết</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8rem' }}>
+              <div style={{ paddingTop: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: 900, textAlign: 'center', marginBottom: '2rem', letterSpacing: '-0.02em' }}>Khám phá chi tiết</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4rem' }}>
                   {viewingItem.contentBlocks?.map((block, idx) => {
                     const isEven = idx % 2 === 0;
                     return (
@@ -518,19 +519,47 @@ const Destinations = () => {
                   })}
                 </div>
               </div>
+
+              {/* Supplemental Gallery at the bottom */}
+              {(viewingItem.imageUrl1 || viewingItem.imageUrl2 || viewingItem.imageUrl3 || viewingItem.imageUrl4 || viewingItem.imageUrl5 || viewingItem.imageUrl6) && (
+                <div style={{ marginTop: '3rem', paddingTop: '1.5rem' }}>
+                  <h4 style={{ fontSize: '0.6rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '1.5rem', letterSpacing: '0.1em', textAlign: 'center' }}>Thư viện ảnh</h4>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                    {/* Unified Grid: Secondary Background (6) + Supplemental 1-5 */}
+                    {[6, 1, 2, 3, 4, 5].map(num => {
+                      const url = (viewingItem as any)[`imageUrl${num}`];
+                      if (!url) return null;
+                      return (
+                        <div key={num} style={{ height: '220px', borderRadius: '24px', overflow: 'hidden', boxShadow: 'var(--shadow-lg)' }}>
+                          <img
+                            src={getProxiedImageUrl(url)}
+                            alt={num === 6 ? 'Secondary Background' : `Gallery ${num}`}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s' }}
+                            referrerPolicy="no-referrer"
+                            className="hover-scale"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
-            <footer style={{ marginTop: '6rem', padding: '3rem 2rem', background: 'var(--bg-sidebar)', color: 'white', textAlign: 'center' }}>
+            <footer style={{ marginTop: '4rem', padding: '2.5rem 2rem', background: '#fff', borderTop: '1px solid #f1f5f9', textAlign: 'center' }}>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
                 <button
                   onClick={() => setViewingItem(null)}
-                  style={{ border: '1px solid rgba(0, 140, 255, 0.4)', background: 'rgba(30, 49, 255, 1)', color: '#ffffffff', padding: '0.75rem 2rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
+                  style={{ border: 'none', background: '#ef4444', color: 'white', padding: '0.85rem 2.5rem', borderRadius: '16px', fontWeight: 800, cursor: 'pointer' }}
+                  className="hover-scale"
                 >
                   Quay lại danh sách
                 </button>
                 <button
                   onClick={() => { setEditingItem(viewingItem); setViewingItem(null); }}
-                  style={{ border: 'none', background: 'white', color: 'var(--bg-sidebar)', padding: '0.75rem 2rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
+                  style={{ border: 'none', background: '#3b82f6', color: 'white', padding: '0.85rem 2.5rem', borderRadius: '16px', fontWeight: 800, cursor: 'pointer' }}
+                  className="hover-scale"
                 >
                   Chỉnh sửa nội dung
                 </button>
@@ -562,6 +591,29 @@ const Destinations = () => {
                 </div>
 
                 <InputField label="Link ảnh nền chính" value={isAddingNew ? newItem.imageUrl : editingItem?.imageUrl} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl: v }) : setEditingItem({ ...editingItem!, imageUrl: v })} icon={ImageIcon} />
+                <InputField label="Link ảnh nền phụ" value={isAddingNew ? newItem.imageUrl6 : editingItem?.imageUrl6} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl6: v }) : setEditingItem({ ...editingItem!, imageUrl6: v })} icon={ImageIcon} />
+                {activeTab !== 'Chùa' && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', background: '#f8fafc', padding: '1.5rem', borderRadius: '20px' }}>
+                    <h4 style={{ gridColumn: '1 / -1', fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                      Thư viện ảnh (5 ảnh)
+                    </h4>
+                    <InputField
+                      label="Ảnh bổ sung 1"
+                      value={isAddingNew ? newItem.imageUrl1 : editingItem?.imageUrl1}
+                      onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl1: v }) : setEditingItem({ ...editingItem!, imageUrl1: v })}
+                      placeholder="Link ảnh..."
+                    />
+                    {[2, 3, 4, 5].map(num => (
+                      <InputField
+                        key={num}
+                        label={`Ảnh bổ sung ${num}`}
+                        value={isAddingNew ? (newItem as any)[`imageUrl${num}`] : (editingItem as any)[`imageUrl${num}`]}
+                        onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, [`imageUrl${num}`]: v }) : setEditingItem({ ...editingItem!, [`imageUrl${num}`]: v })}
+                        placeholder="Link ảnh..."
+                      />
+                    ))}
+                  </div>
+                )}
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                   <InputField label="Mô tả tóm tắt (Tiếng Việt)" textarea value={isAddingNew ? newItem.description : editingItem?.description} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, description: v }) : setEditingItem({ ...editingItem!, description: v })} />
