@@ -127,9 +127,9 @@ export default function TabsLayout() {
           lazy: false, // Pre-render all screens to avoid mount-time jerking
           freezeOnBlur: true, // Freezes JS execution on inactive screens for speed
           tabBarStyle: {
-            height: 70,
-            paddingBottom: 20,
-            paddingTop: 15,
+            height: 75,
+            paddingBottom: 5,
+            paddingTop: 8,
             backgroundColor: COLORS.background,
             borderTopLeftRadius: 0, // Simplified for stability
             borderTopRightRadius: 0, // Simplified for stability
@@ -138,7 +138,12 @@ export default function TabsLayout() {
             elevation: 0,
             shadowOpacity: 0,
           },
-          tabBarShowLabel: false,
+          tabBarShowLabel: true,
+          tabBarLabelStyle: {
+            fontSize: 11,
+            fontWeight: '600',
+            marginTop: 8,
+          }
         }}>
         <Tabs.Screen
           name="index"
@@ -188,7 +193,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="profile"
           options={{
-            title: 'Cá nhân',
+            title: 'Hồ sơ',
             tabBarIcon: ({ color, focused, size }) => (
               <Ionicons
                 name={focused ? 'person-circle' : 'person-circle-outline'}

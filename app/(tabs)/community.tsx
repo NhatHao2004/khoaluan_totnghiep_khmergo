@@ -138,6 +138,21 @@ export default function CommunityScreen() {
   const animatedCreatePostStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: createPostX.value }]
   }));
+  
+  // Animation for Comments Modal
+  const commentsX = useSharedValue(SCREEN_WIDTH);
+
+  useEffect(() => {
+    if (isModalVisible) {
+      commentsX.value = withTiming(0, { duration: 300 });
+    } else {
+      commentsX.value = SCREEN_WIDTH;
+    }
+  }, [isModalVisible]);
+
+  const animatedCommentsStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: commentsX.value }]
+  }));
 
   const triggerToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToastMsg(msg);
@@ -718,7 +733,7 @@ export default function CommunityScreen() {
       </Modal>
 
       {/* Modal: Bình luận */}
-      <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
+      <Modal animationType="fade" transparent={true} statusBarTranslucent={true} visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
           {renderToast()}
           <TouchableOpacity
@@ -729,7 +744,7 @@ export default function CommunityScreen() {
               setModalVisible(false);
             }}
           />
-          <View style={[styles.modalContent, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + 12) }]}>
+          <Animated.View style={[styles.modalContent, animatedCommentsStyle, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + 12) }]}>
             <View style={styles.modalHeader}>
 
               <View style={styles.modalHeaderTitleBox}>
@@ -816,7 +831,7 @@ export default function CommunityScreen() {
                 {isAddingComment ? <ActivityIndicator size="small" color="#1877F2" /> : <Ionicons name="send" size={25} color={commentText.trim() ? "#1877F2" : "#1877F2"} />}
               </TouchableOpacity>
             </View>
-          </View>
+          </Animated.View>
         </View>
       </Modal>
 
