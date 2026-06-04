@@ -30,7 +30,8 @@ type GameState = 'selection' | 'playing' | 'results';
 
 export default function VocabQuizScreen() {
     const router = useRouter();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
+    const isKm = language === 'km';
     const { user, refreshUser } = useAuth();
 
     const [gameState, setGameState] = useState<GameState>('selection');
@@ -263,7 +264,9 @@ export default function VocabQuizScreen() {
 
                                     {/* Content */}
                                     <View style={styles.categoryCardBody}>
-                                        <Text style={styles.categoryCardTitle}>{t(category.title)}</Text>
+                                        <Text style={styles.categoryCardTitle}>
+                                            {isKm && category.titleKm ? category.titleKm : t(category.title)}
+                                        </Text>
                                         <Text style={styles.categoryCardSub}>{Math.min(10, category.words?.length || 0)} {t('vocab_challenge_questions')}</Text>
 
                                         {/* Quiz footer */}
