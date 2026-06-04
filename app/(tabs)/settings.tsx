@@ -1,10 +1,7 @@
 import { AuthContext } from '@/contexts/AuthContext';
 import { translations, useLanguage } from '@/contexts/LanguageContext';
-import { scheduleDaily7AMReminder } from '@/utils/notification-handler';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants, { ExecutionEnvironment } from 'expo-constants';
-import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import React, { useContext, useEffect, useState } from 'react';
 
@@ -31,7 +28,6 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { language, setLanguage, t } = useLanguage();
   const { user } = useContext(AuthContext);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [chatButtonEnabled, setChatButtonEnabled] = useState(true);
   const [showIntro, setShowIntro] = useState(false);
 
@@ -53,13 +49,9 @@ export default function SettingsScreen() {
     }, 4000);
   };
 
-  // Load notification setting
+  // Load chat button setting
   useEffect(() => {
     const loadSetting = async () => {
-      const saved = await AsyncStorage.getItem('notifications_enabled');
-      if (saved !== null) {
-        setNotificationsEnabled(saved === 'true');
-      }
       const savedChat = await AsyncStorage.getItem('chat_button_enabled');
       if (savedChat !== null) {
         setChatButtonEnabled(savedChat === 'true');
@@ -68,54 +60,17 @@ export default function SettingsScreen() {
     loadSetting();
   }, []);
 
-  const toggleNotifications = async (value: boolean) => {
-    setNotificationsEnabled(value);
-    await AsyncStorage.setItem('notifications_enabled', value.toString());
-
-    if (value) {
-      await scheduleDaily7AMReminder();
-      triggerToast(t('notif_on'), 'success');
-    } else {
-      // Bỏ qua trên Expo Go Android để tránh lỗi SDK 53+
-      const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
-      if (!(isExpoGo && Platform.OS === 'android')) {
-        await Notifications.cancelAllScheduledNotificationsAsync();
-      }
-      triggerToast(t('notif_off'), 'info');
-    }
-  };
-
   const toggleChatButton = async (value: boolean) => {
     setChatButtonEnabled(value);
     await AsyncStorage.setItem('chat_button_enabled', value.toString());
     triggerToast(value ? t('chat_on') : t('chat_off'), 'success');
   };
 
-  const toggleAnim = useSharedValue(notificationsEnabled ? 1 : 0);
   const chatToggleAnim = useSharedValue(chatButtonEnabled ? 1 : 0);
-
-  useEffect(() => {
-    toggleAnim.value = withTiming(notificationsEnabled ? 1 : 0, { duration: 250 });
-  }, [notificationsEnabled]);
 
   useEffect(() => {
     chatToggleAnim.value = withTiming(chatButtonEnabled ? 1 : 0, { duration: 250 });
   }, [chatButtonEnabled]);
-
-  const animatedTrackStyle = useAnimatedStyle(() => {
-    const backgroundColor = interpolateColor(
-      toggleAnim.value,
-      [0, 1],
-      ['#CCCCCC', '#FF4B4B']
-    );
-    return { backgroundColor };
-  });
-
-  const animatedThumbStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateX: toggleAnim.value * 20 }],
-    };
-  });
 
   const animatedChatTrackStyle = useAnimatedStyle(() => {
     const backgroundColor = interpolateColor(
@@ -185,28 +140,6 @@ export default function SettingsScreen() {
                 color={language === 'km' ? "#FF4B4B" : "#CCCCCC"}
               />
             </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Thông báo */}
-        <View style={[styles.section, !user && { opacity: 0.5 }]}>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>{t('notif_settings')}</Text>
-            <View style={styles.switchItem}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.switchSubLabel}>{t('study_reminder')}</Text>
-              </View>
-
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => user && toggleNotifications(!notificationsEnabled)}
-                disabled={!user}
-              >
-                <Animated.View style={[styles.customToggleTrack, animatedTrackStyle]}>
-                  <Animated.View style={[styles.customToggleThumb, animatedThumbStyle]} />
-                </Animated.View>
-              </TouchableOpacity>
-            </View>
           </View>
         </View>
 
