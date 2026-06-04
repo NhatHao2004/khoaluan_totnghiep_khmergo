@@ -6,6 +6,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
+  Dimensions,
   Image,
   Modal,
   ScrollView,
@@ -14,7 +15,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Animated, { FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeInUp, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 
 type MenuItem = {
@@ -44,6 +47,21 @@ export default function ProfileScreen() {
   const [isLoginRequiredVisible, setLoginRequiredVisible] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const lastFetchTime = useRef<number>(0);
+
+  // Animation for Logout Modal
+  const logoutX = useSharedValue(SCREEN_WIDTH);
+
+  React.useEffect(() => {
+    if (isLogoutModalVisible) {
+      logoutX.value = withTiming(0, { duration: 300 });
+    } else {
+      logoutX.value = SCREEN_WIDTH;
+    }
+  }, [isLogoutModalVisible]);
+
+  const animatedLogoutStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: logoutX.value }]
+  }));
 
   const fetchRank = async (force = false) => {
     if (!user || user.isAnonymous) {
@@ -221,9 +239,8 @@ export default function ProfileScreen() {
         </View>
       </Modal>
 
-      {/* Logout Confirmation Bottom Sheet */}
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={isLogoutModalVisible}
         onRequestClose={() => setLogoutModalVisible(false)}
@@ -232,7 +249,7 @@ export default function ProfileScreen() {
         <View
           style={styles.modalOverlay}
         >
-          <View style={styles.logoutContent}>
+          <Animated.View style={[styles.logoutContent, animatedLogoutStyle]}>
 
 
             <View style={styles.logoutHeader}>
@@ -254,7 +271,7 @@ export default function ProfileScreen() {
                 <Text style={styles.cancelLogoutText}>{t('back')}</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </Animated.View>
         </View>
       </Modal>
     </View>

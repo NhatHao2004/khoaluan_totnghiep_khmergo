@@ -21,10 +21,10 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 const TOP_GAP = SCREEN_HEIGHT * 0.3;
 
 interface Comment {
@@ -108,6 +108,36 @@ export default function CommunityScreen() {
   const [replyToId, setReplyToId] = useState<string | null>(null);
   const [replyToName, setReplyToName] = useState<string | null>(null);
   const [replyToUserId, setReplyToUserId] = useState<string | null>(null);
+  
+  // Animation for Options Menu
+  const optionsX = useSharedValue(SCREEN_WIDTH);
+  
+  useEffect(() => {
+    if (isOptionsModalVisible) {
+      optionsX.value = withTiming(0, { duration: 300 });
+    } else {
+      optionsX.value = SCREEN_WIDTH;
+    }
+  }, [isOptionsModalVisible]);
+
+  const animatedOptionsStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: optionsX.value }]
+  }));
+
+  // Animation for Create/Edit Post Modal
+  const createPostX = useSharedValue(SCREEN_WIDTH);
+
+  useEffect(() => {
+    if (isCreateModalVisible) {
+      createPostX.value = withTiming(0, { duration: 300 });
+    } else {
+      createPostX.value = SCREEN_WIDTH;
+    }
+  }, [isCreateModalVisible]);
+
+  const animatedCreatePostStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: createPostX.value }]
+  }));
 
   const triggerToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToastMsg(msg);
@@ -587,7 +617,7 @@ export default function CommunityScreen() {
       />
 
       {/* Modal: Tạo/Sửa bài viết */}
-      <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isCreateModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
+      <Modal animationType="fade" transparent={true} statusBarTranslucent={true} visible={isCreateModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
         <View style={styles.modalOverlay}>
           {renderToast()}
           <TouchableOpacity
@@ -598,7 +628,7 @@ export default function CommunityScreen() {
               setCreateModalVisible(false);
             }}
           />
-          <View style={[styles.modalContent, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + 15) }]}>
+          <Animated.View style={[styles.modalContent, animatedCreatePostStyle, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + 15) }]}>
             <View style={styles.modalHeader}>
 
               <View style={styles.modalHeaderTitleBox}>
@@ -683,7 +713,7 @@ export default function CommunityScreen() {
                 </TouchableOpacity>
               </View>
             )}
-          </View>
+          </Animated.View>
         </View>
       </Modal>
 
@@ -791,19 +821,19 @@ export default function CommunityScreen() {
       </Modal>
 
       {/* Post Options Bottom Sheet */}
-      <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isOptionsModalVisible} onRequestClose={() => setOptionsModalVisible(false)}>
+      <Modal animationType="fade" transparent={true} statusBarTranslucent={true} visible={isOptionsModalVisible} onRequestClose={() => setOptionsModalVisible(false)}>
         <TouchableOpacity style={styles.optionsOverlay} activeOpacity={1} onPress={() => setOptionsModalVisible(false)}>
-          <View style={[styles.optionsContent, { paddingBottom: insets.bottom + 10 }]}>
+          <Animated.View style={[styles.optionsContent, animatedOptionsStyle, { paddingBottom: insets.bottom + 10 }]}>
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleEditPost(selectedPost); }}>
-              <View style={styles.optionIconContainer}><Ionicons name="create-outline" size={24} color="#FFF" /></View>
+              <View style={styles.optionIconContainer}><Ionicons name="create-outline" size={24} color="#1A1A1A" /></View>
               <View><Text style={styles.optionText}>Chỉnh sửa bài viết</Text></View>
             </TouchableOpacity>
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleDeletePost(selectedPost.id, selectedPost.userId); }}>
-              <View style={styles.optionIconContainer}><Ionicons name="trash-outline" size={24} color="#FFF" /></View>
+              <View style={styles.optionIconContainer}><Ionicons name="trash-outline" size={24} color="#1A1A1A" /></View>
               <View><Text style={styles.optionText}>Xóa bỏ bài viết</Text></View>
             </TouchableOpacity>
             <View style={{ height: 8 }} />
-          </View>
+          </Animated.View>
         </TouchableOpacity>
       </Modal>
 
@@ -965,11 +995,11 @@ const styles = StyleSheet.create({
   attachActionText: { fontSize: 14, fontWeight: '700', color: '#1877F2', marginRight: 2 },
   closeModalBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', borderRadius: 22, backgroundColor: '#FFF0F0' },
   optionsOverlay: { flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end' },
-  optionsContent: { backgroundColor: '#000', borderRadius: 30, marginHorizontal: 15, marginBottom: 15, paddingHorizontal: 10, paddingTop: 20, paddingBottom: 5, shadowColor: '#000', shadowOffset: { width: 0, height: -10 }, shadowOpacity: 0.1, shadowRadius: 20, elevation: 20 },
-  optionsHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: 12 },
-  optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: 2, paddingHorizontal: 25, width: '100%' },
-  optionIconContainer: { width: 30, height: 40, justifyContent: 'center', alignItems: 'center', marginRight: 15 },
-  optionText: { fontSize: 16, fontWeight: '600', color: '#FFFFFF' },
+  optionsContent: { backgroundColor: '#FFFFFF', borderRadius: 30, marginHorizontal: 15, marginBottom: 15, paddingHorizontal: 10, paddingTop: 20, paddingBottom: 5, shadowColor: '#000', shadowOffset: { width: 0, height: -10 }, shadowOpacity: 0.1, shadowRadius: 20, elevation: 20 },
+  optionsHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: 12 },
+  optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: 10, paddingHorizontal: 25, width: '100%' },
+  optionIconContainer: { width: 30, height: 30, justifyContent: 'center', alignItems: 'center', marginRight: 15 },
+  optionText: { fontSize: 16, fontWeight: '700', color: '#1A1A1A' },
 
   // --- Premium Login Modal Styles (Unique Names to avoid conflict) ---
   pModalOverlay: {
