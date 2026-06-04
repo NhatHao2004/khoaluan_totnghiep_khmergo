@@ -1,7 +1,7 @@
 import { collection, doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Book, CheckCircle, Languages, Shield, Trash2, Type, Volume2 } from 'lucide-react';
-import { useEffect, useState, useMemo } from 'react';
+import { CheckCircle, Languages, Shield, Trash2, Type, Volume2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { db } from '../firebase/config';
 
 interface Word {
@@ -9,6 +9,7 @@ interface Word {
   khm: string;
   life: string; // Vietnamese meaning
   pronunciation: string; // Phonetic
+  imageUrl?: string;
 }
 
 interface Category {
@@ -74,6 +75,7 @@ const Vocabulary = () => {
           khm: w.khm || '',
           life: w.life || w.vie || '',
           pronunciation: w.pronunciation || w.pro || '',
+          imageUrl: w.imageUrl || w.image || '',
         }));
         return {
           id: doc.id,
@@ -83,9 +85,7 @@ const Vocabulary = () => {
         } as Category;
       });
       setCategories(cats.sort((a, b) => (a.order || 0) - (b.order || 0)));
-      if (cats.length > 0 && !activeCategoryId) {
-        setActiveCategoryId(cats[0].id);
-      }
+      // Bỏ tự động chọn danh mục đầu tiên để hiện Grid trước
       setLoading(false);
     });
     return () => unsub();
@@ -164,7 +164,7 @@ const Vocabulary = () => {
   );
 
   return (
-    <div className="fade-in" style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '0.5rem 2rem 2rem 2rem' }}>
+    <div className="fade-in">
       <AnimatePresence>
         {toast.isOpen && (
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 10000, padding: '1rem 1.5rem', background: toast.type === 'success' ? 'var(--success)' : 'var(--danger)', color: '#fff', borderRadius: '12px', boxShadow: 'var(--shadow-lg)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -177,101 +177,148 @@ const Vocabulary = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Quản lý từ vựng</h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <input className="input-field" placeholder="Tìm kiếm nhanh..." style={{ width: '300px' }} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-          <button className="btn" onClick={() => { setEditingWord({ id: `w_${Date.now()}`, khm: '', life: '', pronunciation: '' }); setIsAddingWord(true); }} style={{ background: 'rgb(59, 130, 246)', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 700 }}>
+          <input
+            className="input-field"
+            placeholder="Tìm kiếm nhanh..."
+            style={{ width: '300px' }}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button className="btn" onClick={() => { setEditingWord({ id: `w_${Date.now()}`, khm: '', life: '', pronunciation: '', imageUrl: '' }); setIsAddingWord(true); }} style={{ background: '#3b82f6', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 700 }}>
             Thêm từ mới
           </button>
         </div>
       </div>
 
-      <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '100px', marginBottom: '2.5rem', boxShadow: 'rgba(0, 0, 0, 0.05) 0px 1px 2px' }}></div>
+      <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
 
-      <div style={{ display: 'flex', gap: '2rem', flex: 1, minHeight: 0 }}>
-        {/* Category List */}
-        <div style={{ width: '280px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem', overflowY: 'auto' }} className="custom-scrollbar">
+      {!activeCategoryId ? (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }} className="fade-in">
           {loading ? (
-            Array.from({ length: 5 }).map((_, i) => <div key={i} className="skeleton" style={{ height: '60px', borderRadius: '16px' }} />)
+            Array.from({ length: 6 }).map((_, i) => <div key={i} className="skeleton" style={{ height: '280px', borderRadius: '32px' }} />)
           ) : (
-            categories.map(cat => (
-              <div
-                key={cat.id}
-                onClick={() => setActiveCategoryId(cat.id)}
-                style={{
-                  padding: '1rem 1.25rem',
-                  borderRadius: '16px',
-                  background: activeCategoryId === cat.id ? 'white' : 'transparent',
-                  border: '1.5px solid',
-                  borderColor: activeCategoryId === cat.id ? 'var(--primary)' : 'transparent',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  transition: 'all 0.2s',
-                  boxShadow: activeCategoryId === cat.id ? 'var(--shadow-md)' : 'none'
-                }}
-                className="hover-bright"
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: activeCategoryId === cat.id ? '#eff6ff' : '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', color: activeCategoryId === cat.id ? 'var(--primary)' : 'var(--text-muted)' }}>
-                    <Book size={20} />
+            categories.map(cat => {
+
+
+              return (
+                <div
+                  key={cat.id}
+                  onClick={() => setActiveCategoryId(cat.id)}
+                  style={{
+                    padding: '1.5rem',
+                    borderRadius: '28px',
+                    background: 'white',
+                    border: '1.5px solid #f1f5f9',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1.25rem',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: 'var(--shadow-sm)',
+                  }}
+                  className="hover-bright hover-scale"
+                >
+                  {/* Category Cover Image (Using provided assets) */}
+                  <div style={{
+                    width: '100%',
+                    aspectRatio: '16/10',
+                    borderRadius: '18px',
+                    overflow: 'hidden',
+                    background: '#f8fafc',
+                    position: 'relative'
+                  }}>
+                    <img
+                      src={`/assets/${
+                        cat.title === 'cat_family' || cat.id === 'family' ? 'giadinh.jpg' :
+                        cat.title === 'cat_food' || cat.id === 'food' ? 'monan.jpg' :
+                        cat.title === 'cat_greetings' || cat.id === 'greetings' ? 'chaohoi.jpg' :
+                        cat.title === 'cat_numbers' || cat.id === 'numbers' ? 'sodem.jpg' :
+                        'giadinh.jpg' // mặc định
+                      }`}
+                      alt={formatCategoryName(cat)}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e: any) => {
+                        // Fallback nếu không tìm thấy file
+                        e.target.onerror = null;
+                        e.target.src = 'https://images.unsplash.com/photo-1544391496-1ca7c9755716?q=80&w=300';
+                      }}
+                    />
                   </div>
+
                   <div>
-                    <p style={{ fontWeight: 700, color: activeCategoryId === cat.id ? 'var(--text-primary)' : 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                    <h3 style={{ fontWeight: 900, color: 'var(--text-primary)', fontSize: '1.4rem', textAlign: 'center' }}>
                       {formatCategoryName(cat)}
+                    </h3>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '0.5rem', fontWeight: 600 }}>
+                      {cat.words?.length || 0} từ vựng
                     </p>
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }} className="fade-in">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <button
+              onClick={() => setActiveCategoryId(null)}
+              style={{ background: '#f1f5f9', border: 'none', padding: '0.6rem 1.25rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              className="hover-bright"
+            >
+              Quay lại
+            </button>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Danh mục {activeCategory?.title ? formatCategoryName(activeCategory) : ''}</h2>
+          </div>
 
-        {/* Word Table */}
-        <div className="card glass-card" style={{ flex: 1, padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', borderRadius: '24px', border: '1px solid #e2e8f0', minHeight: 0 }}>
-          <div style={{ flex: 1, overflowY: 'auto' }} className="custom-scrollbar">
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10 }}>
-                <tr>
-                  <th style={{ textAlign: 'left', padding: '1.25rem 1.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Từ Khmer</th>
-                  <th style={{ textAlign: 'left', padding: '1.25rem 1.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Nghĩa Tiếng Việt</th>
-                  <th style={{ textAlign: 'left', padding: '1.25rem 1.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Phát âm</th>
-                  <th style={{ textAlign: 'right', padding: '1.25rem 1.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredWords.length === 0 ? (
+          {/* Word Table */}
+          <div className="card glass-card" style={{ flex: 1, padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', borderRadius: '24px', border: '1px solid #e2e8f0', maxHeight: '433px' }}>
+            <div style={{ flex: 1, overflowY: 'auto', borderRadius: '0 0 24px 24px' }} className="custom-scrollbar">
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10 }}>
                   <tr>
-                    <td colSpan={4} style={{ padding: '5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                      <Languages size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
-                      <p>Không có dữ liệu từ vựng</p>
-                    </td>
+
+                    <th style={{ textAlign: 'left', padding: '0.85rem 1.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Tiếng Khmer</th>
+                    <th style={{ textAlign: 'left', padding: '0.85rem 1.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Tiếng Việt</th>
+                    <th style={{ textAlign: 'left', padding: '0.85rem 1.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Phát âm</th>
+                    <th style={{ textAlign: 'right', padding: '0.85rem 1.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Thao tác</th>
                   </tr>
-                ) : (
-                  filteredWords.map((word) => (
-                    <tr key={word.id} style={{ borderBottom: '1px solid #f1f5f9' }} className="hover-bright">
-                      <td style={{ padding: '1.25rem 1.5rem', fontWeight: 800, fontSize: '1.1rem', color: 'var(--primary)' }}>{word.khm}</td>
-                      <td style={{ padding: '1.25rem 1.5rem', fontWeight: 700, color: 'var(--text-primary)' }}>{word.life}</td>
-                      <td style={{ padding: '1.25rem 1.5rem', color: 'var(--text-secondary)' }}>
-                        {word.pronunciation && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#f1f5f9', padding: '4px 10px', borderRadius: '100px', width: 'fit-content', fontSize: '0.8rem' }}>
-                            <Volume2 size={14} /> {word.pronunciation}
-                          </div>
-                        )}
-                      </td>
-                      <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right' }}>
-                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                          <button onClick={() => { setEditingWord(word); setIsAddingWord(false); }} className="btn-icon" style={{ background: '#eff6ff', color: 'var(--primary)', border: 'none', cursor: 'pointer' }} title="Sửa"><Type size={16} /></button>
-                          <button onClick={() => handleDeleteWord(word.id)} className="btn-icon" style={{ background: '#fef2f2', color: 'var(--danger)', border: 'none', cursor: 'pointer' }} title="Xóa"><Trash2 size={16} /></button>
-                        </div>
+                </thead>
+                <tbody>
+                  {filteredWords.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} style={{ padding: '5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                        <Languages size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
+                        <p>Không có dữ liệu từ vựng</p>
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : (
+                    filteredWords.map((word) => (
+                      <tr key={word.id} style={{ borderBottom: '1px solid #f1f5f9' }} className="hover-bright">
+                        <td style={{ padding: '0.75rem 1.5rem', fontWeight: 800, fontSize: '1.05rem', color: 'var(--primary)' }}>{word.khm}</td>
+                        <td style={{ padding: '0.75rem 1.5rem', fontWeight: 700, color: 'var(--text-primary)' }}>{word.life}</td>
+                        <td style={{ padding: '0.75rem 1.5rem', color: 'var(--text-secondary)' }}>
+                          {word.pronunciation && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#f1f5f9', padding: '4px 10px', borderRadius: '100px', width: 'fit-content', fontSize: '0.8rem' }}>
+                              <Volume2 size={14} /> {word.pronunciation}
+                            </div>
+                          )}
+                        </td>
+                        <td style={{ padding: '0.75rem 1.5rem', textAlign: 'right' }}>
+                          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                            <button onClick={() => { setEditingWord(word); setIsAddingWord(false); }} className="btn-icon" style={{ background: '#eff6ff', color: 'var(--primary)', border: 'none', cursor: 'pointer' }} title="Sửa"><Type size={16} /></button>
+                            <button onClick={() => handleDeleteWord(word.id)} className="btn-icon" style={{ background: '#fef2f2', color: 'var(--danger)', border: 'none', cursor: 'pointer' }} title="Xóa"><Trash2 size={16} /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Add/Edit Word Modal */}
       <AnimatePresence>
@@ -284,6 +331,7 @@ const Vocabulary = () => {
                 <InputField label="Từ Khmer" value={editingWord?.khm || ''} onChange={(v: string) => setEditingWord(prev => prev ? { ...prev, khm: v } : null)} placeholder="Ví dụ: សួស្តី" />
                 <InputField label="Nghĩa Tiếng Việt" value={editingWord?.life || ''} onChange={(v: string) => setEditingWord(prev => prev ? { ...prev, life: v } : null)} placeholder="Ví dụ: Xin chào" />
                 <InputField label="Phát âm" value={editingWord?.pronunciation || ''} onChange={(v: string) => setEditingWord(prev => prev ? { ...prev, pronunciation: v } : null)} placeholder="Ví dụ: Suostei" />
+                <InputField label="Link ảnh" value={editingWord?.imageUrl || ''} onChange={(v: string) => setEditingWord(prev => prev ? { ...prev, imageUrl: v } : null)} placeholder="Dán link ảnh tại đây..." />
                 <div style={{ display: 'flex', gap: '1rem', marginTop: '2.5rem' }}>
                   <button type="button" className="btn" style={{ flex: 1, background: '#f1f5f9', color: '#64748b', borderRadius: '12px', border: 'none', fontWeight: 600, padding: '0.875rem' }} onClick={() => { setIsAddingWord(false); setEditingWord(null); }}>Hủy</button>
                   <button type="submit" className="btn" style={{ flex: 2, background: 'var(--primary)', color: 'white', borderRadius: '12px', border: 'none', fontWeight: 700, padding: '0.875rem' }} disabled={isProcessing}>{isProcessing ? 'Đang lưu...' : 'Lưu dữ liệu'}</button>
