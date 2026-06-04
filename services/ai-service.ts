@@ -133,8 +133,9 @@ export const chatWithAI = async (message: string): Promise<string> => {
     4. Nếu hỏi về vị trí chùa, phải nêu đúng ĐỊA CHỈ ở trên. Nếu hỏi về văn hóa/ẩm thực, hãy mô tả hương vị hoặc ý nghĩa chính.
     5. KIẾN THỨC ĐẶC BIỆT: Vào dịp lễ hội Ok Om Bok, Cốm dẹp là món ăn quan trọng nhất. Bánh tét thường gắn liền với dịp Tết (Chôl Chnăm Thmây).
     6. TUYỆT ĐỐI KHÔNG viết mã ID vào nội dung trả lời.
-    7. Gợi ý "Nhấn nút xem chi tiết để khám phá thêm." cho link cụ thể, hoặc "Khám phá danh sách đầy đủ tại đây." cho link [LINK:..._all].
-    8. Chỉ tập trung vào văn hóa Khmer. Từ chối các chủ đề ngoài lề.`;
+    7. Gợi ý "Nếu bạn muốn tìm hiểu sâu hơn, hãy nhấn nút xem chi tiết." cho link cụ thể, hoặc "Nếu bạn muốn khám phá thêm, hãy nhấn vào nút bên dưới để xem danh sách đầy đủ." cho link [LINK:..._all].
+    8. Luôn kết thúc bằng dấu chấm câu trước khi đặt tag [LINK:ID]. Tag [LINK:ID] phải luôn nằm ở cuối cùng của toàn bộ câu trả lời.
+    9. Chỉ tập trung vào văn hóa Khmer. Từ chối các chủ đề ngoài lề.`;
 
     const response = await fetch(GROQ_API_URL, {
       method: "POST",

@@ -319,7 +319,7 @@ export default function AIAssistantScreen() {
                             style={styles.aiMessageText}
                             textBreakStrategy="highQuality"
                           >
-                            {msg.text.replace(/\[LINK:.*?\]/g, '').replace(/\n\s*\n/g, '\n').replace(/\s\s+/g, ' ').trim()}
+                            {msg.text.replace(/\[LINK:.*?\]/g, '').replace(/\n\s*\n/g, '\n').replace(/\s+([.,!?;])/g, '$1').replace(/\s\s+/g, ' ').trim()}
                           </Text>
                           {msg.text.includes('[LINK:') && (
                             <TouchableOpacity
