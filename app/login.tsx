@@ -107,7 +107,7 @@ export default function LoginScreen() {
     } catch (error: any) {
       let msg = t('update_failed');
       if (error.message === 'ACCOUNT_BLOCKED' || error.message === 'AUTH_FAILED') {
-        msg = 'Tài khoản của bạn đã bị khóa';
+        msg = t('account_blocked');
       } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
         msg = t('wrong_old_pass');
       }
@@ -147,7 +147,7 @@ export default function LoginScreen() {
                 resizeMode="contain"
               />
               <View style={styles.logoHintRow}>
-                <Text style={styles.logoHint} numberOfLines={1} adjustsFontSizeToFit>Chào mừng bạn quay lại</Text>
+                <Text style={styles.logoHint} numberOfLines={1} adjustsFontSizeToFit>{t('welcome_back')}</Text>
                 <Animated.View style={[waveStyle, { marginLeft: 8 }]}>
                   <Text style={styles.waveEmoji}>👋</Text>
                 </Animated.View>
@@ -176,7 +176,7 @@ export default function LoginScreen() {
                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 4, gap: 10 }}>
                   <Text style={[styles.inputLabel, { flex: 1 }]} numberOfLines={1}>{t('password_label')}</Text>
                   <TouchableOpacity>
-                    <Text style={{ fontSize: 13, color: '#94A3B8', fontWeight: '500' }}>Quên mật khẩu</Text>
+                    <Text style={{ fontSize: 13, color: '#94A3B8', fontWeight: '500' }}>{t('forgot_password')}</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.inputWrapper}>
@@ -223,7 +223,7 @@ export default function LoginScreen() {
             <View style={styles.socialFooter}>
               <View style={styles.dividerBox}>
                 <View style={styles.dividerLine} />
-                <Text style={styles.dividerText}>Sử dụng tài khoản khác</Text>
+                <Text style={styles.dividerText}>{t('use_other_account')}</Text>
                 <View style={styles.dividerLine} />
               </View>
 

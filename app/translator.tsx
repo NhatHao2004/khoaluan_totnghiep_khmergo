@@ -121,7 +121,7 @@ export default function TranslatorScreen() {
       }
     } catch (error) {
       console.error("Lỗi khi gọi API Dịch:", error);
-      setTranslatedText('Đã có lỗi xảy ra. Hãy kiểm tra kết nối mạng.');
+      setTranslatedText(t('translation_error'));
     } finally {
       setIsLoading(false);
     }

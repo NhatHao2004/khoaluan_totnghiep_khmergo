@@ -193,7 +193,7 @@ export default function RegisterScreen() {
                   <Ionicons name="add" size={16} color="#FFF" />
                 </View>
               </TouchableOpacity>
-              <Text style={styles.avatarHint}>Ảnh đại diện</Text>
+              <Text style={styles.avatarHint}>{t('avatar_label')}</Text>
             </View>
 
             {/* Form */}
@@ -363,7 +363,7 @@ export default function RegisterScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <ThemedText style={styles.modalTitle}>ĐIỀU KHOẢN DỊCH VỤ</ThemedText>
+              <ThemedText style={styles.modalTitle}>{t('terms_modal_title')}</ThemedText>
             </View>
 
             <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
@@ -403,7 +403,7 @@ export default function RegisterScreen() {
               style={styles.acceptBtn}
               onPress={() => setShowTerms(false)}
             >
-              <Text style={styles.acceptBtnText}>ĐÃ HIỂU</Text>
+              <Text style={styles.acceptBtnText}>{t('terms_modal_understand')}</Text>
             </TouchableOpacity>
           </View>
         </View>

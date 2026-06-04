@@ -21,11 +21,13 @@ const COLORS = {
   shadow: '#000000ff',
 };
 
+import { useLanguage } from '@/contexts/LanguageContext';
 import React, { useEffect, useRef, useState } from 'react';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function TabsLayout() {
+  const { t } = useLanguage();
   const colorScheme = useColorScheme();
   const pathname = usePathname();
   const router = useRouter();
@@ -148,7 +150,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: 'Trang chủ',
+            title: t('tab_home'),
             tabBarIcon: ({ color, focused, size }) => (
               <Ionicons
                 name={focused ? 'home' : 'home-outline'}
@@ -161,7 +163,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="community"
           options={{
-            title: 'Cộng đồng',
+            title: t('tab_community'),
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
                 name={focused ? 'people' : 'people-outline'}
@@ -174,7 +176,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="quiz"
           options={{
-            title: 'Thử thách',
+            title: t('tab_quiz'),
             tabBarIcon: ({ color, focused, size }) => (
               <Ionicons
                 name={focused ? 'game-controller' : 'game-controller-outline'}
@@ -193,7 +195,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="profile"
           options={{
-            title: 'Hồ sơ',
+            title: t('tab_profile'),
             tabBarIcon: ({ color, focused, size }) => (
               <Ionicons
                 name={focused ? 'person-circle' : 'person-circle-outline'}

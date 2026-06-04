@@ -49,7 +49,7 @@ export default function AIAssistantScreen() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'default',
-      text: 'Tôi là KhmerGo AI - luôn sẵn sàng khám phá văn hóa, địa điểm và ngôn ngữ Khmer cùng bạn.',
+      text: t('ai_intro'),
       sender: 'ai',
       timestamp: new Date(),
     },
@@ -108,11 +108,11 @@ export default function AIAssistantScreen() {
       await AsyncStorage.removeItem(CHAT_HISTORY_KEY);
       setMessages([{
         id: 'default',
-        text: 'Tôi là KhmerGo AI - luôn sẵn sàng khám phá văn hóa, địa điểm và ngôn ngữ Khmer cùng bạn.',
+        text: t('ai_intro'),
         sender: 'ai',
         timestamp: new Date(),
       }]);
-      triggerToast('Đã dọn dẹp lịch sử trò chuyện');
+      triggerToast(t('clear_chat_history'));
     } catch (e) { console.error(e); }
   };
   const scrollViewRef = useRef<ScrollView>(null);
@@ -185,7 +185,7 @@ export default function AIAssistantScreen() {
     const aiWaitingId = (Date.now() + 1).toString();
     const aiWaitingMsg: Message = {
       id: aiWaitingId,
-      text: 'Đang suy nghĩ...',
+      text: t('thinking'),
       sender: 'ai',
       timestamp: new Date()
     };
@@ -199,7 +199,7 @@ export default function AIAssistantScreen() {
       );
     } catch (error) {
       setMessages((prev) =>
-        prev.map(m => m.id === aiWaitingId ? { ...m, text: "Xin lỗi, tôi gặp sự cố kết nối. Bạn thử lại nhé!" } : m)
+        prev.map(m => m.id === aiWaitingId ? { ...m, text: t('ai_error_connection') } : m)
       );
     }
   };
@@ -240,14 +240,14 @@ export default function AIAssistantScreen() {
       const [response] = await Promise.all([responsePromise, minAnalysisTime]);
 
       if (response.artifact) {
-        setResult({ title: response.artifact.name, content: "Đặc điểm nhận diện: " + response.artifact.features });
+        setResult({ title: response.artifact.name, content: t('features_label') + ": " + response.artifact.features });
       } else if (response.isRecognized && response.rawResponse) {
-        setResult({ title: "Phân tích từ AI", content: response.rawResponse });
+        setResult({ title: t('ai_result_title'), content: response.rawResponse });
       } else {
-        setResult({ title: "Vật thể không xác định", content: "Hiện vật này hiện chưa khớp với dữ liệu nhận diện trong hệ thống KhmerGo AI. Vui lòng thử lại với hình ảnh rõ nét hơn hoặc góc chụp khác để AI có thể phân tích chính xác hơn." });
+        setResult({ title: t('ai_unknown_object'), content: t('ai_unknown_desc') });
       }
     } catch (error) {
-      setResult({ title: "Lỗi kết nối", content: "Vui lòng thử lại sau giây lát." });
+      setResult({ title: t('connection_error_title'), content: t('connection_error_desc') });
     } finally {
       setStatus('result');
     }
@@ -260,7 +260,7 @@ export default function AIAssistantScreen() {
     setImage(null);
     setStatus('idle');
     setResult(null);
-    triggerToast('Đã dọn dẹp kết quả phân tích');
+    triggerToast(t('clear_analysis_success'));
   };
 
 
@@ -346,7 +346,7 @@ export default function AIAssistantScreen() {
                             }}
                           >
                             <Text style={styles.detailBtnText}>
-                              {msg.text.includes('_all]') ? 'Khám phá ngay' : 'Xem chi tiết'}
+                              {msg.text.includes('_all]') ? t('explore_now') : t('view_details')}
                             </Text>
                           </TouchableOpacity>
                         )}
@@ -386,7 +386,7 @@ export default function AIAssistantScreen() {
             ]}>
               <TextInput
                 style={styles.input}
-                placeholder="Hỏi bất cứ điều gì..."
+                placeholder={t('ask_anything_placeholder')}
                 placeholderTextColor="#9CA3AF"
                 value={inputText}
                 onChangeText={setInputText}
@@ -446,15 +446,15 @@ export default function AIAssistantScreen() {
                   {(status === 'idle' || status === 'selected') && (
                     <View style={{ marginBottom: 5 }}>
                       <Text style={{ fontSize: 18, fontWeight: '800', color: '#1A1A1A' }}>
-                        {status === 'idle' ? 'Chào bạn nhé' : 'Sẵn sàng phân tích'}
+                        {status === 'idle' ? t('ai_camera_idle_title') : t('ai_camera_ready')}
                       </Text>
                     </View>
                   )}
-                  {status === 'idle' && <Text style={styles.aiBubbleTextSmall}>Tải ảnh lên hoặc chụp ảnh liên quan đến văn hóa Khmer Nam Bộ. KhmerGo AI sẽ hỗ trợ phân tích và giải thích chi tiết.</Text>}
-                  {status === 'selected' && <Text style={styles.aiBubbleTextSmall}>Đã chọn ảnh. Nhấn “Bắt đầu phân tích” để KhmerGo AI khám phá và giải thích ý nghĩa văn hóa của hiện vật này.</Text>}
+                  {status === 'idle' && <Text style={styles.aiBubbleTextSmall}>{t('ai_camera_idle_desc')}</Text>}
+                  {status === 'selected' && <Text style={styles.aiBubbleTextSmall}>{t('ai_camera_selected_desc')}</Text>}
                   {status === 'analyzing' && <View style={[styles.analyzingBox, { marginTop: 120 }]}>
                     <ActivityIndicator color="#0066ffff" size="large" />
-                    <Text style={styles.analyzingText}>Đang phân tích hình ảnh...</Text>
+                    <Text style={styles.analyzingText}>{t('ai_analyzing')}</Text>
                   </View>}
 
                   {status === 'result' && result && (
@@ -484,7 +484,7 @@ export default function AIAssistantScreen() {
                 {status === 'selected' && (
                   <TouchableOpacity style={styles.analyzeBtn} onPress={handleAnalyze}>
                     <LinearGradient colors={['#0066ffff', '#0052cc']} style={styles.analyzeGradient}>
-                      <Text style={styles.analyzeBtnText}>BẮT ĐẦU PHÂN TÍCH</Text>
+                      <Text style={styles.analyzeBtnText}>{t('ai_start_analysis')}</Text>
                     </LinearGradient>
                   </TouchableOpacity>
                 )}

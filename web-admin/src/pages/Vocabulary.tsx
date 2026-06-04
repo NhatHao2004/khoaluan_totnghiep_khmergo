@@ -1,6 +1,6 @@
 import { addDoc, collection, deleteDoc, doc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle, Languages, Pencil, Shield, Trash2 } from 'lucide-react';
+import { CheckCircle, Pencil, Shield, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { db } from '../firebase/config';
 
@@ -433,8 +433,6 @@ const Vocabulary = () => {
                   {filteredWords.length === 0 ? (
                     <tr>
                       <td colSpan={4} style={{ padding: '5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                        <Languages size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
-                        <p>Không có dữ liệu từ vựng</p>
                       </td>
                     </tr>
                   ) : (

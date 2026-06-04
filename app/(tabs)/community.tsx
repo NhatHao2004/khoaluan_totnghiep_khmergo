@@ -1,4 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -53,6 +54,7 @@ interface Post {
 
 export default function CommunityScreen() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { openPostId } = useLocalSearchParams();
@@ -225,7 +227,7 @@ export default function CommunityScreen() {
       try {
         const postsData = snapshot.docs.map(doc => {
           const data = doc.data();
-          let timeDisplay = 'Vừa xong';
+          let timeDisplay = t('just_now');
           
           if (data.createdAt) {
             try {
@@ -267,14 +269,14 @@ export default function CommunityScreen() {
       try {
         const commentsData = snapshot.docs.map(doc => {
           const data = doc.data();
-          let timeDisplay = 'Vừa xong';
+          let timeDisplay = t('just_now');
 
           if (data.createdAt) {
             try {
               const date = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
               timeDisplay = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             } catch (e) {
-              timeDisplay = 'Vừa xong';
+              timeDisplay = t('just_now');
             }
           }
 
@@ -301,7 +303,7 @@ export default function CommunityScreen() {
       await Firestore.addDoc(Firestore.collection(db, 'notifications'), {
         toUserId: receiverId,
         senderId: user.uid,
-        fromUserName: user.name || 'Người dùng',
+        fromUserName: user.name || t('user_default'),
         senderAvatar: user.avatar || 'https://i.pravatar.cc/150?u=me',
         type,
         postId,
@@ -317,7 +319,7 @@ export default function CommunityScreen() {
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      triggerToast("Vui lòng cấp quyền truy cập ảnh trong cài đặt", "error");
+      triggerToast(t('photo_permission_error'), "error");
       return;
     }
 
@@ -337,7 +339,7 @@ export default function CommunityScreen() {
         );
         const base64Str = `data:image/jpeg;base64,${manipResult.base64}`;
         if (base64Str.length > 950000) {
-          triggerToast("Ảnh quá nặng, hãy chọn ảnh khác", "error");
+          triggerToast(t('image_too_heavy'), "error");
           return;
         }
         setSelectedImage(manipResult.uri);
@@ -346,7 +348,7 @@ export default function CommunityScreen() {
           setImageRatio(manipResult.width / manipResult.height);
         }
       } catch (error) {
-        triggerToast("Lỗi xử lý hình ảnh", "error");
+        triggerToast(t('image_process_error'), "error");
       }
     }
   };
@@ -361,11 +363,11 @@ export default function CommunityScreen() {
           image: base64Image,
           imageAspectRatio: imageRatio || 1,
         });
-        triggerToast("Đã cập nhật bài viết");
+        triggerToast(t('update_post_success'));
       } else {
         await Firestore.addDoc(Firestore.collection(db, 'posts'), {
           userId: user.uid,
-          user: user.name || 'Người dùng',
+          user: user.name || t('user_default'),
           userAvatar: user.avatar || 'https://i.pravatar.cc/150?u=me',
           content: createPostText.trim(),
           image: base64Image,
@@ -375,7 +377,7 @@ export default function CommunityScreen() {
           likedBy: [],
           createdAt: Firestore.serverTimestamp()
         });
-        triggerToast("Đã đăng bài viết");
+        triggerToast(t('post_success'));
       }
 
       setCreatePostText('');
@@ -386,7 +388,7 @@ export default function CommunityScreen() {
       setIsEditingPost(false);
       setCreateModalVisible(false);
     } catch (error) {
-      triggerToast("Thao tác thất bại", "error");
+      triggerToast(t('action_failed'), "error");
     } finally {
       setTimeout(() => {
         setIsSubmittingPost(false);
@@ -411,7 +413,7 @@ export default function CommunityScreen() {
         const postSnap = await Firestore.getDoc(postRef);
         if (postSnap.exists()) {
           const postData = postSnap.data();
-          sendNotification(postData.userId, 'like', postId, "đã thích bài viết của bạn");
+          sendNotification(postData.userId, 'like', postId, t('someone_liked'));
         }
       }
     } catch (error) {
@@ -443,7 +445,7 @@ export default function CommunityScreen() {
     try {
       const commentData = {
         userId: user.uid,
-        user: user.name || 'Người dùng',
+        user: user.name || t('user_default'),
         avatar: user.avatar || 'https://i.pravatar.cc/150?u=me',
         text: currentComment,
         parentId: replyToId || null,
@@ -463,13 +465,13 @@ export default function CommunityScreen() {
       if (postSnap.exists()) {
         const postData = postSnap.data();
         if (replyToId && replyToUserId) {
-          sendNotification(replyToUserId, 'reply', activePostId, `đã trả lời bình luận của bạn: "${currentComment.substring(0, 30)}..."`);
+          sendNotification(replyToUserId, 'reply', activePostId, `${t('someone_replied')}: "${currentComment.substring(0, 30)}..."`);
         } else {
-          sendNotification(postData.userId, 'comment', activePostId, `đã bình luận bài viết của bạn: "${currentComment.substring(0, 30)}..."`);
+          sendNotification(postData.userId, 'comment', activePostId, `${t('someone_commented')}: "${currentComment.substring(0, 30)}..."`);
         }
       }
     } catch (error) {
-      triggerToast("Lỗi gửi bình luận", "error");
+      triggerToast(t('action_failed'), "error");
       // Re-set text if error so user doesn't lose it
       setCommentText(currentComment);
     } finally {
@@ -507,9 +509,9 @@ export default function CommunityScreen() {
         comments: Firestore.increment(-totalToDelete)
       });
 
-      triggerToast("Đã xóa bình luận");
+      triggerToast(t('delete_comment_success'));
     } catch (error) {
-      triggerToast("Lỗi khi xóa bình luận", "error");
+      triggerToast(t('action_failed'), "error");
     }
   };
 
@@ -545,9 +547,9 @@ export default function CommunityScreen() {
     if (!postToDelete) return;
     try {
       await Firestore.deleteDoc(Firestore.doc(db, 'posts', postToDelete));
-      triggerToast("Đã xóa bài viết");
+      triggerToast(t('delete_post_success'));
     } catch (error) {
-      triggerToast("Lỗi khi xóa bài viết", "error");
+      triggerToast(t('action_failed'), "error");
     } finally {
       setShowDeleteModal(false);
       setPostToDelete(null);
@@ -611,7 +613,7 @@ export default function CommunityScreen() {
 
       <View style={styles.screenHeader}>
         <View style={{ width: 36 }} />
-        <Text style={styles.screenTitle}>Cộng đồng</Text>
+        <Text style={styles.screenTitle}>{t('tab_community')}</Text>
         <TouchableOpacity
           style={styles.plusBtn}
           onPress={() => {
@@ -635,7 +637,7 @@ export default function CommunityScreen() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="newspaper-outline" size={48} color="#EEE" />
-            <Text style={styles.emptyText}>Chưa có bài viết nào</Text>
+            <Text style={styles.emptyText}>{t('empty_posts')}</Text>
           </View>
         }
       />
@@ -656,7 +658,7 @@ export default function CommunityScreen() {
             <View style={styles.modalHeader}>
 
               <View style={styles.modalHeaderTitleBox}>
-                <Text style={styles.modalTitle}>{isEditingPost ? 'Sửa bài viết' : 'Tạo bài viết'}</Text>
+                <Text style={styles.modalTitle}>{isEditingPost ? t('edit_post_title') : t('create_post_title')}</Text>
                 <TouchableOpacity
                   onPress={submitPost}
                   disabled={!createPostText.trim() && !base64Image || isSubmittingPost}
@@ -671,7 +673,7 @@ export default function CommunityScreen() {
                         fontSize: 16,
                         fontWeight: '700',
                       }}>
-                        {isEditingPost ? 'Cập nhật' : 'Đăng bài'}
+                        {isEditingPost ? t('update_post') : t('submit_post')}
                       </Text>
                     )}
                   </View>
@@ -686,11 +688,11 @@ export default function CommunityScreen() {
             >
               <View style={styles.userInfoRow}>
                 <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.commentAvatar} />
-                <Text style={styles.userNameInModal}>{user?.name || 'Người dùng'}</Text>
+                <Text style={styles.userNameInModal}>{user?.name || t('user_default')}</Text>
               </View>
               <TextInput
                 style={styles.createPostInput}
-                placeholder="Chia sẻ khoảnh khắc đẹp..."
+                placeholder={t('post_placeholder')}
                 placeholderTextColor="#999"
                 multiline
                 autoFocus
@@ -718,7 +720,7 @@ export default function CommunityScreen() {
               <View style={[styles.createPostActions, { paddingBottom: insets.bottom + 5 }]}>
                 <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
                   <Ionicons name="image-outline" size={24} color="#1877F2" />
-                  <Text style={styles.attachActionText}>Ảnh</Text>
+                  <Text style={styles.attachActionText}>{t('image_label')}</Text>
                 </TouchableOpacity>
                 <View style={{ flex: 1 }} />
                 <TouchableOpacity
@@ -757,7 +759,7 @@ export default function CommunityScreen() {
             <View style={styles.modalHeader}>
 
               <View style={styles.modalHeaderTitleBox}>
-                <Text style={styles.modalTitle}>Bình luận ({posts.find(p => p.id === activePostId)?.comments || 0})</Text>
+                <Text style={styles.modalTitle}>{t('comments_title')} ({posts.find(p => p.id === activePostId)?.comments || 0})</Text>
                 <TouchableOpacity onPress={() => {
                   Keyboard.dismiss();
                   setModalVisible(false);
@@ -791,7 +793,7 @@ export default function CommunityScreen() {
                                 <Ionicons name="caret-forward-sharp" size={12} color="#666" />
                                 {"  "}
                                 <Text style={styles.repliedToUser}>
-                                  {comments.find(c => c.id === item.parentId)?.user || 'Người dùng'}
+                                  {comments.find(c => c.id === item.parentId)?.user || t('user_default')}
                                 </Text>
                               </Text>
                             )}
@@ -803,11 +805,11 @@ export default function CommunityScreen() {
                       <View style={styles.commentFooter}>
                         <Text style={styles.commentTime}>{item.time}</Text>
                         <TouchableOpacity onPress={() => handleReply(item)} style={{ marginLeft: 12 }}>
-                          <Text style={styles.footerActionText}>Trả lời</Text>
+                          <Text style={styles.footerActionText}>{t('reply_action')}</Text>
                         </TouchableOpacity>
                         {isMyComment && (
                           <TouchableOpacity onPress={() => handleDeleteComment(item.id)} style={{ marginLeft: 1 }}>
-                            <Text style={styles.footerActionText}>Xóa</Text>
+                            <Text style={styles.footerActionText}>{t('delete_action')}</Text>
                           </TouchableOpacity>
                         )}
                       </View>
@@ -815,12 +817,12 @@ export default function CommunityScreen() {
                   </View>
                 );
               }}
-              ListEmptyComponent={<View style={{ padding: 40, alignItems: 'center' }}><Text style={{ color: '#999' }}>Hãy là người đầu tiên bình luận</Text></View>}
+              ListEmptyComponent={<View style={{ padding: 40, alignItems: 'center' }}><Text style={{ color: '#999' }}>{t('first_comment_msg')}</Text></View>}
             />
 
             {replyToName && (
               <View style={styles.replyBar}>
-                <Text style={styles.replyBarText}>Đang trả lời: <Text style={{ fontWeight: '800' }}>{replyToName}</Text></Text>
+                <Text style={styles.replyBarText}>{t('replying_to')}: <Text style={{ fontWeight: '800' }}>{replyToName}</Text></Text>
                 <TouchableOpacity onPress={() => { setReplyToId(null); setReplyToName(null); setReplyToUserId(null); }}>
                   <Ionicons name="close-circle" size={24} color="#FF3B30" />
                 </TouchableOpacity>
@@ -831,7 +833,7 @@ export default function CommunityScreen() {
               <TextInput
                 ref={commentInputRef}
                 style={styles.commentInput}
-                placeholder="Viết bình luận..."
+                placeholder={t('write_comment_placeholder')}
                 value={commentText}
                 onChangeText={setCommentText}
                 multiline
@@ -850,11 +852,11 @@ export default function CommunityScreen() {
           <Animated.View style={[styles.optionsContent, animatedOptionsStyle, { paddingBottom: insets.bottom + 10 }]}>
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleEditPost(selectedPost); }}>
               <View style={styles.optionIconContainer}><Ionicons name="create-outline" size={24} color="#1A1A1A" /></View>
-              <View><Text style={styles.optionText}>Chỉnh sửa bài viết</Text></View>
+              <View><Text style={styles.optionText}>{t('edit_post_menu')}</Text></View>
             </TouchableOpacity>
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleDeletePost(selectedPost.id, selectedPost.userId); }}>
               <View style={styles.optionIconContainer}><Ionicons name="trash-outline" size={24} color="#1A1A1A" /></View>
-              <View><Text style={styles.optionText}>Xóa bỏ bài viết</Text></View>
+              <View><Text style={styles.optionText}>{t('delete_post_menu')}</Text></View>
             </TouchableOpacity>
             <View style={{ height: 8 }} />
           </Animated.View>
@@ -874,8 +876,8 @@ export default function CommunityScreen() {
             <View style={styles.pModalIconCircle}>
               <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
             </View>
-            <Text style={styles.pModalTitle}>Yêu cầu đăng nhập</Text>
-            <Text style={styles.pModalSub}>Đăng nhập để sử dụng tính năng này</Text>
+            <Text style={styles.pModalTitle}>{t('login_required')}</Text>
+            <Text style={styles.pModalSub}>{t('login_to_use')}</Text>
 
             <View style={styles.pModalActionRow}>
               <TouchableOpacity
@@ -885,14 +887,14 @@ export default function CommunityScreen() {
                   router.push('/login');
                 }}
               >
-                <Text style={styles.pModalPrimaryBtnText}>Đăng nhập</Text>
+                <Text style={styles.pModalPrimaryBtnText}>{t('login')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.pModalSecondaryBtn}
                 onPress={() => setShowLoginModal(false)}
               >
-                <Text style={styles.pModalSecondaryBtnText}>Quay lại</Text>
+                <Text style={styles.pModalSecondaryBtnText}>{t('back')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -912,22 +914,22 @@ export default function CommunityScreen() {
             <View style={[styles.pModalIconCircle, { backgroundColor: '#FEF2F2', borderColor: '#FEE2E2' }]}>
               <Ionicons name="trash-outline" size={40} color="#EF4444" />
             </View>
-            <Text style={styles.pModalTitle}>Xóa bài viết</Text>
-            <Text style={styles.pModalSub}>Hành động này không thể hoàn tác</Text>
+            <Text style={styles.pModalTitle}>{t('delete_post_confirm')}</Text>
+            <Text style={styles.pModalSub}>{t('cannot_undo')}</Text>
 
             <View style={styles.pModalActionRow}>
               <TouchableOpacity
                 style={[styles.pModalPrimaryBtn, { backgroundColor: '#EF4444', shadowColor: '#EF4444' }]}
                 onPress={confirmDeletePost}
               >
-                <Text style={styles.pModalPrimaryBtnText}>Xóa bài viết</Text>
+                <Text style={styles.pModalPrimaryBtnText}>{t('delete_post_confirm')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[styles.pModalSecondaryBtn, { backgroundColor: '#3B82F6' }]}
                 onPress={() => setShowDeleteModal(false)}
               >
-                <Text style={[styles.pModalSecondaryBtnText, { color: '#FFF' }]}>Quay lại</Text>
+                <Text style={[styles.pModalSecondaryBtnText, { color: '#FFF' }]}>{t('back')}</Text>
               </TouchableOpacity>
             </View>
           </View>

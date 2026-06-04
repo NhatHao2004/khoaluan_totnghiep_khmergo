@@ -238,7 +238,7 @@ export default function HomeScreen() {
       const nData = snapshot.docs.map((doc: any) => ({
         id: doc.id,
         ...doc.data(),
-        time: doc.data().createdAt?.toDate()?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || 'Vừa xong'
+        time: doc.data().createdAt?.toDate()?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || t('just_now')
       }));
       setNotifications(nData);
       setUnreadCount(nData.filter((n: any) => !n.isRead).length);
@@ -504,7 +504,7 @@ export default function HomeScreen() {
         >
           <Animated.View style={[styles.notificationContainer, animatedSlideStyle]}>
             <View style={styles.nHeader}>
-              <Text style={styles.nTitle}>Thông báo</Text>
+              <Text style={styles.nTitle}>{t('notifications_title')}</Text>
             </View>
 
             <ScrollView
@@ -585,7 +585,7 @@ export default function HomeScreen() {
               ) : (
                 <View style={{ alignItems: 'center' }}>
                   <Ionicons name="notifications-off-outline" size={45} color="#E2E8F0" />
-                  <Text style={{ color: '#94A3B8', marginTop: 12, fontSize: 14 }}>Chưa có thông báo nào</Text>
+                  <Text style={{ color: '#94A3B8', marginTop: 12, fontSize: 14 }}>{t('no_notifications')}</Text>
                 </View>
               )}
             </ScrollView>
