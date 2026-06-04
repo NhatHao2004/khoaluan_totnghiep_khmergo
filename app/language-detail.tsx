@@ -1,11 +1,13 @@
 import { ThemedText } from '@/components/themed-text';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { VOCABULARY_CATEGORIES } from '@/utils/vocabularyData';
+import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import { doc, onSnapshot } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   Dimensions,
   ScrollView,
   StyleSheet,
@@ -20,8 +22,18 @@ export default function LanguageDetailScreen() {
   const { categoryId, title } = useLocalSearchParams();
   const { t } = useLanguage();
 
-  const category = useMemo(() => {
-    return VOCABULARY_CATEGORIES.find(c => c.id === categoryId);
+  const [category, setCategory] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!categoryId) return;
+    const unsubscribe = onSnapshot(doc(db, 'vocab_categories', categoryId as string), (doc) => {
+      if (doc.exists()) {
+        setCategory({ id: doc.id, ...doc.data() });
+      }
+      setLoading(false);
+    });
+    return () => unsubscribe();
   }, [categoryId]);
 
   const [playingId, setPlayingId] = useState<string | null>(null);
@@ -71,6 +83,21 @@ export default function LanguageDetailScreen() {
     }
   };
 
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backBtn} onPress={handleBackPress}>
+            <Ionicons name="arrow-back" size={28} color="#000000" />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.errorContainer}>
+          <ActivityIndicator size="large" color="#3B82F6" />
+        </View>
+      </View>
+    );
+  }
+
   if (!category) {
     return (
       <View style={styles.container}>
@@ -109,17 +136,17 @@ export default function LanguageDetailScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.listContainer}>
-          {category.words.map((word, index) => (
+          {(category.words || []).map((word: any, index: number) => (
             <View key={word.id} style={styles.flashcard}>
               <View style={styles.cardHeader}>
-                <View style={[styles.indexBadge, { backgroundColor: category.color + '20' }]}>
-                  <ThemedText style={[styles.indexText, { color: category.color }]}>{index + 1}</ThemedText>
+                <View style={[styles.indexBadge, { backgroundColor: (category.color || '#3B82F6') + '20' }]}>
+                  <ThemedText style={[styles.indexText, { color: category.color || '#3B82F6' }]}>{index + 1}</ThemedText>
                 </View>
                 <TouchableOpacity onPress={() => playSound(word.khm, 'km', word.id)}>
                   <Ionicons
                     name={playingId === word.id ? "volume-high" : "volume-medium-outline"}
                     size={28}
-                    color={playingId === word.id ? category.color : "#0060d6ff"}
+                    color={playingId === word.id ? (category.color || '#3B82F6') : "#0060d6ff"}
                   />
                 </TouchableOpacity>
               </View>
@@ -130,7 +157,7 @@ export default function LanguageDetailScreen() {
 
                 <View style={styles.divider} />
 
-                <ThemedText style={styles.vieText}>{word.vie}</ThemedText>
+                <ThemedText style={styles.vieText}>{word.life || word.vie}</ThemedText>
               </View>
             </View>
           ))}

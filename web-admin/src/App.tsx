@@ -385,6 +385,7 @@ function App() {
                   {[
                     { key: 'destinations', label: 'Nội dung học tập' },
                     { key: 'challenges', label: 'Thử thách' },
+                    { key: 'vocab_categories', label: 'Danh mục' },
                     { key: 'posts', label: 'Bài viết cộng đồng' }
                   ].map(tab => (
                     <button
@@ -424,11 +425,22 @@ function App() {
                                 if (isProcessing) return;
                                 setIsProcessing(true);
                                 try {
-                                  const collectionName = item.type === 'challenges' ? 'quizzes' : (item.type === 'destinations' ? 'destinations' : 'posts');
-                                  await setDoc(doc(db, collectionName, item.originalId), {
-                                    ...item.data,
-                                    createdAt: serverTimestamp()
-                                  });
+                                  if (item.type === 'vocab_categories') {
+                                    await setDoc(doc(db, 'vocab_categories', item.originalId), item.data);
+                                  } else if (item.type === 'vocab_words') {
+                                    const catRef = doc(db, 'vocab_categories', item.categoryId);
+                                    const catSnap = await getDoc(catRef);
+                                    const currentWords = catSnap.exists() ? (catSnap.data().words || []) : [];
+                                    await setDoc(catRef, {
+                                      words: [...currentWords, item.data]
+                                    }, { merge: true });
+                                  } else {
+                                    const collectionName = item.type === 'challenges' ? 'quizzes' : (item.type === 'destinations' ? 'destinations' : 'posts');
+                                    await setDoc(doc(db, collectionName, item.originalId), {
+                                      ...item.data,
+                                      createdAt: serverTimestamp()
+                                    });
+                                  }
                                   await deleteDoc(doc(db, 'trash', item.id));
                                   showToast('Đã khôi phục dữ liệu thành công');
                                 } catch (e) {

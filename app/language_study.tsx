@@ -1,10 +1,11 @@
 import { ThemedText } from '@/components/themed-text';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { VOCABULARY_CATEGORIES } from '@/utils/vocabularyData';
+import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import { Image as ExpoImage } from 'expo-image';
 import { useRouter } from 'expo-router';
+import { collection, onSnapshot, query } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -23,11 +24,28 @@ const CATEGORY_IMAGES = [
   require('@/assets/images/chaohoi.jpg'),
   require('@/assets/images/sodem.jpg'),
 ];
+
 export default function LanguageStudyScreen() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const isKm = language === 'km';
   const [activeTab, setActiveTab] = useState<'topics' | 'translator'>('topics');
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loadingCats, setLoadingCats] = useState(true);
+
+  // Fetch categories from Firebase
+  useEffect(() => {
+    const q = query(collection(db, 'vocab_categories'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const cats = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setCategories(cats.sort((a: any, b: any) => (a.order || 0) - (b.order || 0)));
+      setLoadingCats(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // --- Translator Logic ---
   const [isViToKm, setIsViToKm] = useState(true);
@@ -200,34 +218,48 @@ export default function LanguageStudyScreen() {
         >
           {activeTab === 'topics' ? (
             <View style={styles.categoryList}>
-              {VOCABULARY_CATEGORIES.map((category, index) => (
-                <TouchableOpacity
-                  key={category.id}
-                  style={styles.categoryMainCard}
-                  activeOpacity={0.8}
-                  onPress={() => handleCategoryPress(category.id, category.title)}
-                >
-                  <View style={styles.categoryImageContainer}>
-                    <ExpoImage
-                      source={CATEGORY_IMAGES[index % CATEGORY_IMAGES.length]}
-                      style={styles.categoryCardImage}
-                      contentFit="contain"
-                      priority="high"
-                      transition={200}
-                    />
-                  </View>
-                  <View style={styles.categoryCardBody}>
-                    <View style={styles.cardInfoRow}>
-                      <View style={styles.textContainer}>
-                        <ThemedText style={styles.categoryCardTitle}>{t(category.title)}</ThemedText>
-                      </View>
-                      <View style={styles.startStudyBtn}>
-                        <ThemedText style={styles.startStudyBtnText}>{isKm ? 'ចាប់ផ្តើមរៀន' : 'Bắt đầu học'}</ThemedText>
+              {loadingCats ? (
+                <ActivityIndicator size="large" color="#3B82F6" style={{ marginTop: 50 }} />
+              ) : (
+                categories.map((category, index) => (
+                  <TouchableOpacity
+                    key={category.id}
+                    style={styles.categoryMainCard}
+                    activeOpacity={0.8}
+                    onPress={() => handleCategoryPress(category.id, isKm && category.titleKm ? category.titleKm : category.title)}
+                  >
+                    <View style={styles.categoryImageContainer}>
+                      <ExpoImage
+                        source={
+                          category.imageUrl
+                            ? { uri: category.imageUrl }
+                            : (category.title === 'cat_family' || category.id === 'family') ? require('@/assets/images/giadinh.jpg') :
+                            (category.title === 'cat_food' || category.id === 'food') ? require('@/assets/images/monan.jpg') :
+                            (category.title === 'cat_greetings' || category.id === 'greetings') ? require('@/assets/images/chaohoi.jpg') :
+                            (category.title === 'cat_numbers' || category.id === 'numbers') ? require('@/assets/images/sodem.jpg') :
+                            CATEGORY_IMAGES[index % CATEGORY_IMAGES.length]
+                        }
+                        style={styles.categoryCardImage}
+                        contentFit="contain"
+                        priority="high"
+                        transition={200}
+                      />
+                    </View>
+                    <View style={styles.categoryCardBody}>
+                      <View style={styles.cardInfoRow}>
+                        <View style={styles.textContainer}>
+                          <ThemedText style={styles.categoryCardTitle}>
+                            {isKm && category.titleKm ? category.titleKm : t(category.title)}
+                          </ThemedText>
+                        </View>
+                        <View style={styles.startStudyBtn}>
+                          <ThemedText style={styles.startStudyBtnText}>{isKm ? 'ចាប់ផ្តើមរៀន' : 'Bắt đầu học'}</ThemedText>
+                        </View>
                       </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-              ))}
+                  </TouchableOpacity>
+                ))
+              )}
             </View>
           ) : (
             <View style={styles.translatorWrapper}>

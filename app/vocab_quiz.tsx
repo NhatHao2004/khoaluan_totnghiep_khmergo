@@ -93,11 +93,12 @@ export default function VocabQuizScreen() {
         const parities = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1].sort(() => 0.5 - Math.random());
 
         words.forEach((w, index) => {
+            const vieText = w.life || w.vie || '';
             if (parities[index] === 0) {
                 leftItemsData.push({ id: w.id, text: w.khm, type: 'khm' });
-                rightItemsData.push({ id: w.id, text: w.vie, type: 'vie' });
+                rightItemsData.push({ id: w.id, text: vieText, type: 'vie' });
             } else {
-                leftItemsData.push({ id: w.id, text: w.vie, type: 'vie' });
+                leftItemsData.push({ id: w.id, text: vieText, type: 'vie' });
                 rightItemsData.push({ id: w.id, text: w.khm, type: 'khm' });
             }
         });
@@ -246,12 +247,15 @@ export default function VocabQuizScreen() {
                                     {/* Proxy Image Container */}
                                     <View style={styles.categoryImageContainer}>
                                         <Image
-                                            source={[
-                                                require('@/assets/images/giadinh.jpg'),
-                                                require('@/assets/images/monan.jpg'),
-                                                require('@/assets/images/chaohoi.jpg'),
-                                                require('@/assets/images/sodem.jpg'),
-                                            ][index % 4]}
+                                            source={
+                                                category.imageUrl
+                                                    ? { uri: category.imageUrl }
+                                                    : (category.title === 'cat_family' || category.id === 'family') ? require('@/assets/images/giadinh.jpg') :
+                                                    (category.title === 'cat_food' || category.id === 'food') ? require('@/assets/images/monan.jpg') :
+                                                    (category.title === 'cat_greetings' || category.id === 'greetings') ? require('@/assets/images/chaohoi.jpg') :
+                                                    (category.title === 'cat_numbers' || category.id === 'numbers') ? require('@/assets/images/sodem.jpg') :
+                                                    require('@/assets/images/giadinh.jpg')
+                                            }
                                             style={styles.categoryCardImage}
                                             contentFit="contain"
                                         />
@@ -441,7 +445,7 @@ export default function VocabQuizScreen() {
                                 style={styles.confirmExitBtn}
                                 onPress={() => {
                                     setShowExitModal(false);
-                                    router.back();
+                                    resetGame();
                                 }}
                             >
                                 <Text style={styles.confirmExitBtnText}>{t('exit')}</Text>
