@@ -1,7 +1,7 @@
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, LogOut, RefreshCw, Trash, Trash2, X } from 'lucide-react';
+import { Bell, LogOut, Menu, RefreshCw, Trash, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
@@ -16,55 +16,56 @@ import ProfilePage from './pages/Profile';
 import Users from './pages/Users';
 import Vocabulary from './pages/Vocabulary';
 
-const TopBar = ({ notifications, clearNotifications, setShowTrash, setTrashActiveTab }: any) => {
+const TopBar = ({ notifications, clearNotifications, setShowTrash, setTrashActiveTab, toggleSidebar }: any) => {
   const [showNotifications, setShowNotifications] = useState(false);
 
   return (
     <header className="top-bar">
-      <div style={{ flex: 1 }}></div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <button
+          onClick={toggleSidebar}
+          className="mobile-only"
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: '0.5rem',
+            cursor: 'pointer',
+            color: 'var(--text-primary)'
+          }}
+        >
+          <Menu size={24} />
+        </button>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <div style={{ position: 'relative' }}>
           <button
             onClick={() => setShowNotifications(!showNotifications)}
             style={{
-              padding: '0.75rem',
-              borderRadius: '20px',
-              border: '1.5px solid #000000',
-              background: '#eff6ff',
-              color: '#3b82f6',
+              padding: '0.6rem',
+              borderRadius: '14px',
+              border: '1px solid var(--border-light)',
+              background: 'white',
+              color: 'var(--text-secondary)',
               cursor: 'pointer',
               position: 'relative',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
+              transition: 'all 0.2s'
             }}
-            className="hover-scale"
           >
-            <Bell size={22} strokeWidth={2.5} />
+            <Bell size={20} />
             {notifications.length > 0 && (
               <span style={{
                 position: 'absolute',
-                top: '-5px',
-                right: '-5px',
-                minWidth: '20px',
-                height: '20px',
-                background: '#ef4444',
-                color: 'white',
-                borderRadius: '10px',
-                border: '2px solid white',
-                fontSize: '0.7rem',
-                fontWeight: 800,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '0 4px',
-                boxShadow: '0 2px 4px rgba(239, 68, 68, 0.4)',
-                pointerEvents: 'none'
-              }}>
-                {notifications.length}
-              </span>
+                top: '-2px',
+                right: '-2px',
+                width: '10px',
+                height: '10px',
+                background: 'var(--danger)',
+                borderRadius: '50%',
+                border: '2px solid white'
+              }}></span>
             )}
           </button>
 
@@ -77,32 +78,42 @@ const TopBar = ({ notifications, clearNotifications, setShowTrash, setTrashActiv
                   style={{ position: 'fixed', inset: 0, zIndex: 998 }}
                 />
                 <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  style={{ position: 'absolute', top: '100%', right: 0, marginTop: '0.75rem', width: '320px', background: 'white', borderRadius: '20px', boxShadow: '0 20px 40px rgba(0,0,0,0.12)', border: '1px solid #f1f5f9', padding: '1.25rem', zIndex: 999 }}
+                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: 0,
+                    marginTop: '0.5rem',
+                    width: 'calc(100vw - 2rem)',
+                    maxWidth: '320px',
+                    background: 'white',
+                    borderRadius: 'var(--radius-lg)',
+                    boxShadow: 'var(--shadow-lg)',
+                    border: '1px solid var(--border-light)',
+                    padding: '1.25rem',
+                    zIndex: 999
+                  }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <h4 style={{ fontWeight: 700, fontSize: '0.925rem' }}>Thông báo</h4>
+                    <h4 style={{ fontWeight: 700, fontSize: '0.875rem' }}>Thông báo</h4>
                     {notifications.length > 0 && (
                       <button onClick={clearNotifications} style={{ fontSize: '0.75rem', color: '#3b82f6', border: 'none', background: 'none', cursor: 'pointer', fontWeight: 600 }}>Xóa tất cả</button>
                     )}
                   </div>
-                  <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                  <div style={{ maxHeight: '300px', overflowY: 'auto' }} className="custom-scrollbar">
                     {notifications.length === 0 ? (
-                      <p style={{ textAlign: 'center', padding: '2rem 1rem', color: '#94a3b8', fontSize: '0.875rem' }}>Không có thông báo mới</p>
+                      <p style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>Không có thông báo mới</p>
                     ) : (
-                      <>
+                      <div style={{ display: 'grid', gap: '0.5rem' }}>
                         {notifications.map((n: any) => (
-                          <div key={n.id} style={{ padding: '0.875rem', borderRadius: '12px', background: '#f8fafc', marginBottom: '0.5rem', fontSize: '0.8125rem', border: '1px solid transparent', transition: 'all 0.2s' }} className="notification-item">
-                            <p style={{ color: '#1e293b', fontWeight: 600, marginBottom: '0.25rem' }}>{n.title}</p>
-                            <p style={{ color: '#64748b', lineHeight: 1.4 }}>{n.message}</p>
+                          <div key={n.id} style={{ padding: '0.75rem', borderRadius: '10px', background: 'var(--bg-accent)', fontSize: '0.8125rem' }}>
+                            <p style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '0.25rem' }}>{n.title}</p>
+                            <p style={{ color: 'var(--text-secondary)', lineHeight: 1.4 }}>{n.message}</p>
                           </div>
                         ))}
-                        <button style={{ width: '100%', padding: '0.75rem', marginTop: '0.5rem', border: 'none', background: '#f1f5f9', borderRadius: '12px', color: '#3b82f6', fontSize: '0.8125rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }} className="hover-bright">
-                          Xem tất cả thông báo
-                        </button>
-                      </>
+                      </div>
                     )}
                   </div>
                 </motion.div>
@@ -117,22 +128,20 @@ const TopBar = ({ notifications, clearNotifications, setShowTrash, setTrashActiv
             setShowTrash(true);
           }}
           style={{
-            padding: '0.75rem',
-            borderRadius: '20px',
-            border: '1.5px solid #000000',
-            background: '#eff6ff',
-            color: '#ef4444',
+            padding: '0.6rem',
+            borderRadius: '14px',
+            border: '1px solid var(--border-light)',
+            background: 'white',
+            color: 'var(--danger)',
             cursor: 'pointer',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
+            transition: 'all 0.2s'
           }}
-          className="hover-scale"
           title="Thùng rác hệ thống"
         >
-          <Trash2 size={22} strokeWidth={2.5} />
+          <Trash2 size={20} />
         </button>
       </div>
     </header>
@@ -154,6 +163,7 @@ function App() {
     isOpen: false, message: '', type: 'success'
   });
   const [isProcessing, setIsProcessing] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ isOpen: true, message, type });
@@ -275,7 +285,9 @@ function App() {
   return (
     <Router>
       <div className="app-container">
-        <Sidebar onLogout={() => setIsLogoutModalOpen(true)} />
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onLogout={() => setIsLogoutModalOpen(true)} />
+        <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
+        
         <div className="main-content">
           <TopBar
             notifications={notifications}
@@ -283,8 +295,9 @@ function App() {
             adminName={authState.user?.displayName || 'Admin'}
             setShowTrash={setShowTrash}
             setTrashActiveTab={setTrashActiveTab}
+            toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           />
-          <div style={{ padding: '2.5rem' }}>
+          <div style={{ padding: '1rem', paddingBottom: '3rem' }} className="fade-in">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/users" element={<Users />} />

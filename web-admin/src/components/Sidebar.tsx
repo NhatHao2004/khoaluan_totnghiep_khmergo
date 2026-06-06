@@ -2,66 +2,57 @@ import { BookOpen, FileText, Gamepad2, LayoutDashboard, Power, Type, User } from
 import { NavLink } from 'react-router-dom';
 import icon from '../assets/icon.png';
 
-const Sidebar = ({ onLogout }: { onLogout: () => void }) => {
+const Sidebar = ({ onLogout, isOpen, onClose }: { onLogout: () => void, isOpen: boolean, onClose: () => void }) => {
+  const NavItem = ({ to, icon: Icon, children }: any) => (
+    <NavLink 
+      to={to} 
+      className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+      onClick={onClose}
+    >
+      <Icon size={20} strokeWidth={2} />
+      <span>{children}</span>
+    </NavLink>
+  );
+
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-logo" style={{ background: 'white' }}>
-        <img src={icon} alt="KhmerGo Logo" style={{ width: 50, height: 50, marginRight: '12px', borderRadius: '10px' }} />
-        <span style={{ fontWeight: 800, fontSize: '1.4rem', color: '#000000ff' }}>KhmerGo</span>
+        <img src={icon} alt="KhmerGo Logo" style={{ width: 40, height: 40, marginRight: '12px', borderRadius: '10px' }} />
+        <span style={{ fontWeight: 800, fontSize: '1.25rem', color: '#000' }}>KhmerGo</span>
       </div>
 
       <nav className="sidebar-nav">
-        <NavLink to="/" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-          <LayoutDashboard size={20} strokeWidth={2} />
-          <span>Bảng điều khiển</span>
-        </NavLink>
+        <NavItem to="/" icon={LayoutDashboard}>Bảng điều khiển</NavItem>
 
-        <div className="sidebar-label" style={{ marginTop: '1.5rem' }}>Quản lý ứng dụng</div>
-        <NavLink to="/users" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-          <User size={20} strokeWidth={2} />
-          <span>Người dùng</span>
-        </NavLink>
-
-        <NavLink to="/destinations" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-          <BookOpen size={20} strokeWidth={2} />
-          <span>Nội dung</span>
-        </NavLink>
-
-        <NavLink to="/challenges" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-          <Gamepad2 size={20} strokeWidth={2} />
-          <span>Thử thách</span>
-        </NavLink>
-
-        <NavLink to="/vocabulary" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-          <Type size={20} strokeWidth={2} />
-          <span>Từ vựng</span>
-        </NavLink>
-
-        <NavLink to="/article" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-          <FileText size={20} strokeWidth={2} />
-          <span>Bài viết</span>
-        </NavLink>
-
-
+        <div className="sidebar-label">Quản lý ứng dụng</div>
+        <NavItem to="/users" icon={User}>Người dùng</NavItem>
+        <NavItem to="/destinations" icon={BookOpen}>Nội dung</NavItem>
+        <NavItem to="/challenges" icon={Gamepad2}>Thử thách</NavItem>
+        <NavItem to="/vocabulary" icon={Type}>Từ vựng</NavItem>
+        <NavItem to="/article" icon={FileText}>Bài viết cộng đồng</NavItem>
       </nav>
 
-      <div style={{ padding: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
+      <div style={{ padding: '1rem', borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}>
         <button
           className="nav-link"
-          onClick={onLogout}
+          onClick={() => {
+            onClose();
+            onLogout();
+          }}
           style={{
             width: '100%',
-            background: '#0f172a',
+            background: 'transparent',
             border: 'none',
             cursor: 'pointer',
-            color: '#ffffffff',
+            color: 'rgba(255, 255, 255, 0.7)',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.875rem'
+            gap: '0.75rem',
+            padding: '0.75rem 1rem'
           }}
         >
           <Power size={20} strokeWidth={2} />
-          <span style={{ fontWeight: 600 }}>Đăng xuất tài khoản</span>
+          <span style={{ fontWeight: 600 }}>Đăng xuất</span>
         </button>
       </div>
     </aside>

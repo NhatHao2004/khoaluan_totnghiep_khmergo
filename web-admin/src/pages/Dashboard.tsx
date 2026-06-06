@@ -144,7 +144,7 @@ const Dashboard = () => {
 
       <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
+      <div className="stats-grid">
         <StatCard title="Người dùng" value={stats.users} icon={User} color="#ef4444" onClick={() => navigate('/users')} />
         <StatCard title="Nội dung" value={stats.destinations} icon={BookOpen} color="#10b981" onClick={() => navigate('/destinations')} />
         <StatCard title="Thử thách" value={stats.quizzes} icon={HelpCircle} color="#f59e0b" onClick={() => navigate('/challenges')} />
@@ -190,8 +190,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="card glass-card" style={{ padding: '3rem 2rem 1.5rem', overflowX: 'hidden' }}>
-          <div className="custom-scrollbar" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: leaderboardType === 'all' ? '0.5rem' : '1.5rem', height: '380px', width: '100%', paddingBottom: '1rem', overflowX: 'hidden' }}>
+        <div className="card glass-card" style={{ padding: '2rem 1rem 1.5rem', overflowX: 'auto' }}>
+          <div className="custom-scrollbar" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start', minWidth: 'max-content', gap: '1rem', height: '320px', paddingBottom: '1rem' }}>
             <style>{`
               .custom-scrollbar::-webkit-scrollbar {
                 display: none;
@@ -206,21 +206,21 @@ const Dashboard = () => {
               const height = rank === 1 ? '65%' : rank === 2 ? '48%' : '35%';
 
               return (
-                <div key={`${leaderboardType}-podium-${rank}`} style={{ flex: 1, maxWidth: '110px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
-                  <div style={{ marginBottom: '1rem', textAlign: 'center', width: '100%' }}>
-                    <div style={{ width: rank === 1 ? '72px' : '56px', height: rank === 1 ? '72px' : '56px', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', overflow: 'hidden', margin: '0 auto 0.5rem', background: 'white' }}>
-                      {user?.avatar && user.avatar !== "" ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={rank === 1 ? 32 : 24} style={{ margin: rank === 1 ? '16px' : '12px', color: '#94a3b8' }} />}
+                <div key={`${leaderboardType}-podium-${rank}`} style={{ width: '100px', flexShrink: 0, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
+                  <div style={{ marginBottom: '0.75rem', textAlign: 'center', width: '100%' }}>
+                    <div style={{ width: rank === 1 ? '60px' : '48px', height: rank === 1 ? '60px' : '48px', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', overflow: 'hidden', margin: '0 auto 0.4rem', background: 'white' }}>
+                      {user?.avatar && user.avatar !== "" ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={rank === 1 ? 28 : 20} style={{ margin: rank === 1 ? '16px' : '14px', color: '#94a3b8' }} />}
                     </div>
-                    <p style={{ fontWeight: 800, fontSize: '0.8125rem', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.name || '---'}</p>
-                    <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 800 }}>{user?.points || 0} Điểm</p>
+                    <p style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.name || '---'}</p>
+                    <p style={{ fontSize: '0.6rem', color: 'var(--text-muted)', fontWeight: 800 }}>{user?.points || 0} Điểm</p>
                   </div>
                   <motion.div
                     initial={{ height: 0 }}
                     animate={{ height }}
                     transition={{ duration: 1, delay: rank * 0.1 }}
-                    style={{ width: '100%', background: color, borderRadius: '14px 14px 4px 4px', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '1rem', boxShadow: `0 10px 20px ${color}22` }}
+                    style={{ width: '100%', background: color, borderRadius: '10px 10px 4px 4px', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '0.5rem', boxShadow: `0 8px 16px ${color}22` }}
                   >
-                    <div style={{ position: 'absolute', bottom: '0.75rem', color: 'white', fontWeight: 900, fontSize: '2rem' }}>{rank}</div>
+                    <div style={{ position: 'absolute', bottom: '0.5rem', color: 'white', fontWeight: 900, fontSize: '1.5rem' }}>{rank}</div>
                   </motion.div>
                 </div>
               );
@@ -230,21 +230,21 @@ const Dashboard = () => {
             {topUsers.slice(3, leaderboardType === 'weekly' ? 10 : 20).map((user, idx) => {
               const rank = idx + 4;
               return (
-                <div key={`${leaderboardType}-rank-${rank}`} style={{ flex: 1, maxWidth: '90px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
-                  <div style={{ marginBottom: '1rem', textAlign: 'center', width: '100%' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', overflow: 'hidden', margin: '0 auto 0.5rem', background: 'white' }}>
-                      {user?.avatar && user.avatar !== "" ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={18} style={{ margin: '9px', color: '#cbd5e1' }} />}
+                <div key={`${leaderboardType}-rank-${rank}`} style={{ width: '80px', flexShrink: 0, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
+                  <div style={{ marginBottom: '0.75rem', textAlign: 'center', width: '100%' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', overflow: 'hidden', margin: '0 auto 0.4rem', background: 'white' }}>
+                      {user?.avatar && user.avatar !== "" ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={16} style={{ margin: '10px', color: '#cbd5e1' }} />}
                     </div>
-                    <p style={{ fontWeight: 700, fontSize: '0.7rem', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#64748b' }}>{user?.name || '---'}</p>
-                    <p style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 700 }}>{user?.points || 0} Điểm</p>
+                    <p style={{ fontWeight: 700, fontSize: '0.65rem', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#64748b' }}>{user?.name || '---'}</p>
+                    <p style={{ fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700 }}>{user?.points || 0} Điểm</p>
                   </div>
                   <motion.div
                     initial={{ height: 0 }}
                     animate={{ height: '20%' }}
                     transition={{ duration: 0.5, delay: 0.5 + idx * 0.05 }}
-                    style={{ width: '100%', background: '#3b82f6', borderRadius: '10px 10px 4px 4px', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 4px 10px rgba(59,130,246,0.1)' }}
+                    style={{ width: '100%', background: '#3b82f6', borderRadius: '8px 8px 4px 4px', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 4px 8px rgba(59,130,246,0.1)' }}
                   >
-                    <div style={{ position: 'absolute', bottom: '0.75rem', color: 'white', fontWeight: 800, fontSize: '1.25rem', opacity: 0.8 }}>{rank}</div>
+                    <div style={{ position: 'absolute', bottom: '0.5rem', color: 'white', fontWeight: 800, fontSize: '1rem', opacity: 0.8 }}>{rank}</div>
                   </motion.div>
                 </div>
               );
