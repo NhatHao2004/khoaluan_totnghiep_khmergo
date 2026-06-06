@@ -139,7 +139,7 @@ const Dashboard = () => {
     <div className="fade-in">
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: 'clamp(1.25rem, 5vw, 1.75rem)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Tổng quan hệ thống</h1>
-        <p style={{ color: 'var(--text-secondary)', marginTop: '0.4rem', fontSize: '0.9rem' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo</p>
+        <p style={{ color: 'var(--text-secondary)', marginTop: '0.4rem', fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo</p>
       </div>
 
       <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
@@ -153,7 +153,7 @@ const Dashboard = () => {
 
       <div style={{ marginBottom: '2.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Biểu đồ bảng xếp hạng</h2>
+          <h2 style={{ fontSize: '1.125rem', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Biểu đồ bảng xếp hạng</h2>
           <div style={{ display: 'flex', background: 'var(--bg-accent)', padding: '4px', borderRadius: '12px', gap: '4px' }}>
             <button
               onClick={() => setLeaderboardType('weekly')}
@@ -166,7 +166,7 @@ const Dashboard = () => {
                 cursor: 'pointer',
                 background: leaderboardType === 'weekly' ? '#3b82f6' : 'transparent',
                 color: leaderboardType === 'weekly' ? 'white' : 'var(--text-muted)',
-                transition: 'all 0.2s'
+                whiteSpace: 'nowrap'
               }}
             >
               Hàng tuần
@@ -182,7 +182,7 @@ const Dashboard = () => {
                 cursor: 'pointer',
                 background: leaderboardType === 'all' ? '#3b82f6' : 'transparent',
                 color: leaderboardType === 'all' ? 'white' : 'var(--text-muted)',
-                transition: 'all 0.2s'
+                whiteSpace: 'nowrap'
               }}
             >
               Tất cả
@@ -277,7 +277,7 @@ const Dashboard = () => {
             {logs.length === 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', justifyContent: 'center', height: '100%', opacity: 0.5 }}>
                 <MessageSquare size={32} style={{ marginBottom: '1rem' }} />
-                <p style={{ fontSize: '0.875rem' }}>Không có hoạt động mới nào được ghi nhận lại</p>
+                <p style={{ fontSize: '0.875rem', whiteSpace: 'nowrap' }}>Không có hoạt động mới nào được ghi nhận lại</p>
               </div>
             ) : (
               logs.map((item: any) => {
