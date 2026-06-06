@@ -191,7 +191,7 @@ const Dashboard = () => {
         </div>
 
         <div className="card glass-card" style={{ padding: '1.5rem 1rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-          <div className="custom-scrollbar" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start', minWidth: 'max-content', gap: '0.75rem', height: '320px', paddingBottom: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
+          <div className="custom-scrollbar" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start', minWidth: 'max-content', gap: '0.5rem', height: '320px', paddingBottom: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
             <style>{`
               .custom-scrollbar::-webkit-scrollbar {
                 display: none;
@@ -206,7 +206,7 @@ const Dashboard = () => {
               const height = rank === 1 ? '65%' : rank === 2 ? '48%' : '35%';
 
               return (
-                <div key={`${leaderboardType}-podium-${rank}`} style={{ width: '100px', flexShrink: 0, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
+                <div key={`${leaderboardType}-podium-${rank}`} style={{ width: '85px', flexShrink: 0, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
                   <div style={{ marginBottom: '0.75rem', textAlign: 'center', width: '100%' }}>
                     <div style={{ width: rank === 1 ? '60px' : '48px', height: rank === 1 ? '60px' : '48px', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', overflow: 'hidden', margin: '0 auto 0.4rem', background: 'white' }}>
                       {user?.avatar && user.avatar !== "" ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={rank === 1 ? 28 : 20} style={{ margin: rank === 1 ? '16px' : '14px', color: '#94a3b8' }} />}
@@ -230,7 +230,7 @@ const Dashboard = () => {
             {topUsers.slice(3, leaderboardType === 'weekly' ? 10 : 20).map((user, idx) => {
               const rank = idx + 4;
               return (
-                <div key={`${leaderboardType}-rank-${rank}`} style={{ width: '80px', flexShrink: 0, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
+                <div key={`${leaderboardType}-rank-${rank}`} style={{ width: '65px', flexShrink: 0, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
                   <div style={{ marginBottom: '0.75rem', textAlign: 'center', width: '100%' }}>
                     <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', overflow: 'hidden', margin: '0 auto 0.4rem', background: 'white' }}>
                       {user?.avatar && user.avatar !== "" ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={16} style={{ margin: '10px', color: '#cbd5e1' }} />}
