@@ -131,7 +131,7 @@ export default function RegisterScreen() {
       try {
         await setDoc(doc(db, 'logs', `reg_${user.uid}`), {
           title: 'Người dùng mới đăng ký',
-          desc: `Người dùng ${name.trim()} (${email.trim().toLowerCase()}) vừa tạo tài khoản thành công`,
+          desc: `Người dùng ${name.trim()} (${email.trim().toLowerCase()}) vừa tạo tài khoản thành công.`,
           type: 'users',
           timestamp: new Date()
         });
