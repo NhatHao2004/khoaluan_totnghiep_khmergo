@@ -110,14 +110,14 @@ const Dashboard = () => {
 
 
   const StatCard = ({ title, value, icon: Icon, color, onClick }: any) => (
-    <div className="card glass-card stat-card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default', padding: '1.25rem' }}>
+    <div className="card glass-card stat-card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default', padding: 'clamp(0.75rem, 3vw, 1.25rem)' }}>
       <div style={{
-        padding: '0.875rem',
-        borderRadius: '14px',
+        padding: 'clamp(0.6rem, 2vw, 0.875rem)',
+        borderRadius: '12px',
         background: `${color}15`,
         color: color,
         width: 'fit-content',
-        marginBottom: '1.25rem',
+        marginBottom: 'clamp(0.75rem, 2vw, 1.25rem)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'

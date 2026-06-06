@@ -265,20 +265,15 @@ html, body {
 /* Grid Systems */
 .stats-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
   margin-bottom: 2rem;
-}
-
-@media (min-width: 540px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 @media (min-width: 1024px) {
   .stats-grid {
     grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
   }
 }
 
