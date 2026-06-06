@@ -1,7 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
-import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -9,11 +8,14 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Dimensions,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native';
+
+const { width } = Dimensions.get('window');
 
 export default function LanguageDetailScreen() {
   const router = useRouter();
@@ -86,7 +88,7 @@ export default function LanguageDetailScreen() {
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backBtn} onPress={handleBackPress}>
-            <Ionicons name="arrow-back" size={scale(28)} color="#000000" />
+            <Ionicons name="arrow-back" size={28} color="#000000" />
           </TouchableOpacity>
         </View>
         <View style={styles.errorContainer}>
@@ -101,7 +103,7 @@ export default function LanguageDetailScreen() {
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backBtn} onPress={handleBackPress}>
-            <Ionicons name="arrow-back" size={scale(28)} color="#000000" />
+            <Ionicons name="arrow-back" size={28} color="#000000" />
           </TouchableOpacity>
         </View>
         <View style={styles.errorContainer}>
@@ -116,7 +118,7 @@ export default function LanguageDetailScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={handleBackPress}>
-          <Ionicons name="arrow-back" size={scale(28)} color="#000000" />
+          <Ionicons name="arrow-back" size={28} color="#000000" />
         </TouchableOpacity>
 
         <View style={styles.headerTitleContainer}>
@@ -125,7 +127,7 @@ export default function LanguageDetailScreen() {
           </ThemedText>
         </View>
 
-        <View style={{ width: scale(40) }} />
+        <View style={{ width: 40 }} />
       </View>
 
       <ScrollView
@@ -143,7 +145,7 @@ export default function LanguageDetailScreen() {
                 <TouchableOpacity onPress={() => playSound(word.khm, 'km', word.id)}>
                   <Ionicons
                     name={playingId === word.id ? "volume-high" : "volume-medium-outline"}
-                    size={scale(28)}
+                    size={28}
                     color={playingId === word.id ? (category.color || '#3B82F6') : "#0060d6ff"}
                   />
                 </TouchableOpacity>
@@ -168,25 +170,25 @@ export default function LanguageDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F8FAFC', // Slate 50
   },
   header: {
     backgroundColor: '#ffffff',
-    paddingTop: verticalScale(45),
-    paddingBottom: verticalScale(15),
-    paddingHorizontal: scale(15),
+    paddingTop: 45,
+    paddingBottom: 15,
+    paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: verticalScale(2) },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: scale(10),
+    shadowRadius: 10,
     elevation: 5,
     zIndex: 100,
   },
   backBtn: {
-    width: scale(40),
-    height: scale(40),
+    width: 40,
+    height: 40,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -197,81 +199,81 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: '#000000',
-    fontSize: moderateScale(20),
+    fontSize: 20,
     fontWeight: '800',
     textAlign: 'center',
-    lineHeight: verticalScale(32),
-    paddingTop: verticalScale(5),
+    lineHeight: 32, // Padding lines
+    paddingTop: 5,
   },
   content: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: verticalScale(20),
+    paddingBottom: 20,
   },
   listContainer: {
-    paddingHorizontal: scale(16),
-    paddingTop: verticalScale(20),
-    gap: verticalScale(16),
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    gap: 16,
   },
   flashcard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: scale(24),
-    padding: scale(24),
+    borderRadius: 24,
+    padding: 24,
     shadowColor: '#64748B',
-    shadowOffset: { width: 0, height: verticalScale(6) },
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.08,
-    shadowRadius: scale(12),
+    shadowRadius: 12,
     elevation: 3,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: verticalScale(15),
+    marginBottom: 15,
   },
   indexBadge: {
-    width: scale(32),
-    height: scale(32),
-    borderRadius: scale(16),
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
   },
   indexText: {
-    fontSize: moderateScale(14),
+    fontSize: 14,
     fontWeight: '900',
   },
   wordContent: {
     alignItems: 'center',
   },
   khmerText: {
-    fontSize: moderateScale(36),
-    lineHeight: verticalScale(56),
-    paddingBottom: verticalScale(10),
+    fontSize: 36,
+    lineHeight: 56, // Tăng lineHeight để tránh cắt nét dưới của chữ Khmer
+    paddingBottom: 10, // Có thêm khoảng trống cho các nét đuôi (subscripts)
     fontWeight: '700',
     color: '#1E293B',
-    marginBottom: verticalScale(2),
+    marginBottom: 2,
     textAlign: 'center',
   },
   pronunciationText: {
-    fontSize: moderateScale(16),
-    lineHeight: verticalScale(24),
+    fontSize: 16,
+    lineHeight: 24,
     color: '#3B82F6',
     fontWeight: '500',
     fontStyle: 'italic',
-    marginBottom: verticalScale(20),
+    marginBottom: 20,
     textAlign: 'center',
-    paddingHorizontal: scale(20),
+    paddingHorizontal: 20,
     width: '100%',
   },
   divider: {
     width: '50%',
     height: 1,
     backgroundColor: '#F1F5F9',
-    marginBottom: verticalScale(20),
+    marginBottom: 20,
   },
   vieText: {
-    fontSize: moderateScale(18),
+    fontSize: 18,
     fontWeight: '800',
     color: '#475569',
     textAlign: 'center',
@@ -283,6 +285,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: '#EF4444',
-    fontSize: moderateScale(16),
+    fontSize: 16,
   }
 });

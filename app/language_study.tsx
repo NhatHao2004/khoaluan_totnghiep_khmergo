@@ -1,7 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
-import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import { Image as ExpoImage } from 'expo-image';
@@ -178,14 +177,14 @@ export default function LanguageStudyScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backBtn} onPress={handleBackPress}>
-            <Ionicons name="arrow-back" size={scale(28)} color="#000000" />
+            <Ionicons name="arrow-back" size={28} color="#000000" />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
             <ThemedText style={styles.headerTitle} numberOfLines={1}>
               {t('language_study')}
             </ThemedText>
           </View>
-          <View style={{ width: scale(40) }} />
+          <View style={{ width: 40 }} />
         </View>
 
         {/* Tabs */}
@@ -220,7 +219,7 @@ export default function LanguageStudyScreen() {
           {activeTab === 'topics' ? (
             <View style={styles.categoryList}>
               {loadingCats ? (
-                <ActivityIndicator size="large" color="#3B82F6" style={{ marginTop: verticalScale(50) }} />
+                <ActivityIndicator size="large" color="#3B82F6" style={{ marginTop: 50 }} />
               ) : (
                 categories.map((category, index) => (
                   <TouchableOpacity
@@ -269,7 +268,7 @@ export default function LanguageStudyScreen() {
                   <ThemedText style={styles.langButtonText}>{isViToKm ? t('vietnamese') : t('khmer')}</ThemedText>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleSwap} style={styles.swapButton}>
-                  <Ionicons name="swap-horizontal" size={scale(24)} color="#1A73E8" />
+                  <Ionicons name="swap-horizontal" size={24} color="#1A73E8" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.langButtonContainer}>
                   <ThemedText style={styles.langButtonText}>{isViToKm ? t('khmer') : t('vietnamese')}</ThemedText>
@@ -297,7 +296,7 @@ export default function LanguageStudyScreen() {
                     onPress={() => playSound(inputText, isViToKm ? 'vi' : 'km', 'input')}
                     disabled={!inputText.trim() || isPlayingInput || isPlayingOutput}
                   >
-                    <Ionicons name={isPlayingInput ? "volume-high" : "volume-medium"} size={scale(28)} color="#1A73E8" />
+                    <Ionicons name={isPlayingInput ? "volume-high" : "volume-medium"} size={28} color="#1A73E8" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -317,12 +316,12 @@ export default function LanguageStudyScreen() {
                         onPress={() => playSound(translatedText, isViToKm ? 'km' : 'vi', 'output')}
                         disabled={isPlayingInput || isPlayingOutput}
                       >
-                        <Ionicons name={isPlayingOutput ? "volume-high" : "volume-medium"} size={scale(28)} color="#1A73E8" />
+                        <Ionicons name={isPlayingOutput ? "volume-high" : "volume-medium"} size={28} color="#1A73E8" />
                       </TouchableOpacity>
                     </View>
                   </View>
                 ) : isLoading ? (
-                  <ActivityIndicator size="small" color="#1A73E8" style={{ marginTop: verticalScale(30) }} />
+                  <ActivityIndicator size="small" color="#1A73E8" style={{ marginTop: 30 }} />
                 ) : (
                   <ThemedText style={styles.emptyResultText}></ThemedText>
                 )}
@@ -342,21 +341,20 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#FFFFFF',
-    paddingTop: verticalScale(45),
-    paddingBottom: verticalScale(15),
-    paddingHorizontal: scale(15),
+    paddingTop: 45,
+    paddingBottom: 15,
+    paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: verticalScale(2) },
-    shadowOpacity: 0.1,
-    shadowRadius: scale(10),
     elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
     zIndex: 100,
   },
   backBtn: {
-    width: scale(40),
-    height: scale(40),
+    width: 40,
+    height: 40,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -365,7 +363,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: moderateScale(20),
+    fontSize: 20,
     fontWeight: '800',
     color: '#000',
   },
@@ -379,7 +377,7 @@ const styles = StyleSheet.create({
   },
   tabItem: {
     flex: 1,
-    paddingVertical: verticalScale(14),
+    paddingVertical: 14,
     alignItems: 'center',
     borderBottomWidth: 3,
     borderBottomColor: 'transparent',
@@ -389,7 +387,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(59, 130, 246, 0.05)',
   },
   tabText: {
-    fontSize: moderateScale(15),
+    fontSize: 15,
     fontWeight: '700',
     color: '#94A3B8',
   },
@@ -401,38 +399,38 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: verticalScale(20),
+    paddingBottom: 20,
   },
   categoryList: {
-    padding: scale(15),
-    gap: verticalScale(15),
+    padding: 15,
+    gap: 15,
   },
   categoryMainCard: {
     backgroundColor: '#ffffff',
-    borderRadius: scale(20),
+    borderRadius: 20,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.05)',
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: verticalScale(2) },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
   },
   categoryImageContainer: {
     width: '100%',
     aspectRatio: 16 / 10,
-    padding: scale(12),
+    padding: 12,
     backgroundColor: '#FFFFFF',
   },
   categoryCardImage: {
     width: '100%',
     height: '100%',
-    borderRadius: scale(12),
+    borderRadius: 12,
   },
   categoryCardBody: {
-    paddingHorizontal: scale(15),
-    paddingBottom: verticalScale(15),
-    paddingTop: verticalScale(6),
+    paddingHorizontal: 15,
+    paddingBottom: 15,
+    paddingTop: 6,
   },
   cardInfoRow: {
     flexDirection: 'row',
@@ -443,46 +441,46 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   categoryCardTitle: {
-    fontSize: moderateScale(16),
+    fontSize: 16,
     fontWeight: '800',
     color: '#1A1A1A',
-    paddingLeft: scale(10),
+    paddingLeft: 10,
   },
   categoryCardSub: {
-    fontSize: moderateScale(13),
+    fontSize: 13,
     color: '#666',
-    marginTop: verticalScale(2),
+    marginTop: 2,
   },
   startStudyBtn: {
     backgroundColor: '#0179e9',
-    paddingVertical: verticalScale(8),
-    paddingHorizontal: scale(16),
-    borderRadius: scale(10),
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 2,
     shadowColor: '#0179e9',
-    shadowOffset: { width: 0, height: verticalScale(1) },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
-    shadowRadius: scale(2),
+    shadowRadius: 2,
   },
   startStudyBtnText: {
     color: '#FFFFFF',
-    fontSize: moderateScale(14),
+    fontSize: 14,
     fontWeight: '700',
   },
   translatorWrapper: {
-    padding: scale(15),
+    padding: 15,
   },
   langBarRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: verticalScale(10),
+    paddingVertical: 10,
     backgroundColor: '#FFF',
-    borderRadius: scale(12),
-    marginBottom: verticalScale(15),
-    paddingHorizontal: scale(10),
+    borderRadius: 12,
+    marginBottom: 15,
+    paddingHorizontal: 10,
     elevation: 1,
   },
   langButtonContainer: {
@@ -491,71 +489,71 @@ const styles = StyleSheet.create({
   },
   langButtonText: {
     color: '#1A73E8',
-    fontSize: moderateScale(16),
+    fontSize: 16,
     fontWeight: '600',
   },
   swapButton: {
-    padding: scale(10),
+    padding: 10,
   },
   inputArea: {
     backgroundColor: '#FFF',
-    borderRadius: scale(16),
-    padding: scale(15),
-    minHeight: verticalScale(220),
-    marginBottom: verticalScale(15),
+    borderRadius: 16,
+    padding: 15,
+    minHeight: 220,
+    marginBottom: 15,
     elevation: 1,
   },
   textInput: {
-    fontSize: moderateScale(22),
+    fontSize: 22,
     color: '#3C4043',
     textAlignVertical: 'top',
-    minHeight: verticalScale(120),
+    minHeight: 120,
   },
   phoneticText: {
-    fontSize: moderateScale(13),
-    lineHeight: verticalScale(20),
+    fontSize: 13,
+    lineHeight: 20,
     color: '#5F6368',
     fontStyle: 'italic',
-    marginTop: verticalScale(5),
-    paddingHorizontal: scale(20),
+    marginTop: 5,
+    paddingHorizontal: 20,
     width: '100%',
   },
   inputFooter: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: verticalScale(10),
+    marginTop: 10,
   },
   resultArea: {
     backgroundColor: '#FFFFFF',
-    borderRadius: scale(16),
-    padding: scale(15),
-    minHeight: verticalScale(250),
+    borderRadius: 16,
+    padding: 15,
+    minHeight: 250,
     elevation: 1,
   },
   outTextLabel: {
-    fontSize: moderateScale(13),
+    fontSize: 13,
     color: '#848789ff',
     fontWeight: '600',
-    marginBottom: verticalScale(8),
+    marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   resultText: {
-    fontSize: moderateScale(25),
+    fontSize: 25,
     color: '#1A73E8',
     fontWeight: '600',
-    lineHeight: verticalScale(36),
-    paddingVertical: verticalScale(5),
+    lineHeight: 36,
+    paddingVertical: 5,
   },
   resultFooter: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: verticalScale(15),
+    marginTop: 15,
   },
   emptyResultText: {
     color: '#94A3B8',
     textAlign: 'center',
-    marginTop: verticalScale(50),
+    marginTop: 50,
     fontStyle: 'italic',
   }
 });

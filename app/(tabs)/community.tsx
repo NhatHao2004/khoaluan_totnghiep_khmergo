@@ -1,7 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
-import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
@@ -196,7 +195,7 @@ export default function CommunityScreen() {
         }
       ]}>
         <View style={styles.toastIcon}>
-          <Ionicons name={toastType === 'success' ? "checkmark" : "close"} size={scale(20)} color="#FFF" />
+          <Ionicons name={toastType === 'success' ? "checkmark" : "close"} size={20} color="#FFF" />
         </View>
         <Text style={styles.toastText}>{toastMsg}</Text>
       </Animated.View>
@@ -572,8 +571,8 @@ export default function CommunityScreen() {
             <Text style={styles.postTime}>{item.time}</Text>
           </View>
           {isMyPost && (
-            <TouchableOpacity onPress={() => handlePostOptions(item)} style={{ padding: scale(5) }}>
-              <Ionicons name="ellipsis-vertical" size={scale(20)} color="#666" />
+            <TouchableOpacity onPress={() => handlePostOptions(item)} style={{ padding: 5 }}>
+              <Ionicons name="ellipsis-vertical" size={20} color="#666" />
             </TouchableOpacity>
           )}
         </View>
@@ -587,11 +586,11 @@ export default function CommunityScreen() {
         <View style={styles.actionsRow}>
           <View style={styles.leftActions}>
             <TouchableOpacity style={styles.actionItem} onPress={() => handleLike(item.id, item.likedBy)}>
-              <Ionicons name={isLiked ? "heart" : "heart-outline"} size={scale(22)} color={isLiked ? "#F43F5E" : "#1A1A1A"} />
+              <Ionicons name={isLiked ? "heart" : "heart-outline"} size={22} color={isLiked ? "#F43F5E" : "#1A1A1A"} />
               <Text style={styles.actionCount}>{item.likes || 0}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionItem} onPress={() => handleComment(item.id)}>
-              <Ionicons name="chatbubble-outline" size={scale(20)} color="#1A1A1A" />
+              <Ionicons name="chatbubble-outline" size={20} color="#1A1A1A" />
               <Text style={styles.actionCount}>{item.comments || 0}</Text>
             </TouchableOpacity>
           </View>
@@ -613,7 +612,7 @@ export default function CommunityScreen() {
       {(!isModalVisible && !isCreateModalVisible) && renderToast()}
 
       <View style={styles.screenHeader}>
-        <View style={{ width: scale(36) }} />
+        <View style={{ width: 36 }} />
         <Text style={styles.screenTitle}>{t('tab_community')}</Text>
         <TouchableOpacity
           style={styles.plusBtn}
@@ -625,7 +624,7 @@ export default function CommunityScreen() {
             setCreateModalVisible(true);
           }}
         >
-          <Ionicons name="add" size={scale(28)} color="#1A1A1A" />
+          <Ionicons name="add" size={28} color="#1A1A1A" />
         </TouchableOpacity>
       </View>
 
@@ -637,7 +636,7 @@ export default function CommunityScreen() {
         contentContainerStyle={[styles.listContent, posts.length === 0 && { flex: 1 }]}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Ionicons name="newspaper-outline" size={scale(48)} color="#EEE" />
+            <Ionicons name="newspaper-outline" size={48} color="#EEE" />
             <Text style={styles.emptyText}>{t('empty_posts')}</Text>
           </View>
         }
@@ -655,7 +654,7 @@ export default function CommunityScreen() {
               setCreateModalVisible(false);
             }}
           />
-          <Animated.View style={[styles.modalContent, animatedCreatePostStyle, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + verticalScale(15)) }]}>
+          <Animated.View style={[styles.modalContent, animatedCreatePostStyle, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + 15) }]}>
             <View style={styles.modalHeader}>
 
               <View style={styles.modalHeaderTitleBox}>
@@ -663,15 +662,15 @@ export default function CommunityScreen() {
                 <TouchableOpacity
                   onPress={submitPost}
                   disabled={!createPostText.trim() && !base64Image || isSubmittingPost}
-                  style={{ minWidth: scale(80), alignItems: 'flex-end', paddingVertical: verticalScale(10) }}
+                  style={{ minWidth: 80, alignItems: 'flex-end', paddingVertical: 10 }}
                 >
-                  <View style={{ minWidth: scale(30), alignItems: 'center', justifyContent: 'center', paddingRight: scale(10) }}>
+                  <View style={{ minWidth: 30, alignItems: 'center', justifyContent: 'center', paddingRight: 10 }}>
                     {isSubmittingPost ? (
                       <ActivityIndicator size="small" color="#1877F2" />
                     ) : (
                       <Text style={{
                         color: (createPostText.trim() || base64Image) ? '#1877F2' : '#CCC',
-                        fontSize: moderateScale(16),
+                        fontSize: 16,
                         fontWeight: '700',
                       }}>
                         {isEditingPost ? t('update_post') : t('submit_post')}
@@ -711,16 +710,16 @@ export default function CommunityScreen() {
                     style={[styles.previewImage, { aspectRatio: imageRatio || 1 }]}
                   />
                   <TouchableOpacity style={styles.removeImageBtn} onPress={() => { setSelectedImage(null); setBase64Image(null); setImageRatio(null); }}>
-                    <Ionicons name="close-circle" size={scale(24)} color="rgba(0,0,0,0.6)" />
+                    <Ionicons name="close-circle" size={24} color="rgba(0,0,0,0.6)" />
                   </TouchableOpacity>
                 </View>
               )}
             </ScrollView>
 
             {keyboardHeight === 0 && (
-              <View style={[styles.createPostActions, { paddingBottom: insets.bottom + verticalScale(5) }]}>
+              <View style={[styles.createPostActions, { paddingBottom: insets.bottom + 5 }]}>
                 <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
-                  <Ionicons name="image-outline" size={scale(24)} color="#1877F2" />
+                  <Ionicons name="image-outline" size={24} color="#1877F2" />
                   <Text style={styles.attachActionText}>{t('image_label')}</Text>
                 </TouchableOpacity>
                 <View style={{ flex: 1 }} />
@@ -736,7 +735,7 @@ export default function CommunityScreen() {
                     setBase64Image(null);
                   }}
                 >
-                  <Ionicons name="close" size={scale(28)} color="#FF3B30" />
+                  <Ionicons name="close" size={28} color="#FF3B30" />
                 </TouchableOpacity>
               </View>
             )}
@@ -756,7 +755,7 @@ export default function CommunityScreen() {
               setModalVisible(false);
             }}
           />
-          <Animated.View style={[styles.modalContent, animatedCommentsStyle, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + verticalScale(12)) }]}>
+          <Animated.View style={[styles.modalContent, animatedCommentsStyle, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + 12) }]}>
             <View style={styles.modalHeader}>
 
               <View style={styles.modalHeaderTitleBox}>
@@ -764,7 +763,7 @@ export default function CommunityScreen() {
                 <TouchableOpacity onPress={() => {
                   Keyboard.dismiss();
                   setModalVisible(false);
-                }}><Ionicons name="close" size={scale(28)} color="#1A1A1A" /></TouchableOpacity>
+                }}><Ionicons name="close" size={28} color="#1A1A1A" /></TouchableOpacity>
               </View>
             </View>
 
@@ -781,8 +780,8 @@ export default function CommunityScreen() {
                 const isReply = !!item.parentId;
 
                 return (
-                  <View style={[styles.commentItem, isReply && { marginLeft: scale(45) }]}>
-                    <Image source={{ uri: displayCommentAvatar }} style={[styles.commentAvatar, isReply && { width: scale(32), height: scale(32) }]} />
+                  <View style={[styles.commentItem, isReply && { marginLeft: 45 }]}>
+                    <Image source={{ uri: displayCommentAvatar }} style={[styles.commentAvatar, isReply && { width: 32, height: 32 }]} />
                     <View style={styles.commentBody}>
                       <View style={styles.commentContentArea}>
                         <View style={styles.commentUserRow}>
@@ -791,7 +790,7 @@ export default function CommunityScreen() {
                             {isReply && item.parentId && (
                               <Text style={{ fontWeight: 'normal' }}>
                                 {"  "}
-                                <Ionicons name="caret-forward-sharp" size={scale(12)} color="#666" />
+                                <Ionicons name="caret-forward-sharp" size={12} color="#666" />
                                 {"  "}
                                 <Text style={styles.repliedToUser}>
                                   {comments.find(c => c.id === item.parentId)?.user || t('user_default')}
@@ -805,11 +804,11 @@ export default function CommunityScreen() {
 
                       <View style={styles.commentFooter}>
                         <Text style={styles.commentTime}>{item.time}</Text>
-                        <TouchableOpacity onPress={() => handleReply(item)} style={{ marginLeft: scale(12) }}>
+                        <TouchableOpacity onPress={() => handleReply(item)} style={{ marginLeft: 12 }}>
                           <Text style={styles.footerActionText}>{t('reply_action')}</Text>
                         </TouchableOpacity>
                         {isMyComment && (
-                          <TouchableOpacity onPress={() => handleDeleteComment(item.id)} style={{ marginLeft: scale(1) }}>
+                          <TouchableOpacity onPress={() => handleDeleteComment(item.id)} style={{ marginLeft: 1 }}>
                             <Text style={styles.footerActionText}>{t('delete_action')}</Text>
                           </TouchableOpacity>
                         )}
@@ -818,19 +817,19 @@ export default function CommunityScreen() {
                   </View>
                 );
               }}
-              ListEmptyComponent={<View style={{ paddingTop: verticalScale(215), paddingHorizontal: scale(40), alignItems: 'center' }}><Text style={{ color: '#999' }}>{t('first_comment_msg')}</Text></View>}
+              ListEmptyComponent={<View style={{ paddingTop: 215, paddingHorizontal: 40, alignItems: 'center' }}><Text style={{ color: '#999' }}>{t('first_comment_msg')}</Text></View>}
             />
 
             {replyToName && (
               <View style={styles.replyBar}>
                 <Text style={styles.replyBarText}>{t('replying_to')}: <Text style={{ fontWeight: '800' }}>{replyToName}</Text></Text>
                 <TouchableOpacity onPress={() => { setReplyToId(null); setReplyToName(null); setReplyToUserId(null); }}>
-                  <Ionicons name="close-circle" size={scale(24)} color="#FF3B30" />
+                  <Ionicons name="close-circle" size={24} color="#FF3B30" />
                 </TouchableOpacity>
               </View>
             )}
 
-            <View style={[styles.commentInputContainer, { paddingBottom: insets.bottom + verticalScale(12) }]}>
+            <View style={[styles.commentInputContainer, { paddingBottom: insets.bottom + 12 }]}>
               <TextInput
                 ref={commentInputRef}
                 style={styles.commentInput}
@@ -840,7 +839,7 @@ export default function CommunityScreen() {
                 multiline
               />
               <TouchableOpacity style={styles.sendBtn} onPress={submitComment} disabled={!commentText.trim() || isAddingComment}>
-                {isAddingComment ? <ActivityIndicator size="small" color="#1877F2" /> : <Ionicons name="send" size={scale(25)} color={commentText.trim() ? "#1877F2" : "#1877F2"} />}
+                {isAddingComment ? <ActivityIndicator size="small" color="#1877F2" /> : <Ionicons name="send" size={25} color={commentText.trim() ? "#1877F2" : "#1877F2"} />}
               </TouchableOpacity>
             </View>
           </Animated.View>
@@ -850,16 +849,16 @@ export default function CommunityScreen() {
       {/* Post Options Bottom Sheet */}
       <Modal animationType="fade" transparent={true} statusBarTranslucent={true} visible={isOptionsModalVisible} onRequestClose={() => setOptionsModalVisible(false)}>
         <TouchableOpacity style={styles.optionsOverlay} activeOpacity={1} onPress={() => setOptionsModalVisible(false)}>
-          <Animated.View style={[styles.optionsContent, animatedOptionsStyle, { paddingBottom: insets.bottom + verticalScale(10) }]}>
+          <Animated.View style={[styles.optionsContent, animatedOptionsStyle, { paddingBottom: insets.bottom + 10 }]}>
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleEditPost(selectedPost); }}>
-              <View style={styles.optionIconContainer}><Ionicons name="create-outline" size={scale(24)} color="#1A1A1A" /></View>
+              <View style={styles.optionIconContainer}><Ionicons name="create-outline" size={24} color="#1A1A1A" /></View>
               <View><Text style={styles.optionText}>{t('edit_post_menu')}</Text></View>
             </TouchableOpacity>
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleDeletePost(selectedPost.id, selectedPost.userId); }}>
-              <View style={styles.optionIconContainer}><Ionicons name="trash-outline" size={scale(24)} color="#1A1A1A" /></View>
+              <View style={styles.optionIconContainer}><Ionicons name="trash-outline" size={24} color="#1A1A1A" /></View>
               <View><Text style={styles.optionText}>{t('delete_post_menu')}</Text></View>
             </TouchableOpacity>
-            <View style={{ height: verticalScale(8) }} />
+            <View style={{ height: 8 }} />
           </Animated.View>
         </TouchableOpacity>
       </Modal>
@@ -875,7 +874,7 @@ export default function CommunityScreen() {
         <View style={styles.pModalOverlay}>
           <View style={styles.pModalContent}>
             <View style={styles.pModalIconCircle}>
-              <Ionicons name="person-circle-outline" size={scale(40)} color="#3B82F6" />
+              <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
             </View>
             <Text style={styles.pModalTitle}>{t('login_required')}</Text>
             <Text style={styles.pModalSub}>{t('login_to_use')}</Text>
@@ -913,7 +912,7 @@ export default function CommunityScreen() {
         <View style={styles.pModalOverlay}>
           <View style={styles.pModalContent}>
             <View style={[styles.pModalIconCircle, { backgroundColor: '#FEF2F2', borderColor: '#FEE2E2' }]}>
-              <Ionicons name="trash-outline" size={scale(40)} color="#EF4444" />
+              <Ionicons name="trash-outline" size={40} color="#EF4444" />
             </View>
             <Text style={styles.pModalTitle}>{t('delete_post_confirm')}</Text>
             <Text style={styles.pModalSub}>{t('cannot_undo')}</Text>
@@ -945,88 +944,88 @@ const styles = StyleSheet.create({
   toastContainer: {
     position: 'absolute',
     top: 0,
-    left: scale(15),
-    right: scale(15),
+    left: 15,
+    right: 15,
     zIndex: 10000,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: verticalScale(14),
-    paddingHorizontal: scale(20),
-    borderRadius: scale(22),
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 22,
     borderWidth: 0,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: verticalScale(12) },
+    shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.2,
-    shadowRadius: scale(15),
+    shadowRadius: 15,
     elevation: 25,
   },
   toastIcon: {
-    width: scale(32),
-    height: scale(32),
-    borderRadius: scale(16),
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  toastText: { color: '#FFF', fontSize: moderateScale(15), fontWeight: '700', marginLeft: scale(15), flex: 1, letterSpacing: 0.3 },
-  screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: scale(20), paddingTop: verticalScale(10), paddingBottom: verticalScale(15), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
-  screenTitle: { fontSize: moderateScale(22), fontWeight: '800', color: '#1A1A1A' },
-  plusBtn: { width: scale(36), height: scale(36), borderRadius: scale(18), backgroundColor: '#F7F7F7', justifyContent: 'center', alignItems: 'center' },
-  listContent: { paddingTop: verticalScale(5), paddingBottom: verticalScale(30) },
-  postContainer: { paddingHorizontal: scale(20), paddingVertical: verticalScale(20), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
-  postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: verticalScale(15) },
-  avatar: { width: scale(48), height: scale(48), borderRadius: scale(24), backgroundColor: '#F0F0F0' },
-  headerInfo: { marginLeft: scale(12), flex: 1, marginRight: scale(10), minWidth: 0 },
-  userName: { fontSize: moderateScale(17), fontWeight: '700', color: '#1A1A1A', paddingVertical: verticalScale(2), paddingRight: scale(15), flexShrink: 1 },
-  postTime: { fontSize: moderateScale(14), color: '#666', marginTop: verticalScale(2) },
-  postContent: { fontSize: moderateScale(16), color: '#1A1A1A', marginBottom: verticalScale(15), paddingVertical: verticalScale(2) },
-  postImage: { width: '100%', borderRadius: scale(24), backgroundColor: '#F0F0F0', marginBottom: verticalScale(15) },
-  actionsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: verticalScale(5) },
-  leftActions: { flexDirection: 'row', alignItems: 'center', gap: scale(20) },
-  actionItem: { flexDirection: 'row', alignItems: 'center', gap: scale(8) },
-  actionCount: { fontSize: moderateScale(16), fontWeight: '700', color: '#1A1A1A' },
+  toastText: { color: '#FFF', fontSize: 15, fontWeight: '700', marginLeft: 15, flex: 1, letterSpacing: 0.3 },
+  screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 10, paddingBottom: 15, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
+  screenTitle: { fontSize: 22, fontWeight: '800', color: '#1A1A1A' },
+  plusBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#F7F7F7', justifyContent: 'center', alignItems: 'center' },
+  listContent: { paddingTop: 5, paddingBottom: 30 },
+  postContainer: { paddingHorizontal: 20, paddingVertical: 20, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
+  postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
+  avatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#F0F0F0' },
+  headerInfo: { marginLeft: 12, flex: 1, marginRight: 10, minWidth: 0 },
+  userName: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', paddingVertical: 2, paddingRight: 15, flexShrink: 1 },
+  postTime: { fontSize: 14, color: '#666', marginTop: 2 },
+  postContent: { fontSize: 16, color: '#1A1A1A', marginBottom: 15, paddingVertical: 2 },
+  postImage: { width: '100%', borderRadius: 24, backgroundColor: '#F0F0F0', marginBottom: 15 },
+  actionsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 5 },
+  leftActions: { flexDirection: 'row', alignItems: 'center', gap: 20 },
+  actionItem: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  actionCount: { fontSize: 16, fontWeight: '700', color: '#1A1A1A' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: scale(30), borderTopRightRadius: scale(30), overflow: 'hidden' },
-  modalHeader: { alignItems: 'center', paddingVertical: verticalScale(12) },
-  modalHandle: { width: scale(40), height: verticalScale(5), borderRadius: scale(3), backgroundColor: '#E0E0E0', marginBottom: verticalScale(10) },
-  modalHeaderTitleBox: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: scale(20), marginBottom: verticalScale(10) },
-  modalTitle: { fontSize: moderateScale(18), fontWeight: '800', color: '#1A1A1A' },
-  commentAvatar: { width: scale(36), height: scale(36), borderRadius: scale(18), backgroundColor: '#F0F0F0' },
-  commentsList: { paddingHorizontal: scale(20), paddingBottom: verticalScale(20) },
-  commentItem: { flexDirection: 'row', marginBottom: verticalScale(15) },
-  commentBody: { marginLeft: scale(10), flex: 1, minWidth: 0 },
-  commentContentArea: { paddingVertical: verticalScale(2) },
-  commentUserRow: { flexDirection: 'row', alignItems: 'center', marginBottom: verticalScale(2), flexWrap: 'wrap' },
-  repliedToUser: { fontSize: moderateScale(14), fontWeight: '700', color: '#1A1A1A', paddingVertical: verticalScale(1) },
-  commentUser: { fontSize: moderateScale(14), fontWeight: '700', color: '#1A1A1A', paddingVertical: verticalScale(1), paddingRight: scale(10), flexShrink: 1 },
-  commentText: { fontSize: moderateScale(14), color: '#1A1A1A', paddingVertical: verticalScale(2) },
-  commentTime: { fontSize: moderateScale(12), color: '#999' },
-  footerActionText: { fontSize: moderateScale(12), fontWeight: '700', color: '#666', paddingVertical: verticalScale(5), paddingRight: scale(12), minWidth: scale(55) },
-  commentFooter: { flexDirection: 'row', alignItems: 'center', marginTop: verticalScale(4) },
-  commentInputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: scale(15), paddingTop: verticalScale(12), borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFFFFF' },
-  commentInput: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: scale(20), paddingHorizontal: scale(15), paddingVertical: verticalScale(8), fontSize: moderateScale(16), maxHeight: verticalScale(110) },
-  replyBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8F9FA', paddingHorizontal: scale(20), paddingVertical: verticalScale(8), borderTopWidth: 1, borderTopColor: '#EEE' },
-  replyBarText: { fontSize: moderateScale(14), color: '#666', flex: 1, marginRight: scale(10) },
-  sendBtn: { marginLeft: scale(10), width: scale(45), height: scale(45), justifyContent: 'center', alignItems: 'center' },
-  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: verticalScale(50) },
-  emptyText: { marginTop: verticalScale(35), fontSize: moderateScale(16), color: '#999', fontWeight: '500' },
+  modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 30, borderTopRightRadius: 30, overflow: 'hidden' },
+  modalHeader: { alignItems: 'center', paddingVertical: 12 },
+  modalHandle: { width: 40, height: 5, borderRadius: 3, backgroundColor: '#E0E0E0', marginBottom: 10 },
+  modalHeaderTitleBox: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginBottom: 10 },
+  modalTitle: { fontSize: 18, fontWeight: '800', color: '#1A1A1A' },
+  commentAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#F0F0F0' },
+  commentsList: { paddingHorizontal: 20, paddingBottom: 20 },
+  commentItem: { flexDirection: 'row', marginBottom: 15 },
+  commentBody: { marginLeft: 10, flex: 1, minWidth: 0 },
+  commentContentArea: { paddingVertical: 2 },
+  commentUserRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 2, flexWrap: 'wrap' },
+  repliedToUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A', paddingVertical: 1 },
+  commentUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A', paddingVertical: 1, paddingRight: 10, flexShrink: 1 },
+  commentText: { fontSize: 14, color: '#1A1A1A', paddingVertical: 2 },
+  commentTime: { fontSize: 12, color: '#999' },
+  footerActionText: { fontSize: 12, fontWeight: '700', color: '#666', paddingVertical: 5, paddingRight: 12, minWidth: 55 },
+  commentFooter: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+  commentInputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFFFFF' },
+  commentInput: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: 20, paddingHorizontal: 15, paddingVertical: 8, fontSize: 16, maxHeight: 110 },
+  replyBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8F9FA', paddingHorizontal: 20, paddingVertical: 8, borderTopWidth: 1, borderTopColor: '#EEE' },
+  replyBarText: { fontSize: 14, color: '#666', flex: 1, marginRight: 10 },
+  sendBtn: { marginLeft: 10, width: 45, height: 45, justifyContent: 'center', alignItems: 'center' },
+  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 50 },
+  emptyText: { marginTop: 35, fontSize: 16, color: '#999', fontWeight: '500' },
   createPostContent: { flexGrow: 1 },
-  userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: verticalScale(20), paddingHorizontal: scale(20), paddingTop: verticalScale(10) },
-  userNameInModal: { fontSize: moderateScale(17), fontWeight: '700', color: '#1A1A1A', marginLeft: scale(12), paddingRight: scale(15), flex: 1 },
-  createPostInput: { fontSize: moderateScale(18), color: '#1A1A1A', textAlignVertical: 'top', flex: 1, minHeight: verticalScale(150), paddingHorizontal: scale(20) },
-  previewImageContainer: { position: 'relative', marginBottom: verticalScale(12), paddingHorizontal: scale(20) },
-  previewImage: { width: '100%', borderRadius: scale(20), backgroundColor: '#F0F0F0' },
-  removeImageBtn: { position: 'absolute', top: verticalScale(10), right: scale(30), backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: scale(15) },
-  createPostActions: { flexDirection: 'row', padding: scale(15), borderTopWidth: 1, borderTopColor: '#F0F0F0', alignItems: 'center', backgroundColor: '#FFFFFF' },
-  attachAction: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0F7FF', paddingHorizontal: scale(20), paddingVertical: verticalScale(10), borderRadius: scale(22), gap: scale(8) },
-  attachActionText: { fontSize: moderateScale(14), fontWeight: '700', color: '#1877F2', marginRight: scale(2) },
-  closeModalBtn: { width: scale(44), height: scale(44), justifyContent: 'center', alignItems: 'center', borderRadius: scale(22), backgroundColor: '#FFF0F0' },
+  userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20, paddingHorizontal: 20, paddingTop: 10 },
+  userNameInModal: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', marginLeft: 12, paddingRight: 15, flex: 1 },
+  createPostInput: { fontSize: 18, color: '#1A1A1A', textAlignVertical: 'top', flex: 1, minHeight: 150, paddingHorizontal: 20 },
+  previewImageContainer: { position: 'relative', marginBottom: 12, paddingHorizontal: 20 },
+  previewImage: { width: '100%', borderRadius: 20, backgroundColor: '#F0F0F0' },
+  removeImageBtn: { position: 'absolute', top: 10, right: 30, backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 15 },
+  createPostActions: { flexDirection: 'row', padding: 15, borderTopWidth: 1, borderTopColor: '#F0F0F0', alignItems: 'center', backgroundColor: '#FFFFFF' },
+  attachAction: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0F7FF', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 22, gap: 8 },
+  attachActionText: { fontSize: 14, fontWeight: '700', color: '#1877F2', marginRight: 2 },
+  closeModalBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', borderRadius: 22, backgroundColor: '#FFF0F0' },
   optionsOverlay: { flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end' },
-  optionsContent: { backgroundColor: '#FFFFFF', borderRadius: scale(30), marginHorizontal: scale(15), marginBottom: verticalScale(15), paddingHorizontal: scale(10), paddingTop: verticalScale(20), paddingBottom: verticalScale(5), shadowColor: '#000', shadowOffset: { width: 0, height: verticalScale(-10) }, shadowOpacity: 0.1, shadowRadius: scale(20), elevation: 20 },
-  optionsHandle: { width: scale(40), height: verticalScale(4), borderRadius: scale(2), backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: verticalScale(12) },
-  optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: verticalScale(10), paddingHorizontal: scale(25), width: '100%' },
-  optionIconContainer: { width: scale(30), height: scale(30), justifyContent: 'center', alignItems: 'center', marginRight: scale(15) },
-  optionText: { fontSize: moderateScale(16), fontWeight: '700', color: '#1A1A1A' },
+  optionsContent: { backgroundColor: '#FFFFFF', borderRadius: 30, marginHorizontal: 15, marginBottom: 15, paddingHorizontal: 10, paddingTop: 20, paddingBottom: 5, shadowColor: '#000', shadowOffset: { width: 0, height: -10 }, shadowOpacity: 0.1, shadowRadius: 20, elevation: 20 },
+  optionsHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: 12 },
+  optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: 10, paddingHorizontal: 25, width: '100%' },
+  optionIconContainer: { width: 30, height: 30, justifyContent: 'center', alignItems: 'center', marginRight: 15 },
+  optionText: { fontSize: 16, fontWeight: '700', color: '#1A1A1A' },
 
   // --- Premium Login Modal Styles (Unique Names to avoid conflict) ---
   pModalOverlay: {
@@ -1034,79 +1033,79 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: scale(24),
+    padding: 24,
   },
   pModalContent: {
     backgroundColor: '#FFF',
-    borderRadius: scale(32),
-    padding: scale(30),
+    borderRadius: 32,
+    padding: 30,
     width: '100%',
-    maxWidth: scale(340),
+    maxWidth: 340,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: verticalScale(10) },
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.1,
-    shadowRadius: scale(20),
+    shadowRadius: 20,
     elevation: 10,
   },
   pModalIconCircle: {
-    width: scale(80),
-    height: scale(80),
-    borderRadius: scale(40),
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: '#EFF6FF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: verticalScale(20),
+    marginBottom: 20,
     borderWidth: 1,
     borderColor: '#DBEAFE',
   },
   pModalTitle: {
-    fontSize: moderateScale(20),
+    fontSize: 20,
     fontWeight: '900',
     color: '#1E293B',
-    marginBottom: verticalScale(8),
+    marginBottom: 8,
     textAlign: 'center',
   },
   pModalSub: {
-    fontSize: moderateScale(15),
+    fontSize: 15,
     color: '#64748B',
     textAlign: 'center',
-    lineHeight: verticalScale(22),
-    marginBottom: verticalScale(24),
+    lineHeight: 22,
+    marginBottom: 24,
   },
   pModalActionRow: {
     width: '100%',
-    gap: scale(12),
+    gap: 12,
   },
   pModalPrimaryBtn: {
     backgroundColor: '#3B82F6',
-    height: verticalScale(56),
-    borderRadius: scale(18),
+    height: 56,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
     shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: verticalScale(4) },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
-    shadowRadius: scale(8),
+    shadowRadius: 8,
     elevation: 4,
   },
   pModalPrimaryBtnText: {
     color: '#FFF',
-    fontSize: moderateScale(16),
+    fontSize: 16,
     fontWeight: '800',
   },
   pModalSecondaryBtn: {
     backgroundColor: '#EF4444',
-    height: verticalScale(56),
-    borderRadius: scale(18),
+    height: 56,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
   pModalSecondaryBtnText: {
     color: '#FFF',
-    fontSize: moderateScale(16),
+    fontSize: 16,
     fontWeight: '800',
   },
 });

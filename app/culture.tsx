@@ -3,7 +3,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCultures } from '@/hooks/use-cultures';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import {
@@ -82,7 +81,7 @@ export default function CultureScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={handleBackPress}>
-          <Ionicons name="arrow-back" size={scale(28)} color="#000000" />
+          <Ionicons name="arrow-back" size={28} color="#000000" />
         </TouchableOpacity>
 
         <View style={styles.headerTitleContainer}>
@@ -91,7 +90,7 @@ export default function CultureScreen() {
           </ThemedText>
         </View>
 
-        <View style={{ width: scale(40) }} />
+        <View style={{ width: 40 }} />
       </View>
 
       {/* Content */}
@@ -153,7 +152,7 @@ export default function CultureScreen() {
       {loading && (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color="#FF0050" />
-          <ThemedText style={{ marginTop: verticalScale(10), color: '#888' }}>{t('loading_content')}</ThemedText>
+          <ThemedText style={{ marginTop: 10, color: '#888' }}>{t('loading_content')}</ThemedText>
         </View>
       )}
     </View>
@@ -167,21 +166,21 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#ffffff',
-    paddingTop: verticalScale(45),
-    paddingBottom: verticalScale(15),
-    paddingHorizontal: scale(15),
+    paddingTop: 45,
+    paddingBottom: 15,
+    paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: verticalScale(2) },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: scale(10),
+    shadowRadius: 10,
     elevation: 5,
     zIndex: 100,
   },
   backBtn: {
-    width: scale(40),
-    height: scale(40),
+    width: 40,
+    height: 40,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -190,21 +189,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerTitle: { color: '#000000', fontSize: moderateScale(20), fontWeight: '800', textAlign: 'center', lineHeight: verticalScale(28) },
+    headerTitle: { color: '#000000', fontSize: 20, fontWeight: '800', textAlign: 'center', lineHeight: 28 },
   content: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: verticalScale(20),
+    paddingBottom: 20,
     flexGrow: 1,
   },
   cultureList: {
-    padding: scale(15),
-    gap: verticalScale(15),
+    padding: 15,
+    gap: 15,
   },
   cultureCard: {
     backgroundColor: '#ffffff',
-    borderRadius: scale(20),
+    borderRadius: 20,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.05)',
@@ -219,16 +218,16 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   cultureContent: {
-    padding: scale(15),
+    padding: 15,
   },
   cultureName: {
-    fontSize: moderateScale(18),
+    fontSize: 18,
     fontWeight: '800',
     color: '#1A1A1A',
-    marginBottom: verticalScale(5),
+    marginBottom: 5,
   },
   cultureLocation: {
-    fontSize: moderateScale(13),
+    fontSize: 13,
     color: '#666',
     fontWeight: '500',
   },
@@ -241,12 +240,12 @@ const styles = StyleSheet.create({
   },
   errorText: {
     textAlign: 'center',
-    marginTop: verticalScale(50),
+    marginTop: 50,
     color: 'red',
   },
   emptyText: {
     textAlign: 'center',
-    marginTop: verticalScale(50),
+    marginTop: 50,
     color: '#999',
   },
 });

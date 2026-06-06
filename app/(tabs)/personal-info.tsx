@@ -1,7 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { auth, db } from '@/utils/firebaseConfig';
-import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
@@ -214,10 +213,10 @@ export default function PersonalInfoScreen() {
     <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={scale(26)} color="#000000ff" />
+          <Ionicons name="arrow-back" size={26} color="#000000ff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>{t('edit_profile')}</Text>
-        <View style={{ width: scale(25) }} />
+        <View style={{ width: 25 }} />
       </View>
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
@@ -230,11 +229,11 @@ export default function PersonalInfoScreen() {
                 {avatarSrc ? (
                   <Image source={avatarSrc} style={styles.avatar} />
                 ) : (
-                  <Ionicons name="person" size={scale(80)} color="#DDD" />
+                  <Ionicons name="person" size={80} color="#DDD" />
                 )}
               </View>
               <View style={styles.cameraOverlay}>
-                <Ionicons name="camera" size={scale(18)} color="#FFF" />
+                <Ionicons name="camera" size={18} color="#FFF" />
               </View>
             </TouchableOpacity>
           </View>
@@ -245,7 +244,7 @@ export default function PersonalInfoScreen() {
 
             {/* Họ và tên */}
             <View style={[styles.menuItem, styles.menuItemBorder]}>
-              <Ionicons name="person-outline" size={scale(22)} color="#555" style={styles.menuIcon} />
+              <Ionicons name="person-outline" size={22} color="#555" style={styles.menuIcon} />
               <View style={styles.menuContent}>
                 <Text style={styles.menuLabel}>{t('full_name')}</Text>
                 <TextInput
@@ -260,7 +259,7 @@ export default function PersonalInfoScreen() {
 
             {/* Email */}
             <View style={[styles.menuItem, styles.menuItemBorder]}>
-              <Ionicons name="mail-outline" size={scale(22)} color="#555" style={styles.menuIcon} />
+              <Ionicons name="mail-outline" size={22} color="#555" style={styles.menuIcon} />
               <View style={styles.menuContent}>
                 <Text style={styles.menuLabel}>{t('email')}</Text>
                 <Text style={styles.menuStatic}>{user?.email || '—'}</Text>
@@ -268,11 +267,11 @@ export default function PersonalInfoScreen() {
             </View>
 
             {/* Đổi mật khẩu Section */}
-            <Text style={[styles.sectionTitle, { marginTop: verticalScale(30) }]}>{t('change_password')}</Text>
+            <Text style={[styles.sectionTitle, { marginTop: 30 }]}>{t('change_password')}</Text>
 
             {/* Mật khẩu hiện tại */}
             <View style={[styles.menuItem, styles.menuItemBorder]}>
-              <Ionicons name="lock-closed-outline" size={scale(22)} color="#555" style={styles.menuIcon} />
+              <Ionicons name="lock-closed-outline" size={22} color="#555" style={styles.menuIcon} />
               <View style={styles.menuContent}>
                 <Text style={styles.menuLabel}>{t('current_password')}</Text>
                 <View style={styles.pwRow}>
@@ -285,7 +284,7 @@ export default function PersonalInfoScreen() {
                     placeholderTextColor="#999"
                   />
                   <TouchableOpacity onPress={() => setShowOld(!showOld)}>
-                    <Ionicons name={showOld ? "eye-off-outline" : "eye-outline"} size={scale(20)} color="#999" />
+                    <Ionicons name={showOld ? "eye-off-outline" : "eye-outline"} size={20} color="#999" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -293,7 +292,7 @@ export default function PersonalInfoScreen() {
 
             {/* Mật khẩu mới */}
             <View style={[styles.menuItem, styles.menuItemBorder]}>
-              <Ionicons name="shield-outline" size={scale(22)} color="#555" style={styles.menuIcon} />
+              <Ionicons name="shield-outline" size={22} color="#555" style={styles.menuIcon} />
               <View style={styles.menuContent}>
                 <Text style={styles.menuLabel}>{t('new_password')}</Text>
                 <View style={styles.pwRow}>
@@ -306,7 +305,7 @@ export default function PersonalInfoScreen() {
                     placeholderTextColor="#999"
                   />
                   <TouchableOpacity onPress={() => setShowNew(!showNew)}>
-                    <Ionicons name={showNew ? "eye-off-outline" : "eye-outline"} size={scale(20)} color="#999" />
+                    <Ionicons name={showNew ? "eye-off-outline" : "eye-outline"} size={20} color="#999" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -314,7 +313,7 @@ export default function PersonalInfoScreen() {
 
             {/* Xác nhận mật khẩu mới */}
             <View style={[styles.menuItem, styles.menuItemBorder]}>
-              <Ionicons name="shield-checkmark-outline" size={scale(22)} color="#555" style={styles.menuIcon} />
+              <Ionicons name="shield-checkmark-outline" size={22} color="#555" style={styles.menuIcon} />
               <View style={styles.menuContent}>
                 <Text style={styles.menuLabel}>{t('confirm_new_password')}</Text>
                 <View style={styles.pwRow}>
@@ -327,7 +326,7 @@ export default function PersonalInfoScreen() {
                     placeholderTextColor="#999"
                   />
                   <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)}>
-                    <Ionicons name={showConfirm ? "eye-off-outline" : "eye-outline"} size={scale(20)} color="#999" />
+                    <Ionicons name={showConfirm ? "eye-off-outline" : "eye-outline"} size={20} color="#999" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -336,7 +335,7 @@ export default function PersonalInfoScreen() {
 
 
           {/* Nút lưu duy nhất */}
-          <View style={{ marginBottom: verticalScale(25) }}>
+          <View style={{ marginBottom: 25 }}>
             <TouchableOpacity
               style={[styles.saveBtn, { backgroundColor: hasChanges ? '#00CFA3' : '#E0E0E0' }]}
               onPress={handleSubmit}
@@ -363,8 +362,8 @@ export default function PersonalInfoScreen() {
             shadowColor: toastType === 'error' ? '#EF4444' : (toastType === 'success' ? '#10B981' : '#007AFF'),
           }
         ]}>
-          <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', width: scale(32), height: scale(32), borderRadius: scale(16), justifyContent: 'center', alignItems: 'center' }}>
-            <Ionicons name={toastType === 'success' ? "checkmark" : (toastType === 'error' ? "close" : "information")} size={scale(18)} color="#FFF" />
+          <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}>
+            <Ionicons name={toastType === 'success' ? "checkmark" : (toastType === 'error' ? "close" : "information")} size={18} color="#FFF" />
           </View>
           <Text style={styles.toastText}>{toastMsg}</Text>
         </Animated.View>
@@ -379,35 +378,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: scale(20),
-    paddingTop: verticalScale(50),
-    paddingBottom: verticalScale(15),
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 15,
     backgroundColor: '#ffffffff',
   },
   backBtn: {
-    width: scale(25),
+    width: 25,
   },
   headerTitle: {
-    fontSize: moderateScale(20),
+    fontSize: 20,
     fontWeight: '800',
     color: '#1A1A1A',
     textAlign: 'center',
   },
   scroll: {
-    paddingHorizontal: scale(25),
-    paddingTop: verticalScale(20),
+    paddingHorizontal: 25,
+    paddingTop: 20,
   },
   avatarSection: {
     alignItems: 'center',
-    marginBottom: verticalScale(30),
+    marginBottom: 30,
   },
   avatarWrapper: {
     position: 'relative',
   },
   avatarRing: {
-    width: scale(130),
-    height: scale(130),
-    borderRadius: scale(65),
+    width: 130,
+    height: 130,
+    borderRadius: 65,
     backgroundColor: '#F7F7F7',
     justifyContent: 'center',
     alignItems: 'center',
@@ -419,63 +418,63 @@ const styles = StyleSheet.create({
   },
   cameraOverlay: {
     position: 'absolute',
-    bottom: verticalScale(5),
-    right: scale(5),
+    bottom: 5,
+    right: 5,
     backgroundColor: '#000000ff',
-    width: scale(38),
-    height: scale(38),
-    borderRadius: scale(19),
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
     borderColor: '#FFF',
   },
   formContainer: {
-    marginBottom: verticalScale(40),
+    marginBottom: 40,
   },
   sectionTitle: {
-    fontSize: moderateScale(18),
+    fontSize: 18,
     fontWeight: '700',
     color: '#1A1A1A',
-    marginBottom: verticalScale(15),
+    marginBottom: 15,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: verticalScale(60), // Fixed height for stability
+    height: 60, // Fixed height for stability
   },
   menuItemBorder: {
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
   },
   menuIcon: {
-    marginRight: scale(15),
-    width: scale(24),
+    marginRight: 15,
+    width: 24,
   },
   menuContent: {
     flex: 1,
   },
   menuLabel: {
-    fontSize: moderateScale(12),
+    fontSize: 12,
     color: '#999',
-    marginBottom: verticalScale(2),
-    lineHeight: verticalScale(18),
+    marginBottom: 2,
+    lineHeight: 18,
   },
   menuInput: {
-    fontSize: moderateScale(14),
+    fontSize: 14,
     fontWeight: '600',
     color: '#000000ff',
     paddingVertical: 0,
     paddingLeft: 0,
-    lineHeight: verticalScale(20),
+    lineHeight: 20,
   },
   menuStatic: {
-    fontSize: moderateScale(14),
+    fontSize: 14,
     fontWeight: '600',
     color: '#000000ff',
     paddingVertical: 0,
     paddingLeft: 0,
-    lineHeight: verticalScale(20),
+    lineHeight: 20,
   },
   pwRow: {
     flexDirection: 'row',
@@ -483,39 +482,39 @@ const styles = StyleSheet.create({
   },
   saveBtn: {
     width: '100%',
-    height: verticalScale(56),
-    borderRadius: scale(16),
+    height: 56,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#ffffffff',
-    shadowOffset: { width: 0, height: verticalScale(4) },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
-    shadowRadius: scale(8),
+    shadowRadius: 8,
     elevation: 3,
     flexShrink: 0,
   },
   saveBtnText: {
     color: '#FFF',
-    fontSize: moderateScale(16),
+    fontSize: 16,
     fontWeight: '700',
     textAlign: 'center',
-    lineHeight: verticalScale(26), // Optimized for VN
+    lineHeight: 26, // Optimized for VN
   },
   toastContainer: {
     position: 'absolute',
-    left: scale(15),
-    right: scale(15),
+    left: 15,
+    right: 15,
     zIndex: 10000,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: verticalScale(14),
-    paddingHorizontal: scale(20),
-    borderRadius: scale(22),
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 22,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: verticalScale(10) },
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
-    shadowRadius: scale(20),
+    shadowRadius: 20,
     elevation: 10,
   },
-  toastText: { color: '#FFF', fontSize: moderateScale(15), fontWeight: '700', marginLeft: scale(15), flex: 1, letterSpacing: 0.3 },
+  toastText: { color: '#FFF', fontSize: 15, fontWeight: '700', marginLeft: 15, flex: 1, letterSpacing: 0.3 },
 });

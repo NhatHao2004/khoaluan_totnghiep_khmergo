@@ -3,7 +3,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { updateQuizScore } from '@/services/firebase-service';
 import { db } from '@/utils/firebaseConfig';
-import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -73,10 +72,10 @@ export default function VocabQuizScreen() {
 
     const shakeAnimation = () => {
         Animated.sequence([
-            Animated.timing(cardShake, { toValue: scale(10), duration: 50, useNativeDriver: true }),
-            Animated.timing(cardShake, { toValue: scale(-10), duration: 50, useNativeDriver: true }),
-            Animated.timing(cardShake, { toValue: scale(5), duration: 50, useNativeDriver: true }),
-            Animated.timing(cardShake, { toValue: scale(-5), duration: 50, useNativeDriver: true }),
+            Animated.timing(cardShake, { toValue: 10, duration: 50, useNativeDriver: true }),
+            Animated.timing(cardShake, { toValue: -10, duration: 50, useNativeDriver: true }),
+            Animated.timing(cardShake, { toValue: 5, duration: 50, useNativeDriver: true }),
+            Animated.timing(cardShake, { toValue: -5, duration: 50, useNativeDriver: true }),
             Animated.timing(cardShake, { toValue: 0, duration: 50, useNativeDriver: true }),
         ]).start();
     };
@@ -226,7 +225,7 @@ export default function VocabQuizScreen() {
                     {/* Header */}
                     <View style={styles.header}>
                         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-                            <Ionicons name="arrow-back" size={scale(28)} color="#000000" />
+                            <Ionicons name="arrow-back" size={28} color="#000000" />
                         </TouchableOpacity>
 
                         <View style={styles.headerTitleContainer}>
@@ -235,7 +234,7 @@ export default function VocabQuizScreen() {
                             </ThemedText>
                         </View>
 
-                        <View style={{ width: scale(50) }} />
+                        <View style={{ width: 50 }} />
                     </View>
 
                     <ScrollView
@@ -314,15 +313,15 @@ export default function VocabQuizScreen() {
         return (
             <View style={styles.resultsContainer}>
                 <LinearGradient colors={['#F5F3FF', '#FFF', '#F5F3FF']} style={StyleSheet.absoluteFill} />
-                <SafeAreaView style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: scale(25) }}>
+                <SafeAreaView style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 25 }}>
                     <View style={styles.resultStarsRow}>
                         {[1, 2, 3, 4, 5].map(s => (
                             <Ionicons
                                 key={s}
                                 name={s <= stars ? 'star' : 'star-outline'}
-                                size={scale(44)}
+                                size={44}
                                 color={s <= stars ? '#FBBF24' : '#E2E8F0'}
-                                style={{ marginHorizontal: scale(4) }}
+                                style={{ marginHorizontal: 4 }}
                             />
                         ))}
                     </View>
@@ -336,7 +335,7 @@ export default function VocabQuizScreen() {
                         {hasSaved && <Text style={styles.savedText}>{t('results_saved')}</Text>}
                     </View>
                     <TouchableOpacity style={styles.resultPrimaryBtn} onPress={() => prepareGame(selectedCategory!)}>
-                        <Ionicons name="refresh" size={scale(20)} color="#FFF" />
+                        <Ionicons name="refresh" size={20} color="#FFF" />
                         <Text style={styles.resultPrimaryBtnText}>{t('replay')}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.resultSecondaryBtn} onPress={resetGame}>
@@ -351,22 +350,22 @@ export default function VocabQuizScreen() {
         <View style={styles.container}>
             <View style={styles.headerContainer}>
                 <TouchableOpacity onPress={() => setShowExitModal(true)} style={styles.headerCloseBtn}>
-                    <Ionicons name="arrow-back" size={scale(28)} color="#1E293B" />
+                    <Ionicons name="arrow-back" size={28} color="#1E293B" />
                 </TouchableOpacity>
                 <View style={styles.timerContainer}>
-                    <Ionicons name="time-outline" size={scale(20)} color={timeLeft < 30 ? '#EF4444' : '#1E293B'} />
+                    <Ionicons name="time-outline" size={20} color={timeLeft < 30 ? '#EF4444' : '#1E293B'} />
                     <Text style={[styles.timerText, timeLeft < 30 && { color: '#EF4444' }]}>{formatTime(timeLeft)}</Text>
                 </View>
                 <View style={styles.scorePill}>
-                    <Ionicons name="flash" size={scale(16)} color="#F59E0B" />
+                    <Ionicons name="flash" size={16} color="#F59E0B" />
                     <Text style={styles.scorePillText}>{score}</Text>
                 </View>
             </View>
 
             <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-                <Animated.View style={{ flex: 1, flexDirection: 'row', padding: scale(20), gap: scale(20), transform: [{ translateX: cardShake }] }}>
+                <Animated.View style={{ flex: 1, flexDirection: 'row', padding: 20, gap: 20, transform: [{ translateX: cardShake }] }}>
                     {/* Khmer Column */}
-                    <View style={{ flex: 1, gap: scale(10) }}>
+                    <View style={{ flex: 1, gap: 10 }}>
                         {leftItems.map((item) => {
                             const isMatched = matches.includes(item.id);
                             const isSelected = selectedLeft === item.id;
@@ -393,7 +392,7 @@ export default function VocabQuizScreen() {
                     </View>
 
                     {/* Vietnamese Column */}
-                    <View style={{ flex: 1, gap: scale(10) }}>
+                    <View style={{ flex: 1, gap: 10 }}>
                         {rightItems.map((item) => {
                             const isMatched = matches.includes(item.id);
                             const isSelected = selectedRight === item.id;
@@ -432,7 +431,7 @@ export default function VocabQuizScreen() {
                 <View style={styles.modalOverlay}>
                     <View style={styles.exitModalContent}>
                         <View style={styles.exitIconCircle}>
-                            <Ionicons name="exit-outline" size={scale(40)} color="#EF4444" />
+                            <Ionicons name="exit-outline" size={40} color="#EF4444" />
                         </View>
                         <Text style={styles.exitTitle}>{t('exit_game_title')}</Text>
                         <Text style={styles.exitSub}>{t('exit_game_msg')}</Text>
@@ -466,57 +465,57 @@ const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#F8FAFC' },
     header: {
         backgroundColor: '#ffffff',
-        paddingTop: verticalScale(45),
-        paddingBottom: verticalScale(15),
-        paddingHorizontal: scale(15),
+        paddingTop: 45,
+        paddingBottom: 15,
+        paddingHorizontal: 15,
         flexDirection: 'row',
         alignItems: 'center',
         elevation: 2,
         zIndex: 100,
     },
-    backBtn: { width: scale(40), height: scale(40), justifyContent: 'center', alignItems: 'center' },
+    backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
     headerTitleContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    headerTitle: { color: '#0F172A', fontSize: moderateScale(20), fontWeight: '800' },
+    headerTitle: { color: '#0F172A', fontSize: 20, fontWeight: '800' },
     content: { flex: 1 },
-    introduction: { padding: scale(24), backgroundColor: '#FFF', marginBottom: verticalScale(16) },
-    introTitle: { fontSize: moderateScale(22), fontWeight: '900', color: '#1E293B', marginBottom: verticalScale(8) },
-    introDesc: { fontSize: moderateScale(15), color: '#64748B', lineHeight: verticalScale(22) },
-    categoryList: { padding: scale(15), gap: verticalScale(15) },
-    categoryMainCard: { backgroundColor: '#FFF', borderRadius: scale(24), padding: 0, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9', overflow: 'hidden' },
-    categoryImageContainer: { width: '100%', aspectRatio: 16 / 10, backgroundColor: '#FFFFFF', padding: scale(12) },
-    categoryCardImage: { width: '100%', height: '100%', borderRadius: scale(16) },
-    categoryCardBody: { padding: scale(20), gap: scale(4) },
-    categoryCardTitle: { fontSize: moderateScale(18), fontWeight: '800', color: '#1E293B' },
-    categoryCardSub: { fontSize: moderateScale(14), color: '#64748B', marginBottom: verticalScale(8) },
-    quizSelectionFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: '#F1F5F9', paddingTop: verticalScale(12) },
-    quizInfoBox: { flexDirection: 'row', alignItems: 'center', gap: scale(4) },
-    quizInfoLabel: { fontSize: moderateScale(12), color: '#64748B', fontWeight: '600' },
-    startQuizBtn: { backgroundColor: '#3B82F6', paddingHorizontal: scale(16), paddingVertical: verticalScale(8), borderRadius: scale(12), alignItems: 'center' },
-    startQuizBtnText: { color: '#FFF', fontWeight: '800', fontSize: moderateScale(13) },
+    introduction: { padding: 24, backgroundColor: '#FFF', marginBottom: 16 },
+    introTitle: { fontSize: 22, fontWeight: '900', color: '#1E293B', marginBottom: 8 },
+    introDesc: { fontSize: 15, color: '#64748B', lineHeight: 22 },
+    categoryList: { padding: 15, gap: 15 },
+    categoryMainCard: { backgroundColor: '#FFF', borderRadius: 24, padding: 0, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9', overflow: 'hidden' },
+    categoryImageContainer: { width: '100%', aspectRatio: 16 / 10, backgroundColor: '#FFFFFF', padding: 12 },
+    categoryCardImage: { width: '100%', height: '100%', borderRadius: 16 },
+    categoryCardBody: { padding: 20, gap: 4 },
+    categoryCardTitle: { fontSize: 18, fontWeight: '800', color: '#1E293B' },
+    categoryCardSub: { fontSize: 14, color: '#64748B', marginBottom: 8 },
+    quizSelectionFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: '#F1F5F9', paddingTop: 12 },
+    quizInfoBox: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+    quizInfoLabel: { fontSize: 12, color: '#64748B', fontWeight: '600' },
+    startQuizBtn: { backgroundColor: '#3B82F6', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12, alignItems: 'center' },
+    startQuizBtnText: { color: '#FFF', fontWeight: '800', fontSize: 13 },
     resultsContainer: { flex: 1 },
-    resultTitle: { fontSize: moderateScale(32), fontWeight: '900', color: '#1E293B', marginBottom: verticalScale(20) },
-    resultStarsRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: verticalScale(24) },
-    resultScoreCard: { width: '100%', backgroundColor: '#FFF', borderRadius: scale(32), padding: scale(30), alignItems: 'center', marginBottom: verticalScale(30), elevation: 4 },
-    resultScoreNum: { fontSize: moderateScale(56), fontWeight: '900', color: '#7C3AED' },
-    resultScoreLabel: { fontSize: moderateScale(16), color: '#64748B', fontWeight: '600' },
-    resultPrimaryBtn: { width: '100%', height: verticalScale(60), backgroundColor: '#7C3AED', borderRadius: scale(20), flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: scale(12) },
-    resultPrimaryBtnText: { color: '#FFF', fontSize: moderateScale(18), fontWeight: '800' },
-    resultSecondaryBtn: { width: '100%', height: verticalScale(60), alignItems: 'center', justifyContent: 'center' },
-    resultSecondaryBtnText: { color: '#64748B', fontSize: moderateScale(16), fontWeight: '700' },
-    savingText: { fontSize: moderateScale(12), color: '#94A3B8', marginTop: verticalScale(8) },
-    savedText: { fontSize: moderateScale(12), color: '#22C55E', fontWeight: '700', marginTop: verticalScale(8) },
-    headerContainer: { paddingTop: verticalScale(50), paddingHorizontal: scale(20), paddingBottom: verticalScale(20), backgroundColor: '#FFF', borderBottomLeftRadius: scale(32), borderBottomRightRadius: scale(32), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', elevation: 4 },
-    headerCloseBtn: { width: scale(40), height: scale(40), justifyContent: 'center', alignItems: 'center' },
-    gameHeaderTitle: { fontSize: moderateScale(16), fontWeight: '800', color: '#334155' },
-    timerContainer: { flexDirection: 'row', alignItems: 'center', gap: scale(6), backgroundColor: '#F1F5F9', paddingHorizontal: scale(12), paddingVertical: verticalScale(6), borderRadius: scale(20) },
-    timerText: { fontSize: moderateScale(16), fontWeight: '800', color: '#1E293B', fontVariant: ['tabular-nums'] },
-    scorePill: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFBEB', paddingHorizontal: scale(12), paddingVertical: verticalScale(6), borderRadius: scale(20), gap: scale(6), borderWidth: 1, borderColor: '#FEF3C7' },
-    scorePillText: { fontSize: moderateScale(16), fontWeight: '900', color: '#D97706' },
-    matchCard: { backgroundColor: '#FFF', borderRadius: scale(20), padding: scale(12), height: verticalScale(70), justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#F1F5F9', elevation: 2 },
+    resultTitle: { fontSize: 32, fontWeight: '900', color: '#1E293B', marginBottom: 20 },
+    resultStarsRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 24 },
+    resultScoreCard: { width: '100%', backgroundColor: '#FFF', borderRadius: 32, padding: 30, alignItems: 'center', marginBottom: 30, elevation: 4 },
+    resultScoreNum: { fontSize: 56, fontWeight: '900', color: '#7C3AED' },
+    resultScoreLabel: { fontSize: 16, color: '#64748B', fontWeight: '600' },
+    resultPrimaryBtn: { width: '100%', height: 60, backgroundColor: '#7C3AED', borderRadius: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12 },
+    resultPrimaryBtnText: { color: '#FFF', fontSize: 18, fontWeight: '800' },
+    resultSecondaryBtn: { width: '100%', height: 60, alignItems: 'center', justifyContent: 'center' },
+    resultSecondaryBtnText: { color: '#64748B', fontSize: 16, fontWeight: '700' },
+    savingText: { fontSize: 12, color: '#94A3B8', marginTop: 8 },
+    savedText: { fontSize: 12, color: '#22C55E', fontWeight: '700', marginTop: 8 },
+    headerContainer: { paddingTop: 50, paddingHorizontal: 20, paddingBottom: 20, backgroundColor: '#FFF', borderBottomLeftRadius: 32, borderBottomRightRadius: 32, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', elevation: 4 },
+    headerCloseBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
+    gameHeaderTitle: { fontSize: 16, fontWeight: '800', color: '#334155' },
+    timerContainer: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#F1F5F9', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
+    timerText: { fontSize: 16, fontWeight: '800', color: '#1E293B', fontVariant: ['tabular-nums'] },
+    scorePill: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFBEB', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, gap: 6, borderWidth: 1, borderColor: '#FEF3C7' },
+    scorePillText: { fontSize: 16, fontWeight: '900', color: '#D97706' },
+    matchCard: { backgroundColor: '#FFF', borderRadius: 20, padding: 12, height: 70, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#F1F5F9', elevation: 2 },
     matchCardSelected: { borderColor: '#3B82F6', backgroundColor: '#EFF6FF' },
     matchCardMatched: { borderColor: '#22C55E', backgroundColor: '#F0FDF4' },
     matchCardWrong: { borderColor: '#EF4444', backgroundColor: '#FEF2F2' },
-    matchText: { fontSize: moderateScale(16), fontWeight: '800', color: '#1E293B', textAlign: 'center' },
+    matchText: { fontSize: 16, fontWeight: '800', color: '#1E293B', textAlign: 'center' },
     matchTextSelected: { color: '#3B82F6' },
     matchTextMatched: { color: '#22C55E' },
 
@@ -526,71 +525,71 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: scale(20),
+        padding: 20,
     },
     exitModalContent: {
         width: '100%',
         backgroundColor: '#FFF',
-        borderRadius: scale(32),
-        padding: scale(30),
+        borderRadius: 32,
+        padding: 30,
         alignItems: 'center',
         elevation: 10,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: verticalScale(4) },
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.25,
-        shadowRadius: scale(10),
+        shadowRadius: 10,
     },
     exitIconCircle: {
-        width: scale(80),
-        height: scale(80),
-        borderRadius: scale(40),
+        width: 80,
+        height: 80,
+        borderRadius: 40,
         backgroundColor: '#FEF2F2',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: verticalScale(20),
-        paddingLeft: scale(7),
+        marginBottom: 20,
+        paddingLeft: 7,
     },
     exitTitle: {
-        fontSize: moderateScale(22),
+        fontSize: 22,
         fontWeight: '800',
         color: '#1E293B',
-        marginBottom: verticalScale(10),
+        marginBottom: 10,
         textAlign: 'center',
     },
     exitSub: {
-        fontSize: moderateScale(16),
+        fontSize: 16,
         color: '#64748B',
         textAlign: 'center',
-        marginBottom: verticalScale(30),
-        lineHeight: verticalScale(24),
+        marginBottom: 30,
+        lineHeight: 24,
     },
     exitActionRow: {
         width: '100%',
-        gap: scale(12),
+        gap: 12,
     },
     stayBtn: {
         width: '100%',
-        height: verticalScale(56),
+        height: 56,
         backgroundColor: '#3B82F6',
-        borderRadius: scale(16),
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
     },
     stayBtnText: {
-        fontSize: moderateScale(16),
+        fontSize: 16,
         fontWeight: '700',
         color: '#FFF',
     },
     confirmExitBtn: {
         width: '100%',
-        height: verticalScale(56),
+        height: 56,
         backgroundColor: '#EF4444',
-        borderRadius: scale(16),
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
     },
     confirmExitBtnText: {
-        fontSize: moderateScale(16),
+        fontSize: 16,
         fontWeight: '700',
         color: '#FFF',
     },

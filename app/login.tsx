@@ -3,7 +3,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { auth } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
@@ -94,6 +93,9 @@ export default function LoginScreen() {
       await signInWithEmailAndPassword(auth, email.trim(), password);
       await refreshUser();
 
+      // Sau khi refresh, nếu user vẫn null nghĩa là có lỗi hoặc bị chặn
+      // fetchAndSetUser sẽ ném ACCOUNT_BLOCKED, refreshUser sẽ ném AUTH_FAILED nếu user null
+
       if (returnTo) {
         router.replace({
           pathname: returnTo as any,
@@ -146,7 +148,7 @@ export default function LoginScreen() {
               />
               <View style={styles.logoHintRow}>
                 <Text style={styles.logoHint} numberOfLines={1} adjustsFontSizeToFit>{t('welcome_back')}</Text>
-                <Animated.View style={[waveStyle, { marginLeft: scale(8) }]}>
+                <Animated.View style={[waveStyle, { marginLeft: 8 }]}>
                   <Text style={styles.waveEmoji}>👋</Text>
                 </Animated.View>
               </View>
@@ -157,7 +159,7 @@ export default function LoginScreen() {
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Email</Text>
                 <View style={styles.inputWrapper}>
-                  <Ionicons name="mail-outline" size={scale(20)} color="#94A3B8" style={styles.inputIcon} />
+                  <Ionicons name="mail-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
                   <TextInput
                     style={styles.input}
                     placeholder="example@gmail.com"
@@ -171,14 +173,14 @@ export default function LoginScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: scale(4), gap: scale(10) }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 4, gap: 10 }}>
                   <Text style={[styles.inputLabel, { flex: 1 }]} numberOfLines={1}>{t('password_label')}</Text>
                   <TouchableOpacity>
-                    <Text style={{ fontSize: moderateScale(13), color: '#94A3B8', fontWeight: '500' }}>{t('forgot_password')}</Text>
+                    <Text style={{ fontSize: 13, color: '#94A3B8', fontWeight: '500' }}>{t('forgot_password')}</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.inputWrapper}>
-                  <Ionicons name="lock-closed-outline" size={scale(20)} color="#94A3B8" style={styles.inputIcon} />
+                  <Ionicons name="lock-closed-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
                   <TextInput
                     style={styles.input}
                     placeholder="••••••••"
@@ -188,7 +190,7 @@ export default function LoginScreen() {
                     secureTextEntry={!showPassword}
                   />
                   <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                    <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={scale(20)} color="#94A3B8" />
+                    <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color="#94A3B8" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -227,10 +229,10 @@ export default function LoginScreen() {
 
               <View style={styles.socialIconsRow}>
                 <TouchableOpacity style={[styles.socialCircle, { backgroundColor: '#FF5A5F' }]}>
-                  <Ionicons name="logo-google" size={scale(24)} color="#FFF" />
+                  <Ionicons name="logo-google" size={24} color="#FFF" />
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.socialCircle, { backgroundColor: '#1877F2' }]}>
-                  <Ionicons name="logo-facebook" size={scale(24)} color="#FFF" />
+                  <Ionicons name="logo-facebook" size={24} color="#FFF" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -253,7 +255,7 @@ export default function LoginScreen() {
           <View style={styles.toastIcon}>
             <Ionicons
               name={toastType === 'success' ? "checkmark" : "close"}
-              size={scale(20)}
+              size={20}
               color="#FFF"
             />
           </View>
@@ -266,69 +268,69 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFF' },
-  fixedHeader: { paddingHorizontal: scale(20), paddingTop: verticalScale(60), paddingBottom: verticalScale(10), backgroundColor: '#FFF' },
-  scrollContent: { paddingHorizontal: scale(20), paddingTop: verticalScale(40), paddingBottom: verticalScale(40), backgroundColor: '#FFF' },
+  fixedHeader: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 10, backgroundColor: '#FFF' },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 40, paddingBottom: 40, backgroundColor: '#FFF' },
   headerTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
-  titleText: { fontSize: moderateScale(32), fontWeight: '900', color: '#0F172A', letterSpacing: -1 },
-  registerLinkText: { fontSize: moderateScale(16), color: '#64748B', fontWeight: '600', marginBottom: verticalScale(4) },
+  titleText: { fontSize: 32, fontWeight: '900', color: '#0F172A', letterSpacing: -1 },
+  registerLinkText: { fontSize: 16, color: '#64748B', fontWeight: '600', marginBottom: 4 },
 
-  card: { backgroundColor: 'transparent', borderRadius: scale(32), padding: scale(24) },
+  card: { backgroundColor: 'transparent', borderRadius: 32, padding: 24 },
 
-  logoWrapper: { alignItems: 'center', marginBottom: verticalScale(25) },
-  logoImage: { width: scale(130), height: scale(130) },
-  logoHintRow: { marginTop: verticalScale(5), flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  logoHint: { fontSize: moderateScale(17), color: '#64748B', fontWeight: '700' },
-  waveEmoji: { fontSize: moderateScale(20) },
+  logoWrapper: { alignItems: 'center', marginBottom: 25 },
+  logoImage: { width: 130, height: 130 },
+  logoHintRow: { marginTop: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
+  logoHint: { fontSize: 17, color: '#64748B', fontWeight: '700' },
+  waveEmoji: { fontSize: 20 },
 
-  form: { gap: verticalScale(20), marginBottom: verticalScale(30) },
-  inputGroup: { gap: verticalScale(8) },
-  inputLabel: { fontSize: moderateScale(14), fontWeight: '700', color: '#64748B', marginLeft: scale(4), flexShrink: 0 },
-  inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: scale(16), paddingHorizontal: scale(16), height: verticalScale(56), borderWidth: 1, borderColor: '#F1F5F9' },
-  inputIcon: { marginRight: scale(12) },
-  input: { flex: 1, fontSize: moderateScale(16), color: '#1E293B', fontWeight: '600', paddingVertical: verticalScale(10) },
+  form: { gap: 20, marginBottom: 30 },
+  inputGroup: { gap: 8 },
+  inputLabel: { fontSize: 14, fontWeight: '700', color: '#64748B', marginLeft: 4, flexShrink: 0 },
+  inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: 16, paddingHorizontal: 16, height: 56, borderWidth: 1, borderColor: '#F1F5F9' },
+  inputIcon: { marginRight: 12 },
+  input: { flex: 1, fontSize: 16, color: '#1E293B', fontWeight: '600', paddingVertical: 10 },
 
-  mainBtn: { borderRadius: scale(18), overflow: 'hidden' },
-  btnGradient: { height: verticalScale(60), justifyContent: 'center', alignItems: 'center' },
-  btnText: { fontSize: moderateScale(16), fontWeight: '800', color: '#FFF', letterSpacing: 1, lineHeight: verticalScale(24), includeFontPadding: false },
+  mainBtn: { borderRadius: 18, overflow: 'hidden' },
+  btnGradient: { height: 60, justifyContent: 'center', alignItems: 'center' },
+  btnText: { fontSize: 16, fontWeight: '800', color: '#FFF', letterSpacing: 1, lineHeight: 24, includeFontPadding: false },
 
-  footer: { marginTop: verticalScale(30), flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
-  footerText: { fontSize: moderateScale(14), color: '#64748B', fontWeight: '500' },
-  footerLink: { fontSize: moderateScale(14), color: '#10B981', fontWeight: '700' },
+  footer: { marginTop: 30, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+  footerText: { fontSize: 14, color: '#64748B', fontWeight: '500' },
+  footerLink: { fontSize: 14, color: '#10B981', fontWeight: '700' },
 
   socialFooter: {
-    marginTop: verticalScale(40),
+    marginTop: 40,
     alignItems: 'center',
   },
   dividerBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: scale(10),
-    marginBottom: verticalScale(25),
+    gap: 10,
+    marginBottom: 25,
   },
   dividerLine: {
     height: 1,
     backgroundColor: '#E2E8F0',
-    width: scale(60),
+    width: 60,
   },
   dividerText: {
-    fontSize: moderateScale(13),
+    fontSize: 13,
     color: '#94A3B8',
     fontWeight: '500',
   },
   socialIconsRow: {
     flexDirection: 'row',
-    gap: scale(25),
+    gap: 25,
   },
   socialCircle: {
-    width: scale(50),
-    height: scale(50),
-    borderRadius: scale(25),
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: verticalScale(4) },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: scale(6),
+    shadowRadius: 6,
     elevation: 3,
   },
 
@@ -336,36 +338,36 @@ const styles = StyleSheet.create({
   toastContainer: {
     position: 'absolute',
     top: 0,
-    left: scale(20),
-    right: scale(20),
-    height: verticalScale(56),
-    borderRadius: scale(20),
+    left: 20,
+    right: 20,
+    height: 56,
+    borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: scale(16),
+    paddingHorizontal: 16,
     zIndex: 9999,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: verticalScale(10) },
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
-    shadowRadius: scale(20),
+    shadowRadius: 20,
     elevation: 10,
   },
   toastIcon: {
-    width: scale(32),
-    height: scale(32),
-    borderRadius: scale(16),
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   toastText: {
     color: '#FFF',
-    fontSize: moderateScale(15),
+    fontSize: 15,
     fontWeight: '700',
-    marginLeft: scale(12),
+    marginLeft: 12,
     flex: 1,
     letterSpacing: 0.2,
     includeFontPadding: false,
-    lineHeight: verticalScale(22),
+    lineHeight: 22,
   },
 });

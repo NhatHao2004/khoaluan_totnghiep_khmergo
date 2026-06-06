@@ -3,7 +3,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
-import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -33,7 +32,7 @@ import Animated, {
 const StyleSheet = RNStyleSheet;
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CATEGORY_CARD_WIDTH = (SCREEN_WIDTH - scale(40) - (3 * scale(8))) / 4; // 20px padding each side, 8px gaps between 4 cards
+const CATEGORY_CARD_WIDTH = (SCREEN_WIDTH - 40 - (3 * 8)) / 4; // 20px padding each side, 8px gaps between 4 cards
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -331,8 +330,8 @@ export default function HomeScreen() {
         >
           <View style={styles.toastIcon}>
             <Ionicons
-              name={toastType === "success" ? "checkmark" : "close"}
-              size={scale(20)}
+              name={toastType === 'success' ? "checkmark" : "close"}
+              size={20}
               color="#FFF"
             />
           </View>
@@ -351,7 +350,7 @@ export default function HomeScreen() {
                 <Image source={{ uri: user.avatar as string }} style={styles.avatar} />
               ) : (
                 <View style={styles.avatarPlaceholder}>
-                  <Ionicons name="person-circle-outline" size={scale(53)} color="#000000ff" />
+                  <Ionicons name="person-circle-outline" size={53} color="#000000ff" />
                 </View>
               )}
             </TouchableOpacity>
@@ -370,7 +369,7 @@ export default function HomeScreen() {
             }}
           >
             <Animated.View style={animatedBellStyle}>
-              <Ionicons name="notifications-outline" size={scale(30)} color="#000" />
+              <Ionicons name="notifications-outline" size={30} color="#000" />
               {unreadCount > 0 && (
                 <View style={styles.notificationBadge}>
                   <ThemedText style={styles.badgeText}>{unreadCount}</ThemedText>
@@ -385,7 +384,7 @@ export default function HomeScreen() {
         <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: verticalScale(2) }}
+          contentContainerStyle={{ paddingBottom: 2 }}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -433,8 +432,8 @@ export default function HomeScreen() {
           </View>
 
           {/* Featured List Header */}
-          <View style={[styles.sectionHeader, { paddingBottom: verticalScale(10), marginTop: verticalScale(8) }]}>
-            <ThemedText style={[styles.sectionTitle, { flex: 1, marginRight: scale(10) }]} numberOfLines={1}>
+          <View style={[styles.sectionHeader, { paddingBottom: 10, marginTop: 8 }]}>
+            <ThemedText style={[styles.sectionTitle, { flex: 1, marginRight: 10 }]} numberOfLines={1}>
               {t('suggestions_for_you')}
             </ThemedText>
             <TouchableOpacity
@@ -511,7 +510,7 @@ export default function HomeScreen() {
             <ScrollView
               style={styles.nList}
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={notifications.length === 0 ? { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: verticalScale(100) } : { paddingBottom: verticalScale(20) }}
+              contentContainerStyle={notifications.length === 0 ? { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 100 } : { paddingBottom: 20 }}
             >
               {notifications.length > 0 ? (
                 notifications.map((item) => (
@@ -564,7 +563,7 @@ export default function HomeScreen() {
                     </View>
                     <View style={styles.nContent}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <View style={{ flex: 1, marginRight: scale(10) }}>
+                        <View style={{ flex: 1, marginRight: 10 }}>
                           <Text style={styles.nItemTitle} numberOfLines={2}>
                             <Text style={{ fontWeight: '800' }}>{item.fromUserName}</Text> {item.message}
                           </Text>
@@ -572,9 +571,9 @@ export default function HomeScreen() {
                         {deletingId === item.id ? (
                           <TouchableOpacity
                             onPress={() => deleteNotification(item.id)}
-                            style={{ padding: scale(5) }}
+                            style={{ padding: 5 }}
                           >
-                            <Ionicons name="close-circle" size={scale(24)} color="#FF3B30" />
+                            <Ionicons name="close-circle" size={24} color="#FF3B30" />
                           </TouchableOpacity>
                         ) : (
                           <Text style={styles.nItemTime}>{item.time}</Text>
@@ -585,8 +584,8 @@ export default function HomeScreen() {
                 ))
               ) : (
                 <View style={{ alignItems: 'center' }}>
-                  <Ionicons name="notifications-off-outline" size={scale(45)} color="#E2E8F0" />
-                  <Text style={{ color: '#94A3B8', marginTop: verticalScale(12), fontSize: moderateScale(14) }}>{t('no_notifications')}</Text>
+                  <Ionicons name="notifications-off-outline" size={45} color="#E2E8F0" />
+                  <Text style={{ color: '#94A3B8', marginTop: 12, fontSize: 14 }}>{t('no_notifications')}</Text>
                 </View>
               )}
             </ScrollView>
@@ -602,44 +601,44 @@ const styles = RNStyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    paddingTop: verticalScale(40),
+    paddingTop: 40,
   },
   featuredCard: {
-    width: scale(SCREEN_WIDTH - 32),
-    marginHorizontal: scale(16),
+    width: SCREEN_WIDTH - 32,
+    marginHorizontal: 16,
     backgroundColor: '#FFF',
-    borderRadius: scale(20),
-    marginBottom: verticalScale(16),
+    borderRadius: 20,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: '#F1F5F9',
     shadowColor: '#1E293B',
-    shadowOffset: { width: 0, height: verticalScale(6) },
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.1,
-    shadowRadius: scale(12),
+    shadowRadius: 12,
     elevation: 4,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: scale(24),
-    marginBottom: verticalScale(10),
+    paddingHorizontal: 24,
+    marginBottom: 10,
   },
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: scale(12),
+    gap: 12,
   },
   avatar: {
-    width: scale(50),
-    height: scale(50),
-    borderRadius: scale(25),
+    width: 50,
+    height: 50,
+    borderRadius: 26, // Half of 52 to make it a circle
     backgroundColor: '#F1F5F9',
   },
   avatarPlaceholder: {
-    width: scale(50),
-    height: scale(50),
-    borderRadius: scale(25),
+    width: 50,
+    height: 50,
+    borderRadius: 25, // Half of 52 to make it a circle
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F1F5F9',
@@ -648,30 +647,30 @@ const styles = RNStyleSheet.create({
     justifyContent: 'center',
   },
   helloText: {
-    fontSize: moderateScale(13),
+    fontSize: 13,
     color: '#1E293B',
     fontWeight: '700',
     letterSpacing: 0.3,
   },
   userName: {
-    fontSize: moderateScale(20),
+    fontSize: 20,
     fontWeight: '900',
     color: '#1E293B',
   },
   notificationBtnSimple: {
-    width: scale(52),
-    height: scale(52),
+    width: 52,
+    height: 52,
     justifyContent: 'center',
     alignItems: 'center',
   },
   notificationBadge: {
     position: 'absolute',
-    top: verticalScale(-2),
-    right: scale(-4),
+    top: -2,
+    right: -4,
     backgroundColor: '#EF4444',
-    width: scale(18),
-    height: scale(18),
-    borderRadius: scale(9),
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1.5,
@@ -681,78 +680,78 @@ const styles = RNStyleSheet.create({
   },
   badgeText: {
     color: '#FFF',
-    fontSize: moderateScale(10),
+    fontSize: 10,
     fontWeight: '900',
     textAlign: 'center',
     textAlignVertical: 'center',
     includeFontPadding: false,
-    lineHeight: verticalScale(14),
+    lineHeight: 14,
   },
   filterBtn: {
-    width: scale(58),
-    height: scale(58),
+    width: 58,
+    height: 58,
     backgroundColor: '#1E293B',
-    borderRadius: scale(20),
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: verticalScale(4) },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
-    shadowRadius: scale(10),
+    shadowRadius: 10,
     elevation: 5,
   },
   content: {
     flex: 1,
   },
   promoBanner: {
-    marginHorizontal: scale(24),
-    height: verticalScale(170),
+    marginHorizontal: 24,
+    height: 170,
     backgroundColor: '#DBEAFE',
-    borderRadius: scale(28),
+    borderRadius: 28,
     flexDirection: 'row',
     overflow: 'hidden',
-    marginBottom: verticalScale(7),
+    marginBottom: 7,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.5)',
   },
   promoLeft: {
     flex: 1.3,
-    padding: scale(24),
+    padding: 24,
     justifyContent: 'center',
     zIndex: 2,
   },
   promoOff: {
-    fontSize: moderateScale(13),
+    fontSize: 13,
     color: '#3B82F6',
     fontWeight: '800',
-    marginBottom: verticalScale(8),
+    marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   promoTitle: {
-    fontSize: moderateScale(18),
+    fontSize: 18,
     fontWeight: '900',
     color: '#1E293B',
-    marginBottom: verticalScale(18),
-    lineHeight: verticalScale(24),
+    marginBottom: 18,
+    lineHeight: 24,
   },
   bookBtn: {
     backgroundColor: '#1E293B',
-    paddingHorizontal: scale(20),
-    paddingVertical: verticalScale(12),
-    borderRadius: scale(14),
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 14,
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: scale(8),
+    gap: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: verticalScale(4) },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
-    shadowRadius: scale(8),
+    shadowRadius: 8,
   },
   bookBtnText: {
     color: '#FFF',
-    fontSize: moderateScale(13),
+    fontSize: 13,
     fontWeight: '800',
   },
   promoImage: {
@@ -765,134 +764,134 @@ const styles = RNStyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: scale(20),
+    paddingHorizontal: 20,
     marginTop: 0,
     marginBottom: 0,
-    paddingTop: verticalScale(5),
+    paddingTop: 5,
     paddingBottom: 0,
   },
   viewAllText: {
     color: '#64748B',
-    fontSize: moderateScale(13),
+    fontSize: 13,
     fontWeight: '600',
   },
   sectionTitle: {
-    fontSize: moderateScale(20),
+    fontSize: 20,
     fontWeight: '900',
     color: '#1E293B',
-    lineHeight: verticalScale(30),
+    lineHeight: 30,
     paddingBottom: 0,
   },
   categoryGrid: {
     flexDirection: 'row',
-    paddingHorizontal: scale(20),
+    paddingHorizontal: 20,
     justifyContent: 'space-between',
     marginBottom: 0,
-    marginTop: verticalScale(10),
+    marginTop: 10,
   },
   categoryCol: {
     width: CATEGORY_CARD_WIDTH,
   },
   serviceCardMini: {
     backgroundColor: '#FFF',
-    borderRadius: scale(18),
-    paddingVertical: verticalScale(12),
+    borderRadius: 18,
+    paddingVertical: 12,
     alignItems: 'center',
     shadowColor: '#1E293B',
-    shadowOffset: { width: 0, height: verticalScale(4) },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
-    shadowRadius: scale(8),
+    shadowRadius: 8,
     elevation: 3,
     borderWidth: 1,
     borderColor: '#F8FAFC',
   },
   iconCircle: {
-    width: scale(44),
-    height: scale(44),
-    borderRadius: scale(22),
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#F8FAFC',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: verticalScale(8),
+    marginBottom: 8,
     borderWidth: 1,
     borderColor: '#F1F5F9',
   },
   serviceIconImage: {
-    width: scale(38),
-    height: scale(38),
-    marginBottom: verticalScale(8),
+    width: 38,
+    height: 38,
+    marginBottom: 8,
   },
   serviceLabelMini: {
-    fontSize: moderateScale(10),
+    fontSize: 10,
     fontWeight: '800',
     color: '#334155',
     textAlign: 'center',
-    lineHeight: verticalScale(16),
-    paddingHorizontal: scale(2),
+    lineHeight: 16,
+    paddingHorizontal: 2,
   },
   iconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   iconBox: {
-    width: scale(68),
-    height: scale(68),
-    borderRadius: scale(24),
+    width: 68,
+    height: 68,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: verticalScale(10),
+    marginBottom: 10,
     backgroundColor: '#FFF',
     shadowColor: '#1E293B',
-    shadowOffset: { width: 0, height: verticalScale(6) },
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.1,
-    shadowRadius: scale(12),
+    shadowRadius: 12,
     elevation: 4,
     borderWidth: 1.5,
     borderColor: '#FFF',
   },
   itemLabel: {
-    fontSize: moderateScale(12),
+    fontSize: 12,
     fontWeight: '800',
     color: '#334155',
     textAlign: 'center',
-    marginTop: verticalScale(2),
+    marginTop: 2,
   },
   comingSoonSub: {
-    fontSize: moderateScale(16),
+    fontSize: 16,
     color: '#64748b',
     textAlign: 'center',
-    marginTop: verticalScale(10),
+    marginTop: 10,
   },
   // Toast Styles
   toastContainer: {
     position: 'absolute',
     top: 0,
-    left: scale(20),
-    right: scale(20),
-    height: verticalScale(56),
-    borderRadius: scale(20),
+    left: 20,
+    right: 20,
+    height: 56,
+    borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: scale(16),
+    paddingHorizontal: 16,
     zIndex: 9999,
-    shadowOffset: { width: 0, height: verticalScale(10) },
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
-    shadowRadius: scale(20),
+    shadowRadius: 20,
     elevation: 10,
   },
   toastIcon: {
-    width: scale(32),
-    height: scale(32),
-    borderRadius: scale(16),
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   toastText: {
     color: '#FFF',
-    fontSize: moderateScale(15),
+    fontSize: 15,
     fontWeight: '700',
-    marginLeft: scale(12),
+    marginLeft: 12,
     flex: 1,
     letterSpacing: 0.2,
   },
@@ -901,8 +900,8 @@ const styles = RNStyleSheet.create({
     aspectRatio: 16 / 10,
     position: 'relative',
     overflow: 'hidden',
-    borderTopLeftRadius: scale(20),
-    borderTopRightRadius: scale(20),
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   cardImage: {
     width: '100%',
@@ -910,45 +909,45 @@ const styles = RNStyleSheet.create({
   },
   cardOverlay: {
     ...StyleSheet.absoluteFillObject,
-    padding: scale(16),
+    padding: 16,
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'flex-start',
   },
   tagBadge: {
-    paddingHorizontal: scale(10),
-    paddingVertical: verticalScale(5),
-    borderRadius: scale(8),
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
   },
   tagText: {
     color: '#FFF',
-    fontSize: moderateScale(9),
+    fontSize: 9,
     fontWeight: '800',
     textTransform: 'uppercase',
   },
   heartBtn: {
-    width: scale(42),
-    height: scale(42),
-    borderRadius: scale(21),
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: '#ffffffff',
     justifyContent: 'center',
     alignItems: 'center',
   },
   cardContent: {
-    padding: scale(18),
+    padding: 18,
   },
   cardHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: verticalScale(8),
+    marginBottom: 8,
   },
   cardTitle: {
-    fontSize: moderateScale(18),
+    fontSize: 18,
     fontWeight: '900',
     color: '#1E293B',
     flex: 1,
-    marginRight: scale(10),
+    marginRight: 10,
   },
   cardFooter: {
     flexDirection: 'row',
@@ -960,7 +959,7 @@ const styles = RNStyleSheet.create({
     alignItems: 'center',
   },
   locationText: {
-    fontSize: moderateScale(13),
+    fontSize: 13,
     color: '#64748B',
     fontWeight: '600',
   },
@@ -969,24 +968,24 @@ const styles = RNStyleSheet.create({
     alignItems: 'center',
   },
   reviewText: {
-    fontSize: moderateScale(12),
+    fontSize: 12,
     color: '#94A3B8',
     fontWeight: '500',
   },
   primaryBtnText: {
-    fontSize: moderateScale(14),
+    fontSize: 14,
     fontWeight: '900',
     color: '#FFF',
   },
   featuredLoader: {
-    paddingVertical: verticalScale(50),
+    paddingVertical: 50,
     alignItems: 'center',
     justifyContent: 'center',
   },
   loaderText: {
-    marginTop: verticalScale(10),
+    marginTop: 10,
     color: '#888',
-    fontSize: moderateScale(14),
+    fontSize: 14,
   },
   // Notification Styles
   modalOverlay: {
@@ -996,61 +995,61 @@ const styles = RNStyleSheet.create({
   },
   notificationContainer: {
     backgroundColor: '#FFF',
-    borderTopLeftRadius: scale(30),
-    borderBottomLeftRadius: scale(30),
+    borderTopLeftRadius: 30,
+    borderBottomLeftRadius: 30,
     width: '85%',
     height: '100%',
-    padding: scale(24),
+    padding: 24,
     alignSelf: 'flex-end',
     elevation: 20,
     shadowColor: '#000',
-    shadowOffset: { width: scale(-5), height: 0 },
+    shadowOffset: { width: -5, height: 0 },
     shadowOpacity: 0.1,
-    shadowRadius: scale(15),
+    shadowRadius: 15,
   },
   nHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: verticalScale(20),
+    marginBottom: 20,
   },
   nTitle: {
-    fontSize: moderateScale(21),
+    fontSize: 21,
     fontWeight: '900',
     color: '#1E293B',
-    marginTop: verticalScale(20),
+    marginTop: 20,
   },
   nList: {
     flex: 1,
   },
   nPromo: {
-    marginBottom: verticalScale(20),
-    borderRadius: scale(15),
+    marginBottom: 20,
+    borderRadius: 15,
     overflow: 'hidden',
   },
   nPromoGradient: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: scale(15),
-    gap: scale(10),
+    padding: 15,
+    gap: 10,
   },
   nPromoText: {
     color: '#FFF',
     fontWeight: '800',
-    fontSize: moderateScale(14),
+    fontSize: 14,
   },
   nItem: {
     flexDirection: 'row',
-    gap: scale(15),
-    marginBottom: verticalScale(20),
-    paddingBottom: verticalScale(15),
+    gap: 15,
+    marginBottom: 20,
+    paddingBottom: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
   },
   nIcon: {
-    width: scale(45),
-    height: scale(43),
-    borderRadius: scale(10),
+    width: 45,
+    height: 43,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1058,19 +1057,19 @@ const styles = RNStyleSheet.create({
     flex: 1,
   },
   nItemTitle: {
-    fontSize: moderateScale(15),
+    fontSize: 15,
     fontWeight: '500', // Chỉ dùng mức trung bình cho nội dung chung
     color: '#1E293B',
-    marginBottom: verticalScale(4),
+    marginBottom: 4,
   },
   nItemBody: {
-    fontSize: moderateScale(13),
+    fontSize: 13,
     color: '#64748B',
-    marginBottom: verticalScale(6),
-    lineHeight: verticalScale(18),
+    marginBottom: 6,
+    lineHeight: 18,
   },
   nItemTime: {
-    fontSize: moderateScale(11),
+    fontSize: 11,
     color: '#94A3B8',
     fontWeight: '500',
   },
