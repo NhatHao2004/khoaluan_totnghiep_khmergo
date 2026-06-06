@@ -16,6 +16,7 @@ const AdminDashboard = () => {
     posts: 0
   });
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [allSortedUsers, setAllSortedUsers] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('weekly');
   const leaderboardRef = useRef<ScrollView>(null);
 
@@ -44,30 +45,18 @@ const AdminDashboard = () => {
       setStats(prev => ({ ...prev, posts: snap.size }));
     });
 
-    // Lấy bảng xếp hạng (Lấy toàn bộ để tự sort, tránh mất người dùng 0 điểm)
+    // Lấy bảng xếp hạng (chỉ chạy 1 lần, lưu toàn bộ)
     const unsubLeaderboard = onSnapshot(collection(db, 'users'), (snap) => {
       const allUsers = snap.docs.map(doc => ({ 
         id: doc.id, 
         ...doc.data() 
-      })).filter(user => (user as any).role !== 'Quản trị viên'); // Không hiện admin trên bảng xếp hạng
+      })).filter(user => (user as any).role !== 'Quản trị viên');
 
-      // Sắp xếp theo điểm giảm dần
       const sortedUsers = allUsers.sort((a: any, b: any) => {
-        const pointsA = a.points || 0;
-        const pointsB = b.points || 0;
-        return pointsB - pointsA;
+        return (b.points || 0) - (a.points || 0);
       });
 
-      // Cắt theo limit của tab: Tuần 10 - Tất cả 20
-      const leaderboardLimit = activeTab === 'all' ? 20 : 10;
-      const topUsers = sortedUsers.slice(0, leaderboardLimit);
-      
-      // Tạo danh sách đầy đủ (hiện cột trống nếu thiếu người)
-      const fullList = Array.from({ length: leaderboardLimit }, (_, i) => {
-        return topUsers[i] || { id: `empty-${i}`, name: '---', points: 0, dummy: true };
-      });
-      
-      setLeaderboard(fullList);
+      setAllSortedUsers(sortedUsers);
     });
 
     return () => {
@@ -79,9 +68,14 @@ const AdminDashboard = () => {
     };
   }, []);
 
-  const top1 = leaderboard[0];
-  const top2 = leaderboard[1];
-  const top3 = leaderboard[2];
+  // Tính danh sách hiển thị dựa trên tab (không gọi lại Firebase)
+  const displayedLeaderboard = (() => {
+    const leaderboardLimit = activeTab === 'all' ? 20 : 10;
+    const topUsers = allSortedUsers.slice(0, leaderboardLimit);
+    return Array.from({ length: leaderboardLimit }, (_, i) => {
+      return topUsers[i] || { id: `empty-${i}`, name: '---', points: 0, dummy: true };
+    });
+  })();
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -160,13 +154,13 @@ const AdminDashboard = () => {
         <View style={styles.tabContainer}>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'weekly' && styles.tabActive]}
-            onPress={() => { setActiveTab('weekly'); leaderboardRef.current?.scrollTo({ x: 0, animated: true }); }}
+            onPress={() => { leaderboardRef.current?.scrollTo({ x: 0, animated: false }); setActiveTab('weekly'); }}
           >
             <Text style={[styles.tabText, activeTab === 'weekly' && styles.tabTextActive]}>Hàng ngày</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'all' && styles.tabActive]}
-            onPress={() => { setActiveTab('all'); leaderboardRef.current?.scrollTo({ x: 0, animated: true }); }}
+            onPress={() => { leaderboardRef.current?.scrollTo({ x: 0, animated: false }); setActiveTab('all'); }}
           >
             <Text style={[styles.tabText, activeTab === 'all' && styles.tabTextActive]}>Tất cả</Text>
           </TouchableOpacity>
@@ -179,8 +173,11 @@ const AdminDashboard = () => {
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.podiumScrollContent}
+          decelerationRate="fast"
+          bounces={true}
+          overScrollMode="always"
         >
-          {leaderboard.map((user, index) => {
+          {displayedLeaderboard.map((user, index) => {
             const rank = index + 1;
             const barColor = rank === 1 ? '#ef4444' : rank === 2 ? '#facc15' : rank === 3 ? '#22c55e' : '#94a3b8';
             const barHeight = rank === 1 ? 120 : rank === 2 ? 100 : rank === 3 ? 85 : 65;
