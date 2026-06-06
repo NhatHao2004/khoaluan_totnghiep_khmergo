@@ -126,10 +126,10 @@ const Dashboard = () => {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <span className="label" style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>{title}</span>
+        <span className="label" style={{ margin: 0, fontSize: 'clamp(0.75rem, 2.5vw, 0.875rem)', fontWeight: 600, whiteSpace: 'nowrap' }}>{title}</span>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.3rem' }}>
-          <h3 className="value" style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800 }}>{value}</h3>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 500 }}>tổng cộng</span>
+          <h3 className="value" style={{ margin: 0, fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: 800 }}>{value}</h3>
+          <span className="mobile-hidden" style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 500 }}>tổng cộng</span>
         </div>
       </div>
     </div>
@@ -139,7 +139,7 @@ const Dashboard = () => {
     <div className="fade-in">
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: 'clamp(1.25rem, 5vw, 1.75rem)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Tổng quan hệ thống</h1>
-        <p style={{ color: 'var(--text-secondary)', marginTop: '0.4rem', fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo</p>
+        <p style={{ color: 'var(--text-secondary)', marginTop: '0.4rem', fontSize: 'clamp(0.7rem, 2.3vw, 0.9rem)', whiteSpace: 'nowrap' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo</p>
       </div>
 
       <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
@@ -153,7 +153,7 @@ const Dashboard = () => {
 
       <div style={{ marginBottom: '2.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h2 style={{ fontSize: '1.125rem', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Biểu đồ bảng xếp hạng</h2>
+          <h2 style={{ fontSize: 'clamp(0.9rem, 3.5vw, 1.125rem)', fontWeight: 700, whiteSpace: 'nowrap' }}>Biểu đồ bảng xếp hạng</h2>
           <div style={{ display: 'flex', background: 'var(--bg-accent)', padding: '4px', borderRadius: '12px', gap: '4px' }}>
             <button
               onClick={() => setLeaderboardType('weekly')}
@@ -277,7 +277,7 @@ const Dashboard = () => {
             {logs.length === 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', justifyContent: 'center', height: '100%', opacity: 0.5 }}>
                 <MessageSquare size={32} style={{ marginBottom: '1rem' }} />
-                <p style={{ fontSize: '0.875rem', whiteSpace: 'nowrap' }}>Không có hoạt động mới nào được ghi nhận lại</p>
+                <p style={{ fontSize: 'clamp(0.75rem, 2.8vw, 0.875rem)', whiteSpace: 'nowrap' }}>Không có hoạt động mới nào được ghi nhận lại</p>
               </div>
             ) : (
               logs.map((item: any) => {
