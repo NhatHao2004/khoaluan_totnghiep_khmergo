@@ -202,9 +202,7 @@ html, body {
 
 .top-bar {
   height: var(--header-height);
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border-light);
   display: flex;
   align-items: center;
@@ -212,7 +210,8 @@ html, body {
   padding: 0 1rem;
   position: sticky;
   top: 0;
-  z-index: 900;
+  z-index: 1000;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
 }
 
 @media (min-width: 768px) {
