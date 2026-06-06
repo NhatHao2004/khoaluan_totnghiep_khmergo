@@ -123,10 +123,10 @@ const Dashboard = () => {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <span className="label" style={{ margin: 0, fontSize: 'clamp(0.75rem, 2.5vw, 0.875rem)', fontWeight: 600, whiteSpace: 'nowrap' }}>{title}</span>
+        <span className="label" style={{ margin: 0, fontSize: 'clamp(0.6rem, 2.5vw, 0.875rem)', fontWeight: 600, whiteSpace: 'nowrap' }}>{title}</span>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.3rem' }}>
           <h3 className="value" style={{ margin: 0, fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: 800 }}>{value}</h3>
-          <span style={{ fontSize: 'clamp(0.55rem, 2vw, 0.7rem)', color: 'var(--text-muted)', fontWeight: 500, whiteSpace: 'nowrap' }}>tổng cộng</span>
+          <span style={{ fontSize: 'clamp(0.5rem, 2vw, 0.7rem)', color: 'var(--text-muted)', fontWeight: 500, whiteSpace: 'nowrap' }}>tổng cộng</span>
         </div>
       </div>
     </div>
@@ -136,7 +136,7 @@ const Dashboard = () => {
     <div className="fade-in">
       <div style={{ marginBottom: '1.5rem', marginTop: '1rem' }}>
         <h1 style={{ fontSize: 'clamp(1.25rem, 5vw, 1.75rem)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Tổng quan hệ thống</h1>
-        <p style={{ color: 'var(--text-secondary)', marginTop: '0.4rem', fontSize: 'clamp(0.7rem, 2.3vw, 0.9rem)', whiteSpace: 'nowrap' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo</p>
+        <p style={{ color: 'var(--text-secondary)', marginTop: '0.4rem', fontSize: 'clamp(0.6rem, 2vw, 0.85rem)', whiteSpace: 'nowrap' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo</p>
       </div>
 
 
@@ -225,7 +225,7 @@ const Dashboard = () => {
                     <div style={{ width: rank === 1 ? '60px' : '48px', height: rank === 1 ? '60px' : '48px', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', overflow: 'hidden', margin: '0 auto 0.4rem', background: 'white' }}>
                       {user?.avatar && user.avatar !== "" ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={rank === 1 ? 28 : 20} style={{ margin: rank === 1 ? '16px' : '14px', color: '#94a3b8' }} />}
                     </div>
-                    <p style={{ fontWeight: 800, fontSize: 'clamp(0.55rem, 1.8vw, 0.7rem)', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'clip' }}>{user?.name || '---'}</p>
+                    <p style={{ fontWeight: 800, fontSize: 'clamp(0.45rem, 1.5vw, 0.7rem)', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'clip' }}>{user?.name || '---'}</p>
                     <p style={{ fontSize: '0.6rem', color: 'var(--text-muted)', fontWeight: 800 }}>{user?.points || 0} Điểm</p>
                   </div>
                   <motion.div
@@ -249,7 +249,7 @@ const Dashboard = () => {
                     <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', overflow: 'hidden', margin: '0 auto 0.4rem', background: 'white' }}>
                       {user?.avatar && user.avatar !== "" ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={16} style={{ margin: '10px', color: '#cbd5e1' }} />}
                     </div>
-                    <p style={{ fontWeight: 700, fontSize: 'clamp(0.5rem, 1.5vw, 0.65rem)', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'clip', color: '#64748b' }}>{user?.name || '---'}</p>
+                    <p style={{ fontWeight: 700, fontSize: 'clamp(0.4rem, 1.2vw, 0.6rem)', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'clip', color: '#64748b' }}>{user?.name || '---'}</p>
                     <p style={{ fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700 }}>{user?.points || 0} Điểm</p>
                   </div>
                   <motion.div
