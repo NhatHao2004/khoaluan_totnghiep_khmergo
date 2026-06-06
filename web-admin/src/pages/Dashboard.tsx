@@ -347,9 +347,9 @@ const Dashboard = () => {
                 <button onClick={() => setIsHistoryOpen(false)} className="btn" style={{ padding: '8px', background: 'var(--bg-accent)', color: 'var(--danger)' }}><X size={25} /></button>
               </div>
 
-              <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid var(--border-light)', paddingBottom: '1rem' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', borderBottom: '1px solid var(--border-light)', paddingBottom: '1rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }} className="custom-scrollbar">
                 {['all', 'users', 'feedback', 'system'].map((tab) => (
-                  <button key={tab} onClick={() => setActiveTab(tab)} style={{ border: 'none', background: 'transparent', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.875rem', fontWeight: 700, color: activeTab === tab ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', position: 'relative', transition: 'all 0.2s' }}>
+                  <button key={tab} onClick={() => setActiveTab(tab)} style={{ border: 'none', background: 'transparent', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.8125rem', fontWeight: 700, color: activeTab === tab ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', position: 'relative', transition: 'all 0.2s', whiteSpace: 'nowrap', flexShrink: 0 }}>
                     {tab === 'all' ? 'Tất cả' : tab === 'users' ? 'Người dùng' : tab === 'feedback' ? 'Phản hồi' : 'Hệ thống'}
                     {activeTab === tab && <motion.div layoutId="tab-underline" style={{ position: 'absolute', bottom: '-1rem', left: 0, right: 0, height: '3px', background: 'var(--primary)', borderRadius: '10px' }} />}
                   </button>

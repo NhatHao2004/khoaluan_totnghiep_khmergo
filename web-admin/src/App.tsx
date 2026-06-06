@@ -389,12 +389,11 @@ function App() {
         {/* System Trash Modal */}
         <AnimatePresence>
           {showTrash && (
-            <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '1.5rem' }}>
+            <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '1rem' }}>
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(10px)' }} onClick={() => setShowTrash(false)} />
-              <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} style={{ position: 'relative', width: '100%', maxWidth: '900px', height: '80vh', background: 'white', borderRadius: '32px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-
+              <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} style={{ position: 'relative', width: '100%', maxWidth: '900px', maxHeight: '85vh', background: 'white', borderRadius: '32px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 {/* Modal Header */}
-                <div style={{ padding: '2rem 2.5rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ padding: 'clamp(1rem, 5vw, 2rem) clamp(1rem, 5vw, 2.5rem)', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b', marginBottom: '0.25rem' }}>Khôi phục dữ liệu</h2>
                     <p style={{ fontSize: '0.875rem', color: '#64748b' }}>Phục hồi các nội dung đã xóa trong 30 ngày</p>
@@ -402,8 +401,8 @@ function App() {
                   <button onClick={() => setShowTrash(false)} style={{ width: '44px', height: '44px', borderRadius: '14px', border: 'none', background: '#f8fafc', color: '#ff0000ff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="hover-bright"><X size={25} /></button>
                 </div>
 
-                {/* Modal Tabs */}
-                <div style={{ padding: '1rem 2.5rem', background: '#f8fafc', display: 'flex', gap: '0.5rem' }}>
+                {/* Modal Tabs - Responsive Scroll */}
+                <div style={{ padding: '0.75rem 1rem', background: '#f8fafc', display: 'flex', gap: '0.5rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }} className="custom-scrollbar">
                   {[
                     { key: 'destinations', label: 'Nội dung học tập' },
                     { key: 'challenges', label: 'Các bài thử thách' },
@@ -413,7 +412,7 @@ function App() {
                     <button
                       key={tab.key}
                       onClick={() => setTrashActiveTab(tab.key)}
-                      style={{ padding: '0.75rem 1.25rem', borderRadius: '12px', border: 'none', background: trashActiveTab === tab.key ? 'white' : 'transparent', color: trashActiveTab === tab.key ? '#3b82f6' : '#64748b', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.6rem', boxShadow: trashActiveTab === tab.key ? '0 4px 12px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }}
+                      style={{ padding: '0.6rem 1rem', borderRadius: '12px', border: 'none', background: trashActiveTab === tab.key ? 'white' : 'transparent', color: trashActiveTab === tab.key ? '#3b82f6' : '#64748b', fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: trashActiveTab === tab.key ? '0 4px 12px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s', whiteSpace: 'nowrap', flexShrink: 0 }}
                     >
                       {tab.label}
                     </button>
@@ -430,18 +429,16 @@ function App() {
                   ) : (
                     <div style={{ display: 'grid', gap: '1rem' }}>
                       {trashItems.filter(item => item.type === trashActiveTab).map((item: any) => (
-                        <div key={item.id} style={{ padding: '1.25rem', borderRadius: '20px', border: '1px solid #f1f5f9', background: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.2s' }} className="hover-shadow">
-                          <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
-                            <div>
-                              <h4 style={{ fontWeight: 700, color: '#1e293b', marginBottom: '0.25rem', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <div key={item.id} style={{ padding: '1rem', borderRadius: '20px', border: '1px solid #f1f5f9', background: 'white', display: 'flex', flexDirection: 'column', gap: '1rem', transition: 'all 0.2s' }} className="hover-shadow">
+                          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                            <div style={{ flex: 1 }}>
+                              <h4 style={{ fontWeight: 700, color: '#1e293b', marginBottom: '0.25rem', maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                 {item.data?.name || item.data?.title || item.data?.pagodaName || item.data?.content || 'Không có tiêu đề'}
                               </h4>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.75rem', color: '#64748b' }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>Đã xóa: {item.deletedAt?.toDate().toLocaleString('vi-VN')}</span>
-                              </div>
+                              <p style={{ fontSize: '0.7rem', color: '#64748b' }}>Đã xóa: {item.deletedAt?.toDate().toLocaleString('vi-VN')}</p>
                             </div>
                           </div>
-                          <div style={{ display: 'flex', gap: '0.75rem' }}>
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
                             <button
                               onClick={async () => {
                                 if (isProcessing) return;
