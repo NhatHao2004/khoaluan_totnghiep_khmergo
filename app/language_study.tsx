@@ -515,7 +515,6 @@ const styles = StyleSheet.create({
     color: '#5F6368',
     fontStyle: 'italic',
     marginTop: 5,
-    paddingHorizontal: 20,
     width: '100%',
   },
   inputFooter: {
