@@ -82,7 +82,7 @@ export const translations: any = {
     culture_quiz: 'Văn hóa Khmer',
     food_quiz: 'Ẩm thực Khmer',
     vocab_quiz: 'Học tiếng Khmer',
-    vocab_quiz_subtitle: 'Ghép từ Khmer - Tiếng Việt',
+    vocab_quiz_subtitle: 'Ghép tiếng Khmer - tiếng Việt',
     vocab_challenge_questions: 'câu hỏi thử thách từ vựng',
     correct_answer_points_msg: 'Cộng 5 điểm cho mỗi câu đúng',
     login_required_long_msg: 'Bạn cần đăng nhập để tham gia thử thách và tích luỵ điểm xếp hạng',
