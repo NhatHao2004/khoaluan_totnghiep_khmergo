@@ -394,12 +394,12 @@ function App() {
               <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} style={{ position: 'relative', width: '100%', maxWidth: '900px', height: '80vh', background: 'white', borderRadius: '32px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
 
                 {/* Modal Header */}
-                <div style={{ padding: '2rem 2.5rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ padding: 'clamp(1rem, 5vw, 2rem) clamp(1.25rem, 5vw, 2.5rem)', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b', marginBottom: '0.25rem' }}>Khôi phục dữ liệu</h2>
-                    <p style={{ fontSize: '0.875rem', color: '#64748b' }}>Phục hồi các nội dung đã xóa trong 30 ngày</p>
+                    <h2 style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: 800, color: '#1e293b', marginBottom: '0.25rem' }}>Khôi phục dữ liệu</h2>
+                    <p style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)', color: '#64748b' }}>Phục hồi các nội dung đã xóa trong 30 ngày</p>
                   </div>
-                  <button onClick={() => setShowTrash(false)} style={{ width: '44px', height: '44px', borderRadius: '14px', border: 'none', background: '#f8fafc', color: '#ff0000ff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="hover-bright"><X size={25} /></button>
+                  <button onClick={() => setShowTrash(false)} style={{ width: '40px', height: '40px', borderRadius: '12px', border: 'none', background: '#f8fafc', color: '#ff0000ff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="hover-bright"><X size={22} /></button>
                 </div>
 
                 {/* Modal Tabs */}

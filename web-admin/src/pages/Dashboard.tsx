@@ -135,8 +135,8 @@ const Dashboard = () => {
   return (
     <div className="fade-in">
       <div style={{ marginBottom: '1.5rem', marginTop: '1rem' }}>
-        <h1 style={{ fontSize: 'clamp(1.25rem, 5vw, 1.75rem)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Tổng quan hệ thống</h1>
-        <p style={{ color: 'var(--text-secondary)', marginTop: '0.4rem', fontSize: 'clamp(0.7rem, 2.3vw, 0.9rem)', whiteSpace: 'nowrap' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo</p>
+        <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2rem)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Tổng quan hệ thống</h1>
+        <p style={{ color: 'var(--text-secondary)', marginTop: '0.4rem', fontSize: 'clamp(0.625rem, 2vw, 0.75rem)', whiteSpace: 'nowrap' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo</p>
       </div>
 
 
@@ -149,41 +149,30 @@ const Dashboard = () => {
       </div>
 
       <div style={{ marginBottom: '2.5rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h2 style={{ fontSize: 'clamp(0.9rem, 3.5vw, 1.125rem)', fontWeight: 700, whiteSpace: 'nowrap' }}>Biểu đồ bảng xếp hạng</h2>
-          <div style={{ display: 'flex', background: 'var(--bg-accent)', padding: '4px', borderRadius: '12px', gap: '4px' }}>
-            <button
-              onClick={() => setLeaderboardType('weekly')}
-              style={{
-                padding: '6px 14px',
-                borderRadius: '9px',
-                border: 'none',
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                background: leaderboardType === 'weekly' ? '#3b82f6' : 'transparent',
-                color: leaderboardType === 'weekly' ? 'white' : 'var(--text-muted)',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              Hàng tuần
-            </button>
-            <button
-              onClick={() => setLeaderboardType('all')}
-              style={{
-                padding: '6px 14px',
-                borderRadius: '9px',
-                border: 'none',
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                background: leaderboardType === 'all' ? '#3b82f6' : 'transparent',
-                color: leaderboardType === 'all' ? 'white' : 'var(--text-muted)',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              Tất cả
-            </button>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
+          <h2 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.5rem)', fontWeight: 800, color: 'var(--text-primary)' }}>Biểu đồ bảng xếp hạng</h2>
+          
+          <div style={{ display: 'flex', background: 'var(--bg-accent)', padding: '0.3rem', borderRadius: '12px', gap: '0.25rem' }}>
+            {['weekly', 'all'].map((type) => (
+              <button
+                key={type}
+                onClick={() => setLeaderboardType(type as any)}
+                style={{
+                  padding: '0.5rem 1rem',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: leaderboardType === type ? 'var(--primary)' : 'transparent',
+                  color: leaderboardType === type ? 'white' : 'var(--text-secondary)',
+                  fontSize: 'clamp(0.625rem, 2vw, 0.75rem)',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {type === 'weekly' ? 'Hàng tuần' : 'Tất cả'}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -272,8 +261,8 @@ const Dashboard = () => {
       <div>
         <div className="card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
-            <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Hoạt động gần đây</h2>
-            <button className="btn" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem', background: '#3b82f6', color: '#fff', borderRadius: '10px', fontWeight: 700, minHeight: '36px' }} onClick={() => { setIsHistoryOpen(true); setActiveTab('all'); }}>
+            <h2 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.5rem)', fontWeight: 800, color: 'var(--text-primary)' }}>Hoạt động gần đây</h2>
+            <button className="btn" style={{ fontSize: 'clamp(0.625rem, 2vw, 0.75rem)', padding: '0.5rem 1rem', background: '#3b82f6', color: '#fff', borderRadius: '10px', fontWeight: 700, minHeight: '36px' }} onClick={() => { setIsHistoryOpen(true); setActiveTab('all'); }}>
               Xem tất cả
             </button>
           </div>
@@ -450,9 +439,9 @@ const ActivityItem = ({ title, time, desc, icon: Icon, color }: any) => (
     </div>
     <div style={{ flex: 1 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.25rem' }}>
-        <h4 style={{ fontWeight: 800, fontSize: '0.95rem' }}>{title}</h4>
+        <h4 style={{ fontWeight: 800, fontSize: 'clamp(0.875rem, 2.5vw, 1rem)' }}>{title}</h4>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{time}</span>
+          <span style={{ fontSize: '0.625rem', color: 'var(--text-muted)', fontWeight: 600 }}>{time}</span>
         </div>
       </div>
       <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{desc}</p>
@@ -461,4 +450,3 @@ const ActivityItem = ({ title, time, desc, icon: Icon, color }: any) => (
 );
 
 export default Dashboard;
-
