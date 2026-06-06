@@ -359,8 +359,12 @@ const Challenges = () => {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
                 <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{isAddingNew ? 'Thử thách mới' : 'Cập nhật Thử thách'}</h2>
               </div>
-              <div style={{ flex: 1, overflowY: 'auto', paddingRight: '1rem' }} className="custom-scrollbar">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2.5rem' }}>
+              <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }} className="custom-scrollbar">
+                <style>{`
+                  .editor-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+                  @media (min-width: 768px) { .editor-grid { grid-template-columns: 1fr 1fr; } }
+                `}</style>
+                <div className="editor-grid">
                   <InputField label="ID Thử thách" value={isAddingNew ? newItem.pagodaId : editingItem?.pagodaId} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, pagodaId: v }) : setEditingItem({ ...editingItem!, pagodaId: v })} disabled={!isAddingNew} />
                   <InputField
                     label={activeTab === 'Chùa' ? "Tên Ngôi chùa Khmer" : activeTab === 'Văn hóa' ? "Tên Văn hóa Khmer" : "Tên Ẩm thực Khmer"}
@@ -390,16 +394,16 @@ const Challenges = () => {
                           <div style={{ padding: '2rem', borderTop: '1px solid var(--border-light)', display: 'grid', gap: '2rem', background: 'white' }}>
                             <InputField label="Nội dung câu hỏi" textarea value={q.question} onChange={(v: string) => { const qs = [...(isAddingNew ? newItem.questions! : editingItem!.questions)]; qs[idx].question = v; isAddingNew ? setNewItem({ ...newItem, questions: qs }) : setEditingItem({ ...editingItem!, questions: qs }) }} />
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                            <div className="editor-grid">
                               {q.options.map((opt, oIdx) => (
-                                <div key={oIdx} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                <div key={oIdx} style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                                   <div
                                     style={{
                                       width: '36px', height: '36px', borderRadius: '12px',
                                       background: q.correctIndex === oIdx ? 'var(--danger)' : 'var(--bg-accent)',
                                       color: q.correctIndex === oIdx ? 'white' : 'var(--text-muted)',
                                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                      fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s',
+                                      fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s', flexShrink: 0,
                                       boxShadow: q.correctIndex === oIdx ? '0 4px 12px rgba(239, 68, 68, 0.3)' : 'none'
                                     }}
                                     onClick={() => { const qs = [...(isAddingNew ? newItem.questions! : editingItem!.questions)]; qs[idx].correctIndex = oIdx; isAddingNew ? setNewItem({ ...newItem, questions: qs }) : setEditingItem({ ...editingItem!, questions: qs }) }}
@@ -411,7 +415,6 @@ const Challenges = () => {
                                     value={opt}
                                     placeholder={`Đáp án ${String.fromCharCode(65 + oIdx)}`}
                                     onChange={(e) => { const qs = [...(isAddingNew ? newItem.questions! : editingItem!.questions)]; qs[idx].options[oIdx] = e.target.value; isAddingNew ? setNewItem({ ...newItem, questions: qs }) : setEditingItem({ ...editingItem!, questions: qs }) }}
-                                    style={{ padding: '10px 15px' }}
                                   />
                                 </div>
                               ))}

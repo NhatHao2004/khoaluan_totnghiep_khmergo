@@ -485,7 +485,12 @@ const Destinations = () => {
                   {viewingItem.contentBlocks?.map((block, idx) => {
                     const isEven = idx % 2 === 0;
                     return (
-                      <div key={idx} style={{ display: 'flex', flexDirection: isEven ? 'row' : 'row-reverse', gap: '5rem', alignItems: 'center' }}>
+                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }} className="responsive-flex-row">
+                        <style>{`
+                          @media (min-width: 1024px) {
+                            .responsive-flex-row { flex-direction: ${isEven ? 'row' : 'row-reverse'} !important; gap: 5rem !important; }
+                          }
+                        `}</style>
                         {/* Image Side */}
                         <div style={{ flex: 1.2 }}>
                           <img
@@ -495,20 +500,20 @@ const Destinations = () => {
                               e.target.onerror = null;
                               e.target.src = 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600';
                             }}
-                            style={{ width: '100%', height: '420px', objectFit: 'cover', borderRadius: '32px', boxShadow: 'var(--shadow-lg)' }}
+                            style={{ width: '100%', height: 'clamp(250px, 50vh, 420px)', objectFit: 'cover', borderRadius: '32px', boxShadow: 'var(--shadow-lg)' }}
                           />
                         </div>
 
                         {/* Text Side */}
                         <div style={{ flex: 1, textAlign: 'left' }}>
                           {viewLanguage === 'vi' && (
-                            <div style={{ padding: '2rem', background: 'var(--bg-accent)', borderRadius: '24px' }}>
+                            <div style={{ padding: 'clamp(1.25rem, 3vw, 2rem)', background: 'var(--bg-accent)', borderRadius: '24px' }}>
                               <h4 style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '1.5rem', letterSpacing: '0.1em' }}>Bản tiếng Việt</h4>
                               <p style={{ fontSize: '1rem', lineHeight: 1.8, color: '#000', textAlign: 'justify' }}>{block.value}</p>
                             </div>
                           )}
                           {viewLanguage === 'km' && (
-                            <div style={{ padding: '2rem', background: '#f8fafc', borderRadius: '24px', border: '1px solid var(--border-light)' }}>
+                            <div style={{ padding: 'clamp(1.25rem, 3vw, 2rem)', background: '#f8fafc', borderRadius: '24px', border: '1px solid var(--border-light)' }}>
                               <h4 style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '1.5rem', letterSpacing: '0.1em' }}>Bản tiếng Khmer</h4>
                               <p style={{ fontSize: '1rem', lineHeight: 1.8, color: '#000', fontStyle: 'italic' }}>{block.value_khmer || 'Nội dung chưa có bản dịch Khmer'}</p>
                             </div>
@@ -579,13 +584,17 @@ const Destinations = () => {
                 <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>{isAddingNew ? `Thêm ${activeTab}` : `Sửa ${activeTab}`}</h2>
               </div>
 
-              <div style={{ flex: 1, overflowY: 'auto', paddingRight: '1rem', display: 'grid', gap: '2rem' }} className="custom-scrollbar">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+              <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }} className="custom-scrollbar">
+                <style>{`
+                  .editor-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+                  @media (min-width: 768px) { .editor-grid { grid-template-columns: 1fr 1fr; } }
+                `}</style>
+                <div className="editor-grid">
                   <InputField label="Tên (Tiếng Việt)" value={isAddingNew ? newItem.name : editingItem?.name} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, name: v }) : setEditingItem({ ...editingItem!, name: v })} icon={AlignLeft} />
                   <InputField label="Tên (Tiếng Khmer)" value={isAddingNew ? newItem.name_khmer : editingItem?.name_khmer} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, name_khmer: v }) : setEditingItem({ ...editingItem!, name_khmer: v })} />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                <div className="editor-grid">
                   <InputField label={activeTab === 'Chùa' ? "Địa chỉ (Tiếng Việt)" : "Mô tả phụ (Tiếng Việt)"} value={isAddingNew ? newItem.location : editingItem?.location} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, location: v }) : setEditingItem({ ...editingItem!, location: v })} />
                   <InputField label={activeTab === 'Chùa' ? "Địa chỉ (Tiếng Khmer)" : "Mô tả phụ (Tiếng Khmer)"} value={isAddingNew ? newItem.location_khmer : editingItem?.location_khmer} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, location_khmer: v }) : setEditingItem({ ...editingItem!, location_khmer: v })} />
                 </div>
@@ -593,29 +602,29 @@ const Destinations = () => {
                 <InputField label="Link ảnh nền chính" value={isAddingNew ? newItem.imageUrl : editingItem?.imageUrl} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl: v }) : setEditingItem({ ...editingItem!, imageUrl: v })} icon={ImageIcon} />
                 <InputField label="Link ảnh nền phụ" value={isAddingNew ? newItem.imageUrl6 : editingItem?.imageUrl6} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl6: v }) : setEditingItem({ ...editingItem!, imageUrl6: v })} icon={ImageIcon} />
                 {activeTab !== 'Chùa' && (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', background: '#f8fafc', padding: '1.5rem', borderRadius: '20px' }}>
-                    <h4 style={{ gridColumn: '1 / -1', fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-                      Thư viện ảnh (5 ảnh)
-                    </h4>
-                    <InputField
-                      label="Ảnh bổ sung 1"
-                      value={isAddingNew ? newItem.imageUrl1 : editingItem?.imageUrl1}
-                      onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl1: v }) : setEditingItem({ ...editingItem!, imageUrl1: v })}
-                      placeholder="Link ảnh..."
-                    />
-                    {[2, 3, 4, 5].map(num => (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', background: '#f8fafc', padding: '1.25rem', borderRadius: '20px' }}>
+                    <h4 style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Thư viện ảnh (5 ảnh)</h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
                       <InputField
-                        key={num}
-                        label={`Ảnh bổ sung ${num}`}
-                        value={isAddingNew ? (newItem as any)[`imageUrl${num}`] : (editingItem as any)[`imageUrl${num}`]}
-                        onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, [`imageUrl${num}`]: v }) : setEditingItem({ ...editingItem!, [`imageUrl${num}`]: v })}
+                        label="Ảnh bổ sung 1"
+                        value={isAddingNew ? newItem.imageUrl1 : editingItem?.imageUrl1}
+                        onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, imageUrl1: v }) : setEditingItem({ ...editingItem!, imageUrl1: v })}
                         placeholder="Link ảnh..."
                       />
-                    ))}
+                      {[2, 3, 4, 5].map(num => (
+                        <InputField
+                          key={num}
+                          label={`Ảnh bổ sung ${num}`}
+                          value={isAddingNew ? (newItem as any)[`imageUrl${num}`] : (editingItem as any)[`imageUrl${num}`]}
+                          onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, [`imageUrl${num}`]: v }) : setEditingItem({ ...editingItem!, [`imageUrl${num}`]: v })}
+                          placeholder="Link ảnh..."
+                        />
+                      ))}
+                    </div>
                   </div>
                 )}
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                <div className="editor-grid">
                   <InputField label="Mô tả tóm tắt (Tiếng Việt)" textarea value={isAddingNew ? newItem.description : editingItem?.description} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, description: v }) : setEditingItem({ ...editingItem!, description: v })} />
                   <InputField label="Mô tả tóm tắt (Tiếng Khmer)" textarea value={isAddingNew ? newItem.description_khmer : editingItem?.description_khmer} onChange={(v: string) => isAddingNew ? setNewItem({ ...newItem, description_khmer: v }) : setEditingItem({ ...editingItem!, description_khmer: v })} />
                 </div>

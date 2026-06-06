@@ -101,18 +101,17 @@ const Article = () => {
 
   return (
     <div className="page-container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
-        <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Quản lý bài viết</h1>
-        </div>
-
-        <div className="input-group" style={{ width: '400px', marginBottom: 0 }}>
-          <div style={{ position: 'relative' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>
+          Quản lý bài viết
+        </h1>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
+          <div className="input-group" style={{ flex: '1 1 250px', maxWidth: '400px', marginBottom: 0 }}>
             <input
               className="input-field"
               type="text"
               placeholder="Tìm kiếm bài viết..."
-              style={{ paddingLeft: '1rem' }}
+              style={{ width: '100%' }}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -122,19 +121,21 @@ const Article = () => {
 
       <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
 
-
       {posts.length === 0 ? (
-        null
+        <div className="card glass-card" style={{ textAlign: 'center', padding: '5rem' }}>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Chưa có bài viết nào</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>Bài viết từ người dùng sẽ hiển thị tại đây</p>
+        </div>
       ) : (
-        <div className="card" style={{ borderRadius: '24px', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="table-responsive">
+          <table className="data-table">
             <thead>
-              <tr style={{ background: 'var(--bg-main)', borderBottom: '1px solid var(--border-light)' }}>
-                <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', width: '120px', whiteSpace: 'nowrap' }}>Hình ảnh</th>
-                <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nội dung bài viết</th>
-                <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Người đăng</th>
-                <th style={{ textAlign: 'left', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Thời gian</th>
-                <th style={{ textAlign: 'right', padding: '1.25rem', fontSize: '0.8125rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Thao tác</th>
+              <tr>
+                <th className="mobile-hidden" style={{ width: '100px' }}>Hình ảnh</th>
+                <th>Nội dung</th>
+                <th>Người đăng</th>
+                <th className="mobile-hidden">Thời gian</th>
+                <th style={{ textAlign: 'right' }}>Thao tác</th>
               </tr>
             </thead>
             <tbody>
