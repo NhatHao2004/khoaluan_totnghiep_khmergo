@@ -259,7 +259,7 @@ const Dashboard = () => {
         <div className="card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
             <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Hoạt động gần đây</h2>
-            <button className="btn" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem', background: '#0f172a', color: '#fff', borderRadius: '10px', fontWeight: 700, minHeight: '36px' }} onClick={() => { setIsHistoryOpen(true); setActiveTab('all'); }}>
+            <button className="btn" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem', background: '#3b82f6', color: '#fff', borderRadius: '10px', fontWeight: 700, minHeight: '36px' }} onClick={() => { setIsHistoryOpen(true); setActiveTab('all'); }}>
               Xem tất cả
             </button>
           </div>
