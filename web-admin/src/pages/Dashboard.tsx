@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, getDocs, limit, onSnapshot, orderBy, query, writeBatch } from 'firebase/firestore';
+import { collection, getDocs, limit, onSnapshot, orderBy, query, writeBatch } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BookOpen, CheckCircle, HelpCircle, Info, MessageSquare, Shield, User, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -107,21 +107,7 @@ const Dashboard = () => {
     });
   };
 
-  const handleDeleteLog = async (id: string) => {
-    setConfirmDialog({
-      isOpen: true,
-      title: 'Xác nhận xóa',
-      message: 'Bạn có chắc chắn muốn xóa hoạt động này không?',
-      onConfirm: async () => {
-        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
-        try {
-          await deleteDoc(doc(db, 'logs', id));
-        } catch (error) {
-          console.error("Error deleting log:", error);
-        }
-      }
-    });
-  };
+
 
   const StatCard = ({ title, value, icon: Icon, color, onClick }: any) => (
     <div className="card glass-card stat-card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default', padding: '1.25rem' }}>
@@ -377,7 +363,6 @@ const Dashboard = () => {
                         desc={item.desc || 'Thao tác không có mô tả chi tiết'}
                         icon={Icon}
                         color={color}
-                        onDelete={() => handleDeleteLog(item.id)}
                       />
                     );
                   })
@@ -444,7 +429,7 @@ const Dashboard = () => {
   );
 };
 
-const ActivityItem = ({ title, time, desc, icon: Icon, color, onDelete }: any) => (
+const ActivityItem = ({ title, time, desc, icon: Icon, color }: any) => (
   <div style={{ display: 'flex', gap: '1.25rem', padding: '1.25rem', borderRadius: '20px', background: 'var(--bg-main)', border: '1px solid var(--border-light)', position: 'relative' }}>
     <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: 'var(--shadow-sm)' }}>
       <Icon size={22} color={color} />
@@ -454,33 +439,6 @@ const ActivityItem = ({ title, time, desc, icon: Icon, color, onDelete }: any) =
         <h4 style={{ fontWeight: 800, fontSize: '0.95rem' }}>{title}</h4>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>{time}</span>
-          {onDelete && (
-            <button
-              onClick={(e) => { e.stopPropagation(); onDelete(); }}
-              style={{
-                border: 'none',
-                background: '#fee2e2',
-                color: '#ef4444',
-                cursor: 'pointer',
-                padding: '6px',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseOver={(e: any) => {
-                e.currentTarget.style.background = '#ef4444';
-                e.currentTarget.style.color = '#ffffff';
-              }}
-              onMouseOut={(e: any) => {
-                e.currentTarget.style.background = '#fee2e2';
-                e.currentTarget.style.color = '#ef4444';
-              }}
-            >
-              <X size={12} strokeWidth={3} />
-            </button>
-          )}
         </div>
       </div>
       <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{desc}</p>
