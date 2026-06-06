@@ -288,138 +288,76 @@ const Vocabulary = () => {
         )}
       </AnimatePresence>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>
+      <div style={{ marginBottom: '2.5rem' }}>
+        <h1 style={{ marginBottom: '0.5rem' }}>
           Quản lý từ vựng {activeCategoryId ? `(${formatCategoryName(activeCategory!)})` : ''}
         </h1>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
-          {!activeCategoryId && (
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+          {activeCategoryId ? 'Quản lý danh sách từ vựng trong chủ đề này' : 'Chọn một chủ đề để bắt đầu quản lý từ vựng'}
+        </p>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="input-group" style={{ flex: '1', maxWidth: '400px', marginBottom: 0 }}>
             <input
               className="input-field"
-              placeholder="Tìm kiếm nhanh..."
-              style={{ width: '100%', maxWidth: '300px' }}
+              placeholder={activeCategoryId ? "Tìm kiếm từ vựng..." : "Tìm kiếm danh mục..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-          )}
+          </div>
 
           {!activeCategoryId ? (
-            <button className="btn" onClick={() => setIsAddingCategory(true)} style={{ background: '#3b82f6', color: 'white', fontWeight: 700, flexGrow: 1, maxWidth: '200px' }}>
+            <button className="btn btn-primary" onClick={() => setIsAddingCategory(true)}>
               Thêm danh mục
             </button>
           ) : (
-            <button className="btn" onClick={() => { setEditingWord({ id: `w_${Date.now()}`, khm: '', life: '', pronunciation: '', imageUrl: '' }); setIsAddingWord(true); }} style={{ background: '#3b82f6', color: 'white', fontWeight: 700, flexGrow: 1, maxWidth: '200px' }}>
-              Thêm từ mới
-            </button>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button className="btn" onClick={() => setActiveCategoryId(null)} style={{ background: 'var(--bg-accent)', color: 'var(--text-primary)' }}>
+                Quay lại
+              </button>
+              <button className="btn btn-primary" onClick={() => { setEditingWord({ id: `w_${Date.now()}`, khm: '', life: '', pronunciation: '', imageUrl: '' }); setIsAddingWord(true); }}>
+                Thêm từ mới
+              </button>
+            </div>
           )}
         </div>
       </div>
 
-      <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
-
       {!activeCategoryId ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1.5rem' }} className="fade-in">
+        <div className="responsive-grid">
           {loading ? (
-            Array.from({ length: 6 }).map((_, i) => <div key={i} className="skeleton" style={{ height: '280px', borderRadius: '32px' }} />)
+            Array.from({ length: 6 }).map((_, i) => <div key={i} className="card skeleton" style={{ height: '240px' }} />)
           ) : categories.filter(cat => formatCategoryName(cat).toLowerCase().includes(searchTerm.toLowerCase())).length === 0 ? (
-            <div className="card glass-card" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '5rem' }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Không tìm thấy kết quả</h3>
+            <div className="card" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '5rem 2rem' }}>
+              <h3 style={{ marginBottom: '0.5rem' }}>Không tìm thấy kết quả</h3>
               <p style={{ color: 'var(--text-secondary)' }}>Thử tìm kiếm với một từ khóa khác</p>
             </div>
           ) : (
             categories
               .filter(cat => formatCategoryName(cat).toLowerCase().includes(searchTerm.toLowerCase()))
-              .map(cat => {
-
-
-                return (
-                  <div
-                    key={cat.id}
-                    style={{
-                      padding: '1.5rem',
-                      borderRadius: '28px',
-                      background: 'white',
-                      border: '1.5px solid #f1f5f9',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '1.25rem',
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      boxShadow: 'var(--shadow-sm)',
-                      position: 'relative'
-                    }}
-                    className="hover-scale"
-                  >
-                    {/* Category Cover Image (Using provided assets) */}
-                    <div style={{
-                      width: '100%',
-                      height: '160px',
-                      borderRadius: '18px',
-                      overflow: 'hidden',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      background: 'transparent'
-                    }}>
-                      <img
-                        src={cat.imageUrl ? cat.imageUrl : `/${cat.title === 'cat_family' || cat.id === 'family' ? 'giadinh.jpg' :
-                          cat.title === 'cat_food' || cat.id === 'food' ? 'monan.jpg' :
-                            cat.title === 'cat_greetings' || cat.id === 'greetings' ? 'chaohoi.jpg' :
-                              cat.title === 'cat_numbers' || cat.id === 'numbers' ? 'sodem.jpg' :
-                                'giadinh.jpg' // mặc định
-                          }`}
-                        alt={formatCategoryName(cat)}
-                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                        onError={(e: any) => {
-                          // Fallback nếu không tìm thấy file
-                          e.target.onerror = null;
-                          e.target.src = 'https://images.unsplash.com/photo-1544391496-1ca7c9755716?q=80&w=300';
-                        }}
-                      />
-                    </div>
-
-                    <div>
-                      <h3 style={{ fontWeight: 900, color: 'var(--text-primary)', fontSize: '1.1rem', textAlign: 'center', marginBottom: '1.25rem' }}>
-                        {formatCategoryName(cat)}
-                      </h3>
-
-                      <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'center' }}>
-                        <button
-                          onClick={() => setActiveCategoryId(cat.id)}
-                          style={{ padding: '0.75rem 1.25rem', background: '#e2e8f0', color: '#0f172a', border: 'none', borderRadius: '16px', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', flex: 1.5 }}
-                          className="hover-bright"
-                        >
-                          Xem chi tiết
-                        </button>
-                        <button
-                          onClick={() => setDeletingCategory(cat)}
-                          style={{ padding: '0.75rem', background: '#fff1f2', color: '#e11d48', border: 'none', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', flex: 1 }}
-                          className="hover-bright"
-                        >
-                          <Trash2 size={16} /> Xóa
-                        </button>
-                      </div>
+              .map(cat => (
+                <div key={cat.id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.25rem' }}>
+                  <div style={{ width: '100%', height: '140px', borderRadius: '12px', overflow: 'hidden', background: 'var(--bg-accent)' }}>
+                    <img
+                      src={cat.imageUrl || `https://images.unsplash.com/photo-1544391496-1ca7c9755716?q=80&w=300`}
+                      alt={cat.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>{formatCategoryName(cat)}</h3>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button className="btn" style={{ flex: 2, background: 'var(--primary)', color: 'white', fontSize: '0.875rem' }} onClick={() => setActiveCategoryId(cat.id)}>Chi tiết</button>
+                      <button className="btn" style={{ flex: 1, background: '#fef2f2', color: 'var(--danger)' }} onClick={() => setDeletingCategory(cat)}><Trash2 size={16} /></button>
                     </div>
                   </div>
-                );
-              })
+                </div>
+              ))
           )}
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }} className="fade-in">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button
-              onClick={() => setActiveCategoryId(null)}
-              style={{ background: '#3b82f6', border: 'none', padding: '0.6rem 1.25rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-              className="hover-bright"
-            >
-              Quay lại
-            </button>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Danh mục {activeCategory?.title ? formatCategoryName(activeCategory) : ''}</h2>
-          </div>
-
-          {/* Word Table */}
-          {/* Word Table */}
-          <div className="table-responsive" style={{ maxHeight: 'calc(100vh - 280px)' }}>
+        <div className="table-wrapper">
+          <div className="table-responsive">
             <table className="data-table">
               <thead>
                 <tr>
@@ -433,19 +371,19 @@ const Vocabulary = () => {
                 {filteredWords.length === 0 ? (
                   <tr>
                     <td colSpan={4} style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                      Không tìm thấy từ vựng nào
+                      Không tìm thấy từ vựng nào trong danh mục này
                     </td>
                   </tr>
                 ) : (
                   filteredWords.map((word) => (
-                    <tr key={word.id} className="hover-bright">
-                      <td style={{ fontWeight: 800, fontSize: '1.05rem' }}>{word.khm}</td>
+                    <tr key={word.id}>
+                      <td style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '1.1rem' }}>{word.khm}</td>
                       <td style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>{word.pronunciation}</td>
                       <td style={{ fontWeight: 700 }}>{word.life}</td>
                       <td style={{ textAlign: 'right' }}>
                         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                          <button onClick={() => { setEditingWord(word); setIsAddingWord(false); }} className="btn" style={{ minHeight: '36px', padding: '0.4rem 0.8rem', background: '#eff6ff', color: '#3b82f6', fontSize: '0.8125rem' }} title="Sửa"><Pencil size={14} /></button>
-                          <button onClick={() => handleDeleteWord(word.id)} className="btn" style={{ minHeight: '36px', padding: '0.4rem 0.8rem', background: '#fef2f2', color: 'var(--danger)', fontSize: '0.8125rem' }} title="Xóa"><Trash2 size={14} /></button>
+                          <button onClick={() => { setEditingWord(word); setIsAddingWord(false); }} className="btn" style={{ padding: '0.5rem', background: '#eff6ff', color: '#3b82f6' }}><Pencil size={14} /></button>
+                          <button onClick={() => handleDeleteWord(word.id)} className="btn" style={{ padding: '0.5rem', background: '#fef2f2', color: 'var(--danger)' }}><Trash2 size={14} /></button>
                         </div>
                       </td>
                     </tr>

@@ -118,140 +118,86 @@ const Users = () => {
 
   return (
     <div className="fade-in">
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
-        <div>
-          <h1 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Quản lý người dùng</h1>
-        </div>
+      <div style={{ marginBottom: '2.5rem' }}>
+        <h1 style={{ marginBottom: '0.5rem' }}>Quản lý người dùng</h1>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>Theo dõi và quản lý tài khoản người dùng trong hệ thống</p>
 
-        <div className="input-group" style={{ width: '100%', maxWidth: '400px', marginBottom: 0 }}>
-          <div style={{ position: 'relative' }}>
-            <input
-              className="input-field"
-              type="text"
-              placeholder="Tìm theo tên hoặc email..."
-              style={{ paddingLeft: '1rem' }}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+        <div className="input-group" style={{ maxWidth: '400px', marginBottom: 0 }}>
+          <input
+            className="input-field"
+            placeholder="Tìm kiếm theo tên / email / ID..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
       </div>
 
-      <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
-
       {loading ? (
-        <div className="card glass-card" style={{ padding: '0', overflow: 'hidden' }}>
-          <div style={{ padding: '2rem', background: 'var(--bg-accent)', height: '100px', animation: 'pulse 1.5s infinite' }} />
-          {[1, 2, 3, 4, 5].map(i => (
-            <div key={i} style={{ padding: '1.5rem', borderTop: '1px solid var(--border-light)', display: 'flex', gap: '1rem' }}>
-              <div style={{ width: 40, height: 40, borderRadius: '10px', background: 'var(--bg-accent)', animation: 'pulse 1.5s infinite' }} />
-              <div style={{ flex: 1, height: 40, background: 'var(--bg-accent)', borderRadius: '8px', animation: 'pulse 1.5s infinite' }} />
-            </div>
-          ))}
+        <div className="responsive-grid">
+          {[1, 2, 3, 4].map(i => <div key={i} className="card skeleton" style={{ height: '280px' }} />)}
         </div>
       ) : users.length === 0 ? (
-        null
+        <div className="card" style={{ textAlign: 'center', padding: '5rem 2rem' }}>
+          <h3 style={{ marginBottom: '0.5rem' }}>Chưa có người dùng</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>Danh sách người dùng sẽ hiển thị tại đây</p>
+        </div>
       ) : filteredUsers.length === 0 ? (
-        <div className="card glass-card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Không tìm thấy kết quả</h3>
+        <div className="card" style={{ textAlign: 'center', padding: '5rem 2rem' }}>
+          <h3 style={{ marginBottom: '0.5rem' }}>Không tìm thấy kết quả</h3>
           <p style={{ color: 'var(--text-secondary)' }}>Thử tìm kiếm với một từ khóa khác</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: '1.25rem' }}>
+        <div className="responsive-grid">
           {filteredUsers.map((user) => (
             <motion.div
               layout
               key={user.id}
               className="card"
               style={{
-                position: 'relative',
-                overflow: 'hidden',
-                padding: '1.75rem',
-                border: '1px solid var(--border-light)',
-                background: 'white',
-                opacity: user.isBlocked ? 0.8 : 1
+                display: 'flex',
+                flexDirection: 'column',
+                padding: '1.5rem',
+                opacity: user.isBlocked ? 0.7 : 1,
+                border: user.isBlocked ? '1px dashed var(--danger)' : '1px solid var(--border-light)'
               }}
             >
-              <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
-                <div style={{ position: 'relative' }}>
-                  <img
-                    src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`}
-                    alt={user.name}
-                    style={{ width: 64, height: 64, borderRadius: '18px', objectFit: 'cover' }}
-                  />
-                  <div style={{
-                    position: 'absolute',
-                    bottom: -2,
-                    right: -2,
-                    width: 14,
-                    height: 14,
-                    borderRadius: '50%',
-                    background: user.isBlocked ? '#ef4444' : '#10b981',
-                    border: '3px solid white'
-                  }} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
-                    {user.name}
-                  </h3>
-                  <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-                    {user.email || user.id}
-                  </p>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <img
+                  src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`}
+                  alt={user.name}
+                  style={{ width: 56, height: 56, borderRadius: '14px', objectFit: 'cover', background: 'var(--bg-accent)' }}
+                />
+                <div style={{ minWidth: 0 }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.125rem' }}>{user.name}</h3>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email || user.id}</p>
                 </div>
               </div>
 
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '1rem',
-                padding: '1rem',
-                background: 'var(--bg-accent)',
-                borderRadius: '16px',
-                marginBottom: '1.5rem'
-              }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', background: 'var(--bg-accent)', padding: '0.75rem', borderRadius: '12px', marginBottom: '1.5rem' }}>
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ fontSize: '0.625rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Điểm số</p>
-                  <p style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)' }}>{user.points || 0}</p>
+                  <div style={{ fontSize: '0.625rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Điểm số</div>
+                  <div style={{ fontSize: '0.925rem', fontWeight: 800 }}>{user.points || 0}</div>
                 </div>
                 <div style={{ textAlign: 'center', borderLeft: '1px solid var(--border-light)' }}>
-                  <p style={{ fontSize: '0.625rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Hoàn thành</p>
-                  <p style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)' }}>{user.completedQuizzes || 0}</p>
+                  <div style={{ fontSize: '0.625rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Thử thách</div>
+                  <div style={{ fontSize: '0.925rem', fontWeight: 800 }}>{user.completedQuizzes || 0}</div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <div style={{ marginTop: 'auto', display: 'flex', gap: '0.5rem' }}>
                 <button
-                  onClick={() => handleOpenFeedback(user)}
                   className="btn"
+                  onClick={() => handleOpenFeedback(user)}
+                  style={{ flex: 1, height: '40px', background: '#eff6ff', color: '#1d4ed8' }}
                   title="Xem phản hồi"
-                  style={{
-                    flex: '0 0 50px',
-                    background: '#3b82f6',
-                    color: '#ffffff',
-                    padding: '0.625rem',
-                    borderRadius: '12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
                 >
                   <MessageCircleMore size={18} />
                 </button>
-
                 <button
-                  onClick={() => toggleBlock(user)}
                   className="btn"
-                  title={user.isBlocked ? "Mở khóa tài khoản" : "Khóa tài khoản"}
-                  style={{
-                    flex: '0 0 50px',
-                    background: user.isBlocked ? '#ef4444' : '#10b981',
-                    color: '#ffffff',
-                    padding: '0.625rem',
-                    borderRadius: '12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
+                  onClick={() => toggleBlock(user)}
+                  style={{ flex: 1, height: '40px', background: user.isBlocked ? '#fef2f2' : '#ecfdf5', color: user.isBlocked ? '#dc2626' : '#059669' }}
+                  title={user.isBlocked ? "Mở khóa" : "Khóa tài khoản"}
                 >
                   {user.isBlocked ? <Ban size={18} /> : <CheckCircle size={18} />}
                 </button>

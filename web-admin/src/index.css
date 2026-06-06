@@ -36,6 +36,12 @@
   --font-family: 'Be Vietnam Pro', sans-serif;
   --sidebar-width: 280px;
   --header-height: 72px;
+
+  /* Redmi 12 Simulator Tokens */
+  --device-width: 390px;
+  --device-height: 844px;
+  --device-radius: 40px;
+  --device-border: 12px;
 }
 
 /* Mobile First Base */
@@ -49,12 +55,14 @@
 html, body {
   width: 100%;
   height: 100%;
-  overflow-x: hidden;
+  overflow: hidden; /* Lock scroll to device */
   font-family: var(--font-family);
-  background-color: var(--bg-main);
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
   color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Scrollbar customization */
@@ -76,88 +84,114 @@ html, body {
   background: var(--text-secondary);
 }
 
-/* Main Layout System */
+/* The Phone Frame Container */
 .app-container {
-  display: flex;
-  min-height: 100vh;
-  background-color: var(--bg-main);
+  width: var(--device-width);
+  height: var(--device-height);
+  background: var(--bg-main);
+  border-radius: var(--device-radius);
   position: relative;
-}
-
-/* Sidebar Wrapper */
-.sidebar {
-  width: var(--sidebar-width);
-  height: 100vh;
-  background: var(--bg-sidebar);
-  color: #fff;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  position: fixed;
-  left: 0;
-  top: 0;
+  box-shadow: 
+    0 0 0 var(--device-border) #1e293b,
+    0 30px 60px rgba(0,0,0,0.4),
+    inset 0 0 2px rgba(255,255,255,0.5);
+  border: 4px solid #334155;
+}
+
+/* Device Hole Punch */
+.app-container::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  background: #0f172a;
+  border-radius: 50%;
+  z-index: 1002;
+  box-shadow: 0 0 0 4px #1e293b;
+}
+
+/* Sidebar transforms into Bottom Navigation */
+.sidebar {
+  width: 100% !important;
+  height: 72px !important;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  top: auto !important;
+  flex-direction: row !important;
+  padding: 0 1rem !important;
+  border-right: none !important;
+  border-top: 1px solid rgba(255,255,255,0.1);
   z-index: 1001;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: none !important;
+  transform: none !important;
 }
 
-/* Desktop View */
-@media (min-width: 1025px) {
-  .sidebar {
-    position: sticky;
-    transform: translateX(0);
-    flex-shrink: 0;
-  }
-}
-
-/* Mobile/Tablet View */
-@media (max-width: 1024px) {
-  .sidebar {
-    transform: translateX(-100%);
-    box-shadow: 10px 0 30px rgba(0,0,0,0.2);
-  }
-  .sidebar.active {
-    transform: translateX(0);
-  }
-}
-
-.sidebar-logo {
-  height: var(--header-height);
-  display: flex;
-  align-items: center;
-  padding: 0 1.5rem;
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #fff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+.sidebar-logo, .sidebar-label {
+  display: none !important;
 }
 
 .sidebar-nav {
-  padding: 1.5rem 1rem;
-  flex: 1;
-  overflow-y: auto;
-}
-
-.sidebar-label {
-  padding: 0 0.75rem;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  font-weight: 700;
-  margin: 1.5rem 0 0.75rem;
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: 0.1em;
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100% !important;
+  height: 100%;
+  justify-content: space-around !important;
+  align-items: center;
+  padding: 0 !important;
+  overflow: hidden !important;
 }
 
 .nav-link {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1rem;
-  color: rgba(255, 255, 255, 0.6);
+  flex-direction: column !important;
+  gap: 4px !important;
+  padding: 8px !important;
+  font-size: 10px !important;
+  width: auto !important;
+  flex: 1;
+  justify-content: center !important;
+  align-items: center !important;
+  border-radius: 12px;
+  height: 100%;
+  color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
-  border-radius: var(--radius-md);
-  transition: all 0.2s ease;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-  font-size: 0.9375rem;
+  display: flex !important;
+  margin-bottom: 0 !important;
+}
+
+.nav-link svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.nav-link.active {
+  background: transparent !important;
+  color: #10b981 !important;
+  font-weight: 800 !important;
+}
+
+.nav-link.active::after {
+  display: none !important;
+}
+
+/* Main Content Area */
+.main-content {
+  flex: 1;
+  width: 100% !important;
+  margin-left: 0 !important;
+  padding: 1.25rem !important;
+  padding-bottom: 85px !important; /* Space for bottom nav */
+  overflow-y: auto !important;
+  display: flex !important;
+  flex-direction: column;
 }
 
 .nav-link:hover {
@@ -171,85 +205,26 @@ html, body {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
-/* Main Content Area */
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0; /* Important for flex child with overflow */
-}
-
-.top-bar {
-  height: var(--header-height);
-  background: #ffffff;
-  border-bottom: 1px solid var(--border-light);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 1.5rem;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-@media (min-width: 1025px) {
-  .top-bar { padding: 0 2.5rem; }
-}
-
-.page-container {
-  padding: 1.5rem;
-  flex: 1;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-@media (min-width: 1025px) {
-  .page-container { padding: 2.5rem; }
-}
-
-/* Sidebar Overlay */
-.sidebar-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(4px);
-  z-index: 1000;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  display: block;
-}
-
-@media (min-width: 1025px) {
-  .sidebar-overlay { display: none; }
-}
-
-.sidebar-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* Component Styling */
-.card {
-  background: #ffffff;
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  border: 1px solid var(--border-light);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
+/* Component Styling Optimized for App Simulator */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
 .responsive-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 /* Data Table Responsive Interface */
@@ -273,9 +248,9 @@ html, body {
 
 .data-table th {
   background: var(--bg-accent);
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
   text-align: left;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
@@ -283,60 +258,49 @@ html, body {
 }
 
 .data-table td {
-  padding: 1rem 1.5rem;
+  padding: 1rem;
   border-bottom: 1px solid var(--border-light);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
 }
 
 /* Button & Inputs */
 .btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
   font-weight: 700;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  border: none;
 }
 
 .input-field {
   width: 100%;
   padding: 0.75rem 1rem;
-  border-radius: var(--radius-md);
+  border-radius: 14px;
   border: 1px solid var(--border-light);
+  background: var(--bg-accent);
   font-family: inherit;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
 }
 
-/* Responsive Utilities */
+/* Simulator Specific: Hide desktop elements always */
 .desktop-hidden {
-  display: none;
-}
-
-@media (max-width: 1024px) {
-  .desktop-hidden { display: flex; }
-}
-
-.mobile-hidden {
   display: flex !important;
 }
 
-@media (max-width: 768px) {
-  .mobile-hidden { display: none !important; }
+.mobile-hidden, .sidebar-overlay, .top-bar {
+  display: none !important;
 }
 
-/* Typography */
-h1 { font-size: 1.75rem; font-weight: 800; color: var(--text-primary); }
-h2 { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); }
-h3 { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
-
-/* Custom Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
+/* Typography for Mobile App */
+h1 { font-size: 1.5rem; font-weight: 900; color: var(--text-primary); letter-spacing: -0.02em; }
+h2 { font-size: 1.25rem; font-weight: 800; color: var(--text-primary); }
+h3 { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); }
 
 /* Animation */
 .fade-in {
@@ -347,3 +311,7 @@ h3 { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Custom Scrollbar for App Simulator */
+.main-content::-webkit-scrollbar { width: 4px; }
+.main-content::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
