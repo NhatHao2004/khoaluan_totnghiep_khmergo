@@ -129,23 +129,6 @@ const AdminDashboard = () => {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header View - Injected by layout, but matches style */}
-      <View style={styles.topActions}>
-        <TouchableOpacity style={styles.iconBtn}>
-          <Ionicons name="menu-outline" size={28} color="#1e293b" />
-        </TouchableOpacity>
-        <View style={{ flexDirection: 'row', gap: 12 }}>
-          <TouchableOpacity style={styles.iconBtn}>
-            <Ionicons name="notifications-outline" size={24} color="#3b82f6" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.iconBtn}
-            onPress={() => router.push('/(admin)/trash' as any)}
-          >
-            <Ionicons name="trash-outline" size={24} color="#ef4444" />
-          </TouchableOpacity>
-        </View>
-      </View>
 
       {/* Statistics Grid */}
       <View style={styles.statsGrid}>
@@ -243,7 +226,7 @@ const AdminDashboard = () => {
                     </View>
                   )}
                   <Text style={styles.podiumName} numberOfLines={1}>{user.name || '---'}</Text>
-                  <Text style={styles.podiumPoints}>{user.points || 0}đ</Text>
+                  <Text style={styles.podiumPoints}>{user.points || 0} điểm</Text>
                 </View>
                 <View style={[styles.bar, { height: barHeight, backgroundColor: barColor }]}>
                   <Text style={styles.rankNum}>{rank}</Text>
@@ -257,7 +240,7 @@ const AdminDashboard = () => {
       {/* Recent Activity Section */}
       <View style={styles.activityHeader}>
         <Text style={styles.activityTitle}>Hoạt động gần đây</Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.seeAllBtn}
           onPress={() => router.push('/(admin)/users' as any)}
         >
@@ -299,8 +282,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   iconBtn: {
-    padding: 8,
-    borderRadius: 12,
+    padding: 3,
+    borderRadius: 14,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -309,6 +292,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 12,
     marginBottom: 30,
+    marginTop: 50,
   },
   statCard: {
     width: CARD_WIDTH,
@@ -545,7 +529,7 @@ const styles = StyleSheet.create({
   emptyText: {
     textAlign: 'center',
     color: '#94a3b8',
-    marginTop: 75,
+    marginTop: 105,
     fontSize: 14,
   },
 });
