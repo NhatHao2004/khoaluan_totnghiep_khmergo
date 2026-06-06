@@ -138,8 +138,8 @@ const Dashboard = () => {
   return (
     <div className="fade-in">
       <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Tổng quan hệ thống</h1>
-        <p style={{ color: 'var(--text-secondary)', marginTop: '0.4rem', fontSize: '0.875rem' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo</p>
+        <h1 style={{ fontSize: 'clamp(1.25rem, 5vw, 1.75rem)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Tổng quan hệ thống</h1>
+        <p style={{ color: 'var(--text-secondary)', marginTop: '0.4rem', fontSize: '0.9rem' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo</p>
       </div>
 
       <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
@@ -190,8 +190,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="card glass-card" style={{ padding: '2rem 1rem 1.5rem', overflowX: 'auto' }}>
-          <div className="custom-scrollbar" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start', minWidth: 'max-content', gap: '1rem', height: '320px', paddingBottom: '1rem' }}>
+        <div className="card glass-card" style={{ padding: '1.5rem 1rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <div className="custom-scrollbar" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', minWidth: '600px', gap: '0.75rem', height: '320px', paddingBottom: '1rem', margin: '0 auto' }}>
             <style>{`
               .custom-scrollbar::-webkit-scrollbar {
                 display: none;
@@ -257,9 +257,9 @@ const Dashboard = () => {
 
       <div>
         <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
             <h2 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Hoạt động gần đây</h2>
-            <button className="btn" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem', background: '#006effff', color: '#ffffffff', borderRadius: '10px', fontWeight: 700 }} onClick={() => { setIsHistoryOpen(true); setActiveTab('all'); }}>
+            <button className="btn" style={{ fontSize: '0.75rem', padding: '0.5rem 1rem', background: '#0f172a', color: '#fff', borderRadius: '10px', fontWeight: 700, minHeight: '36px' }} onClick={() => { setIsHistoryOpen(true); setActiveTab('all'); }}>
               Xem tất cả
             </button>
           </div>

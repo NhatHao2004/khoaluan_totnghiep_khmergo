@@ -24,16 +24,19 @@ const TopBar = ({ notifications, clearNotifications, setShowTrash, setTrashActiv
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         <button
           onClick={toggleSidebar}
-          className="mobile-only"
+          className="desktop-hidden"
           style={{
             background: 'none',
             border: 'none',
-            padding: '0.5rem',
+            padding: '0.6rem',
             cursor: 'pointer',
-            color: 'var(--text-primary)'
+            color: 'var(--text-primary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         >
-          <Menu size={24} />
+          <Menu size={28} />
         </button>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -122,29 +125,31 @@ const TopBar = ({ notifications, clearNotifications, setShowTrash, setTrashActiv
           </AnimatePresence>
         </div>
 
-        <button
-          onClick={() => {
-            setTrashActiveTab('destinations');
-            setShowTrash(true);
-          }}
-          style={{
-            padding: '0.6rem',
-            borderRadius: '14px',
-            border: '1px solid var(--border-light)',
-            background: 'white',
-            color: 'var(--danger)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.2s'
-          }}
-          title="Thùng rác hệ thống"
-        >
-          <Trash2 size={20} />
-        </button>
-      </div>
-    </header>
+          <button
+            onClick={() => {
+              setTrashActiveTab('destinations');
+              setShowTrash(true);
+            }}
+            style={{
+              padding: '0.6rem',
+              borderRadius: '14px',
+              border: '1px solid var(--border-light)',
+              background: 'white',
+              color: 'var(--danger)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s',
+              minWidth: '44px',
+              minHeight: '44px'
+            }}
+            title="Thùng rác hệ thống"
+          >
+            <Trash2 size={20} />
+          </button>
+        </div>
+      </header>
   );
 };
 
@@ -297,7 +302,8 @@ function App() {
             setTrashActiveTab={setTrashActiveTab}
             toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           />
-          <div style={{ padding: '1rem', paddingBottom: '3rem' }} className="fade-in">
+          <div className="page-container">
+            <div className="fade-in">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/users" element={<Users />} />
@@ -308,6 +314,7 @@ function App() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+            </div>
           </div>
         </div>
 
