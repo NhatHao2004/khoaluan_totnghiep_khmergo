@@ -198,8 +198,8 @@ const Dashboard = () => {
               }
             `}</style>
 
-            {/* Podium Ranking: Rank 2, Rank 1, Rank 3 */}
-            {[1, 0, 2].map((uIdx) => {
+            {/* Sequential Ranking: 1, 2, 3, 4... */}
+            {[0, 1, 2].map((uIdx) => {
               const user = topUsers[uIdx];
               const rank = uIdx + 1; // 0->1, 1->2, 2->3
               const color = rank === 1 ? '#ef4444' : rank === 2 ? '#f8d330' : '#22c55e';
