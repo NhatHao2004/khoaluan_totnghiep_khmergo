@@ -88,6 +88,7 @@ const TopBar = ({ notifications, clearNotifications, setShowTrash, setTrashActiv
                     position: 'absolute',
                     top: '100%',
                     right: 0,
+                    left: 'auto',
                     marginTop: '0.5rem',
                     width: 'calc(100vw - 2rem)',
                     maxWidth: '320px',
@@ -96,7 +97,8 @@ const TopBar = ({ notifications, clearNotifications, setShowTrash, setTrashActiv
                     boxShadow: 'var(--shadow-lg)',
                     border: '1px solid var(--border-light)',
                     padding: '1.25rem',
-                    zIndex: 999
+                    zIndex: 999,
+                    transformOrigin: 'top right'
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
