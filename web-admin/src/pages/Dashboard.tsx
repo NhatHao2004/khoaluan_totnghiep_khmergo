@@ -129,7 +129,7 @@ const Dashboard = () => {
         <span className="label" style={{ margin: 0, fontSize: 'clamp(0.75rem, 2.5vw, 0.875rem)', fontWeight: 600, whiteSpace: 'nowrap' }}>{title}</span>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.3rem' }}>
           <h3 className="value" style={{ margin: 0, fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: 800 }}>{value}</h3>
-          <span className="mobile-hidden" style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 500 }}>tổng cộng</span>
+          <span style={{ fontSize: 'clamp(0.55rem, 2vw, 0.7rem)', color: 'var(--text-muted)', fontWeight: 500, whiteSpace: 'nowrap' }}>tổng cộng</span>
         </div>
       </div>
     </div>
