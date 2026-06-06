@@ -1,5 +1,6 @@
 import { AuthContext } from '@/contexts/AuthContext';
 import { translations, useLanguage } from '@/contexts/LanguageContext';
+import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
@@ -83,7 +84,7 @@ export default function SettingsScreen() {
 
   const animatedChatThumbStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateX: chatToggleAnim.value * 20 }],
+      transform: [{ translateX: chatToggleAnim.value * scale(20) }],
     };
   });
 
@@ -98,10 +99,10 @@ export default function SettingsScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={26} color="#1A1A1A" />
+          <Ionicons name="arrow-back" size={scale(26)} color="#1A1A1A" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>{t('settings')}</Text>
-        <View style={{ width: 25 }} />
+        <View style={{ width: scale(25) }} />
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
@@ -121,7 +122,7 @@ export default function SettingsScreen() {
               <Text style={[styles.optionText, language === 'vi' && styles.activeOptionText]}>{t('vietnamese')}</Text>
               <Ionicons
                 name={language === 'vi' ? "checkmark-circle" : "ellipse-outline"}
-                size={22}
+                size={scale(22)}
                 color={language === 'vi' ? "#FF4B4B" : "#CCCCCC"}
               />
             </TouchableOpacity>
@@ -136,7 +137,7 @@ export default function SettingsScreen() {
               <Text style={[styles.optionText, language === 'km' && styles.activeOptionText]}>{t('khmer')}</Text>
               <Ionicons
                 name={language === 'km' ? "checkmark-circle" : "ellipse-outline"}
-                size={22}
+                size={scale(22)}
                 color={language === 'km' ? "#FF4B4B" : "#CCCCCC"}
               />
             </TouchableOpacity>
@@ -149,7 +150,7 @@ export default function SettingsScreen() {
             <Text style={styles.cardTitle}>{t('app_info')}</Text>
             <TouchableOpacity style={styles.infoItem} onPress={() => setShowIntro(true)}>
               <Text style={styles.infoLabel}>{t('intro')}</Text>
-              <Ionicons name="chevron-forward" size={18} color="#CCC" />
+              <Ionicons name="chevron-forward" size={scale(18)} color="#CCC" />
             </TouchableOpacity>
             <View style={styles.divider} />
             <View style={styles.infoItem}>
@@ -159,7 +160,7 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        <View style={{ height: 40 }} />
+        <View style={{ height: verticalScale(40) }} />
       </ScrollView>
 
 
@@ -175,11 +176,11 @@ export default function SettingsScreen() {
             <View style={styles.introHeader}>
               <Text style={styles.introTitle}>Giới thiệu ứng dụng</Text>
               <TouchableOpacity onPress={() => setShowIntro(false)} style={styles.introCloseBtn}>
-                <Ionicons name="close" size={28} color="#1A1A1A" />
+                <Ionicons name="close" size={scale(28)} color="#1A1A1A" />
               </TouchableOpacity>
             </View>
 
-            <View style={styles.introScroll}>
+            <ScrollView style={styles.introScroll} showsVerticalScrollIndicator={false}>
 
               {/* App Identity */}
               <View style={styles.appIdentity}>
@@ -220,7 +221,7 @@ export default function SettingsScreen() {
                   <Text style={styles.introItemText}>Lâm Nhật Hào</Text>
                 </View>
               </View>
-            </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -240,7 +241,7 @@ export default function SettingsScreen() {
           <View style={styles.toastIcon}>
             <Ionicons
               name={toastType === 'success' ? "checkmark" : "close"}
-              size={20}
+              size={scale(20)}
               color="#FFF"
             />
           </View>
@@ -261,62 +262,62 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 10,
-    minHeight: 100, // Fixed height for visual stability
+    paddingHorizontal: scale(20),
+    paddingTop: verticalScale(50),
+    paddingBottom: verticalScale(10),
+    minHeight: verticalScale(100), // Fixed height for visual stability
     backgroundColor: '#ffffff',
   },
   backBtn: {
-    width: 25,
+    width: scale(25),
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: '800',
     color: '#1A1A1A',
     textAlign: 'center',
-    lineHeight: 28,
+    lineHeight: verticalScale(28),
   },
   scroll: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingHorizontal: scale(20),
+    paddingTop: verticalScale(20),
   },
   section: {
-    marginBottom: 20,
+    marginBottom: verticalScale(20),
   },
   card: {
     backgroundColor: '#FFF',
-    borderRadius: 16,
-    paddingHorizontal: 15,
-    paddingBottom: 5,
+    borderRadius: scale(16),
+    paddingHorizontal: scale(15),
+    paddingBottom: verticalScale(5),
     // Shadow for iOS
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: verticalScale(2) },
     shadowOpacity: 0.05,
-    shadowRadius: 10,
+    shadowRadius: scale(10),
     // Elevation for Android
     elevation: 2,
   },
   cardTitle: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     fontWeight: '700',
     color: '#000000ff',
-    paddingTop: 15,
-    paddingBottom: 5,
+    paddingTop: verticalScale(15),
+    paddingBottom: verticalScale(5),
     letterSpacing: 0.5,
-    lineHeight: 22,
+    lineHeight: verticalScale(22),
   },
   optionItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: 60, // Minimum height for visual stability
+    minHeight: verticalScale(60), // Minimum height for visual stability
   },
   optionText: {
-    fontSize: 15,
+    fontSize: moderateScale(15),
     color: '#444',
     fontWeight: '500',
-    lineHeight: 24,
+    lineHeight: verticalScale(24),
   },
   activeOption: {
     // optional active styling
@@ -324,75 +325,75 @@ const styles = StyleSheet.create({
   activeOptionText: {
     color: '#1A1A1A',
     fontWeight: '600',
-    lineHeight: 24,
+    lineHeight: verticalScale(24),
   },
   switchItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: 60, // Minimum height for visual stability
+    minHeight: verticalScale(60), // Minimum height for visual stability
   },
   switchLabel: {
-    fontSize: 15,
+    fontSize: moderateScale(15),
     color: '#1E293B',
     fontWeight: '700',
-    lineHeight: 24,
+    lineHeight: verticalScale(24),
   },
   switchSubLabel: {
-    fontSize: 15,
+    fontSize: moderateScale(15),
     color: '#000000ff',
-    marginTop: 2,
-    lineHeight: 24,
+    marginTop: verticalScale(2),
+    lineHeight: verticalScale(24),
   },
   customToggleTrack: {
-    width: 48,
-    height: 28,
-    borderRadius: 14,
-    padding: 3,
+    width: scale(48),
+    height: verticalScale(28),
+    borderRadius: scale(14),
+    padding: scale(3),
     justifyContent: 'center',
   },
   customToggleThumb: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    width: scale(22),
+    height: scale(22),
+    borderRadius: scale(11),
     backgroundColor: '#FFFFFF',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: verticalScale(1) },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowRadius: scale(2),
     elevation: 2,
   },
   timeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#000000ff',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    paddingHorizontal: scale(12),
+    paddingVertical: verticalScale(6),
+    borderRadius: scale(20),
   },
   timeText: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     color: '#ffffffff',
     fontWeight: '700',
-    lineHeight: 20,
+    lineHeight: verticalScale(20),
   },
   infoItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 55, // Fixed height for visual stability
+    height: verticalScale(55), // Fixed height for visual stability
   },
   infoLabel: {
-    fontSize: 15,
+    fontSize: moderateScale(15),
     color: '#444',
     fontWeight: '500',
-    lineHeight: 22,
+    lineHeight: verticalScale(22),
   },
   infoValue: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     color: '#000000ff',
     fontWeight: '500',
-    lineHeight: 20,
+    lineHeight: verticalScale(20),
   },
   divider: {
     height: 1,
@@ -407,10 +408,10 @@ const styles = StyleSheet.create({
   },
   introContent: {
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    paddingTop: 20,
-    paddingHorizontal: 24,
+    borderTopLeftRadius: scale(32),
+    borderTopRightRadius: scale(32),
+    paddingTop: verticalScale(20),
+    paddingHorizontal: scale(24),
     paddingBottom: 0,
     width: '100%',
     maxHeight: '79%',
@@ -419,145 +420,145 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 25,
-    paddingHorizontal: 5,
+    marginBottom: verticalScale(25),
+    paddingHorizontal: scale(5),
   },
   introTitle: {
-    fontSize: 18,
+    fontSize: moderateScale(18),
     fontWeight: '800',
     color: '#1A1A1A',
   },
   introCloseBtn: {
-    padding: 5,
+    padding: scale(5),
   },
   introScroll: {
-    paddingBottom: 20,
+    // ScrollView inside modal
   },
   appIdentity: {
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: verticalScale(15),
   },
   appLogo: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    marginBottom: 12,
+    width: scale(80),
+    height: scale(80),
+    borderRadius: scale(20),
+    marginBottom: verticalScale(12),
   },
   appName: {
-    fontSize: 25,
+    fontSize: moderateScale(25),
     fontWeight: '900',
     color: '#000000ff',
-    marginBottom: 4,
+    marginBottom: verticalScale(4),
   },
   appVersionTag: {
-    fontSize: 13,
+    fontSize: moderateScale(13),
     color: '#64748B',
     fontWeight: '600',
     backgroundColor: '#F1F5F9',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 20,
+    paddingHorizontal: scale(12),
+    paddingVertical: verticalScale(4),
+    borderRadius: scale(20),
   },
   appDesc: {
-    fontSize: 15,
-    lineHeight: 24,
+    fontSize: moderateScale(15),
+    lineHeight: verticalScale(24),
     color: '#475569',
     textAlign: 'center',
-    marginBottom: 15,
+    marginBottom: verticalScale(15),
     fontStyle: 'italic',
   },
   introSection: {
-    marginBottom: 8,
+    marginBottom: verticalScale(8),
   },
   introSectionTitle: {
-    fontSize: 15,
+    fontSize: moderateScale(15),
     fontWeight: '800',
     color: '#1E293B',
-    marginBottom: 4,
+    marginBottom: verticalScale(4),
   },
   introDetailRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginBottom: 4,
+    marginBottom: verticalScale(4),
   },
   introBullet: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     color: '#475569',
-    marginBottom: 4,
-    paddingLeft: 10,
+    marginBottom: verticalScale(4),
+    paddingLeft: scale(10),
   },
   introItemText: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     color: '#475569',
-    lineHeight: 20,
-    marginBottom: 4,
+    lineHeight: verticalScale(20),
+    marginBottom: verticalScale(4),
   },
   introRow: {
     flexDirection: 'row',
-    gap: 20,
-    marginBottom: 4,
+    gap: scale(20),
+    marginBottom: verticalScale(4),
   },
   actionGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     backgroundColor: '#F8FAFC',
-    borderRadius: 20,
-    padding: 20,
-    marginVertical: 20,
+    borderRadius: scale(20),
+    padding: scale(20),
+    marginVertical: verticalScale(20),
   },
   actionItem: {
     alignItems: 'center',
-    gap: 8,
+    gap: scale(8),
   },
   actionIcon: {
-    width: 45,
-    height: 45,
-    borderRadius: 15,
+    width: scale(45),
+    height: scale(45),
+    borderRadius: scale(15),
     justifyContent: 'center',
     alignItems: 'center',
   },
   actionLabel: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     fontWeight: '700',
     color: '#64748B',
   },
   copyright: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     color: '#94A3B8',
     textAlign: 'center',
-    marginTop: 15,
+    marginTop: verticalScale(15),
   },
   // Toast Styles
   toastContainer: {
     position: 'absolute',
     top: 0,
-    left: 20,
-    right: 20,
-    height: 56,
-    borderRadius: 20,
+    left: scale(20),
+    right: scale(20),
+    height: verticalScale(56),
+    borderRadius: scale(20),
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: scale(16),
     zIndex: 9999,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: verticalScale(10) },
     shadowOpacity: 0.3,
-    shadowRadius: 20,
+    shadowRadius: scale(20),
     elevation: 10,
   },
   toastIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: scale(32),
+    height: scale(32),
+    borderRadius: scale(16),
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   toastText: {
     color: '#FFF',
-    fontSize: 15,
+    fontSize: moderateScale(15),
     fontWeight: '700',
-    marginLeft: 12,
+    marginLeft: scale(12),
     flex: 1,
     letterSpacing: 0.2,
   },

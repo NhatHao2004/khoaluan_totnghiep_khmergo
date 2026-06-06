@@ -7,9 +7,10 @@ import React, { useRef, useState } from 'react';
 
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const { width } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 import { getLeaderboardUsers, UserProfile } from '@/services/firebase-service';
+import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function MedalScreen() {
@@ -86,10 +87,10 @@ export default function MedalScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={26} color="#1A1A1A" />
+          <Ionicons name="arrow-back" size={scale(26)} color="#1A1A1A" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('leaderboard')}</Text>
-        <View style={{ width: 26 }} />
+        <View style={{ width: scale(26) }} />
       </View>
 
       <View style={styles.tabContainer}>
@@ -116,14 +117,14 @@ export default function MedalScreen() {
             <View style={styles.podiumContainer}>
 
               {/* 1st Place */}
-              <View style={[styles.podiumItem, { marginTop: -45 }]}>
+              <View style={[styles.podiumItem, { marginTop: verticalScale(-45) }]}>
                 <View style={styles.crownContainer}>
                 </View>
-                <View style={[styles.avatarContainer, { width: 80, height: 80, borderRadius: 40, borderWidth: 1, borderColor: '#000000ff' }]}>
+                <View style={[styles.avatarContainer, { width: scale(80), height: scale(80), borderRadius: scale(40), borderWidth: 1, borderColor: '#000000ff' }]}>
                   {topThree[1].avatar ? (
                     <Image source={{ uri: topThree[1].avatar }} style={styles.avatar} />
                   ) : (
-                    <Ionicons name="person-circle-outline" size={70} color="#CCC" />
+                    <Ionicons name="person-circle-outline" size={scale(70)} color="#CCC" />
                   )}
 
                 </View>
@@ -135,18 +136,18 @@ export default function MedalScreen() {
                     {`${topThree[1].points} ${t('points')}`}
                   </Text>
                 </View>
-                <View style={[styles.podiumBase, { height: 135, backgroundColor: '#ff0000ff' }]}>
+                <View style={[styles.podiumBase, { height: verticalScale(135), backgroundColor: '#ff0000ff' }]}>
                   <Text style={styles.podiumRank}>1</Text>
                 </View>
               </View>
 
               {/* 2nd Place */}
               <View style={styles.podiumItem}>
-                <View style={[styles.avatarContainer, { width: 80, height: 80, borderRadius: 40, borderWidth: 1, borderColor: '#000000ff' }]}>
+                <View style={[styles.avatarContainer, { width: scale(80), height: scale(80), borderRadius: scale(40), borderWidth: 1, borderColor: '#000000ff' }]}>
                   {topThree[0].avatar ? (
                     <Image source={{ uri: topThree[0].avatar }} style={styles.avatar} />
                   ) : (
-                    <Ionicons name="person-circle-outline" size={70} color="#CCC" />
+                    <Ionicons name="person-circle-outline" size={scale(70)} color="#CCC" />
                   )}
 
                 </View>
@@ -158,18 +159,18 @@ export default function MedalScreen() {
                     {`${topThree[0].points} ${t('points')}`}
                   </Text>
                 </View>
-                <View style={[styles.podiumBase, { height: 100, backgroundColor: '#f8d330ff' }]}>
+                <View style={[styles.podiumBase, { height: verticalScale(100), backgroundColor: '#f8d330ff' }]}>
                   <Text style={styles.podiumRank}>2</Text>
                 </View>
               </View>
 
               {/* 3rd Place */}
               <View style={styles.podiumItem}>
-                <View style={[styles.avatarContainer, { width: 80, height: 80, borderRadius: 40, borderWidth: 1, borderColor: '#000000ff' }]}>
+                <View style={[styles.avatarContainer, { width: scale(80), height: scale(80), borderRadius: scale(40), borderWidth: 1, borderColor: '#000000ff' }]}>
                   {topThree[2].avatar ? (
                     <Image source={{ uri: topThree[2].avatar }} style={styles.avatar} />
                   ) : (
-                    <Ionicons name="person-circle-outline" size={70} color="#CCC" />
+                    <Ionicons name="person-circle-outline" size={scale(70)} color="#CCC" />
                   )}
 
                 </View>
@@ -181,7 +182,7 @@ export default function MedalScreen() {
                     {`${topThree[2].points} ${t('points')}`}
                   </Text>
                 </View>
-                <View style={[styles.podiumBase, { height: 65, backgroundColor: '#1ca900ff' }]}>
+                <View style={[styles.podiumBase, { height: verticalScale(65), backgroundColor: '#1ca900ff' }]}>
                   <Text style={styles.podiumRank}>3</Text>
                 </View>
               </View>
@@ -194,7 +195,7 @@ export default function MedalScreen() {
           ref={scrollRef}
           style={styles.listContainer}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 35, paddingBottom: 0 }}
+          contentContainerStyle={{ paddingHorizontal: scale(35), paddingBottom: 0 }}
         >
 
           {restOfPlayers.map((item) => {
@@ -215,10 +216,10 @@ export default function MedalScreen() {
                 {item.avatar ? (
                   <Image source={{ uri: item.avatar }} style={styles.listItemAvatar} />
                 ) : (
-                  <Ionicons name="person-circle-outline" size={50} color="#CCC" style={styles.listItemAvatar} />
+                  <Ionicons name="person-circle-outline" size={scale(50)} color="#CCC" style={styles.listItemAvatar} />
                 )}
                 <View style={styles.listItemInfo}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: scale(6) }}>
                     <Text style={[styles.listItemName, isMe && styles.myListItemName]} numberOfLines={1}>
                       {item.name}
                     </Text>
@@ -242,82 +243,85 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF', // White background
-    paddingTop: 40,
+    paddingTop: verticalScale(40),
   },
   headerBackground: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 478, // Covers header and podium
+    height: verticalScale(478), // Covers header and podium
     backgroundColor: '#ffffffff', // Cement Gray
-    borderBottomLeftRadius: 40,
-    borderBottomRightRadius: 40,
+    borderBottomLeftRadius: scale(40),
+    borderBottomRightRadius: scale(40),
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 15,
+    paddingHorizontal: scale(20),
+    paddingTop: verticalScale(10),
+    paddingBottom: verticalScale(15),
   },
 
   backBtn: {
-    width: 24,
+    width: scale(24),
   },
   headerTitle: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 22,
+    fontSize: moderateScale(22),
     fontWeight: '900',
     color: '#1A1A1A', // Black text
-    lineHeight: 32,
+    lineHeight: verticalScale(32),
   },
 
 
   tabContainer: {
     alignItems: 'center',
-    marginTop: 15,
+    marginTop: verticalScale(15),
     marginBottom: 0,
   },
   tabBackground: {
     flexDirection: 'row',
     backgroundColor: '#F5F5F5',
-    borderRadius: 15,
-    padding: 4,
-    width: width * 0.8,
+    borderRadius: scale(15),
+    padding: scale(4),
+    width: SCREEN_WIDTH * 0.8,
   },
 
   tab: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: verticalScale(8),
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 12,
-    minHeight: 44,
+    borderRadius: scale(12),
+    minHeight: verticalScale(44),
   },
 
   activeTab: {
     backgroundColor: '#008cffff',
-    boxShadow: '0px 4px 10px rgba(16, 185, 129, 0.2)',
+    shadowColor: 'rgba(16, 185, 129, 0.2)',
+    shadowOffset: { width: 0, height: verticalScale(4) },
+    shadowOpacity: 1,
+    shadowRadius: scale(10),
     elevation: 3,
   },
   tabText: {
     color: '#000000ff',
     fontWeight: '600',
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: moderateScale(14),
+    lineHeight: verticalScale(20),
   },
   activeTabText: {
     color: '#FFFFFF',
     fontWeight: '800',
-    lineHeight: 20,
+    lineHeight: verticalScale(20),
   },
 
 
   podiumWrapper: {
-    marginTop: 70,
+    marginTop: verticalScale(70),
     paddingBottom: 0,
   },
 
@@ -327,36 +331,36 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.15)',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginRight: 25,
-    marginBottom: 10,
-    gap: 5,
+    paddingHorizontal: scale(10),
+    paddingVertical: verticalScale(6),
+    borderRadius: scale(20),
+    marginRight: scale(25),
+    marginBottom: verticalScale(10),
+    gap: scale(5),
   },
   timerText: {
     color: '#FFF',
-    fontSize: 11,
+    fontSize: moderateScale(11),
     fontWeight: '600',
   },
   podiumContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'center',
-    paddingHorizontal: 15,
+    paddingHorizontal: scale(15),
   },
   podiumItem: {
     alignItems: 'center',
-    width: (width - 60) / 3,
+    width: (SCREEN_WIDTH - scale(60)) / 3,
   },
   avatarContainer: {
-    width: 65,
-    height: 65,
-    borderRadius: 32.5,
+    width: scale(65),
+    height: scale(65),
+    borderRadius: scale(32.5),
     borderWidth: 3,
     borderColor: 'rgba(255,255,255,0.5)',
     position: 'relative',
-    marginBottom: 8,
+    marginBottom: verticalScale(8),
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
@@ -366,71 +370,71 @@ const styles = StyleSheet.create({
   avatar: {
     width: '100%',
     height: '100%',
-    borderRadius: 40,
+    borderRadius: scale(40),
   },
 
   crownContainer: {
     position: 'absolute',
-    top: -20,
+    top: verticalScale(-20),
     zIndex: 10,
   },
   crownHexagon: {
-    width: 30,
-    height: 30,
+    width: scale(30),
+    height: scale(30),
     backgroundColor: '#FDD835',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: scale(8),
     transform: [{ rotate: '45deg' }],
   },
   podiumName: {
     color: '#1A1A1A',
-    fontSize: 12,
+    fontSize: moderateScale(12),
     fontWeight: '700',
-    marginBottom: 5,
+    marginBottom: verticalScale(5),
     textAlign: 'center',
-    lineHeight: 18,
+    lineHeight: verticalScale(18),
   },
   podiumPoints: {
     backgroundColor: '#F3F4F6',
-    paddingHorizontal: 4,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginBottom: 10,
-    minWidth: 60,
+    paddingHorizontal: scale(4),
+    paddingVertical: verticalScale(4),
+    borderRadius: scale(12),
+    marginBottom: verticalScale(10),
+    minWidth: scale(60),
     alignItems: 'center',
     justifyContent: 'center',
   },
   podiumPointsText: {
     color: '#000000',
-    fontSize: 12,
+    fontSize: moderateScale(12),
     fontWeight: '700',
-    lineHeight: 16,
+    lineHeight: verticalScale(16),
     textAlign: 'center',
   },
 
 
   podiumBase: {
     width: '100%',
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
+    borderTopLeftRadius: scale(15),
+    borderTopRightRadius: scale(15),
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingTop: 10,
+    paddingTop: verticalScale(10),
   },
   podiumRank: {
     color: '#FFF',
-    fontSize: 36,
+    fontSize: moderateScale(36),
     fontWeight: '800',
     opacity: 0.9,
-    lineHeight: 44,
+    lineHeight: verticalScale(44),
     textShadowColor: '#000',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
   listContainer: {
     flex: 1,
-    marginTop: 10,
+    marginTop: verticalScale(10),
   },
   listHandle: {
     display: 'none',
@@ -438,45 +442,45 @@ const styles = StyleSheet.create({
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 13,
+    paddingVertical: verticalScale(13),
     borderBottomWidth: 1,
     borderBottomColor: '#F5F5F5',
   },
   listItemRankContainer: {
-    width: 35, // Đảm bảo hiển thị tốt các số 2 chữ số (ví dụ: 10, 20)
+    width: scale(35), // Đảm bảo hiển thị tốt các số 2 chữ số (ví dụ: 10, 20)
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
+    marginRight: scale(10),
   },
   listItemRank: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     fontWeight: '700',
     color: '#1A1A1A',
-    lineHeight: 22, // Optimized for VN/Numbers
+    lineHeight: verticalScale(22), // Optimized for VN/Numbers
   },
 
   listItemAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 15,
+    width: scale(50),
+    height: scale(50),
+    borderRadius: scale(25),
+    marginRight: scale(15),
   },
   listItemInfo: {
     flex: 1,
   },
   listItemName: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '700',
     color: '#1A1A1A',
-    marginBottom: 2,
+    marginBottom: verticalScale(2),
   },
   listItemPoints: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     color: '#666',
   },
   myListItem: {
     backgroundColor: '#ffffffff',
-    paddingVertical: 13,
+    paddingVertical: verticalScale(13),
     marginHorizontal: 0,
     marginVertical: 0,
   },
@@ -485,31 +489,31 @@ const styles = StyleSheet.create({
   },
   meTag: {
     backgroundColor: '#764eb4ff',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
+    paddingHorizontal: scale(6),
+    paddingVertical: verticalScale(2),
+    borderRadius: scale(6),
   },
   meTagText: {
     color: '#FFF',
-    fontSize: 10,
+    fontSize: moderateScale(10),
     fontWeight: '900',
   },
   myRankIndicator: {
     position: 'absolute',
-    bottom: 80,
-    right: 30,
+    bottom: verticalScale(80),
+    right: scale(30),
     backgroundColor: '#9368d2ff',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+    paddingVertical: verticalScale(8),
+    paddingHorizontal: scale(16),
+    borderRadius: scale(20),
     shadowColor: '#9C77D5',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: verticalScale(4) },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowRadius: scale(8),
     elevation: 6,
   },
   myRankIndicatorText: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     fontWeight: '800',
     color: '#FFF',
   },

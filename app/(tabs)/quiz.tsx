@@ -3,12 +3,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getLeaderboardUsers } from '@/services/firebase-service';
 import { Ionicons } from '@expo/vector-icons';
+import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Dimensions, Image, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export default function QuizScreen() {
   const { t } = useLanguage();
@@ -74,7 +75,7 @@ export default function QuizScreen() {
 
       <ScrollView
         style={styles.scrollContent}
-        contentContainerStyle={{ paddingBottom: 25 }}
+        contentContainerStyle={{ paddingBottom: verticalScale(25) }}
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Card - Floating */}
@@ -84,7 +85,7 @@ export default function QuizScreen() {
               {user?.avatar ? (
                 <Image source={{ uri: user.avatar }} style={styles.cardAvatar} />
               ) : (
-                <Ionicons name="person-circle-outline" size={70} color="#000000ff" />
+                <Ionicons name="person-circle-outline" size={scale(70)} color="#000000ff" />
               )}
             </View>
 
@@ -125,7 +126,7 @@ export default function QuizScreen() {
             <View style={{ flex: 1.2 }}>
               <TouchableOpacity
                 activeOpacity={0.85}
-                style={[styles.bentoCard, { height: 295 }]}
+                style={[styles.bentoCard, { height: verticalScale(295) }]}
                 onPress={() => {
                   if (!user || user.isAnonymous) {
                     setShowLoginModal(true);
@@ -137,17 +138,17 @@ export default function QuizScreen() {
                 <View style={styles.bentoTitleContainer}>
                   <Text style={styles.bentoTitle} numberOfLines={2}>{t('pagoda_quiz')}</Text>
                 </View>
-                <View style={[styles.bentoImageContainer, { flex: 1, marginTop: 10 }]}>
+                <View style={[styles.bentoImageContainer, { flex: 1, marginTop: verticalScale(10) }]}>
                   <Image source={require('@/assets/images/pagoda.jpg')} style={styles.bentoImage} />
                 </View>
               </TouchableOpacity>
             </View>
 
             {/* Right Column – Coming soon items */}
-            <View style={{ flex: 1, gap: 15 }}>
+            <View style={{ flex: 1, gap: scale(15) }}>
               <TouchableOpacity
                 activeOpacity={0.7}
-                style={[styles.bentoCard, { height: 140 }]}
+                style={[styles.bentoCard, { height: verticalScale(140) }]}
                 onPress={() => {
                   if (!user || user.isAnonymous) {
                     setShowLoginModal(true);
@@ -156,8 +157,8 @@ export default function QuizScreen() {
                   router.push('/quiz-culture');
                 }}
               >
-                <View style={[styles.bentoTitleContainer, { height: 25 }]}>
-                  <Text style={[styles.bentoTitleSmall, { lineHeight: 34 }]} numberOfLines={1}>{t('culture_quiz')}</Text>
+                <View style={[styles.bentoTitleContainer, { height: verticalScale(25) }]}>
+                  <Text style={[styles.bentoTitleSmall, { lineHeight: verticalScale(34) }]} numberOfLines={1}>{t('culture_quiz')}</Text>
                 </View>
                 <View style={[styles.bentoImageContainerSmall, { flex: 1 }]}>
                   <Image source={require('@/assets/images/festival.jpg')} style={styles.bentoImage} />
@@ -166,7 +167,7 @@ export default function QuizScreen() {
 
               <TouchableOpacity
                 activeOpacity={0.7}
-                style={[styles.bentoCard, { height: 140 }]}
+                style={[styles.bentoCard, { height: verticalScale(140) }]}
                 onPress={() => {
                   if (!user || user.isAnonymous) {
                     setShowLoginModal(true);
@@ -175,8 +176,8 @@ export default function QuizScreen() {
                   router.push('/quiz-food');
                 }}
               >
-                <View style={[styles.bentoTitleContainer, { height: 25 }]}>
-                  <Text style={[styles.bentoTitleSmall, { lineHeight: 34 }]} numberOfLines={1}>{t('food_quiz')}</Text>
+                <View style={[styles.bentoTitleContainer, { height: verticalScale(25) }]}>
+                  <Text style={[styles.bentoTitleSmall, { lineHeight: verticalScale(34) }]} numberOfLines={1}>{t('food_quiz')}</Text>
                 </View>
                 <View style={[styles.bentoImageContainerSmall, { flex: 1 }]}>
                   <Image source={require('@/assets/images/amthuc.jpg')} style={styles.bentoImage} />
@@ -188,7 +189,7 @@ export default function QuizScreen() {
           {/* Bottom Full Width Card - Vocab Quiz */}
           <TouchableOpacity
             activeOpacity={0.7}
-            style={[styles.bentoCardFull, { marginTop: 10 }]}
+            style={[styles.bentoCardFull, { marginTop: verticalScale(10) }]}
             onPress={() => {
               if (!user || user.isAnonymous) {
                 setShowLoginModal(true);
@@ -219,10 +220,10 @@ export default function QuizScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setShowLoginModal(false)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: scale(24) }}>
           <View style={styles.modalContent}>
             <View style={styles.modalIconCircle}>
-              <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
+              <Ionicons name="person-circle-outline" size={scale(40)} color="#3B82F6" />
             </View>
             <Text style={styles.modalTitle}>{t('login_required')}</Text>
             <Text style={styles.modalSub}>{t('login_to_use')}</Text>
@@ -256,50 +257,49 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    paddingTop: 40,
+    paddingTop: verticalScale(40),
   },
   scrollContent: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 10,
+    paddingHorizontal: scale(20),
+    paddingTop: verticalScale(10),
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    minHeight: 50,
+    paddingHorizontal: scale(20),
+    minHeight: verticalScale(50),
     backgroundColor: '#FFFFFF',
     zIndex: 10,
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: moderateScale(22),
     fontWeight: '900',
     color: '#000000ff',
-    lineHeight: 32,
+    lineHeight: verticalScale(32),
   },
 
-  // Trong styles của quiz.tsx
   profileCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 25,
-    marginBottom: 15,
+    borderRadius: scale(24),
+    padding: scale(25),
+    marginBottom: verticalScale(15),
     borderWidth: 1,
     borderColor: '#F1F5F9',
-    height: 200, // Thiết lập chiều cao cố định để không bị nhảy khi đổi ngôn ngữ
+    height: verticalScale(200),
   },
 
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 15,
-    marginBottom: 20,
+    gap: scale(15),
+    marginBottom: verticalScale(20),
   },
   avatarWrapper: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: scale(70),
+    height: scale(70),
+    borderRadius: scale(35),
     backgroundColor: '#ffffffff',
     justifyContent: 'center',
     alignItems: 'center',
@@ -313,41 +313,41 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardName: {
-    fontSize: 22,
+    fontSize: moderateScale(22),
     fontWeight: '900',
     color: '#000000ff',
-    marginBottom: 4,
-    lineHeight: 30, // Fixed line height for Khmer
+    marginBottom: verticalScale(4),
+    lineHeight: verticalScale(30),
   },
   rankBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#ffffffff',
     paddingHorizontal: 0,
-    paddingVertical: 2,
-    borderRadius: 10,
+    paddingVertical: verticalScale(2),
+    borderRadius: scale(10),
     alignSelf: 'flex-start',
-    gap: 6,
-    height: 25, // Fixed height
+    gap: scale(6),
+    height: verticalScale(25),
   },
   cardRankText: {
-    fontSize: 15,
+    fontSize: moderateScale(15),
     fontWeight: '800',
     color: '#000000ff',
-    lineHeight: 20,
+    lineHeight: verticalScale(20),
   },
   cardStats: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     backgroundColor: '#ffffffff',
-    borderRadius: 16,
-    paddingVertical: 15,
+    borderRadius: scale(16),
+    paddingVertical: verticalScale(15),
   },
   statItem: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 5,
+    paddingHorizontal: scale(5),
   },
   statDivider: {
     width: 1,
@@ -356,58 +356,58 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   statValue: {
-    fontSize: 18,
+    fontSize: moderateScale(18),
     fontWeight: '900',
     color: '#1E293B',
-    lineHeight: 24,
+    lineHeight: verticalScale(24),
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     color: '#64748B',
     fontWeight: '600',
-    marginTop: 2,
+    marginTop: verticalScale(2),
     textAlign: 'center',
-    height: 18, // Fixed height to prevent shift
+    height: verticalScale(18),
   },
   sectionHeader: {
-    marginBottom: 20,
+    marginBottom: verticalScale(20),
     alignItems: 'flex-start',
-    height: 60, // Fixed height
+    height: verticalScale(60),
     justifyContent: 'center',
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: moderateScale(22),
     fontWeight: '900',
     color: '#1E293B',
     textAlign: 'left',
-    lineHeight: 30,
+    lineHeight: verticalScale(30),
   },
   sectionSubtitle: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     color: '#64748B',
-    marginTop: 2,
+    marginTop: verticalScale(2),
     textAlign: 'left',
-    lineHeight: 20,
+    lineHeight: verticalScale(20),
   },
   bentoContainer: {
     width: '100%',
   },
   bentoRow: {
     flexDirection: 'row',
-    gap: 15,
+    gap: scale(15),
   },
   bentoCard: {
-    borderRadius: 24,
-    padding: 16,
+    borderRadius: scale(24),
+    padding: scale(16),
     overflow: 'visible',
     position: 'relative',
     alignItems: 'center',
-    justifyContent: 'flex-start', // Use flex-start to control layout
+    justifyContent: 'flex-start',
     backgroundColor: '#FFFFFF',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: verticalScale(2) },
     shadowOpacity: 0.05,
-    shadowRadius: 5,
+    shadowRadius: scale(5),
     elevation: 2,
   },
   bentoTitleContainer: {
@@ -415,74 +415,74 @@ const styles = StyleSheet.create({
     height: '25%',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 5,
+    marginBottom: verticalScale(5),
   },
   bentoCardFull: {
     width: '100%',
-    height: 180,
-    borderRadius: 24,
-    padding: 20,
+    height: verticalScale(180),
+    borderRadius: scale(24),
+    padding: scale(20),
     overflow: 'visible',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: verticalScale(2) },
     shadowOpacity: 0.05,
-    shadowRadius: 5,
+    shadowRadius: scale(5),
     elevation: 2,
   },
 
   bentoTitle: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: '900',
     color: '#0F172A',
-    lineHeight: 28,
+    lineHeight: verticalScale(28),
     textAlign: 'center',
   },
   bentoTitleSmall: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     fontWeight: '900',
     color: '#0F172A',
-    lineHeight: 24,
+    lineHeight: verticalScale(24),
     textAlign: 'center',
   },
   bentoSubtitle: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     color: '#64748B',
     fontWeight: '600',
-    marginTop: 2,
+    marginTop: verticalScale(2),
     textAlign: 'center',
-    lineHeight: 18,
+    lineHeight: verticalScale(18),
   },
   bentoImageContainer: {
-    width: 110,
-    height: 110,
+    width: scale(110),
+    height: scale(110),
     opacity: 1,
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 0,
-    borderRadius: 25,
+    borderRadius: scale(25),
     overflow: 'hidden',
   },
   bentoImageContainerSmall: {
-    width: 70,
-    height: 70,
+    width: scale(70),
+    height: scale(70),
     opacity: 1,
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 5,
-    borderRadius: 15,
+    marginTop: verticalScale(5),
+    borderRadius: scale(15),
     overflow: 'hidden',
   },
   bentoImageContainerFull: {
-    width: 110,
-    height: 110,
+    width: scale(110),
+    height: scale(110),
     opacity: 1,
     backgroundColor: 'transparent',
-    borderRadius: 20,
+    borderRadius: scale(20),
     overflow: 'hidden',
   },
   bentoImage: {
@@ -498,56 +498,56 @@ const styles = StyleSheet.create({
   },
   activeBadge: {
     position: 'absolute',
-    bottom: 12,
-    right: 12,
+    bottom: verticalScale(12),
+    right: scale(12),
     backgroundColor: '#FF6B2C',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    paddingHorizontal: scale(8),
+    paddingVertical: verticalScale(4),
+    borderRadius: scale(8),
   },
   activeBadgeText: {
     color: '#FFF',
-    fontSize: 10,
+    fontSize: moderateScale(10),
     fontWeight: '800',
   },
   comingSoonTag: {
     position: 'absolute',
-    bottom: 8,
-    right: 8,
+    bottom: verticalScale(8),
+    right: scale(8),
     backgroundColor: '#F1F5F9',
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 6,
+    paddingHorizontal: scale(6),
+    paddingVertical: verticalScale(3),
+    borderRadius: scale(6),
   },
   comingSoonTagText: {
     color: '#94A3B8',
-    fontSize: 9,
+    fontSize: moderateScale(9),
     fontWeight: '700',
   },
   comingSoonText: {
     color: '#94A3B8',
-    fontSize: 9,
+    fontSize: moderateScale(9),
     fontWeight: '700',
   },
   bentoDesc: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     color: '#64748B',
-    marginTop: 4,
+    marginTop: verticalScale(4),
     textAlign: 'left',
   },
   // Pilgrimage Card Styles
   pilgrimageCard: {
-    marginBottom: 20,
-    borderRadius: 24,
+    marginBottom: verticalScale(20),
+    borderRadius: scale(24),
     overflow: 'hidden',
     elevation: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: verticalScale(10) },
     shadowOpacity: 0.2,
-    shadowRadius: 20,
+    shadowRadius: scale(20),
   },
   pilgrimageGradient: {
-    padding: 24,
+    padding: scale(24),
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -557,40 +557,40 @@ const styles = StyleSheet.create({
   },
   pLabel: {
     color: '#3B82F6',
-    fontSize: 10,
+    fontSize: moderateScale(10),
     fontWeight: '900',
     letterSpacing: 2,
-    marginBottom: 4,
+    marginBottom: verticalScale(4),
   },
   pTitle: {
     color: '#FFF',
-    fontSize: 24,
+    fontSize: moderateScale(24),
     fontWeight: '900',
-    marginBottom: 4,
+    marginBottom: verticalScale(4),
   },
   pDesc: {
     color: '#94A3B8',
-    fontSize: 13,
+    fontSize: moderateScale(13),
     fontWeight: '500',
-    marginBottom: 15,
+    marginBottom: verticalScale(15),
   },
   pBadge: {
     alignSelf: 'flex-start',
     backgroundColor: '#FFCC00',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-    gap: 6,
+    paddingHorizontal: scale(12),
+    paddingVertical: verticalScale(6),
+    borderRadius: scale(12),
+    gap: scale(6),
   },
   pBadgeText: {
     color: '#000',
-    fontSize: 11,
+    fontSize: moderateScale(11),
     fontWeight: '800',
   },
   pIconBox: {
-    marginLeft: 15,
+    marginLeft: scale(15),
   },
 
   // --- Premium Modal Styles ---
@@ -599,79 +599,79 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: scale(24),
   },
   modalContent: {
     backgroundColor: '#FFF',
-    borderRadius: 32,
-    padding: 30,
+    borderRadius: scale(32),
+    padding: scale(30),
     width: '100%',
-    maxWidth: 340,
+    maxWidth: scale(340),
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: verticalScale(10) },
     shadowOpacity: 0.1,
-    shadowRadius: 20,
+    shadowRadius: scale(20),
     elevation: 10,
   },
   modalIconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: scale(80),
+    height: scale(80),
+    borderRadius: scale(40),
     backgroundColor: '#EFF6FF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: verticalScale(20),
     borderWidth: 1,
     borderColor: '#DBEAFE',
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: '900',
     color: '#1E293B',
-    marginBottom: 8,
+    marginBottom: verticalScale(8),
     textAlign: 'center',
   },
   modalSub: {
-    fontSize: 15,
+    fontSize: moderateScale(15),
     color: '#64748B',
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 24,
+    lineHeight: verticalScale(22),
+    marginBottom: verticalScale(24),
   },
   modalActionRow: {
     width: '100%',
-    gap: 12,
+    gap: scale(12),
   },
   modalPrimaryBtn: {
     backgroundColor: '#3B82F6',
-    height: 56,
-    borderRadius: 18,
+    height: verticalScale(56),
+    borderRadius: scale(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
     shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: verticalScale(4) },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowRadius: scale(8),
     elevation: 4,
   },
   modalPrimaryBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '800',
   },
   modalSecondaryBtn: {
     backgroundColor: '#EF4444',
-    height: 56,
-    borderRadius: 18,
+    height: verticalScale(56),
+    borderRadius: scale(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
   modalSecondaryBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '800',
   },
 });

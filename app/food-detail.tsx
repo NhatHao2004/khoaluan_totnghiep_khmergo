@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
+import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -12,8 +13,8 @@ import {
   StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
-const HERO_HEIGHT = height * 0.40;
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const HERO_HEIGHT = SCREEN_HEIGHT * 0.40;
 
 export default function FoodDetailScreen() {
   const router = useRouter();
@@ -116,18 +117,18 @@ export default function FoodDetailScreen() {
             />
           ) : (
             <View style={styles.noImg}>
-              <Ionicons name="restaurant-outline" size={60} color="#E2E8F0" />
+              <Ionicons name="restaurant-outline" size={scale(60)} color="#E2E8F0" />
             </View>
           )}
 
           {/* --- Navigation inside Image --- */}
           <View style={styles.topNav}>
             <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
-              <Ionicons name="arrow-back" size={24} color="#000" />
+              <Ionicons name="arrow-back" size={scale(24)} color="#000" />
             </TouchableOpacity>
-            <View style={{ flexDirection: 'row', gap: 12 }}>
+            <View style={{ flexDirection: 'row', gap: scale(12) }}>
               <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
-                <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={22} color={isFavorite ? "#FF4B4B" : "#000"} />
+                <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={scale(22)} color={isFavorite ? "#FF4B4B" : "#000"} />
               </TouchableOpacity>
             </View>
           </View>
@@ -186,7 +187,7 @@ export default function FoodDetailScreen() {
               </TouchableOpacity>
             </View>
 
-            <View style={{ minHeight: 250 }}>
+            <View style={{ minHeight: verticalScale(250) }}>
               {activeTab === 'gallery' ? (
                 <View style={styles.galleryContainer}>
                   <ScrollView
@@ -195,11 +196,11 @@ export default function FoodDetailScreen() {
                     contentContainerStyle={[
                       styles.galleryScroll,
                       {
-                        paddingLeft: 25,
-                        paddingRight: 10
+                        paddingLeft: scale(25),
+                        paddingRight: scale(10)
                       }
                     ]}
-                    snapToInterval={width * 0.75 + 15}
+                    snapToInterval={SCREEN_WIDTH * 0.75 + scale(15)}
                     snapToAlignment="center"
                     decelerationRate="fast"
                     onScrollBeginDrag={() => setMainScrollEnabled(false)}
@@ -224,7 +225,7 @@ export default function FoodDetailScreen() {
                     {/* Placeholder nếu chỉ có 1 ảnh */}
                     {(!foodData?.imageUrl2) && (
                       <View style={[styles.galleryItem, styles.galleryPlaceholder]}>
-                        <Ionicons name="images-outline" size={32} color="#CBD5E1" />
+                        <Ionicons name="images-outline" size={scale(32)} color="#CBD5E1" />
                         <Text style={styles.placeholderText}>{isKm ? 'ពង្រីកដើម្បីមើលបន្ថែម...' : 'Mở rộng xem thêm...'}</Text>
                       </View>
                     )}
@@ -265,7 +266,7 @@ export default function FoodDetailScreen() {
             </View>
           </View>
 
-          <View style={{ height: 20 }} />
+          <View style={{ height: verticalScale(20) }} />
         </View>
       </ScrollView>
 
@@ -277,10 +278,10 @@ export default function FoodDetailScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setShowLoginModal(false)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: scale(24) }}>
           <View style={styles.modalContent}>
             <View style={styles.modalIconCircle}>
-              <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
+              <Ionicons name="person-circle-outline" size={scale(40)} color="#3B82F6" />
             </View>
             <Text style={styles.modalTitle}>{t('login_required') || 'Yêu cầu đăng nhập'}</Text>
             <Text style={styles.modalSub}>
@@ -322,28 +323,28 @@ const styles = StyleSheet.create({
   },
   topNav: {
     position: 'absolute',
-    top: 50,
-    left: 20,
-    right: 20,
+    top: verticalScale(50),
+    left: scale(20),
+    right: scale(20),
     flexDirection: 'row',
     justifyContent: 'space-between',
     zIndex: 100,
   },
   iconBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: scale(44),
+    height: scale(44),
+    borderRadius: scale(22),
     backgroundColor: 'rgba(255,255,255,0.9)',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: verticalScale(2) },
     shadowOpacity: 0.1,
-    shadowRadius: 5,
+    shadowRadius: scale(5),
     elevation: 4,
   },
   imageBlock: {
-    width: width,
+    width: SCREEN_WIDTH,
     height: HERO_HEIGHT,
     backgroundColor: '#fff',
   },
@@ -358,99 +359,99 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   contentArea: {
-    paddingHorizontal: 25,
-    paddingTop: 30,
+    paddingHorizontal: scale(25),
+    paddingTop: verticalScale(30),
     backgroundColor: '#fff',
-    borderTopLeftRadius: 36,
-    borderTopRightRadius: 36,
-    marginTop: -30,
-    minHeight: height - HERO_HEIGHT + 30,
+    borderTopLeftRadius: scale(36),
+    borderTopRightRadius: scale(36),
+    marginTop: verticalScale(-30),
+    minHeight: SCREEN_HEIGHT - HERO_HEIGHT + verticalScale(30),
   },
   titleBox: {
-    marginBottom: 20,
+    marginBottom: verticalScale(20),
   },
   mainTitle: {
-    fontSize: 28,
+    fontSize: moderateScale(28),
     fontWeight: '900',
     color: '#0F172A',
-    lineHeight: 36,
+    lineHeight: verticalScale(36),
   },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 8,
-    gap: 6,
+    marginTop: verticalScale(8),
+    gap: scale(6),
   },
   locationLabel: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     color: '#64748B',
     fontWeight: '500',
   },
   contentPiece: {
-    marginTop: 15,
+    marginTop: verticalScale(15),
   },
   blockPic: {
     width: '100%',
-    height: 220,
-    borderRadius: 24,
-    marginBottom: 15,
+    height: verticalScale(220),
+    borderRadius: scale(24),
+    marginBottom: verticalScale(15),
   },
   blockTextWrap: {
   },
   pieceTitle: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: '900',
     color: '#0F172A',
-    marginBottom: 8,
+    marginBottom: verticalScale(8),
   },
   piecePara: {
-    fontSize: 16,
-    lineHeight: 26,
+    fontSize: moderateScale(16),
+    lineHeight: verticalScale(26),
     color: '#475569',
     textAlign: 'left',
   },
   mediaWrap: {
-    marginTop: 10,
+    marginTop: verticalScale(10),
   },
   sectionTabRow: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 20,
+    gap: scale(12),
+    marginBottom: verticalScale(20),
   },
   tabBtn: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 12,
+    gap: scale(8),
+    paddingVertical: verticalScale(12),
     backgroundColor: '#F8FAFC',
-    borderRadius: 16,
+    borderRadius: scale(16),
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
   tabBtnText: {
-    fontSize: 13,
+    fontSize: moderateScale(13),
     fontWeight: '700',
     color: '#64748B',
     textTransform: 'uppercase',
-    lineHeight: 20,
+    lineHeight: verticalScale(20),
   },
   tabBtnTextActive: {
     color: '#FFF',
   },
   galleryContainer: {
-    marginHorizontal: -25,
-    width: width,
-    marginBottom: 10,
+    marginHorizontal: scale(-25),
+    width: SCREEN_WIDTH,
+    marginBottom: verticalScale(10),
   },
   galleryScroll: {
   },
   galleryItem: {
-    width: width * 0.75,
-    height: 200,
-    marginRight: 15,
-    borderRadius: 24,
+    width: SCREEN_WIDTH * 0.75,
+    height: verticalScale(200),
+    marginRight: scale(15),
+    borderRadius: scale(24),
     backgroundColor: '#F8FAFC',
     overflow: 'hidden',
   },
@@ -466,52 +467,52 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
   },
   placeholderText: {
-    marginTop: 10,
-    fontSize: 12,
+    marginTop: verticalScale(10),
+    fontSize: moderateScale(12),
     color: '#94A3B8',
     fontWeight: '600',
   },
   quizCard: {
-    height: 220,
+    height: verticalScale(220),
     backgroundColor: '#FFF7ED',
-    borderRadius: 28,
+    borderRadius: scale(28),
     borderWidth: 1,
     borderColor: '#FFEDD5',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 30,
+    paddingHorizontal: scale(30),
     marginHorizontal: 0,
   },
   quizTitle: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: '900',
     color: '#1E293B',
-    marginBottom: 8,
+    marginBottom: verticalScale(8),
   },
   quizDesc: {
-    fontSize: 13,
+    fontSize: moderateScale(13),
     color: '#64748B',
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 12,
+    lineHeight: verticalScale(22),
+    marginBottom: verticalScale(12),
   },
   quizStartBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: scale(10),
     backgroundColor: '#FF6B2C',
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 16,
+    paddingHorizontal: scale(24),
+    paddingVertical: verticalScale(14),
+    borderRadius: scale(16),
     shadowColor: '#FF6B2C',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: verticalScale(4) },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowRadius: scale(8),
     elevation: 4,
   },
   quizStartBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '800',
   },
   loaderContainer: {
@@ -522,10 +523,10 @@ const styles = StyleSheet.create({
   },
   loaderContent: {
     alignItems: 'center',
-    gap: 15,
+    gap: scale(15),
   },
   loaderText: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     color: '#64748B',
     fontWeight: '600',
     letterSpacing: 0.5,
@@ -537,79 +538,79 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: scale(24),
   },
   modalContent: {
     backgroundColor: '#FFF',
-    borderRadius: 32,
-    padding: 30,
+    borderRadius: scale(32),
+    padding: scale(30),
     width: '100%',
-    maxWidth: 340,
+    maxWidth: scale(340),
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: verticalScale(10) },
     shadowOpacity: 0.1,
-    shadowRadius: 20,
+    shadowRadius: scale(20),
     elevation: 10,
   },
   modalIconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: scale(80),
+    height: scale(80),
+    borderRadius: scale(40),
     backgroundColor: '#EFF6FF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: verticalScale(20),
     borderWidth: 1,
     borderColor: '#DBEAFE',
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: '900',
     color: '#1E293B',
-    marginBottom: 8,
+    marginBottom: verticalScale(8),
     textAlign: 'center',
   },
   modalSub: {
-    fontSize: 15,
+    fontSize: moderateScale(15),
     color: '#64748B',
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 24,
+    lineHeight: verticalScale(22),
+    marginBottom: verticalScale(24),
   },
   modalActionRow: {
     width: '100%',
-    gap: 12,
+    gap: scale(12),
   },
   modalPrimaryBtn: {
     backgroundColor: '#3B82F6',
-    height: 56,
-    borderRadius: 18,
+    height: verticalScale(56),
+    borderRadius: scale(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
     shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: verticalScale(4) },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowRadius: scale(8),
     elevation: 4,
   },
   modalPrimaryBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '800',
   },
   modalSecondaryBtn: {
     backgroundColor: '#EF4444',
-    height: 56,
-    borderRadius: 18,
+    height: verticalScale(56),
+    borderRadius: scale(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
   modalSecondaryBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '800',
   },
 });

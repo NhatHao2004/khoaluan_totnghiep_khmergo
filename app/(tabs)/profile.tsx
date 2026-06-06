@@ -2,6 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getLeaderboardUsers } from '@/services/firebase-service';
 import { Ionicons } from '@expo/vector-icons';
+import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
@@ -153,7 +154,7 @@ export default function ProfileScreen() {
                 (
                   <Image source={{ uri: user.avatar }} style={styles.avatar} />
                 ) : (
-                  <Ionicons name="person-circle-outline" size={115} color="#000000ff" />
+                  <Ionicons name="person-circle-outline" size={scale(115)} color="#000000ff" />
                 )}
             </View>
 
@@ -179,11 +180,11 @@ export default function ProfileScreen() {
             >
               <Ionicons
                 name={item.icon as any}
-                size={22}
+                size={scale(22)}
                 color={((!user || user.isAnonymous || isLoggingOut) && item.id !== 'login') ? '#94A3B8' : (item.color || '#555')}
                 style={[
                   styles.menuIcon,
-                  item.id === 'login' && { marginLeft: 3, marginRight: 12 }
+                  item.id === 'login' && { marginLeft: scale(3), marginRight: scale(12) }
                 ]}
               />
               <Text style={[
@@ -194,14 +195,14 @@ export default function ProfileScreen() {
               </Text>
               <Ionicons
                 name="chevron-forward"
-                size={18}
+                size={scale(18)}
                 color={((!user || user.isAnonymous || isLoggingOut) && item.id !== 'login') ? '#E2E8F0' : (item.color || '#CCC')}
               />
             </TouchableOpacity>
           ))}
         </View>
 
-        <View style={{ height: 40 }} />
+        <View style={{ height: verticalScale(40) }} />
       </ScrollView>
 
       {/* Custom Login Modal */}
@@ -285,77 +286,77 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    paddingTop: 40,
+    paddingTop: verticalScale(40),
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: scale(20),
     paddingTop: 0,
-    paddingBottom: 5,
-    minHeight: 60,
+    paddingBottom: verticalScale(5),
+    minHeight: verticalScale(60),
   },
 
   notifBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 15,
+    width: scale(40),
+    height: scale(40),
+    borderRadius: scale(15),
     backgroundColor: '#ffffffff',
     justifyContent: 'center',
     alignItems: 'center',
   },
   loginTextBtn: {
-    paddingHorizontal: 15,
-    paddingVertical: 6,
-    borderRadius: 15,
+    paddingHorizontal: scale(15),
+    paddingVertical: verticalScale(6),
+    borderRadius: scale(15),
     backgroundColor: '#00CFA3',
-    marginTop: 10,
+    marginTop: verticalScale(10),
     alignSelf: 'center',
   },
 
 
   loginTextBtnLabel: {
-    fontSize: 13,
+    fontSize: moderateScale(13),
     fontWeight: '700',
     color: '#ffffffff',
-    lineHeight: 18,
+    lineHeight: verticalScale(18),
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: moderateScale(22),
     fontWeight: '800',
     color: '#000000ff',
-    lineHeight: 32,
-    paddingVertical: 5,
-    paddingRight: 5,
+    lineHeight: verticalScale(32),
+    paddingVertical: verticalScale(5),
+    paddingRight: scale(5),
     textAlign: 'center',
   },
 
 
   // Profile Card
   profileCard: {
-    flexDirection: 'column', // Changed from row to center vertically
+    flexDirection: 'column',
     alignItems: 'center',
-    paddingHorizontal: 33,
-    paddingTop: 0, // Increased top padding
-    paddingBottom: 0, // Increased bottom padding
-    gap: 15,
+    paddingHorizontal: scale(33),
+    paddingTop: 0,
+    paddingBottom: 0,
+    gap: verticalScale(15),
   },
   avatarWrapper: {
     position: 'relative',
   },
   avatar: {
-    width: 115,
-    height: 115,
-    borderRadius: 60,
+    width: scale(115),
+    height: scale(115),
+    borderRadius: scale(60),
   },
   cameraBtn: {
     position: 'absolute',
-    bottom: 2,
-    right: 2,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    bottom: verticalScale(2),
+    right: scale(2),
+    width: scale(24),
+    height: scale(24),
+    borderRadius: scale(12),
     backgroundColor: '#555',
     justifyContent: 'center',
     alignItems: 'center',
@@ -363,52 +364,52 @@ const styles = StyleSheet.create({
     borderColor: '#FFF',
   },
   profileInfo: {
-    alignItems: 'center', // Center text horizontally
+    alignItems: 'center',
     gap: 0,
   },
   profileName: {
-    fontSize: 24,
+    fontSize: moderateScale(24),
     fontWeight: '800',
     color: '#1A1A1A',
-    marginBottom: 5,
-    lineHeight: 32,
-    paddingRight: 5,
+    marginBottom: verticalScale(5),
+    lineHeight: verticalScale(32),
+    paddingRight: scale(5),
     textAlign: 'center',
   },
   profileEmail: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     color: '#666',
     marginBottom: 0,
-    lineHeight: 20,
+    lineHeight: verticalScale(20),
     textAlign: 'center',
   },
 
 
   // Menu
   menuList: {
-    paddingHorizontal: 24,
-    paddingTop: 5,
+    paddingHorizontal: scale(24),
+    paddingTop: verticalScale(5),
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: verticalScale(20),
   },
   menuItemBorder: {
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
   },
   menuIcon: {
-    marginRight: 15,
-    width: 24,
+    marginRight: scale(15),
+    width: scale(24),
   },
   menuTitle: {
     flex: 1,
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '500',
     color: '#1A1A1A',
-    lineHeight: 23,
-    paddingRight: 5,
+    lineHeight: verticalScale(23),
+    paddingRight: scale(5),
   },
 
   // Logout Bottom Sheet Styles
@@ -419,156 +420,155 @@ const styles = StyleSheet.create({
   },
   logoutContent: {
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingHorizontal: 25,
-    paddingBottom: 40,
-    paddingTop: 10,
-    // Add shadow for white sheet
+    borderTopLeftRadius: scale(30),
+    borderTopRightRadius: scale(30),
+    paddingHorizontal: scale(25),
+    paddingBottom: verticalScale(40),
+    paddingTop: verticalScale(10),
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
+    shadowOffset: { width: 0, height: verticalScale(-4) },
     shadowOpacity: 0.1,
-    shadowRadius: 10,
+    shadowRadius: scale(10),
     elevation: 20,
   },
   modalHandle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
+    width: scale(40),
+    height: verticalScale(4),
+    borderRadius: scale(2),
     backgroundColor: '#E5E7EB',
     alignSelf: 'center',
-    marginBottom: 25,
+    marginBottom: verticalScale(25),
   },
   logoutHeader: {
     alignItems: 'center',
-    marginBottom: 30,
-    paddingTop: 20,
+    marginBottom: verticalScale(30),
+    paddingTop: verticalScale(20),
   },
   logoutIconCircle: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: scale(70),
+    height: scale(70),
+    borderRadius: scale(35),
     backgroundColor: 'rgba(255, 77, 77, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: verticalScale(15),
   },
   logoutTitle: {
-    fontSize: 22,
+    fontSize: moderateScale(22),
     fontWeight: '800',
     color: '#FFF',
-    marginBottom: 8,
+    marginBottom: verticalScale(8),
   },
   logoutMsg: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     color: '#1A1A1A',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: verticalScale(24),
     fontWeight: '500',
   },
   logoutActionRow: {
-    gap: 12,
+    gap: verticalScale(12),
   },
   confirmLogoutBtn: {
-    height: 56,
-    borderRadius: 16,
+    height: verticalScale(56),
+    borderRadius: scale(16),
     backgroundColor: '#FF4D4D',
     justifyContent: 'center',
     alignItems: 'center',
   },
   confirmLogoutText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '800',
-    lineHeight: 28,
+    lineHeight: verticalScale(28),
   },
   cancelLogoutBtn: {
-    height: 56,
-    borderRadius: 16,
+    height: verticalScale(56),
+    borderRadius: scale(16),
     backgroundColor: '#1877F2',
     justifyContent: 'center',
     alignItems: 'center',
   },
   cancelLogoutText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '800',
-    lineHeight: 28,
+    lineHeight: verticalScale(28),
   },
 
   // Login Required Modal (centered card)
   loginModalContent: {
     backgroundColor: '#FFF',
-    borderRadius: 32,
-    padding: 30,
+    borderRadius: scale(32),
+    padding: scale(30),
     width: '100%',
-    maxWidth: 340,
+    maxWidth: scale(340),
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: verticalScale(10) },
     shadowOpacity: 0.1,
-    shadowRadius: 20,
+    shadowRadius: scale(20),
     elevation: 10,
   },
   loginModalIconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: scale(80),
+    height: scale(80),
+    borderRadius: scale(40),
     backgroundColor: '#EFF6FF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: verticalScale(20),
     borderWidth: 1,
     borderColor: '#DBEAFE',
   },
   loginModalTitle: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: '900',
     color: '#1E293B',
-    marginBottom: 8,
+    marginBottom: verticalScale(8),
     textAlign: 'center',
   },
   loginModalSub: {
-    fontSize: 15,
+    fontSize: moderateScale(15),
     color: '#64748B',
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 24,
+    lineHeight: verticalScale(22),
+    marginBottom: verticalScale(24),
   },
   loginModalActionRow: {
     width: '100%',
-    gap: 12,
+    gap: scale(12),
   },
   loginModalPrimaryBtn: {
     backgroundColor: '#3B82F6',
-    height: 56,
-    borderRadius: 18,
+    height: verticalScale(56),
+    borderRadius: scale(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
     shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: verticalScale(4) },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowRadius: scale(8),
     elevation: 4,
   },
   loginModalPrimaryBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '800',
   },
   loginModalSecondaryBtn: {
     backgroundColor: '#EF4444',
-    height: 56,
-    borderRadius: 18,
+    height: verticalScale(56),
+    borderRadius: scale(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
   loginModalSecondaryBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '800',
-    lineHeight: 28,
+    lineHeight: verticalScale(28),
   },
 });

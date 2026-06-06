@@ -1,6 +1,7 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toggleFavorite } from '@/services/firebase-service';
 import { db } from '@/utils/firebaseConfig';
+import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
@@ -86,10 +87,10 @@ export default function FavoritesScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={26} color="#1A1A1A" />
+          <Ionicons name="arrow-back" size={scale(26)} color="#1A1A1A" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('favorites')}</Text>
-        <View style={{ width: 40 }} />
+        <View style={{ width: scale(40) }} />
       </View>
 
       <ScrollView
@@ -99,7 +100,7 @@ export default function FavoritesScreen() {
         {favorites.length === 0 ? (
           <View style={styles.emptyContainer}>
             <View style={styles.emptyIconCircle}>
-              <Ionicons name="heart-dislike-outline" size={50} color="#FF4D4D" />
+              <Ionicons name="heart-dislike-outline" size={scale(50)} color="#FF4D4D" />
             </View>
             <Text style={styles.emptyTitle}>Chưa có mục yêu thích nào</Text>
             <Text style={styles.emptySub}>Hãy khám phá và lưu lại những điều{'\n'}bạn yêu thích nhé</Text>
@@ -139,106 +140,106 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FAFAFA',
-    paddingTop: 33,
+    paddingTop: verticalScale(33),
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 15,
+    paddingHorizontal: scale(20),
+    paddingTop: verticalScale(10),
+    paddingBottom: verticalScale(15),
     backgroundColor: '#FAFAFA',
   },
   backBtn: {
-    width: 40,
-    height: 40,
+    width: scale(40),
+    height: scale(40),
     justifyContent: 'center',
     alignItems: 'flex-start',
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: '800',
     color: '#1A1A1A',
     textAlign: 'center',
   },
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: verticalScale(20),
   },
   emptyContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 240,
-    paddingHorizontal: 30,
+    paddingTop: verticalScale(240),
+    paddingHorizontal: scale(30),
   },
   emptyIconCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: scale(100),
+    height: scale(100),
+    borderRadius: scale(50),
     backgroundColor: '#FFE5E5',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: verticalScale(20),
   },
   emptyTitle: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: '800',
     color: '#1A1A1A',
-    marginBottom: 10,
+    marginBottom: verticalScale(10),
     textAlign: 'center',
   },
   emptySub: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     color: '#666',
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 30,
+    lineHeight: verticalScale(22),
+    marginBottom: verticalScale(30),
   },
   exploreButton: {
     backgroundColor: '#FF0050',
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 25,
+    paddingHorizontal: scale(30),
+    paddingVertical: verticalScale(15),
+    borderRadius: scale(25),
     elevation: 3,
     shadowColor: '#FF0050',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: verticalScale(4) },
     shadowOpacity: 0.3,
-    shadowRadius: 5,
+    shadowRadius: scale(5),
   },
   exploreText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '800',
   },
   listContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
+    paddingHorizontal: scale(20),
+    paddingTop: verticalScale(10),
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: moderateScale(18),
     fontWeight: '800',
     color: '#1A1A1A',
-    marginBottom: 15,
+    marginBottom: verticalScale(15),
   },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+    borderRadius: scale(20),
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    marginBottom: 15,
+    padding: scale(12),
+    marginBottom: verticalScale(15),
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: verticalScale(2) },
     shadowOpacity: 0.05,
-    shadowRadius: 5,
+    shadowRadius: scale(5),
   },
   cardImage: {
-    width: 65,
-    height: 65,
-    borderRadius: 15,
-    marginRight: 15,
+    width: scale(65),
+    height: scale(65),
+    borderRadius: scale(15),
+    marginRight: scale(15),
     resizeMode: 'contain',
     overflow: 'hidden',
   },
@@ -247,25 +248,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cardTitle: {
-    fontSize: 17,
+    fontSize: moderateScale(17),
     fontWeight: '800',
     color: '#1A1A1A',
-    marginBottom: 6,
+    marginBottom: verticalScale(6),
   },
   cardLocationBox: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   cardLocation: {
-    fontSize: 10,
+    fontSize: moderateScale(10),
     color: '#666',
-    marginLeft: 4,
+    marginLeft: scale(4),
     flexShrink: 1,
   },
   heartButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 18,
+    width: scale(30),
+    height: scale(30),
+    borderRadius: scale(18),
     borderWidth: 1.5,
     borderColor: '#f6f1f1ff',
     backgroundColor: 'transparent',

@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFoods } from '@/hooks/use-foods';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import {
@@ -78,14 +79,14 @@ export default function FoodScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={handleBackPress}>
-          <Ionicons name="arrow-back" size={28} color="#000000" />
+          <Ionicons name="arrow-back" size={scale(28)} color="#000000" />
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
           <ThemedText style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
             {t('food')}
           </ThemedText>
         </View>
-        <View style={{ width: 40 }} />
+        <View style={{ width: scale(40) }} />
       </View>
 
       <ScrollView
@@ -141,7 +142,7 @@ export default function FoodScreen() {
       {loading && (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color="#FF0050" />
-          <ThemedText style={{ marginTop: 10, color: '#888' }}>{t('loading_content')}</ThemedText>
+          <ThemedText style={{ marginTop: verticalScale(10), color: '#888' }}>{t('loading_content')}</ThemedText>
         </View>
       )}
     </View>
@@ -150,19 +151,32 @@ export default function FoodScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f9fa' },
-  header: { backgroundColor: '#ffffff', paddingTop: 45, paddingBottom: 15, paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', elevation: 5, zIndex: 100 },
-  backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
+  header: {
+    backgroundColor: '#ffffff',
+    paddingTop: verticalScale(45),
+    paddingBottom: verticalScale(15),
+    paddingHorizontal: scale(15),
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: verticalScale(2) },
+    shadowOpacity: 0.1,
+    shadowRadius: scale(10),
+    elevation: 5,
+    zIndex: 100
+  },
+  backBtn: { width: scale(40), height: scale(40), justifyContent: 'center', alignItems: 'center' },
   headerTitleContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { color: '#000000', fontSize: 20, fontWeight: '800', lineHeight: 32 },
+  headerTitle: { color: '#000000', fontSize: moderateScale(20), fontWeight: '800', lineHeight: verticalScale(32) },
   content: { flex: 1 },
-  scrollContent: { paddingBottom: 20, flexGrow: 1 },
-  foodList: { padding: 15, gap: 15 },
-  foodCard: { backgroundColor: '#ffffff', borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)', elevation: 2 },
+  scrollContent: { paddingBottom: verticalScale(20), flexGrow: 1 },
+  foodList: { padding: scale(15), gap: verticalScale(15) },
+  foodCard: { backgroundColor: '#ffffff', borderRadius: scale(20), overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)', elevation: 2 },
   imageContainer: { width: '100%', aspectRatio: 16 / 10 },
   foodImage: { width: '100%', height: '100%' },
-  foodContent: { padding: 15 },
-  foodName: { fontSize: 18, fontWeight: '800', color: '#1A1A1A', marginBottom: 5 },
-  foodLocation: { fontSize: 13, color: '#666' },
+  foodContent: { padding: scale(15) },
+  foodName: { fontSize: moderateScale(18), fontWeight: '800', color: '#1A1A1A', marginBottom: verticalScale(5) },
+  foodLocation: { fontSize: moderateScale(13), color: '#666' },
   loader: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#fff',
@@ -170,6 +184,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 10
   },
-  errorText: { textAlign: 'center', marginTop: 50, color: 'red' },
-  emptyText: { textAlign: 'center', marginTop: 50, color: '#999' },
+  errorText: { textAlign: 'center', marginTop: verticalScale(50), color: 'red' },
+  emptyText: { textAlign: 'center', marginTop: verticalScale(50), color: '#999' },
 });

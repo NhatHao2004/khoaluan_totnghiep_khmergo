@@ -4,6 +4,7 @@ import { Audio } from 'expo-av';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import {
   ActivityIndicator,
   Keyboard,
@@ -172,14 +173,14 @@ export default function TranslatorScreen() {
         {/* Header Navigation */}
         <View style={styles.navHeader}>
           <TouchableOpacity style={styles.backBtn} onPress={handleBackPress}>
-            <Ionicons name="arrow-back" size={28} color="#000000ff" />
+            <Ionicons name="arrow-back" size={scale(28)} color="#000000ff" />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
             <ThemedText style={styles.headerTitle} numberOfLines={1}>
               {t('vocab_translation')}
             </ThemedText>
           </View>
-          <View style={{ width: 40 }} />
+          <View style={{ width: scale(40) }} />
         </View>
 
         {/* Thanh Chọn Ngôn Ngữ */}
@@ -191,7 +192,7 @@ export default function TranslatorScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={handleSwap} style={styles.swapButton}>
-            <Ionicons name="swap-horizontal" size={24} color="#000000ff" />
+            <Ionicons name="swap-horizontal" size={scale(24)} color="#000000ff" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.langButtonContainer}>
@@ -232,7 +233,7 @@ export default function TranslatorScreen() {
               >
                 <Ionicons
                   name={isPlaying ? "volume-high" : "volume-medium"}
-                  size={24}
+                  size={scale(24)}
                   color="#1A73E8"
                 />
               </TouchableOpacity>
@@ -258,14 +259,14 @@ export default function TranslatorScreen() {
                   <TouchableOpacity onPress={() => playSound(translatedText, isViToKm ? 'km' : 'vi')} disabled={isPlaying}>
                     <Ionicons
                       name={isPlaying ? "volume-high" : "volume-medium"}
-                      size={24}
+                      size={scale(24)}
                       color="#1A73E8"
                     />
                   </TouchableOpacity>
                 </View>
               </View>
             ) : isLoading ? (
-              <ActivityIndicator size="small" color="#1A73E8" style={{ marginTop: 20 }} />
+              <ActivityIndicator size="small" color="#1A73E8" style={{ marginTop: verticalScale(20) }} />
             ) : null}
           </View>
 
@@ -278,19 +279,19 @@ export default function TranslatorScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF', // Toàn bộ nền trắng chuẩn Google
+    backgroundColor: '#FFFFFF',
   },
   navHeader: {
-    paddingTop: 45,
-    paddingHorizontal: 15,
-    paddingBottom: 10,
+    paddingTop: verticalScale(45),
+    paddingHorizontal: scale(15),
+    paddingBottom: verticalScale(10),
     backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     alignItems: 'center',
   },
   backBtn: {
-    width: 40,
-    height: 40,
+    width: scale(40),
+    height: scale(40),
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -301,34 +302,34 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: '#3C4043',
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: 'bold',
     textAlign: 'center',
-    lineHeight: 32,
-    paddingTop: 5,
+    lineHeight: verticalScale(32),
+    paddingTop: verticalScale(5),
   },
   langBarRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 15,
+    paddingVertical: verticalScale(15),
   },
   langButtonContainer: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 5,
+    paddingVertical: verticalScale(5),
   },
   langButtonText: {
-    color: '#1A73E8', // Màu xanh dương đặc trưng Google
-    fontSize: 16,
+    color: '#1A73E8',
+    fontSize: moderateScale(16),
     fontWeight: '500',
   },
   caret: {
-    marginLeft: 6,
-    marginTop: 2,
+    marginLeft: scale(6),
+    marginTop: verticalScale(2),
   },
   swapButton: {
-    padding: 10,
+    padding: scale(10),
   },
   divider: {
     height: 1,
@@ -339,9 +340,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   inputArea: {
-    minHeight: 200,
-    padding: 20,
-    paddingTop: 10,
+    minHeight: verticalScale(200),
+    padding: scale(20),
+    paddingTop: verticalScale(10),
     backgroundColor: '#FFFFFF',
   },
   inputRow: {
@@ -349,42 +350,42 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   textInput: {
-    fontSize: 26, // Chữ to giống ảnh
-    color: '#3C4043', // Xám đen mềm
+    fontSize: moderateScale(26),
+    color: '#3C4043',
     textAlignVertical: 'top',
-    minHeight: 200, // Đủ cao để gõ được vài dòng
+    minHeight: verticalScale(200),
   },
   clearBtn: {
-    padding: 5,
-    marginLeft: 10,
-    alignSelf: 'flex-start', // Nằm dính trên cùng
+    padding: scale(5),
+    marginLeft: scale(10),
+    alignSelf: 'flex-start',
   },
   inputFooter: {
     flexDirection: 'row',
-    justifyContent: 'flex-end', // Nút loa góc phải dưới
+    justifyContent: 'flex-end',
     alignItems: 'flex-end',
     flex: 1,
-    marginTop: 10,
+    marginTop: verticalScale(10),
   },
   resultArea: {
-    minHeight: 150,
-    padding: 20,
-    backgroundColor: '#F8F9FA', // Một chút màu xám rất nhạt cho kết quả
+    minHeight: verticalScale(150),
+    padding: scale(20),
+    backgroundColor: '#F8F9FA',
     borderBottomWidth: 1,
     borderColor: '#E8EAED',
   },
   resultText: {
-    fontSize: 26,
+    fontSize: moderateScale(26),
     color: '#3C4043',
-    lineHeight: 36,
+    lineHeight: verticalScale(36),
   },
   phoneticText: {
-    marginTop: 8,
-    fontSize: 14,
-    lineHeight: 22,
+    marginTop: verticalScale(8),
+    fontSize: moderateScale(14),
+    lineHeight: verticalScale(22),
     color: '#5F6368',
     fontStyle: 'italic',
-    paddingHorizontal: 20,
+    paddingHorizontal: scale(20),
     width: '100%',
   },
   resultFooter: {
@@ -392,9 +393,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'flex-end',
     flex: 1,
-    marginTop: 20,
+    marginTop: verticalScale(20),
   },
   footerIcon: {
-    marginLeft: 20,
+    marginLeft: scale(20),
   }
 });

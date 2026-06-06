@@ -1,5 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
@@ -64,7 +65,7 @@ export default function AIAssistantScreen() {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withTiming(Platform.OS === 'ios' ? 50 : 40, { duration: 400 });
+    toastY.value = withTiming(Platform.OS === 'ios' ? verticalScale(50) : verticalScale(40), { duration: 400 });
 
     setTimeout(() => {
       toastY.value = withTiming(-120, { duration: 400 });
@@ -270,7 +271,7 @@ export default function AIAssistantScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name="chevron-back" size={28} color="#1F2937" />
+          <Ionicons name="chevron-back" size={scale(28)} color="#1F2937" />
         </TouchableOpacity>
         <View style={styles.headerInfo}>
           <Text style={styles.headerTitle}>{activeTab === 'chat' ? 'KhmerGo AI' : 'KhmerGo AI'}</Text>
@@ -279,7 +280,7 @@ export default function AIAssistantScreen() {
           style={styles.menuBtn}
           onPress={() => activeTab === 'camera' ? resetCamera() : clearChat()}
         >
-          <Ionicons name="trash-outline" size={24} color="#1F2937" />
+          <Ionicons name="trash-outline" size={scale(24)} color="#1F2937" />
         </TouchableOpacity>
       </View>
 
@@ -290,14 +291,14 @@ export default function AIAssistantScreen() {
             style={[styles.tab, activeTab === 'chat' && styles.activeTab]}
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('chat'); }}
           >
-            <Ionicons name="chatbubbles" size={20} color={activeTab === 'chat' ? '#FFF' : '#6B7280'} />
+            <Ionicons name="chatbubbles" size={scale(20)} color={activeTab === 'chat' ? '#FFF' : '#6B7280'} />
             <Text style={[styles.tabText, activeTab === 'chat' && styles.activeTabText]} numberOfLines={1}>AI Chatbot</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'camera' && styles.activeTab]}
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('camera'); }}
           >
-            <Ionicons name="camera" size={20} color={activeTab === 'camera' ? '#FFF' : '#6B7280'} />
+            <Ionicons name="camera" size={scale(20)} color={activeTab === 'camera' ? '#FFF' : '#6B7280'} />
             <Text style={[styles.tabText, activeTab === 'camera' && styles.activeTabText]} numberOfLines={1}>AI Camera</Text>
           </TouchableOpacity>
         </View>
@@ -380,8 +381,8 @@ export default function AIAssistantScreen() {
               styles.inputContainer,
               {
                 paddingBottom: keyboardHeight > 0
-                  ? (Platform.OS === 'ios' ? keyboardHeight - 15 : keyboardHeight + 10)
-                  : 12
+                  ? (Platform.OS === 'ios' ? keyboardHeight - verticalScale(15) : keyboardHeight + verticalScale(10))
+                  : verticalScale(12)
               }
             ]}>
               <TextInput
@@ -393,7 +394,7 @@ export default function AIAssistantScreen() {
                 multiline
               />
               <TouchableOpacity style={styles.sendfab} onPress={sendMessage}>
-                <Ionicons name="send" size={28} color={inputText.trim() ? "#1877F2" : "#1877F2"} />
+                <Ionicons name="send" size={scale(28)} color={inputText.trim() ? "#1877F2" : "#1877F2"} />
               </TouchableOpacity>
             </View>
           </View>
@@ -403,7 +404,7 @@ export default function AIAssistantScreen() {
               style={{ flex: 1 }}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{
-                paddingBottom: (status === 'idle' || status === 'selected') ? 150 : 10
+                paddingBottom: (status === 'idle' || status === 'selected') ? verticalScale(150) : verticalScale(10)
               }}
             >
               <View style={styles.cameraSection}>
@@ -444,21 +445,21 @@ export default function AIAssistantScreen() {
                   </View>
 
                   {(status === 'idle' || status === 'selected') && (
-                    <View style={{ marginBottom: 5 }}>
-                      <Text style={{ fontSize: 18, fontWeight: '800', color: '#1A1A1A' }}>
+                    <View style={{ marginBottom: verticalScale(5) }}>
+                      <Text style={{ fontSize: moderateScale(18), fontWeight: '800', color: '#1A1A1A' }}>
                         {status === 'idle' ? t('ai_camera_idle_title') : t('ai_camera_ready')}
                       </Text>
                     </View>
                   )}
                   {status === 'idle' && <Text style={styles.aiBubbleTextSmall}>{t('ai_camera_idle_desc')}</Text>}
                   {status === 'selected' && <Text style={styles.aiBubbleTextSmall}>{t('ai_camera_selected_desc')}</Text>}
-                  {status === 'analyzing' && <View style={[styles.analyzingBox, { marginTop: 120 }]}>
+                  {status === 'analyzing' && <View style={[styles.analyzingBox, { marginTop: verticalScale(120) }]}>
                     <ActivityIndicator color="#0066ffff" size="large" />
                     <Text style={styles.analyzingText}>{t('ai_analyzing')}</Text>
                   </View>}
 
                   {status === 'result' && result && (
-                    <View style={{ marginTop: -5 }}>
+                    <View style={{ marginTop: verticalScale(-5) }}>
                       <Text style={styles.resultTitleSmall}>{result.title}</Text>
                       <Text style={styles.aiBubbleTextSmall}>{result.content}</Text>
                     </View>
@@ -473,10 +474,10 @@ export default function AIAssistantScreen() {
                 {status === 'idle' && (
                   <View style={styles.camBtnRow}>
                     <TouchableOpacity style={styles.rectBtn} onPress={() => pickImage(false)}>
-                      <Ionicons name="images" size={32} color="#0066ffff" />
+                      <Ionicons name="images" size={scale(32)} color="#0066ffff" />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.rectBtn} onPress={() => pickImage(true)}>
-                      <Ionicons name="camera" size={32} color="#0066ffff" />
+                      <Ionicons name="camera" size={scale(32)} color="#0066ffff" />
                     </TouchableOpacity>
                   </View>
                 )}
@@ -502,8 +503,8 @@ export default function AIAssistantScreen() {
             shadowColor: toastType === 'error' ? '#EF4444' : (toastType === 'success' ? '#10B981' : '#007AFF'),
           }
         ]}>
-          <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}>
-            <Ionicons name={toastType === 'success' ? "checkmark" : (toastType === 'error' ? "close" : "information")} size={18} color="#FFF" />
+          <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', width: scale(32), height: scale(32), borderRadius: scale(16), justifyContent: 'center', alignItems: 'center' }}>
+            <Ionicons name={toastType === 'success' ? "checkmark" : (toastType === 'error' ? "close" : "information")} size={scale(18)} color="#FFF" />
           </View>
           <Text style={styles.toastText}>{toastMsg}</Text>
         </Animated.View>
@@ -517,85 +518,85 @@ const styles = StyleSheet.create({
   toastContainer: {
     position: 'absolute',
     top: 0,
-    left: 15,
-    right: 15,
+    left: scale(15),
+    right: scale(15),
     zIndex: 10000,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 22,
+    paddingVertical: verticalScale(14),
+    paddingHorizontal: scale(20),
+    borderRadius: scale(22),
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: verticalScale(10) },
     shadowOpacity: 0.3,
-    shadowRadius: 20,
+    shadowRadius: scale(20),
     elevation: 10
   },
-  toastText: { color: '#FFF', fontSize: 15, fontWeight: '700', marginLeft: 15, flex: 1, letterSpacing: 0.3 },
-  header: { paddingTop: 40, paddingBottom: 10, paddingHorizontal: 20, backgroundColor: '#FFF', flexDirection: 'row', alignItems: 'center' },
-  backBtn: { marginRight: 15 },
+  toastText: { color: '#FFF', fontSize: moderateScale(15), fontWeight: '700', marginLeft: scale(15), flex: 1, letterSpacing: 0.3 },
+  header: { paddingTop: verticalScale(40), paddingBottom: verticalScale(10), paddingHorizontal: scale(20), backgroundColor: '#FFF', flexDirection: 'row', alignItems: 'center' },
+  backBtn: { marginRight: scale(15) },
   headerInfo: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 20, fontWeight: '900', color: '#1A1A1A', textAlign: 'center' },
-  menuBtn: { width: 42, height: 42, justifyContent: 'center', alignItems: 'center' },
+  headerTitle: { fontSize: moderateScale(20), fontWeight: '900', color: '#1A1A1A', textAlign: 'center' },
+  menuBtn: { width: scale(42), height: scale(42), justifyContent: 'center', alignItems: 'center' },
 
-  tabContainer: { paddingHorizontal: 20, paddingVertical: 10, backgroundColor: '#FFF' },
-  tabWrapper: { flexDirection: 'row', backgroundColor: '#F1F5F9', borderRadius: 25, padding: 4 },
-  tab: { flex: 1, flexDirection: 'row', height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', gap: 6 },
+  tabContainer: { paddingHorizontal: scale(20), paddingVertical: verticalScale(10), backgroundColor: '#FFF' },
+  tabWrapper: { flexDirection: 'row', backgroundColor: '#F1F5F9', borderRadius: scale(25), padding: scale(4) },
+  tab: { flex: 1, flexDirection: 'row', height: verticalScale(40), borderRadius: scale(20), alignItems: 'center', justifyContent: 'center', gap: scale(6) },
   activeTab: {
     backgroundColor: '#1877F2',
     shadowColor: '#1877F2',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: verticalScale(4) },
     shadowOpacity: 0.4,
-    shadowRadius: 8,
+    shadowRadius: scale(8),
     elevation: 8,
   },
-  tabText: { fontSize: 13, fontWeight: '700', color: '#64748B' },
+  tabText: { fontSize: moderateScale(13), fontWeight: '700', color: '#64748B' },
   activeTabText: { color: '#FFF' },
 
   contentArea: { flex: 1 },
   messageList: { flex: 1 },
-  messageListContent: { paddingHorizontal: 15, paddingTop: 15, paddingBottom: 30 },
-  messageWrapper: { flexDirection: 'row', marginBottom: 24, width: '100%', paddingHorizontal: 10, alignItems: 'flex-start' },
+  messageListContent: { paddingHorizontal: scale(15), paddingTop: verticalScale(15), paddingBottom: verticalScale(30) },
+  messageWrapper: { flexDirection: 'row', marginBottom: verticalScale(24), width: '100%', paddingHorizontal: scale(10), alignItems: 'flex-start' },
   aiWrapper: { alignSelf: 'flex-start' },
   userWrapper: { alignSelf: 'flex-end', justifyContent: 'flex-end' },
-  chatAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#F1F3F4', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' },
-  aiBubbleContainer: { marginLeft: 8, flex: 1, maxWidth: '82%' },
-  userBubbleContainer: { marginRight: 8, alignItems: 'flex-end', flex: 1, maxWidth: '82%' },
-  chatName: { fontSize: 13, fontWeight: '700', color: '#5F6368', marginBottom: 4, marginLeft: 8 },
-  chatTime: { fontSize: 11, color: '#70757A', marginTop: 4, marginLeft: 8 },
+  chatAvatar: { width: scale(36), height: scale(36), borderRadius: scale(18), backgroundColor: '#F1F3F4', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' },
+  aiBubbleContainer: { marginLeft: scale(8), flex: 1, maxWidth: '82%' },
+  userBubbleContainer: { marginRight: scale(8), alignItems: 'flex-end', flex: 1, maxWidth: '82%' },
+  chatName: { fontSize: moderateScale(13), fontWeight: '700', color: '#5F6368', marginBottom: verticalScale(4), marginLeft: scale(8) },
+  chatTime: { fontSize: moderateScale(11), color: '#70757A', marginTop: verticalScale(4), marginLeft: scale(8) },
   aiBubble: {
     backgroundColor: '#F1F3F4',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 22,
-    borderTopLeftRadius: 4,
+    paddingHorizontal: scale(16),
+    paddingVertical: verticalScale(10),
+    borderRadius: scale(22),
+    borderTopLeftRadius: scale(4),
     alignSelf: 'flex-start'
   },
   userBubble: {
     backgroundColor: '#1877F2',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 22,
-    borderBottomRightRadius: 4,
+    paddingHorizontal: scale(16),
+    paddingVertical: verticalScale(10),
+    borderRadius: scale(22),
+    borderBottomRightRadius: scale(4),
     alignSelf: 'flex-end'
   },
-  aiMessageText: { fontSize: 16, color: '#1A1A1A', lineHeight: 22, textAlign: 'justify' },
-  userMessageText: { fontSize: 16, color: '#FFFFFF', lineHeight: 22, textAlign: 'justify' },
+  aiMessageText: { fontSize: moderateScale(16), color: '#1A1A1A', lineHeight: verticalScale(22), textAlign: 'justify' },
+  userMessageText: { fontSize: moderateScale(16), color: '#FFFFFF', lineHeight: verticalScale(22), textAlign: 'justify' },
 
   detailBtn: {
     backgroundColor: '#1877F2',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
-    marginTop: 6,
+    paddingHorizontal: scale(12),
+    paddingVertical: verticalScale(8),
+    borderRadius: scale(12),
+    marginTop: verticalScale(6),
     alignSelf: 'flex-start',
-    gap: 6
+    gap: scale(6)
   },
   detailBtnText: {
     color: '#FFF',
-    fontSize: 14,
+    fontSize: moderateScale(14),
     fontWeight: '700'
   },
 
@@ -604,42 +605,42 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.1)',
     justifyContent: 'flex-start',
     alignItems: 'flex-end',
-    paddingTop: 60,
-    paddingRight: 10
+    paddingTop: verticalScale(60),
+    paddingRight: scale(10)
   },
   menuPopup: {
-    width: 220,
+    width: scale(220),
     backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 8,
+    borderRadius: scale(16),
+    padding: scale(8),
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: verticalScale(4) },
     shadowOpacity: 0.15,
-    shadowRadius: 10,
+    shadowRadius: scale(10),
     elevation: 8,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    gap: 12
+    padding: scale(12),
+    gap: scale(12)
   },
   menuItemText: {
-    fontSize: 15,
+    fontSize: moderateScale(15),
     fontWeight: '600',
     color: '#1A1A1A'
   },
   menuDivider: {
     height: 1,
     backgroundColor: '#F1F5F9',
-    marginHorizontal: 8
+    marginHorizontal: scale(8)
   },
 
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 15,
-    paddingTop: 12,
+    paddingHorizontal: scale(15),
+    paddingTop: verticalScale(12),
     borderTopWidth: 1,
     borderTopColor: '#F0F0F0',
     backgroundColor: '#FFFFFF'
@@ -647,72 +648,72 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     backgroundColor: '#F0F2F5',
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    fontSize: 16,
-    maxHeight: 110,
+    borderRadius: scale(20),
+    paddingHorizontal: scale(15),
+    paddingVertical: verticalScale(10),
+    fontSize: moderateScale(16),
+    maxHeight: verticalScale(110),
     color: '#1A1A1A'
   },
   sendfab: {
-    marginLeft: 10,
-    width: 45,
-    height: 45,
+    marginLeft: scale(10),
+    width: scale(45),
+    height: scale(45),
     justifyContent: 'center',
     alignItems: 'center'
   },
 
-  cameraSection: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 10, alignItems: 'center' },
-  imageFrame: { width: SCREEN_WIDTH - 80, aspectRatio: 1, padding: 15, position: 'relative', marginBottom: 10 },
-  innerFrame: { width: '100%', height: '100%', borderRadius: 25, overflow: 'hidden', backgroundColor: '#F1F5F9', borderWidth: 1, borderColor: '#E2E8F0' },
+  cameraSection: { paddingHorizontal: scale(20), paddingTop: verticalScale(20), paddingBottom: verticalScale(10), alignItems: 'center' },
+  imageFrame: { width: SCREEN_WIDTH - scale(80), aspectRatio: 1, padding: scale(15), position: 'relative', marginBottom: verticalScale(10) },
+  innerFrame: { width: '100%', height: '100%', borderRadius: scale(25), overflow: 'hidden', backgroundColor: '#F1F5F9', borderWidth: 1, borderColor: '#E2E8F0' },
   imageWrapper: { width: '100%', height: '100%' },
   previewImage: { width: '100%', height: '100%', resizeMode: 'cover' },
-  scanLine: { position: 'absolute', left: 0, right: 0, height: 4, zIndex: 10 },
+  scanLine: { position: 'absolute', left: 0, right: 0, height: verticalScale(4), zIndex: 10 },
   placeholderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 
-  corner: { position: 'absolute', width: 45, height: 45, borderColor: '#000000ff', borderStyle: 'solid', zIndex: 20 },
-  topL: { top: 0, left: 0, borderTopWidth: 3.5, borderLeftWidth: 3.5, borderTopLeftRadius: 15 },
-  topR: { top: 0, right: 0, borderTopWidth: 3.5, borderRightWidth: 3.5, borderTopRightRadius: 15 },
-  botL: { bottom: 0, left: 0, borderBottomWidth: 3.5, borderLeftWidth: 3.5, borderBottomLeftRadius: 15 },
-  botR: { bottom: 0, right: 0, borderBottomWidth: 3.5, borderRightWidth: 3.5, borderBottomRightRadius: 15 },
+  corner: { position: 'absolute', width: scale(45), height: scale(45), borderColor: '#000000ff', borderStyle: 'solid', zIndex: 20 },
+  topL: { top: 0, left: 0, borderTopWidth: 3.5, borderLeftWidth: 3.5, borderTopLeftRadius: scale(15) },
+  topR: { top: 0, right: 0, borderTopWidth: 3.5, borderRightWidth: 3.5, borderTopRightRadius: scale(15) },
+  botL: { bottom: 0, left: 0, borderBottomWidth: 3.5, borderLeftWidth: 3.5, borderBottomLeftRadius: scale(15) },
+  botR: { bottom: 0, right: 0, borderBottomWidth: 3.5, borderRightWidth: 3.5, borderBottomRightRadius: scale(15) },
 
-  focusBracketContainer: { width: 80, height: 80, position: 'relative' },
-  focusBracket: { position: 'absolute', width: 25, height: 25, borderColor: '#000000ff', borderStyle: 'solid' },
-  fb_tl: { top: 0, left: 0, borderTopWidth: 2, borderLeftWidth: 2, borderTopLeftRadius: 10 },
-  fb_tr: { top: 0, right: 0, borderTopWidth: 2, borderRightWidth: 2, borderTopRightRadius: 10 },
-  fb_bl: { bottom: 0, left: 0, borderBottomWidth: 2, borderLeftWidth: 2, borderBottomLeftRadius: 10 },
-  fb_br: { bottom: 0, right: 0, borderBottomWidth: 2, borderRightWidth: 2, borderBottomRightRadius: 10 },
+  focusBracketContainer: { width: scale(80), height: scale(80), position: 'relative' },
+  focusBracket: { position: 'absolute', width: scale(25), height: scale(25), borderColor: '#000000ff', borderStyle: 'solid' },
+  fb_tl: { top: 0, left: 0, borderTopWidth: 2, borderLeftWidth: 2, borderTopLeftRadius: scale(10) },
+  fb_tr: { top: 0, right: 0, borderTopWidth: 2, borderRightWidth: 2, borderTopRightRadius: scale(10) },
+  fb_bl: { bottom: 0, left: 0, borderBottomWidth: 2, borderLeftWidth: 2, borderBottomLeftRadius: scale(10) },
+  fb_br: { bottom: 0, right: 0, borderBottomWidth: 2, borderRightWidth: 2, borderBottomRightRadius: scale(10) },
 
   aiCard: {
     backgroundColor: '#FFF',
-    borderRadius: 35,
-    paddingHorizontal: 24,
-    paddingBottom: 24,
-    paddingTop: 5,
+    borderRadius: scale(35),
+    paddingHorizontal: scale(24),
+    paddingBottom: scale(24),
+    paddingTop: scale(5),
     width: '100%',
   },
-  aiHeader: { alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-  aiAvatarSmall: { width: 36, height: 36, borderRadius: 20, backgroundColor: '#1877F2', justifyContent: 'center', alignItems: 'center' },
-  aiNameSmall: { fontSize: 18, fontWeight: '900', color: '#1A1A1A', textAlign: 'center' },
-  aiBubbleTextSmall: { fontSize: 16, color: '#475569', lineHeight: 26, textAlign: 'justify' },
-  analyzingBox: { alignItems: 'center', paddingVertical: 10 },
-  analyzingText: { marginTop: 5, color: '#1877F2', fontWeight: '600' },
-  resultTitleSmall: { fontSize: 22, fontWeight: '900', color: '#1A1A1A', marginBottom: 5 },
+  aiHeader: { alignItems: 'center', justifyContent: 'center', marginBottom: verticalScale(12) },
+  aiAvatarSmall: { width: scale(36), height: scale(36), borderRadius: scale(20), backgroundColor: '#1877F2', justifyContent: 'center', alignItems: 'center' },
+  aiNameSmall: { fontSize: moderateScale(18), fontWeight: '900', color: '#1A1A1A', textAlign: 'center' },
+  aiBubbleTextSmall: { fontSize: moderateScale(16), color: '#475569', lineHeight: verticalScale(26), textAlign: 'justify' },
+  analyzingBox: { alignItems: 'center', paddingVertical: verticalScale(10) },
+  analyzingText: { marginTop: verticalScale(5), color: '#1877F2', fontWeight: '600' },
+  resultTitleSmall: { fontSize: moderateScale(22), fontWeight: '900', color: '#1A1A1A', marginBottom: verticalScale(5) },
 
-  camBtnRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 15 },
+  camBtnRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: scale(15) },
   rectBtn: {
     flex: 1,
-    height: 70,
+    height: verticalScale(70),
     backgroundColor: '#FFF',
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
-    borderRadius: 20,
+    borderRadius: scale(20),
     justifyContent: 'center',
     alignItems: 'center',
   },
-  analyzeBtn: { width: '100%', height: 60, borderRadius: 20, overflow: 'hidden' },
+  analyzeBtn: { width: '100%', height: verticalScale(60), borderRadius: scale(20), overflow: 'hidden' },
   analyzeGradient: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  analyzeBtnText: { color: '#FFF', fontWeight: '800', letterSpacing: 0.5, fontSize: 16 },
+  analyzeBtnText: { color: '#FFF', fontWeight: '800', letterSpacing: 0.5, fontSize: moderateScale(16) },
 
   fixedCameraActions: {
     position: 'absolute',
@@ -720,9 +721,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'transparent',
-    paddingHorizontal: 20,
-    paddingBottom: 25,
-    paddingTop: 10,
+    paddingHorizontal: scale(20),
+    paddingBottom: verticalScale(25),
+    paddingTop: verticalScale(10),
     alignItems: 'center',
     justifyContent: 'center',
   },
