@@ -1,4 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { scale, verticalScale, moderateScale } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -103,10 +104,10 @@ export default function GameMCQScreen() {
 
   const shakeCard = useCallback(() => {
     Animated.sequence([
-      Animated.timing(cardShake, { toValue: 8, duration: 60, useNativeDriver: true }),
-      Animated.timing(cardShake, { toValue: -8, duration: 60, useNativeDriver: true }),
-      Animated.timing(cardShake, { toValue: 6, duration: 60, useNativeDriver: true }),
-      Animated.timing(cardShake, { toValue: -6, duration: 60, useNativeDriver: true }),
+      Animated.timing(cardShake, { toValue: scale(8), duration: 60, useNativeDriver: true }),
+      Animated.timing(cardShake, { toValue: -scale(8), duration: 60, useNativeDriver: true }),
+      Animated.timing(cardShake, { toValue: scale(6), duration: 60, useNativeDriver: true }),
+      Animated.timing(cardShake, { toValue: -scale(6), duration: 60, useNativeDriver: true }),
       Animated.timing(cardShake, { toValue: 0, duration: 60, useNativeDriver: true }),
     ]).start();
   }, []);
@@ -232,7 +233,7 @@ export default function GameMCQScreen() {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator size="large" color="#FF6B2C" />
-        <Text style={{ marginTop: 12, color: '#64748B' }}>Đang tải câu hỏi...</Text>
+        <Text style={{ marginTop: verticalScale(12), color: '#64748B' }}>Đang tải câu hỏi...</Text>
       </View>
     );
   }
@@ -240,10 +241,10 @@ export default function GameMCQScreen() {
   // ─────────────── GUEST VIEW ───────────────
   if (!user) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 24 }]}>
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: scale(24) }]}>
         <StatusBar barStyle="dark-content" />
         <View style={styles.guestIconCircle}>
-          <Ionicons name="lock-closed" size={50} color="#3B82F6" />
+          <Ionicons name="lock-closed" size={scale(50)} color="#3B82F6" />
         </View>
         <Text style={styles.guestTitle}>Yêu cầu đăng nhập</Text>
         <Text style={styles.guestSub}>
@@ -279,7 +280,7 @@ export default function GameMCQScreen() {
   if (phase === 'result') {
     const displayPoints = correctCount * POINTS_PER_CORRECT;
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 24 }]}>
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: scale(24) }]}>
         <StatusBar barStyle="dark-content" />
 
         {/* Stars */}
@@ -288,9 +289,9 @@ export default function GameMCQScreen() {
             <Ionicons
               key={s}
               name={s <= stars ? 'star' : 'star-outline'}
-              size={44}
+              size={scale(44)}
               color={s <= stars ? '#FBBF24' : '#E2E8F0'}
-              style={{ marginHorizontal: 4 }}
+              style={{ marginHorizontal: scale(4) }}
             />
           ))}
         </View>
@@ -321,7 +322,7 @@ export default function GameMCQScreen() {
               key={i}
               style={[styles.resultDot, r ? styles.resultDotGreen : styles.resultDotRed]}
             >
-              <Ionicons name={r ? 'checkmark' : 'close'} size={12} color="#FFF" />
+              <Ionicons name={r ? 'checkmark' : 'close'} size={scale(12)} color="#FFF" />
             </View>
           ))}
         </View>
@@ -330,7 +331,7 @@ export default function GameMCQScreen() {
           style={[styles.resultPrimaryBtn, { backgroundColor: quizData.color }]}
           onPress={handleReplay}
         >
-          <Ionicons name="refresh" size={18} color="#FFF" />
+          <Ionicons name="refresh" size={scale(18)} color="#FFF" />
           <Text style={styles.resultPrimaryBtnText}>Chơi lại</Text>
         </TouchableOpacity>
 
@@ -366,7 +367,7 @@ export default function GameMCQScreen() {
           <View style={styles.headerTopRow}>
             <Text style={styles.headerTitle}>Câu {questionIndex + 1} / {TOTAL_QUESTIONS}</Text>
             <View style={styles.scorePill}>
-              <Ionicons name="flash" size={16} color="#F59E0B" />
+              <Ionicons name="flash" size={scale(16)} color="#F59E0B" />
               <Text style={styles.scorePillText}>{score}</Text>
             </View>
           </View>
@@ -432,9 +433,9 @@ export default function GameMCQScreen() {
               >
                 <View style={getOptionLetterStyle(index)}>
                   {answerState !== 'idle' && index === currentQuestion?.correctIndex ? (
-                    <Ionicons name="checkmark" size={16} color="#FFF" />
+                    <Ionicons name="checkmark" size={scale(16)} color="#FFF" />
                   ) : answerState !== 'idle' && index === selectedOption && index !== currentQuestion.correctIndex ? (
-                    <Ionicons name="close" size={16} color="#FFF" />
+                    <Ionicons name="close" size={scale(16)} color="#FFF" />
                   ) : (
                     <Text style={[
                       styles.optLetter,
@@ -449,7 +450,7 @@ export default function GameMCQScreen() {
             ))}
           </View>
         </Animated.View>
-        <View style={{ height: 40 }} />
+        <View style={{ height: verticalScale(40) }} />
       </ScrollView>
 
       {/* New Bottom Feedback UI */}
@@ -463,7 +464,7 @@ export default function GameMCQScreen() {
               <View style={[styles.statusIconCircle, answerState === 'wrong' && styles.statusIconCircleWrong]}>
                 <Ionicons
                   name={answerState === 'correct' ? 'checkmark' : 'close'}
-                  size={24}
+                  size={scale(24)}
                   color="#FFF"
                 />
               </View>
@@ -510,7 +511,7 @@ export default function GameMCQScreen() {
         style={styles.floatingCloseBtn}
         activeOpacity={0.8}
       >
-        <Ionicons name="close" size={26} color="#FFF" />
+        <Ionicons name="close" size={scale(26)} color="#FFF" />
       </TouchableOpacity>
 
       {/* Custom Exit Modal */}
@@ -524,7 +525,7 @@ export default function GameMCQScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.exitModalContent}>
             <View style={styles.exitIconCircle}>
-              <Ionicons name="exit-outline" size={40} color="#EF4444" />
+              <Ionicons name="exit-outline" size={scale(40)} color="#EF4444" />
             </View>
             <Text style={styles.exitTitle}>Thoát khỏi trò chơi</Text>
             <Text style={styles.exitSub}>Tiến trình hiện tại của bạn sẽ{'\n'}không được lưu lại</Text>
@@ -562,7 +563,7 @@ export default function GameMCQScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.exitModalContent}>
             <View style={[styles.exitIconCircle, { backgroundColor: '#EFF6FF', borderColor: '#DBEAFE' }]}>
-              <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
+              <Ionicons name="person-circle-outline" size={scale(40)} color="#3B82F6" />
             </View>
             <Text style={styles.exitTitle}>Bạn chưa đăng nhập</Text>
             <Text style={styles.exitSub}>Hãy đăng nhập để lưu lại thành tích{'\n'}và tích luỹ điểm thưởng nhé!</Text>
@@ -596,46 +597,46 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
   bgCircle: {
     position: 'absolute',
-    top: -100,
-    right: -100,
-    width: 300,
-    height: 300,
-    borderRadius: 150,
+    top: verticalScale(-100),
+    right: scale(-100),
+    width: scale(300),
+    height: scale(300),
+    borderRadius: scale(150),
     zIndex: 0,
   },
 
   // ── MODERN HEADER ──
   headerContainer: {
-    paddingTop: 52,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    height: 120, // Fixed height
+    paddingTop: verticalScale(52),
+    paddingHorizontal: scale(20),
+    paddingBottom: verticalScale(20),
+    height: verticalScale(120),
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFF',
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: scale(30),
+    borderBottomRightRadius: scale(30),
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: verticalScale(10) },
     shadowOpacity: 0.03,
-    shadowRadius: 20,
+    shadowRadius: scale(20),
     elevation: 5,
     zIndex: 10,
   },
   floatingCloseBtn: {
     position: 'absolute',
-    bottom: 30,
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    bottom: verticalScale(30),
+    right: scale(20),
+    width: scale(56),
+    height: scale(56),
+    borderRadius: scale(28),
     backgroundColor: '#1E293B',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: verticalScale(4) },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowRadius: scale(8),
     elevation: 5,
     zIndex: 100,
   },
@@ -647,18 +648,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: verticalScale(12),
   },
   headerTitle: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '800',
     color: '#334155',
   },
   progressContainer: {
     width: '100%',
-    height: 10,
+    height: verticalScale(10),
     backgroundColor: '#F1F5F9',
-    borderRadius: 5,
+    borderRadius: scale(5),
     overflow: 'hidden',
   },
   progressTrack: {
@@ -666,29 +667,29 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    borderRadius: 5,
+    borderRadius: scale(5),
   },
   scorePill: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFBEB',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    gap: 6,
+    paddingHorizontal: scale(12),
+    paddingVertical: verticalScale(6),
+    borderRadius: scale(20),
+    gap: scale(6),
     borderWidth: 1,
     borderColor: '#FEF3C7',
   },
   scorePillText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '900',
     color: '#D97706',
   },
 
   // ── SCROLL CONTENT ──
   scrollContent: {
-    paddingTop: 24,
-    paddingHorizontal: 20,
+    paddingTop: verticalScale(24),
+    paddingHorizontal: scale(20),
     flexGrow: 1,
   },
 
@@ -697,23 +698,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
-    gap: 8,
+    marginBottom: verticalScale(24),
+    gap: scale(8),
   },
   modernDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: scale(8),
+    height: scale(8),
+    borderRadius: scale(4),
   },
   modernDotEmpty: {
     backgroundColor: '#CBD5E1',
-    width: 6,
-    height: 6,
+    width: scale(6),
+    height: scale(6),
   },
   modernDotActive: {
-    width: 24,
-    height: 8,
-    borderRadius: 4,
+    width: scale(24),
+    height: scale(8),
+    borderRadius: scale(4),
   },
   modernDotCorrect: {
     backgroundColor: '#22C55E',
@@ -725,31 +726,31 @@ const styles = StyleSheet.create({
   // ── MAIN QUESTION CARD ──
   mainCard: {
     backgroundColor: '#FFF',
-    borderRadius: 30,
-    padding: 28,
+    borderRadius: scale(30),
+    padding: scale(28),
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 20 },
+    shadowOffset: { width: 0, height: verticalScale(20) },
     shadowOpacity: 0.05,
-    shadowRadius: 30,
+    shadowRadius: scale(30),
     elevation: 8,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.8)',
-    marginBottom: 24,
+    marginBottom: verticalScale(24),
   },
   mainQuestionText: {
-    fontSize: 22,
+    fontSize: moderateScale(22),
     fontWeight: '800',
     color: '#1E293B',
-    lineHeight: 32,
+    lineHeight: verticalScale(32),
     textAlign: 'center',
   },
   modernExplBox: {
-    marginTop: 20,
-    padding: 16,
-    borderRadius: 20,
+    marginTop: verticalScale(20),
+    padding: scale(16),
+    borderRadius: scale(20),
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 12,
+    gap: scale(12),
   },
   modernExplCorrect: {
     backgroundColor: '#F0FDF4',
@@ -763,29 +764,29 @@ const styles = StyleSheet.create({
   },
   modernExplText: {
     flex: 1,
-    fontSize: 14,
+    fontSize: moderateScale(14),
     color: '#475569',
-    lineHeight: 20,
+    lineHeight: verticalScale(20),
     fontWeight: '600',
     textAlign: 'justify',
   },
 
   // ── OPTIONS AREA ──
   optionsArea: {
-    gap: 12,
+    gap: verticalScale(12),
   },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFF',
-    padding: 18,
-    borderRadius: 24,
+    padding: scale(18),
+    borderRadius: scale(24),
     borderWidth: 2,
     borderColor: '#F1F5F9',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: verticalScale(4) },
     shadowOpacity: 0.02,
-    shadowRadius: 8,
+    shadowRadius: scale(8),
     elevation: 2,
   },
   optionCorrect: {
@@ -802,27 +803,27 @@ const styles = StyleSheet.create({
     borderColor: '#F1F5F9',
   },
   optionLetterBox: {
-    width: 40,
-    height: 40,
-    borderRadius: 14,
+    width: scale(40),
+    height: scale(40),
+    borderRadius: scale(14),
     backgroundColor: '#F1F5F9',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: scale(16),
   },
   optLetter: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '900',
     color: '#64748B',
   },
   optText: {
     flex: 1,
-    fontSize: 15,
+    fontSize: moderateScale(15),
     fontWeight: '700',
     color: '#334155',
   },
   correctMarker: {
-    marginLeft: 8,
+    marginLeft: scale(8),
   },
 
   // --- New Bottom Feedback Styles ---
@@ -831,37 +832,37 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(15, 23, 42, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: scale(24),
     zIndex: 2000,
   },
   feedbackBottomCard: {
     backgroundColor: '#F0FDF4',
-    borderRadius: 36,
+    borderRadius: scale(36),
     width: '100%',
-    maxWidth: 350,
-    padding: 30,
+    maxWidth: scale(350),
+    padding: scale(30),
     borderWidth: 2,
     borderColor: '#DCFCE7',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 20 },
+    shadowOffset: { width: 0, height: verticalScale(20) },
     shadowOpacity: 0.2,
-    shadowRadius: 30,
+    shadowRadius: scale(30),
     elevation: 20,
   },
   feedbackBottomCardWrong: {
-    backgroundColor: '#FEF2F2', // Light red
+    backgroundColor: '#FEF2F2',
     borderColor: '#FEE2E2',
   },
   feedbackHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    marginBottom: 16,
+    gap: scale(12),
+    marginBottom: verticalScale(16),
   },
   statusIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: scale(36),
+    height: scale(36),
+    borderRadius: scale(18),
     backgroundColor: '#22C55E',
     justifyContent: 'center',
     alignItems: 'center',
@@ -870,7 +871,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#EF4444',
   },
   statusText: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: '900',
     color: '#166534',
   },
@@ -879,19 +880,19 @@ const styles = StyleSheet.create({
   },
   explScroll: {
     width: '100%',
-    maxHeight: 250,
-    marginBottom: 20,
+    maxHeight: verticalScale(250),
+    marginBottom: verticalScale(20),
     backgroundColor: '#FFFFFF',
     borderWidth: 2,
     borderColor: '#1E293B',
     borderStyle: 'dashed',
-    borderRadius: 16,
-    padding: 12,
-    marginTop: 15,
+    borderRadius: scale(16),
+    padding: scale(12),
+    marginTop: verticalScale(15),
   },
   explTextNew: {
-    fontSize: 15,
-    lineHeight: 24,
+    fontSize: moderateScale(15),
+    lineHeight: verticalScale(24),
     color: '#334155',
     fontWeight: '600',
     textAlign: 'center',
@@ -901,16 +902,16 @@ const styles = StyleSheet.create({
   },
   nextBtnNew: {
     backgroundColor: '#22C55E',
-    height: 60,
-    borderRadius: 20,
+    height: verticalScale(60),
+    borderRadius: scale(20),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
+    gap: scale(10),
     shadowColor: '#22C55E',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: verticalScale(4) },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowRadius: scale(8),
     elevation: 4,
   },
   nextBtnNewWrong: {
@@ -919,18 +920,18 @@ const styles = StyleSheet.create({
   },
   nextBtnTextNew: {
     color: '#FFF',
-    fontSize: 18,
+    fontSize: moderateScale(18),
     fontWeight: '800',
   },
   correctAnswerBox: {
-    marginTop: 10,
-    marginBottom: 20,
+    marginTop: verticalScale(10),
+    marginBottom: verticalScale(20),
     alignSelf: 'center',
     alignItems: 'center',
     gap: 0,
   },
   correctAnswerLabel: {
-    fontSize: 11,
+    fontSize: moderateScale(11),
     fontWeight: '800',
     color: '#64748B',
     textTransform: 'uppercase',
@@ -940,7 +941,7 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   correctAnswerText: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '900',
     color: '#1E293B',
     textAlign: 'center',
@@ -953,42 +954,42 @@ const styles = StyleSheet.create({
   resultStarsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: 16,
+    marginBottom: verticalScale(16),
   },
-  resultTitle: { fontSize: 26, fontWeight: '900', color: '#1E293B', marginBottom: 20, textAlign: 'center' },
+  resultTitle: { fontSize: moderateScale(26), fontWeight: '900', color: '#1E293B', marginBottom: verticalScale(20), textAlign: 'center' },
   resultScoreCard: {
     width: '100%', alignItems: 'center', backgroundColor: '#FFF',
-    borderRadius: 24, padding: 24, borderWidth: 2, marginBottom: 14,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.07, shadowRadius: 12, elevation: 4,
+    borderRadius: scale(24), padding: scale(24), borderWidth: 2, marginBottom: verticalScale(14),
+    shadowColor: '#000', shadowOffset: { width: 0, height: verticalScale(4) },
+    shadowOpacity: 0.07, shadowRadius: scale(12), elevation: 4,
   },
   resultScoreRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: 8,
+    gap: scale(8),
   },
-  resultScoreNum: { fontSize: 52, fontWeight: '900' },
-  resultScoreLabel: { fontSize: 16, color: '#64748B', fontWeight: '600' },
-  savingText: { fontSize: 12, color: '#94A3B8', marginTop: 6 },
-  savedText: { fontSize: 12, color: '#22C55E', fontWeight: '700', marginTop: 6 },
-  resultCorrectLabel: { fontSize: 14, color: '#64748B', marginBottom: 16 },
-  resultDotRow: { flexDirection: 'row', gap: 8, marginBottom: 28 },
+  resultScoreNum: { fontSize: moderateScale(52), fontWeight: '900' },
+  resultScoreLabel: { fontSize: moderateScale(16), color: '#64748B', fontWeight: '600' },
+  savingText: { fontSize: moderateScale(12), color: '#94A3B8', marginTop: verticalScale(6) },
+  savedText: { fontSize: moderateScale(12), color: '#22C55E', fontWeight: '700', marginTop: verticalScale(6) },
+  resultCorrectLabel: { fontSize: moderateScale(14), color: '#64748B', marginBottom: verticalScale(16) },
+  resultDotRow: { flexDirection: 'row', gap: scale(8), marginBottom: verticalScale(28) },
   resultDot: {
-    width: 28, height: 28, borderRadius: 14,
+    width: scale(28), height: scale(28), borderRadius: scale(14),
     justifyContent: 'center', alignItems: 'center',
   },
   resultDotGreen: { backgroundColor: '#22C55E' },
   resultDotRed: { backgroundColor: '#EF4444' },
   resultPrimaryBtn: {
     width: '100%', flexDirection: 'row', alignItems: 'center',
-    justifyContent: 'center', gap: 8,
-    paddingVertical: 16, borderRadius: 18, marginBottom: 12,
+    justifyContent: 'center', gap: scale(8),
+    paddingVertical: verticalScale(16), borderRadius: scale(18), marginBottom: verticalScale(12),
   },
-  resultPrimaryBtnText: { color: '#FFF', fontSize: 16, fontWeight: '900' },
+  resultPrimaryBtnText: { color: '#FFF', fontSize: moderateScale(16), fontWeight: '900' },
   resultSecondaryBtn: {
-    paddingVertical: 12,
+    paddingVertical: verticalScale(12),
   },
-  resultSecondaryBtnText: { color: '#64748B', fontSize: 14, fontWeight: '600', textAlign: 'center' },
+  resultSecondaryBtnText: { color: '#64748B', fontSize: moderateScale(14), fontWeight: '600', textAlign: 'center' },
 
   // --- Modal Styles ---
   modalOverlay: {
@@ -996,127 +997,127 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: scale(20),
   },
   exitModalContent: {
     backgroundColor: '#FFF',
-    borderRadius: 30,
-    padding: 30,
+    borderRadius: scale(30),
+    padding: scale(30),
     width: '100%',
-    maxWidth: 340,
+    maxWidth: scale(340),
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: verticalScale(10) },
     shadowOpacity: 0.1,
-    shadowRadius: 20,
+    shadowRadius: scale(20),
     elevation: 10,
   },
   exitIconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: scale(80),
+    height: scale(80),
+    borderRadius: scale(40),
     backgroundColor: '#FEF2F2',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: verticalScale(20),
     borderWidth: 1,
     borderColor: '#FEE2E2',
-    paddingLeft: 7,
+    paddingLeft: scale(7),
   },
   exitTitle: {
-    fontSize: 20,
+    fontSize: moderateScale(20),
     fontWeight: '800',
     color: '#1E293B',
-    marginBottom: 10,
+    marginBottom: verticalScale(10),
     textAlign: 'center',
   },
   exitSub: {
-    fontSize: 15,
+    fontSize: moderateScale(15),
     color: '#64748B',
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 25,
+    lineHeight: verticalScale(22),
+    marginBottom: verticalScale(25),
   },
   exitActionRow: {
     width: '100%',
-    gap: 12,
+    gap: scale(12),
   },
   stayBtn: {
     backgroundColor: '#3B82F6',
-    height: 56,
-    borderRadius: 18,
+    height: verticalScale(56),
+    borderRadius: scale(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
   stayBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '700',
   },
   confirmExitBtn: {
     backgroundColor: '#EF4444',
-    height: 56,
-    borderRadius: 18,
+    height: verticalScale(56),
+    borderRadius: scale(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
   confirmExitBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '700',
   },
 
   // --- Guest View Styles ---
   guestIconCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: scale(100),
+    height: scale(100),
+    borderRadius: scale(50),
     backgroundColor: '#EFF6FF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: verticalScale(24),
     borderWidth: 1,
     borderColor: '#DBEAFE',
   },
   guestTitle: {
-    fontSize: 24,
+    fontSize: moderateScale(24),
     fontWeight: '900',
     color: '#1E293B',
-    marginBottom: 12,
+    marginBottom: verticalScale(12),
     textAlign: 'center',
   },
   guestSub: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     color: '#64748B',
     textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 40,
-    paddingHorizontal: 20,
+    lineHeight: verticalScale(24),
+    marginBottom: verticalScale(40),
+    paddingHorizontal: scale(20),
   },
   guestPrimaryBtn: {
     width: '100%',
-    height: 60,
-    borderRadius: 20,
+    height: verticalScale(60),
+    borderRadius: scale(20),
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: verticalScale(16),
     shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: verticalScale(4) },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowRadius: scale(8),
     elevation: 4,
   },
   guestPrimaryBtnText: {
     color: '#FFF',
-    fontSize: 18,
+    fontSize: moderateScale(18),
     fontWeight: '800',
   },
   guestSecondaryBtn: {
     width: '100%',
-    height: 60,
-    borderRadius: 20,
+    height: verticalScale(60),
+    borderRadius: scale(20),
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1.5,
@@ -1124,7 +1125,7 @@ const styles = StyleSheet.create({
   },
   guestSecondaryBtnText: {
     color: '#64748B',
-    fontSize: 16,
+    fontSize: moderateScale(16),
     fontWeight: '700',
   },
 });

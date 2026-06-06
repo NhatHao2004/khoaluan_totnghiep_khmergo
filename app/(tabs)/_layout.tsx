@@ -11,6 +11,7 @@ const { width } = Dimensions.get('window');
 import { HapticTab } from '@/components/haptic-tab';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Ionicons } from '@expo/vector-icons';
+import { scale as respScale, verticalScale, moderateScale } from '@/utils/responsive';
 
 // Prevent native splash screen from auto-hiding
 
@@ -49,13 +50,13 @@ export default function TabsLayout() {
   const translateY = useSharedValue(0);
   const context = useSharedValue({ x: 0, y: 0 });
   const opacity = useSharedValue(1);
-  const scale = useSharedValue(1);
+  const buttonScale = useSharedValue(1);
   const dimTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Removed resetIdleTimer to keep button fully visible at all times
   useEffect(() => {
     // Scale animation (3s cycle)
-    scale.value = withRepeat(
+    buttonScale.value = withRepeat(
       withSequence(
         withTiming(1.1, { duration: 1500 }),
         withTiming(1, { duration: 1500 })
@@ -66,10 +67,10 @@ export default function TabsLayout() {
   }, []);
 
   const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-  const BUTTON_SIZE = 60;
-  const MARGIN = 15;
-  const BTN_BOTTOM = 85;
-  const BTN_RIGHT = 15;
+  const BUTTON_SIZE = respScale(60);
+  const MARGIN = respScale(15);
+  const BTN_BOTTOM = verticalScale(85);
+  const BTN_RIGHT = respScale(15);
 
   // X limits
   const MIN_X = -SCREEN_WIDTH + BUTTON_SIZE + (BTN_RIGHT * 2);
@@ -100,7 +101,7 @@ export default function TabsLayout() {
 
   const animatedChatStyle = useAnimatedStyle(() => {
     // Breathing aura
-    const shadowRadius = interpolate(scale.value, [1, 1.1], [8, 18]);
+    const shadowRadius = interpolate(buttonScale.value, [1, 1.1], [8, 18]);
 
     return {
       opacity: 1, // Always fully visible
@@ -111,7 +112,7 @@ export default function TabsLayout() {
       transform: [
         { translateX: translateX.value },
         { translateY: translateY.value },
-        { scale: scale.value },
+        { scale: buttonScale.value },
       ],
     };
   });
@@ -129,9 +130,9 @@ export default function TabsLayout() {
           lazy: false, // Pre-render all screens to avoid mount-time jerking
           freezeOnBlur: true, // Freezes JS execution on inactive screens for speed
           tabBarStyle: {
-            height: 75,
-            paddingBottom: 5,
-            paddingTop: 8,
+            height: verticalScale(75),
+            paddingBottom: verticalScale(5),
+            paddingTop: verticalScale(8),
             backgroundColor: COLORS.background,
             borderTopLeftRadius: 0, // Simplified for stability
             borderTopRightRadius: 0, // Simplified for stability
@@ -142,9 +143,9 @@ export default function TabsLayout() {
           },
           tabBarShowLabel: true,
           tabBarLabelStyle: {
-            fontSize: 11,
+            fontSize: moderateScale(11),
             fontWeight: '600',
-            marginTop: 8,
+            marginTop: verticalScale(8),
           }
         }}>
         <Tabs.Screen
@@ -154,7 +155,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, focused, size }) => (
               <Ionicons
                 name={focused ? 'home' : 'home-outline'}
-                size={size || 24}
+                size={respScale(size || 24)}
                 color={color}
               />
             ),
@@ -167,7 +168,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
                 name={focused ? 'people' : 'people-outline'}
-                size={27}
+                size={respScale(27)}
                 color={color}
               />
             ),
@@ -180,7 +181,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, focused, size }) => (
               <Ionicons
                 name={focused ? 'game-controller' : 'game-controller-outline'}
-                size={27}
+                size={respScale(27)}
                 color={color}
               />
             ),
@@ -199,7 +200,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, focused, size }) => (
               <Ionicons
                 name={focused ? 'person-circle' : 'person-circle-outline'}
-                size={29}
+                size={respScale(29)}
                 color={color}
               />
             ),
@@ -314,11 +315,11 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   floatingChatBtn: {
     position: 'absolute',
-    bottom: 85,
-    right: 15,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    bottom: verticalScale(85),
+    right: respScale(15),
+    width: respScale(60),
+    height: respScale(60),
+    borderRadius: respScale(30),
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
@@ -332,7 +333,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
-    borderRadius: 30,
+    borderRadius: respScale(30),
   },
   chatIconImage: {
     width: '100%',

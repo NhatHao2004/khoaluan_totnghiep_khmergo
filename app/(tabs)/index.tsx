@@ -33,7 +33,7 @@ import Animated, {
 const StyleSheet = RNStyleSheet;
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CATEGORY_CARD_WIDTH = (SCREEN_WIDTH - 40 - (3 * 8)) / 4; // 20px padding each side, 8px gaps between 4 cards
+const CATEGORY_CARD_WIDTH = (SCREEN_WIDTH - scale(40) - (3 * scale(8))) / 4; // 20px padding each side, 8px gaps between 4 cards
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -331,8 +331,8 @@ export default function HomeScreen() {
         >
           <View style={styles.toastIcon}>
             <Ionicons
-              name={toastType === 'success' ? "checkmark" : "close"}
-              size={20}
+              name={toastType === "success" ? "checkmark" : "close"}
+              size={scale(20)}
               color="#FFF"
             />
           </View>
@@ -351,7 +351,7 @@ export default function HomeScreen() {
                 <Image source={{ uri: user.avatar as string }} style={styles.avatar} />
               ) : (
                 <View style={styles.avatarPlaceholder}>
-                  <Ionicons name="person-circle-outline" size={53} color="#000000ff" />
+                  <Ionicons name="person-circle-outline" size={scale(53)} color="#000000ff" />
                 </View>
               )}
             </TouchableOpacity>
@@ -370,7 +370,7 @@ export default function HomeScreen() {
             }}
           >
             <Animated.View style={animatedBellStyle}>
-              <Ionicons name="notifications-outline" size={30} color="#000" />
+              <Ionicons name="notifications-outline" size={scale(30)} color="#000" />
               {unreadCount > 0 && (
                 <View style={styles.notificationBadge}>
                   <ThemedText style={styles.badgeText}>{unreadCount}</ThemedText>
@@ -385,7 +385,7 @@ export default function HomeScreen() {
         <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 2 }}
+          contentContainerStyle={{ paddingBottom: verticalScale(2) }}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -433,8 +433,8 @@ export default function HomeScreen() {
           </View>
 
           {/* Featured List Header */}
-          <View style={[styles.sectionHeader, { paddingBottom: 10, marginTop: 8 }]}>
-            <ThemedText style={[styles.sectionTitle, { flex: 1, marginRight: 10 }]} numberOfLines={1}>
+          <View style={[styles.sectionHeader, { paddingBottom: verticalScale(10), marginTop: verticalScale(8) }]}>
+            <ThemedText style={[styles.sectionTitle, { flex: 1, marginRight: scale(10) }]} numberOfLines={1}>
               {t('suggestions_for_you')}
             </ThemedText>
             <TouchableOpacity
@@ -511,7 +511,7 @@ export default function HomeScreen() {
             <ScrollView
               style={styles.nList}
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={notifications.length === 0 ? { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 100 } : { paddingBottom: 20 }}
+              contentContainerStyle={notifications.length === 0 ? { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: verticalScale(100) } : { paddingBottom: verticalScale(20) }}
             >
               {notifications.length > 0 ? (
                 notifications.map((item) => (
@@ -564,7 +564,7 @@ export default function HomeScreen() {
                     </View>
                     <View style={styles.nContent}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <View style={{ flex: 1, marginRight: 10 }}>
+                        <View style={{ flex: 1, marginRight: scale(10) }}>
                           <Text style={styles.nItemTitle} numberOfLines={2}>
                             <Text style={{ fontWeight: '800' }}>{item.fromUserName}</Text> {item.message}
                           </Text>
@@ -572,9 +572,9 @@ export default function HomeScreen() {
                         {deletingId === item.id ? (
                           <TouchableOpacity
                             onPress={() => deleteNotification(item.id)}
-                            style={{ padding: 5 }}
+                            style={{ padding: scale(5) }}
                           >
-                            <Ionicons name="close-circle" size={24} color="#FF3B30" />
+                            <Ionicons name="close-circle" size={scale(24)} color="#FF3B30" />
                           </TouchableOpacity>
                         ) : (
                           <Text style={styles.nItemTime}>{item.time}</Text>
@@ -585,8 +585,8 @@ export default function HomeScreen() {
                 ))
               ) : (
                 <View style={{ alignItems: 'center' }}>
-                  <Ionicons name="notifications-off-outline" size={45} color="#E2E8F0" />
-                  <Text style={{ color: '#94A3B8', marginTop: 12, fontSize: 14 }}>{t('no_notifications')}</Text>
+                  <Ionicons name="notifications-off-outline" size={scale(45)} color="#E2E8F0" />
+                  <Text style={{ color: '#94A3B8', marginTop: verticalScale(12), fontSize: moderateScale(14) }}>{t('no_notifications')}</Text>
                 </View>
               )}
             </ScrollView>
@@ -689,16 +689,16 @@ const styles = RNStyleSheet.create({
     lineHeight: verticalScale(14),
   },
   filterBtn: {
-    width: 58,
-    height: 58,
+    width: scale(58),
+    height: scale(58),
     backgroundColor: '#1E293B',
-    borderRadius: 20,
+    borderRadius: scale(20),
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: verticalScale(4) },
     shadowOpacity: 0.2,
-    shadowRadius: 10,
+    shadowRadius: scale(10),
     elevation: 5,
   },
   content: {
@@ -785,23 +785,23 @@ const styles = RNStyleSheet.create({
   },
   categoryGrid: {
     flexDirection: 'row',
-    paddingHorizontal: 20,
+    paddingHorizontal: scale(20),
     justifyContent: 'space-between',
     marginBottom: 0,
-    marginTop: 10,
+    marginTop: verticalScale(10),
   },
   categoryCol: {
     width: CATEGORY_CARD_WIDTH,
   },
   serviceCardMini: {
     backgroundColor: '#FFF',
-    borderRadius: 18,
-    paddingVertical: 12,
+    borderRadius: scale(18),
+    paddingVertical: verticalScale(12),
     alignItems: 'center',
     shadowColor: '#1E293B',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: verticalScale(4) },
     shadowOpacity: 0.08,
-    shadowRadius: 8,
+    shadowRadius: scale(8),
     elevation: 3,
     borderWidth: 1,
     borderColor: '#F8FAFC',
@@ -858,10 +858,10 @@ const styles = RNStyleSheet.create({
     marginTop: verticalScale(2),
   },
   comingSoonSub: {
-    fontSize: 16,
+    fontSize: moderateScale(16),
     color: '#64748b',
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: verticalScale(10),
   },
   // Toast Styles
   toastContainer: {
@@ -890,9 +890,9 @@ const styles = RNStyleSheet.create({
   },
   toastText: {
     color: '#FFF',
-    fontSize: 15,
+    fontSize: moderateScale(15),
     fontWeight: '700',
-    marginLeft: 12,
+    marginLeft: scale(12),
     flex: 1,
     letterSpacing: 0.2,
   },
@@ -916,13 +916,13 @@ const styles = RNStyleSheet.create({
     alignItems: 'flex-start',
   },
   tagBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
+    paddingHorizontal: scale(10),
+    paddingVertical: verticalScale(5),
+    borderRadius: scale(8),
   },
   tagText: {
     color: '#FFF',
-    fontSize: 9,
+    fontSize: moderateScale(9),
     fontWeight: '800',
     textTransform: 'uppercase',
   },
@@ -960,7 +960,7 @@ const styles = RNStyleSheet.create({
     alignItems: 'center',
   },
   locationText: {
-    fontSize: 13,
+    fontSize: moderateScale(13),
     color: '#64748B',
     fontWeight: '600',
   },
@@ -969,24 +969,24 @@ const styles = RNStyleSheet.create({
     alignItems: 'center',
   },
   reviewText: {
-    fontSize: 12,
+    fontSize: moderateScale(12),
     color: '#94A3B8',
     fontWeight: '500',
   },
   primaryBtnText: {
-    fontSize: 14,
+    fontSize: moderateScale(14),
     fontWeight: '900',
     color: '#FFF',
   },
   featuredLoader: {
-    paddingVertical: 50,
+    paddingVertical: verticalScale(50),
     alignItems: 'center',
     justifyContent: 'center',
   },
   loaderText: {
-    marginTop: 10,
+    marginTop: verticalScale(10),
     color: '#888',
-    fontSize: 14,
+    fontSize: moderateScale(14),
   },
   // Notification Styles
   modalOverlay: {
@@ -1012,45 +1012,45 @@ const styles = RNStyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: verticalScale(20),
   },
   nTitle: {
-    fontSize: 21,
+    fontSize: moderateScale(21),
     fontWeight: '900',
     color: '#1E293B',
-    marginTop: 20,
+    marginTop: verticalScale(20),
   },
   nList: {
     flex: 1,
   },
   nPromo: {
-    marginBottom: 20,
-    borderRadius: 15,
+    marginBottom: verticalScale(20),
+    borderRadius: scale(15),
     overflow: 'hidden',
   },
   nPromoGradient: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
-    gap: 10,
+    padding: scale(15),
+    gap: scale(10),
   },
   nPromoText: {
     color: '#FFF',
     fontWeight: '800',
-    fontSize: 14,
+    fontSize: moderateScale(14),
   },
   nItem: {
     flexDirection: 'row',
-    gap: 15,
-    marginBottom: 20,
-    paddingBottom: 15,
+    gap: scale(15),
+    marginBottom: verticalScale(20),
+    paddingBottom: verticalScale(15),
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
   },
   nIcon: {
-    width: 45,
-    height: 43,
-    borderRadius: 10,
+    width: scale(45),
+    height: scale(43),
+    borderRadius: scale(10),
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1058,19 +1058,19 @@ const styles = RNStyleSheet.create({
     flex: 1,
   },
   nItemTitle: {
-    fontSize: 15,
+    fontSize: moderateScale(15),
     fontWeight: '500', // Chỉ dùng mức trung bình cho nội dung chung
     color: '#1E293B',
-    marginBottom: 4,
+    marginBottom: verticalScale(4),
   },
   nItemBody: {
-    fontSize: 13,
+    fontSize: moderateScale(13),
     color: '#64748B',
-    marginBottom: 6,
-    lineHeight: 18,
+    marginBottom: verticalScale(6),
+    lineHeight: verticalScale(18),
   },
   nItemTime: {
-    fontSize: 11,
+    fontSize: moderateScale(11),
     color: '#94A3B8',
     fontWeight: '500',
   },
