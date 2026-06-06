@@ -188,12 +188,29 @@ const Dashboard = () => {
         </div>
 
         <div className="card glass-card" style={{ padding: '1.5rem 1rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-          <div className="custom-scrollbar" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start', minWidth: 'max-content', gap: '0.5rem', height: '320px', paddingBottom: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
-            <style>{`
-              .custom-scrollbar::-webkit-scrollbar {
-                display: none;
+          <style>{`
+            .chart-inner {
+              display: flex;
+              align-items: flex-end;
+              gap: 0.5rem;
+              height: 320px;
+              padding-bottom: 1rem;
+              padding-left: 1rem;
+              padding-right: 1rem;
+              min-width: max-content;
+              justify-content: flex-start;
+            }
+            @media (min-width: 1024px) {
+              .chart-inner {
+                justify-content: center;
+                margin: 0 auto;
               }
-            `}</style>
+            }
+            .custom-scrollbar::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
+          <div className="chart-inner custom-scrollbar">
 
             {/* Sequential Ranking: 1, 2, 3, 4... */}
             {[0, 1, 2].map((uIdx) => {
