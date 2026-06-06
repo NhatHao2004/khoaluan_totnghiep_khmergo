@@ -282,66 +282,55 @@ const Destinations = () => {
 
   const filteredDestinations = destinations
     .filter(d => d.category === activeTab)
-    .filter(d => 
-      (d.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) || 
-      (d.location?.toLowerCase() || '').includes(searchTerm.toLowerCase())
-    );
+    .filter(d => d.name?.toLowerCase().includes(searchTerm.toLowerCase()) || d.location?.toLowerCase().includes(searchTerm.toLowerCase()));
+
+
 
   return (
     <div className="fade-in">
-      <div style={{ marginBottom: '2.5rem' }}>
-        <h1 style={{ marginBottom: '0.5rem' }}>Nội dung học tập</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>Theo dõi và quản lý các địa danh, văn hóa và ẩm thực Khmer</p>
-        
-        <div className="dest-header-container" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-          <style>{`
-            @media (min-width: 768px) {
-              .dest-header-container { flex-direction: row !important; align-items: center !important; }
-              .dest-actions { flex-direction: row !important; align-items: center !important; width: 100% !important; }
-              .dest-search { max-width: 400px !important; margin-bottom: 0 !important; }
-            }
-          `}</style>
-          <div className="dest-actions" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', justifyContent: 'space-between' }}>
-            <div className="dest-search" style={{ width: '100%', marginBottom: '0.5rem' }}>
+      <AnimatePresence>
+        {toast.isOpen && (
+          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 10000, padding: '1rem 1.5rem', background: toast.type === 'success' ? 'var(--success)' : 'var(--danger)', color: '#fff', borderRadius: '12px', boxShadow: 'var(--shadow-lg)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            {toast.type === 'success' ? <CheckCircle size={20} /> : <Shield size={20} />}
+            {toast.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+        <div>
+          <h1 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Nội dung học tập</h1>
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
+          <div className="input-group" style={{ flex: '1 1 200px', maxWidth: '300px', marginBottom: 0 }}>
+            <div style={{ position: 'relative' }}>
               <input
                 className="input-field"
-                placeholder="Tìm kiếm nội dung..."
+                placeholder="Tìm kiếm nhanh..."
+                style={{ paddingLeft: '1rem' }}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <button
-              className="btn btn-primary"
-              onClick={() => { setIsAddingNew(true); setNewItem({ ...newItem, category: activeTab }); }}
-            >
-              Thêm mới nội dung
-            </button>
           </div>
+          <button
+            className="btn"
+            onClick={() => { setIsAddingNew(true); setNewItem({ ...newItem, category: activeTab }); }}
+            style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0.75rem 1.25rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+          >
+            Thêm mới nội dung
+          </button>
         </div>
       </div>
 
-      <div style={{ marginBottom: '2rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: '0.5rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem', background: 'var(--bg-accent)', padding: '0.5rem', borderRadius: '14px', width: 'fit-content' }}>
+      <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
+
+      <div style={{ marginBottom: '2rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', background: 'var(--bg-accent)', padding: '0.5rem', borderRadius: '14px', minWidth: 'max-content' }}>
           {TABS.map(tab => {
             const isActive = activeTab === tab.key;
             return (
-              <button 
-                key={tab.key} 
-                onClick={() => handleTabChange(tab.key)} 
-                style={{ 
-                  border: 'none', 
-                  padding: '0.75rem 1.5rem', 
-                  borderRadius: '10px', 
-                  background: isActive ? 'white' : 'transparent', 
-                  color: isActive ? 'var(--primary)' : 'var(--text-secondary)', 
-                  fontWeight: 700, 
-                  cursor: 'pointer', 
-                  transition: 'all 0.2s', 
-                  boxShadow: isActive ? 'var(--shadow-sm)' : 'none', 
-                  whiteSpace: 'nowrap',
-                  fontSize: '0.875rem'
-                }}
-              >
+              <button key={tab.key} onClick={() => handleTabChange(tab.key)} style={{ flex: 'none', border: 'none', padding: '0.75rem 1rem', borderRadius: '10px', background: isActive ? 'white' : 'transparent', color: isActive ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: isActive ? 'var(--shadow-sm)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', whiteSpace: 'nowrap', fontSize: '0.875rem' }}>
                 {tab.label}
               </button>
             );
@@ -350,40 +339,48 @@ const Destinations = () => {
       </div>
 
       {loading ? (
-        <div className="responsive-grid">
-          {[1, 2, 3, 4].map(i => <div key={i} className="card" style={{ height: 350, opacity: 0.5 }} />)}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '1.5rem' }}>
+          {[1, 2, 3].map(i => <div key={i} className="card" style={{ height: 380, animation: 'pulse 1.5s infinite' }} />)}
         </div>
       ) : filteredDestinations.length === 0 ? (
-        <div className="card" style={{ textAlign: 'center', padding: '5rem 2rem' }}>
-          <h3 style={{ marginBottom: '0.5rem' }}>Không tìm thấy kết quả</h3>
-          <p style={{ color: 'var(--text-secondary)' }}>Thử tìm kiếm với một từ khóa khác hoặc chuyển danh mục</p>
+        <div className="card glass-card" style={{ textAlign: 'center', padding: '5rem' }}>
+
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Không tìm thấy kết quả</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>Thử tìm kiếm với một từ khóa khác</p>
         </div>
       ) : (
-        <div className="responsive-grid">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '1.5rem' }}>
           {filteredDestinations.map(dest => (
-            <motion.div layout key={dest.id} className="card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ height: '200px', width: '100%', position: 'relative', background: '#f1f5f9' }}>
+            <motion.div layout key={dest.id} className="card glass-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ height: '220px', position: 'relative' }}>
                 <img
                   src={getProxiedImageUrl(dest.imageUrl) || 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600'}
                   alt={dest.name}
+                  referrerPolicy="no-referrer"
+                  onError={(e: any) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600';
+                  }}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
+
               </div>
               <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ marginBottom: '0.5rem' }}>{dest.name}</h3>
-                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                  {dest.location || dest.description || 'Chưa có thông tin'}
+
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem', lineHeight: 1.3 }}>{dest.name}</h3>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  {dest.location || 'Chưa có địa chỉ'}
                 </p>
-                <div style={{ marginTop: 'auto', display: 'flex', gap: '0.5rem' }}>
-                  <button className="btn" style={{ flex: 1, background: 'var(--bg-accent)', color: 'var(--text-primary)', fontSize: '0.8125rem' }} onClick={() => setViewingItem(dest)}>Xem</button>
-                  <button className="btn" style={{ background: '#eff6ff', color: '#2563eb', padding: '0.5rem' }} onClick={() => setEditingItem(dest)}><Edit2 size={16} /></button>
-                  <button className="btn" style={{ background: '#fef2f2', color: 'var(--danger)', padding: '0.5rem' }} onClick={() => handleDelete(dest.id)}><Trash2 size={16} /></button>
+                <div style={{ marginTop: 'auto', paddingTop: '1rem', display: 'flex', gap: '0.75rem' }}>
+                  <button className="btn btn-secondary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.75rem' }} onClick={() => { setViewingItem(dest); setViewLanguage('vi'); }}>Xem chi tiết</button>
+                  <button className="btn" style={{ padding: '0.5rem 1rem', background: '#eff6ff', color: '#2563eb', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.75rem' }} onClick={() => setEditingItem(dest)}><Edit2 size={14} /> Sửa</button>
+                  <button className="btn" style={{ padding: '0.5rem 1rem', background: '#fef2f2', color: 'var(--danger)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.75rem' }} onClick={() => handleDelete(dest.id)}><Trash2 size={14} /> Xóa</button>
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
-      ) }
+      )}
 
       {/* Full Page Detail View */}
       <AnimatePresence>

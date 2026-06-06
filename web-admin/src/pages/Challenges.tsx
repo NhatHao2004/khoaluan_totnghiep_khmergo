@@ -1,6 +1,6 @@
 import { addDoc, collection, deleteDoc, doc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Award, Brain, Edit2, Shield, Trash2, Utensils } from 'lucide-react';
+import { Award, Brain, CheckCircle, Shield, Trash2, Utensils } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { db } from '../firebase/config';
 
@@ -66,6 +66,15 @@ const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 't
   );
 };
 
+const getProxiedImageUrl = (url?: string) => {
+  if (!url) return '';
+  if (url.includes('googleusercontent.com') || url.includes('lh3.googleusercontent.com')) {
+    const cleanUrl = url.replace(/-rw$/, '');
+    return `https://images.weserv.nl/?url=${encodeURIComponent(cleanUrl)}`;
+  }
+  return url;
+};
+
 const Challenges = () => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [destinations, setDestinations] = useState<any[]>([]);
@@ -75,6 +84,10 @@ const Challenges = () => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedQuestion, setExpandedQuestion] = useState<number | null>(0);
+
+  const [toast, setToast] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' }>({
+    isOpen: false, message: '', type: 'success'
+  });
   const [confirmConfig, setConfirmConfig] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({
     isOpen: false, title: '', message: '', onConfirm: () => { }
   });
@@ -86,7 +99,8 @@ const Challenges = () => {
   });
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
-    console.log(`[TOAST] ${type}: ${message}`);
+    setToast({ isOpen: true, message, type });
+    setTimeout(() => setToast(prev => ({ ...prev, isOpen: false })), 3000);
   };
 
   useEffect(() => {
@@ -242,103 +256,99 @@ const Challenges = () => {
 
   return (
     <div className="fade-in">
-      <div style={{ marginBottom: '2.5rem' }}>
-        <h1 style={{ marginBottom: '0.5rem' }}>Quản lý Thử thách</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>Theo dõi và thiết lập các bộ câu hỏi đố vui về văn hóa và địa danh</p>
+      <AnimatePresence>
+        {toast.isOpen && (
+          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }} style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 10000, padding: '1rem 1.5rem', background: toast.type === 'success' ? 'var(--success)' : 'var(--danger)', color: '#fff', borderRadius: '12px', boxShadow: 'var(--shadow-lg)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            {toast.type === 'success' ? <CheckCircle size={20} /> : <Shield size={20} />}
+            {toast.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div className="input-group" style={{ flex: '1', maxWidth: '400px', marginBottom: 0 }}>
-            <input
-              className="input-field"
-              placeholder="Tìm kiếm thử thách..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <button className="btn btn-primary" onClick={handleOpenAddModal}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', fontWeight: 800 }}>Quản lý thử thách</h1>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
+          <input
+            className="input-field"
+            placeholder="Tìm kiếm nhanh..."
+            style={{ flex: '1 1 200px', maxWidth: '300px' }}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button className="btn" onClick={handleOpenAddModal} style={{ background: '#3b82f6', color: 'white', padding: '0.75rem 1.25rem', borderRadius: '12px', fontWeight: 700, whiteSpace: 'nowrap' }}>
             Thêm mới thử thách
           </button>
         </div>
       </div>
 
-      <div style={{ marginBottom: '2rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: '0.5rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem', background: 'var(--bg-accent)', padding: '0.5rem', borderRadius: '14px', width: 'fit-content' }}>
+      <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
+
+      <div style={{ marginBottom: '2rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', background: 'var(--bg-accent)', padding: '0.5rem', borderRadius: '14px', minWidth: 'max-content' }}>
           {TABS.map(tab => (
-            <button 
-              key={tab.key} 
-              onClick={() => setActiveTab(tab.key)} 
-              style={{ 
-                border: 'none', 
-                padding: '0.75rem 1.5rem', 
-                borderRadius: '10px', 
-                background: activeTab === tab.key ? 'white' : 'transparent', 
-                color: activeTab === tab.key ? 'var(--primary)' : 'var(--text-secondary)', 
-                fontWeight: 700, 
-                cursor: 'pointer', 
-                transition: 'all 0.2s', 
-                boxShadow: activeTab === tab.key ? 'var(--shadow-sm)' : 'none', 
-                whiteSpace: 'nowrap',
-                fontSize: '0.875rem'
-              }}
-            >
+            <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ flex: 'none', border: 'none', padding: '0.75rem 1rem', borderRadius: '10px', background: activeTab === tab.key ? 'white' : 'transparent', color: activeTab === tab.key ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: activeTab === tab.key ? 'var(--shadow-sm)' : 'none', whiteSpace: 'nowrap', fontSize: '0.875rem' }}>
               {tab.label}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="table-wrapper">
-        <div className="table-responsive">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Địa danh / Chủ đề</th>
-                <th className="mobile-hidden">Số câu hỏi</th>
-                <th style={{ textAlign: 'right' }}>Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={3} style={{ textAlign: 'center', padding: '3rem' }}>Đang tải dữ liệu...</td>
-                </tr>
-              ) : filteredChallenges.length === 0 ? (
-                <tr>
-                  <td colSpan={3} style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Không tìm thấy kết quả phù hợp</td>
-                </tr>
-              ) : (
-                filteredChallenges.map(item => {
-                  const matchedDest = destinations.find(d => 
-                    (item.pagodaId && d.id === item.pagodaId) || 
-                    (d.id === item.id) || 
-                    (item.pagodaName && normalizeStr(d.name) === normalizeStr(item.pagodaName))
-                  );
-                  
-                  return (
-                    <tr key={item.id}>
-                      <td>
-                        <div style={{ fontWeight: 800, color: 'var(--primary)', marginBottom: '0.25rem' }}>
-                          {item.pagodaName || matchedDest?.name || 'Thử thách tự do'}
-                        </div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>ID: {item.id}</div>
-                      </td>
-                      <td className="mobile-hidden">
-                        <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{item.questions?.length || 0}</span>
-                        <span style={{ marginLeft: '4px', fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>câu hỏi</span>
-                      </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                          <button className="btn" style={{ background: '#eff6ff', color: '#3b82f6', padding: '0.5rem' }} onClick={() => { setEditingItem(item); setExpandedQuestion(0); }}><Edit2 size={16} /></button>
-                          <button className="btn" style={{ background: '#fef2f2', color: 'var(--danger)', padding: '0.5rem' }} onClick={() => handleDelete(item.id)}><Trash2 size={16} /></button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '1.5rem' }}>
+        {loading ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="card glass-card skeleton" style={{ height: '300px' }} />
+          ))
+        ) : filteredChallenges.length === 0 ? (
+          <div className="card glass-card" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '5rem' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Không tìm thấy kết quả</h3>
+            <p style={{ color: 'var(--text-secondary)' }}>Thử tìm kiếm với một từ khóa khác</p>
+          </div>
+        ) : (
+          filteredChallenges.map(item => {
+            const matchedDest = destinations.find(d =>
+              (item.pagodaId && d.id === item.pagodaId) ||
+              (d.id === item.id) ||
+              (item.pagodaName && normalizeStr(d.name) === normalizeStr(item.pagodaName))
+            );
+
+            return (
+              <motion.div layout key={item.id} className="card glass-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ height: '220px', background: 'var(--bg-accent)', position: 'relative' }}>
+                  <img
+                    src={getProxiedImageUrl(item.imageUrl) || getProxiedImageUrl(matchedDest?.imageUrl) || 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600'}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    alt={item.pagodaName}
+                    referrerPolicy="no-referrer"
+                    onError={(e: any) => {
+                      e.target.onerror = null;
+                      // Nếu item.imageUrl lỗi, thử dùng ảnh từ destinations ngay lập tức
+                      if (matchedDest?.imageUrl && e.target.src !== getProxiedImageUrl(matchedDest.imageUrl)) {
+                        e.target.src = getProxiedImageUrl(matchedDest.imageUrl);
+                      } else {
+                        e.target.src = 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=600';
+                      }
+                    }}
+                  />
+                  <div style={{ position: 'absolute', bottom: '1rem', left: '1rem', padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', borderRadius: '10px', fontWeight: 800, fontSize: '0.7rem', color: 'var(--primary)' }}>
+                    {item.questions?.length} CÂU HỎI
+                  </div>
+                </div>
+                <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
+                    {item.pagodaName || matchedDest?.name || 'Chưa đặt tên'}
+                  </h3>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    {matchedDest?.location || matchedDest?.description || 'Chế độ thử thách tự do'}
+                  </p>
+                  <div style={{ marginTop: 'auto', paddingTop: '1rem', display: 'flex', gap: '0.75rem' }}>
+                    <button className="btn btn-secondary" style={{ flex: 1, padding: '0.5rem', fontSize: '0.75rem' }} onClick={() => { setEditingItem(item); setExpandedQuestion(0); }}>Chỉnh sửa câu hỏi</button>
+                    <button className="btn" style={{ padding: '0.5rem 1rem', background: '#fef2f2', color: 'var(--danger)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.75rem' }} onClick={() => handleDelete(item.id)}><Trash2 size={14} /> Xóa</button>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })
+        )}
       </div>
 
       <AnimatePresence>

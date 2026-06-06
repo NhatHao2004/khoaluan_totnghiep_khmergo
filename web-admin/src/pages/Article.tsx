@@ -100,98 +100,130 @@ const Article = () => {
   };
 
   return (
-    <div className="fade-in">
-      <div style={{ marginBottom: '2.5rem' }}>
-        <h1 style={{ marginBottom: '0.5rem' }}>Quản lý bài viết</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>Theo dõi và quản lý các bài đăng từ cộng đồng người dùng</p>
-
-        <div className="input-group" style={{ maxWidth: '400px', marginBottom: 0 }}>
-          <input
-            className="input-field"
-            type="text"
-            placeholder="Tìm kiếm nội dung bài viết..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+    <div className="page-container">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>
+          Quản lý bài viết
+        </h1>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
+          <div className="input-group" style={{ flex: '1 1 250px', maxWidth: '400px', marginBottom: 0 }}>
+            <input
+              className="input-field"
+              type="text"
+              placeholder="Tìm kiếm bài viết..."
+              style={{ width: '100%' }}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
+      <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
+
       {posts.length === 0 ? (
-        <div className="card" style={{ textAlign: 'center', padding: '5rem 2rem' }}>
-          <h3 style={{ marginBottom: '0.5rem' }}>Chưa có bài viết nào</h3>
+        <div className="card glass-card" style={{ textAlign: 'center', padding: '5rem' }}>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Chưa có bài viết nào</h3>
           <p style={{ color: 'var(--text-secondary)' }}>Bài viết từ người dùng sẽ hiển thị tại đây</p>
         </div>
       ) : (
-        <div className="table-wrapper">
-          <div className="table-responsive">
-            <table className="data-table">
-              <thead>
+        <div className="table-responsive">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th className="mobile-hidden" style={{ width: '100px' }}>Hình ảnh</th>
+                <th>Nội dung</th>
+                <th>Người đăng</th>
+                <th className="mobile-hidden">Thời gian</th>
+                <th style={{ textAlign: 'right' }}>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredPosts.length === 0 ? (
                 <tr>
-                  <th className="mobile-hidden" style={{ width: '80px' }}>Ảnh</th>
-                  <th>Nội dung</th>
-                  <th>Người đăng</th>
-                  <th className="mobile-hidden">Thời gian</th>
-                  <th style={{ textAlign: 'right' }}>Thao tác</th>
+                  <td colSpan={5} style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+                    Không tìm thấy bài viết phù hợp với tìm kiếm
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {filteredPosts.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
-                      Không tìm thấy bài viết phù hợp
+              ) : (
+                filteredPosts.map((post) => (
+                  <tr key={post.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                    <td style={{ padding: '1.25rem' }}>
+                      {post.image ? (
+                        <img
+                          src={getProxiedImageUrl(post.image)}
+                          alt="post content"
+                          referrerPolicy="no-referrer"
+                          style={{ width: '60px', height: '60px', borderRadius: '12px', objectFit: 'cover', background: 'var(--bg-accent)' }}
+                        />
+                      ) : (
+                        <div style={{ width: '60px', height: '60px', borderRadius: '12px', background: 'var(--bg-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+                          <ImageIcon size={20} />
+                        </div>
+                      )}
                     </td>
-                  </tr>
-                ) : (
-                  filteredPosts.map((post) => (
-                    <tr key={post.id}>
-                      <td className="mobile-hidden">
-                        {post.image ? (
-                          <img
-                            src={getProxiedImageUrl(post.image)}
-                            alt="post"
-                            style={{ width: '48px', height: '48px', borderRadius: '10px', objectFit: 'cover' }}
-                          />
-                        ) : (
-                          <div style={{ width: '48px', height: '48px', borderRadius: '10px', background: 'var(--bg-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-                            <ImageIcon size={18} />
-                          </div>
-                        )}
-                      </td>
-                      <td>
-                        <div style={{ maxWidth: '400px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    <td style={{ padding: '1.25rem' }}>
+                      <div style={{ maxWidth: '450px' }}>
+                        <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem', fontSize: '1rem' }}>
                           {post.content || 'Không có nội dung'}
                         </div>
-                      </td>
-                      <td style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                        {post.user || 'Ẩn danh'}
-                      </td>
-                      <td className="mobile-hidden" style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                        {formatTime(post.createdAt)}
-                      </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                          <button
-                            className="btn"
-                            style={{ background: '#eff6ff', color: '#3b82f6', padding: '0.5rem 1rem', fontSize: '0.75rem' }}
-                            onClick={() => setSelectedPost(post)}
-                          >
-                            <Eye size={16} /> <span className="mobile-hidden">Xem</span>
-                          </button>
-                          <button
-                            className="btn"
-                            style={{ background: '#fef2f2', color: 'var(--danger)', padding: '0.5rem 1rem', fontSize: '0.75rem' }}
-                            onClick={() => setConfirmDialog({ isOpen: true, postId: post.id })}
-                          >
-                            <Trash2 size={16} /> <span className="mobile-hidden">Xóa</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                      </div>
+                    </td>
+                    <td style={{ padding: '1.25rem', fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                      {post.user || 'Ẩn danh'}
+                    </td>
+                    <td style={{ padding: '1.25rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+                      {formatTime(post.createdAt)}
+                    </td>
+                    <td style={{ padding: '1.25rem', textAlign: 'right' }}>
+                      <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                        <button
+                          title="Xem chi tiết"
+                          onClick={() => setSelectedPost(post)}
+                          style={{
+                            border: 'none',
+                            background: '#eff6ff',
+                            color: '#3b82f6',
+                            cursor: 'pointer',
+                            padding: '8px 16px',
+                            borderRadius: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem',
+                            transition: 'opacity 0.2s'
+                          }}
+                        >
+                          <Eye size={18} strokeWidth={2.5} />
+                          <span style={{ fontWeight: 700, fontSize: '0.75rem' }}>Xem</span>
+                        </button>
+                        <button
+                          title="Xóa bài viết"
+                          style={{
+                            border: 'none',
+                            background: '#fef2f2',
+                            color: '#ef4444',
+                            cursor: 'pointer',
+                            padding: '8px 16px',
+                            borderRadius: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem',
+                            transition: 'opacity 0.2s'
+                          }}
+                          onClick={() => setConfirmDialog({ isOpen: true, postId: post.id })}
+                        >
+                          <Trash2 size={18} strokeWidth={2.5} />
+                          <span style={{ fontWeight: 700, fontSize: '0.75rem' }}>Xóa</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       )}
 
