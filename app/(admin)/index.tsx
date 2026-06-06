@@ -1,6 +1,6 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useRef, useState } from 'react';
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { db } from '../../utils/firebaseConfig';
@@ -17,6 +17,7 @@ const AdminDashboard = () => {
   });
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [allSortedUsers, setAllSortedUsers] = useState<any[]>([]);
+  const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('weekly');
   const leaderboardRef = useRef<ScrollView>(null);
 
@@ -47,9 +48,9 @@ const AdminDashboard = () => {
 
     // Lấy bảng xếp hạng (chỉ chạy 1 lần, lưu toàn bộ)
     const unsubLeaderboard = onSnapshot(collection(db, 'users'), (snap) => {
-      const allUsers = snap.docs.map(doc => ({ 
-        id: doc.id, 
-        ...doc.data() 
+      const allUsers = snap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
       })).filter(user => (user as any).role !== 'Quản trị viên');
 
       const sortedUsers = allUsers.sort((a: any, b: any) => {
@@ -59,12 +60,61 @@ const AdminDashboard = () => {
       setAllSortedUsers(sortedUsers);
     });
 
+    // Hàm tính thời gian tương đối
+    const getTimeAgo = (timestamp: any) => {
+      if (!timestamp) return 'Vừa xong';
+      const now = new Date();
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+      if (diffInSeconds < 60) return 'Vừa xong';
+      const diffInMinutes = Math.floor(diffInSeconds / 60);
+      if (diffInMinutes < 60) return `${diffInMinutes} phút trước`;
+      const diffInHours = Math.floor(diffInMinutes / 60);
+      if (diffInHours < 24) return `${diffInHours} giờ trước`;
+      const diffInDays = Math.floor(diffInHours / 24);
+      return `${diffInDays} ngày trước`;
+    };
+
+    // Lấy hoạt động gần đây (Chỉ lấy người dùng đăng ký trong 24h qua)
+    const unsubRecent = onSnapshot(collection(db, 'users'), (snap) => {
+      const now = new Date().getTime();
+      const oneDayInMs = 24 * 60 * 60 * 1000;
+
+      const recentUsers = snap.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+        .filter((user: any) => {
+          if (!user.createdAt) return false;
+          const createTime = user.createdAt.toDate ? user.createdAt.toDate().getTime() : new Date(user.createdAt).getTime();
+          return (now - createTime) < oneDayInMs; // Chỉ lấy trong vòng 24h
+        });
+
+      // Sắp xếp người mới nhất lên đầu
+      const sortedRecent = recentUsers.sort((a: any, b: any) => {
+        const timeA = a.createdAt.toDate ? a.createdAt.toDate().getTime() : 0;
+        const timeB = b.createdAt.toDate ? b.createdAt.toDate().getTime() : 0;
+        return timeB - timeA;
+      });
+
+      const activities = sortedRecent.slice(0, 5).map((user: any) => ({
+        id: user.id,
+        name: user.name || 'Người dùng mới',
+        timeAgo: getTimeAgo(user.createdAt)
+      }));
+
+      setRecentActivities(activities);
+    });
+
     return () => {
       unsubUsers();
       unsubContent();
       unsubChallenges();
       unsubPosts();
       unsubLeaderboard();
+      unsubRecent();
     };
   }, []);
 
@@ -203,6 +253,34 @@ const AdminDashboard = () => {
           })}
         </ScrollView>
       </View>
+
+      {/* Recent Activity Section */}
+      <View style={styles.activityHeader}>
+        <Text style={styles.activityTitle}>Hoạt động gần đây</Text>
+        <TouchableOpacity 
+          style={styles.seeAllBtn}
+          onPress={() => router.push('/(admin)/users' as any)}
+        >
+          <Text style={styles.seeAllText}>Xem tất cả</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.activityContainer}>
+        {recentActivities.map((activity, index) => (
+          <View key={activity.id} style={styles.activityCard}>
+            <View style={styles.activityIconBox}>
+              <Ionicons name="person-outline" size={20} color="#10b981" />
+            </View>
+            <View style={styles.activityInfo}>
+              <Text style={styles.activityItemTitle}>{activity.name} vừa đăng ký</Text>
+            </View>
+            <Text style={styles.activityTime}>{activity.timeAgo || 'Vừa xong'}</Text>
+          </View>
+        ))}
+        {recentActivities.length === 0 && (
+          <Text style={styles.emptyText}>Chưa có hoạt động mới nào</Text>
+        )}
+      </View>
     </ScrollView>
   );
 };
@@ -318,7 +396,7 @@ const styles = StyleSheet.create({
   podiumContainer: {
     marginHorizontal: 16,
     paddingBottom: 0,
-    marginBottom: 40,
+    marginBottom: 15,
   },
   podiumScrollContent: {
     paddingHorizontal: 4,
@@ -398,7 +476,78 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '900',
     color: '#fff',
-  }
+  },
+  activityHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 15,
+  },
+  activityTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#1e293b',
+  },
+  seeAllBtn: {
+    backgroundColor: '#3b82f6',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  seeAllText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  activityContainer: {
+    paddingHorizontal: 16,
+    marginBottom: 40,
+  },
+  activityCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+  },
+  activityIconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: '#f0fdf4',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  activityInfo: {
+    flex: 1,
+  },
+  activityItemTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1e293b',
+    marginBottom: 2,
+  },
+  activityDesc: {
+    fontSize: 12,
+    color: '#64748b',
+  },
+  activityTime: {
+    fontSize: 11,
+    color: '#94a3b8',
+    fontWeight: '500',
+    marginLeft: 10,
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#94a3b8',
+    marginTop: 75,
+    fontSize: 14,
+  },
 });
 
 export default AdminDashboard;
