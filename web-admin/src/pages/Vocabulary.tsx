@@ -288,26 +288,27 @@ const Vocabulary = () => {
         )}
       </AnimatePresence>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Quản lý từ vựng {activeCategoryId ? `(${formatCategoryName(activeCategory!)})` : ''}</h1>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>
+          Quản lý từ vựng {activeCategoryId ? `(${formatCategoryName(activeCategory!)})` : ''}
+        </h1>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
           {!activeCategoryId && (
             <input
               className="input-field"
               placeholder="Tìm kiếm nhanh..."
-              style={{ width: '250px' }}
+              style={{ width: '100%', maxWidth: '300px' }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           )}
 
-          {!activeCategoryId && (
-            <button className="btn" onClick={() => setIsAddingCategory(true)} style={{ background: '#3b82f6', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 700 }}>
+          {!activeCategoryId ? (
+            <button className="btn" onClick={() => setIsAddingCategory(true)} style={{ background: '#3b82f6', color: 'white', fontWeight: 700, flexGrow: 1, maxWidth: '200px' }}>
               Thêm danh mục
             </button>
-          )}
-          {activeCategoryId && (
-            <button className="btn" onClick={() => { setEditingWord({ id: `w_${Date.now()}`, khm: '', life: '', pronunciation: '', imageUrl: '' }); setIsAddingWord(true); }} style={{ background: '#3b82f6', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 700 }}>
+          ) : (
+            <button className="btn" onClick={() => { setEditingWord({ id: `w_${Date.now()}`, khm: '', life: '', pronunciation: '', imageUrl: '' }); setIsAddingWord(true); }} style={{ background: '#3b82f6', color: 'white', fontWeight: 700, flexGrow: 1, maxWidth: '200px' }}>
               Thêm từ mới
             </button>
           )}
@@ -317,7 +318,7 @@ const Vocabulary = () => {
       <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
 
       {!activeCategoryId ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }} className="fade-in">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1.5rem' }} className="fade-in">
           {loading ? (
             Array.from({ length: 6 }).map((_, i) => <div key={i} className="skeleton" style={{ height: '280px', borderRadius: '32px' }} />)
           ) : categories.filter(cat => formatCategoryName(cat).toLowerCase().includes(searchTerm.toLowerCase())).length === 0 ? (
@@ -417,44 +418,41 @@ const Vocabulary = () => {
           </div>
 
           {/* Word Table */}
-          <div className="card glass-card" style={{ flex: 1, padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', borderRadius: '24px', border: '1px solid #e2e8f0', maxHeight: '433px' }}>
-            <div style={{ flex: 1, overflowY: 'auto', borderRadius: '0 0 24px 24px' }} className="custom-scrollbar">
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 10 }}>
+          {/* Word Table */}
+          <div className="table-responsive" style={{ maxHeight: 'calc(100vh - 280px)' }}>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Tiếng Khmer</th>
+                  <th>Phiên âm</th>
+                  <th>Tiếng Việt</th>
+                  <th style={{ textAlign: 'right' }}>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredWords.length === 0 ? (
                   <tr>
-
-                    <th style={{ textAlign: 'left', padding: '0.85rem 1.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Tiếng Khmer</th>
-                    <th style={{ textAlign: 'left', padding: '0.85rem 1.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Phiên âm</th>
-                    <th style={{ textAlign: 'left', padding: '0.85rem 1.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Tiếng Việt</th>
-                    <th style={{ textAlign: 'right', padding: '0.85rem 1.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Thao tác</th>
+                    <td colSpan={4} style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                      Không tìm thấy từ vựng nào
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {filteredWords.length === 0 ? (
-                    <tr>
-                      <td colSpan={4} style={{ padding: '5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                ) : (
+                  filteredWords.map((word) => (
+                    <tr key={word.id} className="hover-bright">
+                      <td style={{ fontWeight: 800, fontSize: '1.05rem' }}>{word.khm}</td>
+                      <td style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>{word.pronunciation}</td>
+                      <td style={{ fontWeight: 700 }}>{word.life}</td>
+                      <td style={{ textAlign: 'right' }}>
+                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                          <button onClick={() => { setEditingWord(word); setIsAddingWord(false); }} className="btn" style={{ minHeight: '36px', padding: '0.4rem 0.8rem', background: '#eff6ff', color: '#3b82f6', fontSize: '0.8125rem' }} title="Sửa"><Pencil size={14} /></button>
+                          <button onClick={() => handleDeleteWord(word.id)} className="btn" style={{ minHeight: '36px', padding: '0.4rem 0.8rem', background: '#fef2f2', color: 'var(--danger)', fontSize: '0.8125rem' }} title="Xóa"><Trash2 size={14} /></button>
+                        </div>
                       </td>
                     </tr>
-                  ) : (
-                    filteredWords.map((word) => (
-                      <tr key={word.id} style={{ borderBottom: '1px solid #f1f5f9' }} className="hover-bright">
-                        <td style={{ padding: '0.75rem 1.5rem', fontWeight: 800, fontSize: '1.05rem', color: 'var(--primary)' }}>
-                          {word.khm}
-                        </td>
-                        <td style={{ padding: '0.75rem 1.5rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>{word.pronunciation}</td>
-                        <td style={{ padding: '0.75rem 1.5rem', fontWeight: 700, color: 'var(--text-primary)' }}>{word.life}</td>
-                        <td style={{ padding: '0.75rem 1.5rem', textAlign: 'right' }}>
-                          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                            <button onClick={() => { setEditingWord(word); setIsAddingWord(false); }} style={{ background: '#ebf3ff', color: '#3b82f6', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.8rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.85rem' }} className="hover-bright" title="Sửa"><Pencil size={16} /> Sửa</button>
-                            <button onClick={() => handleDeleteWord(word.id)} style={{ background: '#fef2f2', color: 'var(--danger)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.8rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.85rem' }} className="hover-bright" title="Xóa"><Trash2 size={16} /> Xóa</button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
