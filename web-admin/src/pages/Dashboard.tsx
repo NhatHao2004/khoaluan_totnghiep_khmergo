@@ -134,7 +134,7 @@ const Dashboard = () => {
 
   return (
     <div className="fade-in">
-      <div style={{ marginBottom: '1.25rem' }}>
+      <div style={{ marginBottom: '1.5rem', marginTop: '1rem' }}>
         <h1 style={{ fontSize: 'clamp(1.25rem, 5vw, 1.75rem)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Tổng quan hệ thống</h1>
         <p style={{ color: 'var(--text-secondary)', marginTop: '0.4rem', fontSize: 'clamp(0.7rem, 2.3vw, 0.9rem)', whiteSpace: 'nowrap' }}>Theo dõi các chỉ số quan trọng của ứng dụng KhmerGo</p>
       </div>
