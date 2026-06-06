@@ -2,9 +2,9 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import * as Haptics from 'expo-haptics';
 import { Tabs, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Dimensions, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Dimensions, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { interpolate, interpolateColor, runOnJS, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
 
@@ -52,17 +52,34 @@ export default function TabsLayout() {
   const scale = useSharedValue(1);
   const dimTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const tooltipOpacity = useSharedValue(0);
+  const tooltipSlideX = useSharedValue(20);
+
   // Removed resetIdleTimer to keep button fully visible at all times
   useEffect(() => {
     // Scale animation (3s cycle)
     scale.value = withRepeat(
       withSequence(
-        withTiming(1.1, { duration: 1500 }),
+        withTiming(1.05, { duration: 1500 }),
         withTiming(1, { duration: 1500 })
       ),
       -1,
       true
     );
+
+    // Periodic Tooltip animation
+    const showTooltip = () => {
+      tooltipOpacity.value = withTiming(1, { duration: 600 });
+      tooltipSlideX.value = withTiming(0, { duration: 600 });
+      
+      setTimeout(() => {
+        tooltipOpacity.value = withTiming(0, { duration: 600 });
+        tooltipSlideX.value = withTiming(20, { duration: 600 });
+      }, 4000);
+    };
+
+    const interval = setInterval(showTooltip, 10000); // Show every 10 seconds
+    return () => clearInterval(interval);
   }, []);
 
   const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -104,14 +121,24 @@ export default function TabsLayout() {
 
     return {
       opacity: 1, // Always fully visible
-      backgroundColor: '#FFFFFF', // Set to white as requested
-      shadowColor: '#007AFF', // Blue shadow to pop on white background
-      borderColor: '#1E3A8A', // Dark blue border (xanh đậm)
+      backgroundColor: '#FFFFFF',
+      shadowColor: '#1E3A8A',
+      borderColor: '#1E3A8A',
       shadowRadius,
       transform: [
         { translateX: translateX.value },
         { translateY: translateY.value },
         { scale: scale.value },
+      ],
+    };
+  });
+
+  const animatedTooltipStyle = useAnimatedStyle(() => {
+    return {
+      opacity: tooltipOpacity.value,
+      transform: [
+        { translateX: translateX.value + tooltipSlideX.value },
+        { translateY: translateY.value - 5 },
       ],
     };
   });
@@ -287,23 +314,32 @@ export default function TabsLayout() {
 
       {/* Floating AI Chat Button - Globally visible in tabs */}
       {isChatEnabled && ['/', '/index', '/community', '/quiz', '/profile'].includes(pathname) && (
-        <GestureDetector gesture={gesture}>
-          <Animated.View style={[styles.floatingChatBtn, animatedChatStyle]}>
-            <TouchableOpacity
-              style={styles.chatBtnInner}
-              activeOpacity={1}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                router.push('/ai-chat' as any);
-              }}
-            >
-              <Image 
-                source={require('@/assets/images/AI.jpg')} 
-                style={styles.chatIconImage} 
-              />
-            </TouchableOpacity>
+        <>
+          {/* "Chat Ngay" Tooltip */}
+          <Animated.View style={[styles.tooltipContainer, animatedTooltipStyle]}>
+            <View style={styles.tooltipInner}>
+              <Animated.Text style={styles.tooltipText}>Khám phá ngay</Animated.Text>
+            </View>
           </Animated.View>
-        </GestureDetector>
+
+          <GestureDetector gesture={gesture}>
+            <Animated.View style={[styles.floatingChatBtn, animatedChatStyle]}>
+              <TouchableOpacity
+                style={styles.chatBtnInner}
+                activeOpacity={1}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  router.push('/ai-chat' as any);
+                }}
+              >
+                <Image
+                  source={require('@/assets/images/AI.jpg')}
+                  style={styles.chatIconImage}
+                />
+              </TouchableOpacity>
+            </Animated.View>
+          </GestureDetector>
+        </>
       )}
 
       <StatusBar style="auto" />
@@ -338,5 +374,22 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+  },
+  tooltipContainer: {
+    position: 'absolute',
+    bottom: 95, // Centered relative to the 60px button height
+    right: 80,  // Spaced from the 15px right margin + button width
+    zIndex: 99998,
+  },
+  tooltipInner: {
+    backgroundColor: '#1E3A8A',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+  },
+  tooltipText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
   },
 });

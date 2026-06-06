@@ -27,7 +27,10 @@ export interface Temple {
 export const toggleFavorite = async (templeId: string, isFavorite: boolean): Promise<void> => {
   try {
     const templeRef = doc(db, 'destinations', templeId);
-    await updateDoc(templeRef, { favorite: isFavorite });
+    await updateDoc(templeRef, { 
+      favorite: isFavorite,
+      favoriteAt: isFavorite ? new Date().getTime() : null
+    });
     console.log('Toggled favorite for', templeId, 'to', isFavorite);
   } catch (error) {
     console.error('Error toggling favorite:', error);

@@ -143,6 +143,8 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        <View style={{ flex: 1 }} />
+
         {/* Thông tin ứng dụng */}
         <View style={styles.section}>
           <View style={styles.card}>
@@ -159,7 +161,7 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        <View style={{ height: 40 }} />
+        <View style={{ height: 0 }} />
       </ScrollView>
 
 
@@ -280,6 +282,7 @@ const styles = StyleSheet.create({
   scroll: {
     paddingHorizontal: 20,
     paddingTop: 20,
+    flexGrow: 1,
   },
   section: {
     marginBottom: 20,
@@ -317,6 +320,7 @@ const styles = StyleSheet.create({
     color: '#444',
     fontWeight: '500',
     lineHeight: 24,
+    paddingLeft: 10,
   },
   activeOption: {
     // optional active styling
@@ -387,6 +391,7 @@ const styles = StyleSheet.create({
     color: '#444',
     fontWeight: '500',
     lineHeight: 22,
+    paddingLeft: 12,
   },
   infoValue: {
     fontSize: 14,

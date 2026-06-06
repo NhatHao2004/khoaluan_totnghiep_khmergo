@@ -39,6 +39,8 @@ export default function FavoritesScreen() {
             ...doc.data()
           });
         });
+        // Sắp xếp: Cái nào thích sau (favoriteAt lớn hơn) thì hiện lên trước
+        dbFavs.sort((a, b) => (b.favoriteAt || 0) - (a.favoriteAt || 0));
         setFavorites(dbFavs);
         setIsLoading(false);
       },
@@ -224,9 +226,9 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    padding: 15,
     marginBottom: 15,
     elevation: 2,
     shadowColor: '#000',
@@ -235,16 +237,16 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
   cardImage: {
-    width: 65,
-    height: 65,
+    width: 110,
+    height: 85,
     borderRadius: 15,
-    marginRight: 15,
-    resizeMode: 'contain',
+    marginBottom: 12,
+    resizeMode: 'cover',
     overflow: 'hidden',
+    alignSelf: 'center',
   },
   cardContent: {
-    flex: 1,
-    justifyContent: 'center',
+    width: '100%',
   },
   cardTitle: {
     fontSize: 17,
@@ -257,9 +259,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cardLocation: {
-    fontSize: 10,
+    fontSize: 13,
     color: '#666',
-    marginLeft: 4,
     flexShrink: 1,
   },
   heartButton: {
