@@ -1,7 +1,7 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { db } from '../../utils/firebaseConfig';
 
@@ -17,6 +17,7 @@ const AdminDashboard = () => {
   });
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('weekly');
+  const leaderboardRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     // Lấy số lượng người dùng (loại bỏ Admin một cách an toàn)
@@ -159,13 +160,13 @@ const AdminDashboard = () => {
         <View style={styles.tabContainer}>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'weekly' && styles.tabActive]}
-            onPress={() => setActiveTab('weekly')}
+            onPress={() => { setActiveTab('weekly'); leaderboardRef.current?.scrollTo({ x: 0, animated: true }); }}
           >
-            <Text style={[styles.tabText, activeTab === 'weekly' && styles.tabTextActive]}>Hàng tuần</Text>
+            <Text style={[styles.tabText, activeTab === 'weekly' && styles.tabTextActive]}>Hàng ngày</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'all' && styles.tabActive]}
-            onPress={() => setActiveTab('all')}
+            onPress={() => { setActiveTab('all'); leaderboardRef.current?.scrollTo({ x: 0, animated: true }); }}
           >
             <Text style={[styles.tabText, activeTab === 'all' && styles.tabTextActive]}>Tất cả</Text>
           </TouchableOpacity>
@@ -174,6 +175,7 @@ const AdminDashboard = () => {
 
       <View style={styles.podiumContainer}>
         <ScrollView
+          ref={leaderboardRef}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.podiumScrollContent}
