@@ -90,13 +90,20 @@ export default function LoginScreen() {
 
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
+      const firebaseUser = userCredential.user;
+      
+      // Lấy role ngay lập tức để chuyển trang
+      const { getDoc, doc } = await import('firebase/firestore');
+      const { db: firestoreDb } = await import('@/utils/firebaseConfig');
+      const userDoc = await getDoc(doc(firestoreDb, 'users', firebaseUser.uid));
+      const userData = userDoc.data();
+
       await refreshUser();
 
-      // Sau khi refresh, nếu user vẫn null nghĩa là có lỗi hoặc bị chặn
-      // fetchAndSetUser sẽ ném ACCOUNT_BLOCKED, refreshUser sẽ ném AUTH_FAILED nếu user null
-
-      if (returnTo) {
+      if (userData?.role === 'Quản trị viên') {
+        router.replace({ pathname: '/(admin)' as any, params: { toast: 'login_success' } });
+      } else if (returnTo) {
         router.replace({
           pathname: returnTo as any,
           params: { ...(returnId ? { id: returnId } : {}), toast: 'login_success' }

@@ -318,7 +318,7 @@ export default function TabsLayout() {
           {/* "Chat Ngay" Tooltip */}
           <Animated.View style={[styles.tooltipContainer, animatedTooltipStyle]}>
             <View style={styles.tooltipInner}>
-              <Animated.Text style={styles.tooltipText}>Khám phá ngay</Animated.Text>
+              <Animated.Text style={styles.tooltipText} numberOfLines={1}>Khám phá ngay</Animated.Text>
             </View>
           </Animated.View>
 

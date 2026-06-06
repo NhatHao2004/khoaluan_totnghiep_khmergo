@@ -15,6 +15,7 @@ export interface UserProfile {
   interests?: string[];
   isBlocked?: boolean;
   isAnonymous?: boolean;
+  role?: string;
 }
 
 
@@ -63,6 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           interests: data.interests || [],
           isBlocked: data.isBlocked || false,
           isAnonymous: firebaseUser.isAnonymous,
+          role: data.role || data['quyền'] || 'Người dùng',
         });
 
       } else {
