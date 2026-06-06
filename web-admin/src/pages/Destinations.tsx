@@ -297,12 +297,12 @@ const Destinations = () => {
         )}
       </AnimatePresence>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
         <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Nội dung học tập</h1>
+          <h1 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>Nội dung học tập</h1>
         </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <div className="input-group" style={{ width: '300px', marginBottom: 0 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
+          <div className="input-group" style={{ flex: '1 1 200px', maxWidth: '300px', marginBottom: 0 }}>
             <div style={{ position: 'relative' }}>
               <input
                 className="input-field"
@@ -316,7 +316,7 @@ const Destinations = () => {
           <button
             className="btn"
             onClick={() => { setIsAddingNew(true); setNewItem({ ...newItem, category: activeTab }); }}
-            style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
+            style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0.75rem 1.25rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
           >
             Thêm mới nội dung
           </button>
@@ -325,12 +325,12 @@ const Destinations = () => {
 
       <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
 
-      <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2.5rem' }}>
-        <div style={{ flex: 1, display: 'flex', gap: '0.5rem', background: 'var(--bg-accent)', padding: '0.5rem', borderRadius: '14px' }}>
+      <div style={{ marginBottom: '2rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', background: 'var(--bg-accent)', padding: '0.5rem', borderRadius: '14px', minWidth: 'max-content' }}>
           {TABS.map(tab => {
             const isActive = activeTab === tab.key;
             return (
-              <button key={tab.key} onClick={() => handleTabChange(tab.key)} style={{ flex: 1, border: 'none', padding: '0.75rem', borderRadius: '10px', background: isActive ? 'white' : 'transparent', color: isActive ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: isActive ? 'var(--shadow-sm)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+              <button key={tab.key} onClick={() => handleTabChange(tab.key)} style={{ flex: 'none', border: 'none', padding: '0.75rem 1rem', borderRadius: '10px', background: isActive ? 'white' : 'transparent', color: isActive ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: isActive ? 'var(--shadow-sm)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', whiteSpace: 'nowrap', fontSize: '0.875rem' }}>
                 {tab.label}
               </button>
             );
@@ -339,7 +339,7 @@ const Destinations = () => {
       </div>
 
       {loading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '1.5rem' }}>
           {[1, 2, 3].map(i => <div key={i} className="card" style={{ height: 380, animation: 'pulse 1.5s infinite' }} />)}
         </div>
       ) : filteredDestinations.length === 0 ? (
@@ -349,7 +349,7 @@ const Destinations = () => {
           <p style={{ color: 'var(--text-secondary)' }}>Thử tìm kiếm với một từ khóa khác</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '1.5rem' }}>
           {filteredDestinations.map(dest => (
             <motion.div layout key={dest.id} className="card glass-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ height: '220px', position: 'relative' }}>
@@ -393,7 +393,7 @@ const Destinations = () => {
             style={{
               position: 'fixed',
               top: 0,
-              left: 'var(--sidebar-width)',
+              left: 0,
               right: 0,
               bottom: 0,
               background: 'white',

@@ -265,17 +265,17 @@ const Challenges = () => {
         )}
       </AnimatePresence>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Quản lý thử thách</h1>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', fontWeight: 800 }}>Quản lý thử thách</h1>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
           <input
             className="input-field"
             placeholder="Tìm kiếm nhanh..."
-            style={{ width: '300px' }}
+            style={{ flex: '1 1 200px', maxWidth: '300px' }}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button className="btn" onClick={handleOpenAddModal} style={{ background: '#3b82f6', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 700 }}>
+          <button className="btn" onClick={handleOpenAddModal} style={{ background: '#3b82f6', color: 'white', padding: '0.75rem 1.25rem', borderRadius: '12px', fontWeight: 700, whiteSpace: 'nowrap' }}>
             Thêm mới thử thách
           </button>
         </div>
@@ -283,17 +283,17 @@ const Challenges = () => {
 
       <div style={{ height: '3px', background: 'black', width: '100%', borderRadius: '10px', marginBottom: '2.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }} />
 
-      <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2.5rem' }}>
-        <div style={{ flex: 1, display: 'flex', gap: '0.5rem', background: 'var(--bg-accent)', padding: '0.5rem', borderRadius: '14px' }}>
+      <div style={{ marginBottom: '2rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', background: 'var(--bg-accent)', padding: '0.5rem', borderRadius: '14px', minWidth: 'max-content' }}>
           {TABS.map(tab => (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ flex: 1, border: 'none', padding: '0.75rem', borderRadius: '10px', background: activeTab === tab.key ? 'white' : 'transparent', color: activeTab === tab.key ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: activeTab === tab.key ? 'var(--shadow-sm)' : 'none' }}>
+            <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{ flex: 'none', border: 'none', padding: '0.75rem 1rem', borderRadius: '10px', background: activeTab === tab.key ? 'white' : 'transparent', color: activeTab === tab.key ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: activeTab === tab.key ? 'var(--shadow-sm)' : 'none', whiteSpace: 'nowrap', fontSize: '0.875rem' }}>
               {tab.label}
             </button>
           ))}
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '1.5rem' }}>
         {loading ? (
           Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="card glass-card skeleton" style={{ height: '300px' }} />

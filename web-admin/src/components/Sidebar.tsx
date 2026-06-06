@@ -4,8 +4,8 @@ import icon from '../assets/icon.png';
 
 const Sidebar = ({ onLogout, isOpen, onClose }: { onLogout: () => void, isOpen: boolean, onClose: () => void }) => {
   const NavItem = ({ to, icon: Icon, children }: any) => (
-    <NavLink 
-      to={to} 
+    <NavLink
+      to={to}
       className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
       onClick={onClose}
     >
@@ -15,10 +15,10 @@ const Sidebar = ({ onLogout, isOpen, onClose }: { onLogout: () => void, isOpen: 
   );
 
   return (
-    <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
-      <div className="sidebar-logo" style={{ background: 'white' }}>
-        <img src={icon} alt="KhmerGo Logo" style={{ width: 40, height: 40, marginRight: '12px', borderRadius: '10px' }} />
-        <span style={{ fontWeight: 800, fontSize: '1.25rem', color: '#000' }}>KhmerGo</span>
+    <aside className={`sidebar ${isOpen ? 'active' : ''}`}>
+      <div className="sidebar-logo" style={{ background: 'var(--bg-sidebar)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <img src={icon} alt="KhmerGo Logo" style={{ width: 36, height: 36, marginRight: '12px', borderRadius: '8px' }} />
+        <span style={{ fontWeight: 800, fontSize: '1.25rem', color: '#fff' }}>KhmerGo</span>
       </div>
 
       <nav className="sidebar-nav">
@@ -29,7 +29,7 @@ const Sidebar = ({ onLogout, isOpen, onClose }: { onLogout: () => void, isOpen: 
         <NavItem to="/destinations" icon={BookOpen}>Nội dung</NavItem>
         <NavItem to="/challenges" icon={Gamepad2}>Thử thách</NavItem>
         <NavItem to="/vocabulary" icon={Type}>Từ vựng</NavItem>
-        <NavItem to="/article" icon={FileText}>Bài viết cộng đồng</NavItem>
+        <NavItem to="/article" icon={FileText}>Bài viết</NavItem>
       </nav>
 
       <div style={{ padding: '1rem', borderTop: '1px solid rgba(0, 0, 0, 0.05)' }}>
