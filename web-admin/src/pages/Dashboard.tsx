@@ -225,7 +225,7 @@ const Dashboard = () => {
                     <div style={{ width: rank === 1 ? '60px' : '48px', height: rank === 1 ? '60px' : '48px', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', overflow: 'hidden', margin: '0 auto 0.4rem', background: 'white' }}>
                       {user?.avatar && user.avatar !== "" ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={rank === 1 ? 28 : 20} style={{ margin: rank === 1 ? '16px' : '14px', color: '#94a3b8' }} />}
                     </div>
-                    <p style={{ fontWeight: 800, fontSize: 'clamp(0.6rem, 2vw, 0.7rem)', marginBottom: '2px', lineHeight: 1.2 }}>{user?.name || '---'}</p>
+                    <p style={{ fontWeight: 800, fontSize: 'clamp(0.55rem, 1.8vw, 0.7rem)', marginBottom: '2px', whiteSpace: 'nowrap' }}>{user?.name || '---'}</p>
                     <p style={{ fontSize: '0.6rem', color: 'var(--text-muted)', fontWeight: 800 }}>{user?.points || 0} Điểm</p>
                   </div>
                   <motion.div
@@ -249,7 +249,7 @@ const Dashboard = () => {
                     <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid rgba(0,0,0,0.1)', overflow: 'hidden', margin: '0 auto 0.4rem', background: 'white' }}>
                       {user?.avatar && user.avatar !== "" ? <img src={user.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={user.name} /> : <User size={16} style={{ margin: '10px', color: '#cbd5e1' }} />}
                     </div>
-                    <p style={{ fontWeight: 700, fontSize: 'clamp(0.55rem, 1.8vw, 0.65rem)', marginBottom: '2px', lineHeight: 1.2, color: '#64748b' }}>{user?.name || '---'}</p>
+                    <p style={{ fontWeight: 700, fontSize: 'clamp(0.5rem, 1.5vw, 0.65rem)', marginBottom: '2px', whiteSpace: 'nowrap', color: '#64748b' }}>{user?.name || '---'}</p>
                     <p style={{ fontSize: '0.6rem', color: '#94a3b8', fontWeight: 700 }}>{user?.points || 0} Điểm</p>
                   </div>
                   <motion.div
