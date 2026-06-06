@@ -59,7 +59,7 @@ export default function AdminLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Quản trị KhmerGo',
+          headerShown: false,
         }}
       />
     </Stack>

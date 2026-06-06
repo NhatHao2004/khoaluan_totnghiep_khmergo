@@ -1,116 +1,209 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
+import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { db } from '../../utils/firebaseConfig';
 
 const { width } = Dimensions.get('window');
-const COLUMN_WIDTH = (width - 48) / 2;
+const CARD_WIDTH = (width - 48) / 2;
 
 const AdminDashboard = () => {
-  const adminModules = [
-    {
-      id: 'users',
-      title: 'Người dùng',
-      subtitle: 'Quản lý thành viên',
-      icon: 'people',
-      color: ['#4facfe', '#00f2fe'],
-      route: '/(admin)/users',
-      lib: Ionicons
-    },
-    {
-      id: 'content',
-      title: 'Nội dung',
-      subtitle: 'Địa điểm & Bài học',
-      icon: 'book-open-variant',
-      color: ['#667eea', '#764ba2'],
-      route: '/(admin)/content',
-      lib: MaterialCommunityIcons
-    },
-    {
-      id: 'challenges',
-      title: 'Thử thách',
-      subtitle: 'Quản lý câu hỏi',
-      icon: 'trophy',
-      color: ['#f6d365', '#fda085'],
-      route: '/(admin)/challenges',
-      lib: FontAwesome5
-    },
-    {
-      id: 'trash',
-      title: 'Thùng rác',
-      subtitle: 'Khôi phục dữ liệu',
-      icon: 'trash-can-outline',
-      color: ['#ff0844', '#ffb199'],
-      route: '/(admin)/trash',
-      lib: MaterialCommunityIcons
-    },
-    {
-      id: 'feedback',
-      title: 'Phản hồi',
-      subtitle: 'Ý kiến người dùng',
-      icon: 'chatbubbles-outline',
-      color: ['#43e97b', '#38f9d7'],
-      route: '/(admin)/feedback',
-      lib: Ionicons
-    },
-    {
-      id: 'settings',
-      title: 'Cài đặt hệ thống',
-      subtitle: 'Cấu hình App',
-      icon: 'settings-outline',
-      color: ['#243949', '#517fa4'],
-      route: '/(admin)/settings',
-      lib: Ionicons
-    }
-  ];
+  const [stats, setStats] = useState({
+    users: 0,
+    content: 0,
+    challenges: 0,
+    posts: 0
+  });
+  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState('weekly');
+
+  useEffect(() => {
+    // Lấy số lượng người dùng (loại bỏ Admin một cách an toàn)
+    const unsubUsers = onSnapshot(collection(db, 'users'), (snap) => {
+      const regularUsers = snap.docs.filter(doc => {
+        const data = doc.data();
+        return data.role !== 'Quản trị viên';
+      });
+      setStats(prev => ({ ...prev, users: regularUsers.length }));
+    });
+
+    // Lấy số lượng địa điểm/nội dung
+    const unsubContent = onSnapshot(collection(db, 'destinations'), (snap) => {
+      setStats(prev => ({ ...prev, content: snap.size }));
+    });
+
+    // Lấy số lượng thử thách
+    const unsubChallenges = onSnapshot(collection(db, 'quizzes'), (snap) => {
+      setStats(prev => ({ ...prev, challenges: snap.size }));
+    });
+
+    // Lấy số lượng bài viết
+    const unsubPosts = onSnapshot(collection(db, 'posts'), (snap) => {
+      setStats(prev => ({ ...prev, posts: snap.size }));
+    });
+
+    // Lấy bảng xếp hạng (Lấy toàn bộ để tự sort, tránh mất người dùng 0 điểm)
+    const unsubLeaderboard = onSnapshot(collection(db, 'users'), (snap) => {
+      const allUsers = snap.docs.map(doc => ({ 
+        id: doc.id, 
+        ...doc.data() 
+      })).filter(user => (user as any).role !== 'Quản trị viên'); // Không hiện admin trên bảng xếp hạng
+
+      // Sắp xếp theo điểm giảm dần
+      const sortedUsers = allUsers.sort((a: any, b: any) => {
+        const pointsA = a.points || 0;
+        const pointsB = b.points || 0;
+        return pointsB - pointsA;
+      });
+
+      // Cắt theo limit của tab: Tuần 10 - Tất cả 20
+      const leaderboardLimit = activeTab === 'all' ? 20 : 10;
+      const topUsers = sortedUsers.slice(0, leaderboardLimit);
+      
+      // Tạo danh sách đầy đủ (hiện cột trống nếu thiếu người)
+      const fullList = Array.from({ length: leaderboardLimit }, (_, i) => {
+        return topUsers[i] || { id: `empty-${i}`, name: '---', points: 0, dummy: true };
+      });
+      
+      setLeaderboard(fullList);
+    });
+
+    return () => {
+      unsubUsers();
+      unsubContent();
+      unsubChallenges();
+      unsubPosts();
+      unsubLeaderboard();
+    };
+  }, []);
+
+  const top1 = leaderboard[0];
+  const top2 = leaderboard[1];
+  const top3 = leaderboard[2];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.header}>
-        <Text style={styles.greeting}>Xin chào, Quản trị viên!</Text>
-        <Text style={styles.subGreeting}>Hôm nay bạn muốn quản lý nội dung nào?</Text>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Header View - Injected by layout, but matches style */}
+      <View style={styles.topActions}>
+        <TouchableOpacity style={styles.iconBtn}>
+          <Ionicons name="menu-outline" size={28} color="#1e293b" />
+        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', gap: 12 }}>
+          <TouchableOpacity style={styles.iconBtn}>
+            <Ionicons name="notifications-outline" size={24} color="#3b82f6" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.iconBtn}
+            onPress={() => router.push('/(admin)/trash' as any)}
+          >
+            <Ionicons name="trash-outline" size={24} color="#ef4444" />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <View style={styles.grid}>
-        {adminModules.map((module) => {
-          const IconLib = module.lib;
-          return (
-            <TouchableOpacity
-              key={module.id}
-              style={styles.cardWrapper}
-              onPress={() => {
-                // Tạm thời log ra nếu chưa có route
-                console.log(`Navigating to ${module.route}`);
-                // router.push(module.route);
-              }}
-            >
-              <LinearGradient
-                colors={module.color as any}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.card}
-              >
-                <View style={styles.iconContainer}>
-                  <IconLib name={module.icon as any} size={32} color="white" />
-                </View>
-                <View>
-                  <Text style={styles.cardTitle}>{module.title}</Text>
-                  <Text style={styles.cardSubtitle}>{module.subtitle}</Text>
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
-          );
-        })}
+      {/* Statistics Grid */}
+      <View style={styles.statsGrid}>
+        <View style={styles.statCard}>
+          <View style={styles.iconBox}>
+            <Ionicons name="person-outline" size={22} color="#ef4444" />
+          </View>
+          <View style={styles.statInfoRow}>
+            <Text style={styles.statLabel}>Người dùng</Text>
+            <View style={styles.statNumberGroup}>
+              <Text style={styles.statNumber}>{stats.users}</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.statCard}>
+          <View style={styles.iconBox}>
+            <Ionicons name="book-outline" size={22} color="#10b981" />
+          </View>
+          <View style={styles.statInfoRow}>
+            <Text style={styles.statLabel}>Nội dung</Text>
+            <View style={styles.statNumberGroup}>
+              <Text style={styles.statNumber}>{stats.content}</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.statCard}>
+          <View style={styles.iconBox}>
+            <Ionicons name="help-circle-outline" size={26} color="#f59e0b" />
+          </View>
+          <View style={styles.statInfoRow}>
+            <Text style={styles.statLabel}>Thử thách</Text>
+            <View style={styles.statNumberGroup}>
+              <Text style={styles.statNumber}>{stats.challenges}</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.statCard}>
+          <View style={styles.iconBox}>
+            <MaterialCommunityIcons name="chat-outline" size={25} color="#ec4899" />
+          </View>
+          <View style={styles.statInfoRow}>
+            <Text style={styles.statLabel}>Bài viết</Text>
+            <View style={styles.statNumberGroup}>
+              <Text style={styles.statNumber}>{stats.posts}</Text>
+            </View>
+          </View>
+        </View>
       </View>
 
-      <TouchableOpacity 
-        style={styles.exitButton}
-        onPress={() => router.replace('/(tabs)')}
-      >
-        <Ionicons name="exit-outline" size={20} color="#ef4444" />
-        <Text style={styles.exitText}>Thoát chế độ Quản trị</Text>
-      </TouchableOpacity>
+      {/* Leaderboard Chart Section */}
+      <View style={styles.chartHeader}>
+        <Text style={styles.chartTitle}>Biểu đồ bảng xếp hạng</Text>
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'weekly' && styles.tabActive]}
+            onPress={() => setActiveTab('weekly')}
+          >
+            <Text style={[styles.tabText, activeTab === 'weekly' && styles.tabTextActive]}>Hàng tuần</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'all' && styles.tabActive]}
+            onPress={() => setActiveTab('all')}
+          >
+            <Text style={[styles.tabText, activeTab === 'all' && styles.tabTextActive]}>Tất cả</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.podiumContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.podiumScrollContent}
+        >
+          {leaderboard.map((user, index) => {
+            const rank = index + 1;
+            const barColor = rank === 1 ? '#ef4444' : rank === 2 ? '#facc15' : rank === 3 ? '#22c55e' : '#94a3b8';
+            const barHeight = rank === 1 ? 120 : rank === 2 ? 100 : rank === 3 ? 85 : 65;
+
+            return (
+              <View key={user.id} style={styles.podiumCol}>
+                <View style={styles.userHead}>
+                  {user.avatar ? (
+                    <Image source={{ uri: user.avatar }} style={rank === 1 ? styles.avatarLarge : styles.avatarMini} />
+                  ) : (
+                    <View style={[styles.avatarPlaceholder, rank === 1 && styles.avatarLarge]}>
+                      <Ionicons name="person" size={rank === 1 ? 24 : 16} color="#cbd5e1" />
+                    </View>
+                  )}
+                  <Text style={styles.podiumName} numberOfLines={1}>{user.name || '---'}</Text>
+                  <Text style={styles.podiumPoints}>{user.points || 0}đ</Text>
+                </View>
+                <View style={[styles.bar, { height: barHeight, backgroundColor: barColor }]}>
+                  <Text style={styles.rankNum}>{rank}</Text>
+                </View>
+              </View>
+            );
+          })}
+        </ScrollView>
+      </View>
     </ScrollView>
   );
 };
@@ -118,82 +211,194 @@ const AdminDashboard = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#fff',
   },
-  content: {
-    padding: 24,
-    paddingBottom: 40,
+  topActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 45,
+    marginBottom: 20,
   },
-  header: {
-    marginBottom: 32,
+  iconBtn: {
+    padding: 8,
+    borderRadius: 12,
   },
-  greeting: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#1e293b',
-    marginBottom: 4,
-  },
-  subGreeting: {
-    fontSize: 14,
-    color: '#64748b',
-    fontWeight: '500',
-  },
-  grid: {
+  statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 16,
+    paddingHorizontal: 16,
     justifyContent: 'space-between',
+    gap: 12,
+    marginBottom: 30,
   },
-  cardWrapper: {
-    width: COLUMN_WIDTH,
-    marginBottom: 8,
-  },
-  card: {
-    padding: 20,
-    borderRadius: 24,
-    height: 180,
-    justifyContent: 'space-between',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 15,
-    elevation: 8,
-  },
-  iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cardTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: 'white',
-    marginBottom: 2,
-  },
-  cardSubtitle: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.8)',
-    fontWeight: '600',
-  },
-  exitButton: {
-    marginTop: 32,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    borderRadius: 16,
+  statCard: {
+    width: CARD_WIDTH,
     backgroundColor: '#fff',
+    borderRadius: 24,
+    padding: 16,
     borderWidth: 1,
-    borderColor: '#fee2e2',
-    gap: 8,
+    borderColor: '#f1f5f9',
+    alignItems: 'flex-start',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
   },
-  exitText: {
-    fontSize: 15,
+  iconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  statInfoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    marginTop: 2,
+  },
+  statLabel: {
+    fontSize: 12,
     fontWeight: '700',
-    color: '#ef4444',
+    color: '#64748b',
+  },
+  statNumberGroup: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 2,
+  },
+  statNumber: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#1e293b',
+  },
+  statTotal: {
+    fontSize: 9,
+    color: '#94a3b8',
+    fontWeight: '500',
+  },
+  chartHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  chartTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#1e293b',
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#f1f5f9',
+    borderRadius: 10,
+    padding: 3,
+  },
+  tab: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  tabActive: {
+    backgroundColor: '#3b82f6',
+  },
+  tabText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#64748b',
+  },
+  tabTextActive: {
+    color: '#fff',
+  },
+  podiumContainer: {
+    marginHorizontal: 16,
+    paddingBottom: 0,
+    marginBottom: 40,
+  },
+  podiumScrollContent: {
+    paddingHorizontal: 4,
+    paddingRight: 4,
+    alignItems: 'flex-end',
+    gap: 10,
+  },
+  podiumCol: {
+    width: 80,
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  userHead: {
+    alignItems: 'center',
+    marginBottom: 12,
+    width: '100%',
+    height: 85,
+    justifyContent: 'flex-end',
+  },
+  avatarMini: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    borderWidth: 1.5,
+    borderColor: '#e2e8f0',
+  },
+  avatarLarge: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 2,
+    borderColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  avatarPlaceholder: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  podiumName: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#1e293b',
+    marginTop: 6,
+    textAlign: 'center',
+  },
+  podiumPoints: {
+    fontSize: 9,
+    color: '#94a3b8',
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  bar: {
+    width: '100%',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  rankNum: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#fff',
   }
 });
 
