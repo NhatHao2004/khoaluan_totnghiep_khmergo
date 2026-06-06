@@ -191,15 +191,15 @@ const Dashboard = () => {
         </div>
 
         <div className="card glass-card" style={{ padding: '1.5rem 1rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-          <div className="custom-scrollbar" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', minWidth: '600px', gap: '0.75rem', height: '320px', paddingBottom: '1rem', margin: '0 auto' }}>
+          <div className="custom-scrollbar" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start', minWidth: 'max-content', gap: '0.75rem', height: '320px', paddingBottom: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
             <style>{`
               .custom-scrollbar::-webkit-scrollbar {
                 display: none;
               }
             `}</style>
 
-            {/* Sequential Ranking Logic (Rank 1, 2, 3) */}
-            {[0, 1, 2].map((uIdx) => {
+            {/* Podium Ranking: Rank 2, Rank 1, Rank 3 */}
+            {[1, 0, 2].map((uIdx) => {
               const user = topUsers[uIdx];
               const rank = uIdx + 1; // 0->1, 1->2, 2->3
               const color = rank === 1 ? '#ef4444' : rank === 2 ? '#f8d330' : '#22c55e';
