@@ -36,93 +36,41 @@
   --font-family: 'Be Vietnam Pro', sans-serif;
   --sidebar-width: 280px;
   --header-height: 72px;
-
-  /* Redmi 12 Simulator Tokens */
-  --device-width: 390px;
-  --device-height: 844px;
-  --device-radius: 40px;
-  --device-border: 12px;
 }
 
-/* Mobile First Base */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
 }
 
 html, body {
   width: 100%;
   height: 100%;
-  overflow: hidden; /* Lock scroll to device */
+  overflow-x: hidden;
   font-family: var(--font-family);
-  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  background-color: var(--bg-main);
   color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Scrollbar customization */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--text-muted);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
-}
-
-/* The Phone Frame Container */
+/* Full Screen Mobile Layout */
 .app-container {
-  width: var(--device-width);
-  height: var(--device-height);
+  width: 100%;
+  min-height: 100vh;
   background: var(--bg-main);
-  border-radius: var(--device-radius);
   position: relative;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 
-    0 0 0 var(--device-border) #1e293b,
-    0 30px 60px rgba(0,0,0,0.4),
-    inset 0 0 2px rgba(255,255,255,0.5);
-  border: 4px solid #334155;
 }
 
-/* Device Hole Punch */
-.app-container::before {
-  content: '';
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 10px;
-  height: 10px;
-  background: #0f172a;
-  border-radius: 50%;
-  z-index: 1002;
-  box-shadow: 0 0 0 4px #1e293b;
-}
-
-/* Sidebar transforms into Bottom Navigation */
+/* Bottom Navigation (App Style) */
 .sidebar {
   width: 100% !important;
   height: 72px !important;
-  background: rgba(15, 23, 42, 0.95);
+  background: rgba(15, 23, 42, 0.98);
   backdrop-filter: blur(12px);
-  position: absolute !important;
+  position: fixed !important;
   bottom: 0 !important;
   left: 0 !important;
   top: auto !important;
@@ -131,8 +79,6 @@ html, body {
   border-right: none !important;
   border-top: 1px solid rgba(255,255,255,0.1);
   z-index: 1001;
-  transition: none !important;
-  transform: none !important;
 }
 
 .sidebar-logo, .sidebar-label {
@@ -161,20 +107,21 @@ html, body {
   align-items: center !important;
   border-radius: 12px;
   height: 100%;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
   display: flex !important;
   margin-bottom: 0 !important;
+  transition: all 0.2s;
 }
 
 .nav-link svg {
-  width: 20px !important;
-  height: 20px !important;
+  width: 22px !important;
+  height: 22px !important;
 }
 
 .nav-link.active {
   background: transparent !important;
-  color: #10b981 !important;
+  color: var(--success) !important;
   font-weight: 800 !important;
 }
 
@@ -187,9 +134,8 @@ html, body {
   flex: 1;
   width: 100% !important;
   margin-left: 0 !important;
-  padding: 1.25rem !important;
-  padding-bottom: 85px !important; /* Space for bottom nav */
-  overflow-y: auto !important;
+  padding: 1.5rem !important;
+  padding-bottom: 90px !important; /* Space for bottom nav */
   display: flex !important;
   flex-direction: column;
 }
