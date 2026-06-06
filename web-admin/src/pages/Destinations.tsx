@@ -73,7 +73,7 @@ const InputField = ({ label, icon: Icon, value, onChange, placeholder, type = 't
   );
 };
 
-const getProxiedImageUrl = (url: string) => {
+const getProxiedImageUrl = (url?: string) => {
   if (!url) return '';
   if (url.includes('googleusercontent.com') || url.includes('lh3.googleusercontent.com')) {
     // Loại bỏ đuôi -rw (WebP) để tránh lỗi một số trình duyệt và proxy

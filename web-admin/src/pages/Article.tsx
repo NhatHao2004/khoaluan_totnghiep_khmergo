@@ -4,7 +4,7 @@ import { CheckCircle, Eye, Image as ImageIcon, Shield, Trash2, X } from 'lucide-
 import { useEffect, useState } from 'react';
 import { db } from '../firebase/config';
 
-const getProxiedImageUrl = (url: string) => {
+const getProxiedImageUrl = (url?: string) => {
   if (!url) return '';
   if (url.includes('googleusercontent.com') || url.includes('lh3.googleusercontent.com')) {
     const cleanUrl = url.replace(/-rw$/, '');
