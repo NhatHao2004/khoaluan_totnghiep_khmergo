@@ -81,55 +81,56 @@ const TrashManagement = () => {
 
   const renderTrashItem = ({ item }: { item: any }) => (
     <View style={styles.card}>
-      {item.imageUrl ? (
-        <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
-      ) : item.originalCollection === 'vocab_categories' ? (
-        <Image
-          source={
-            (item.title === 'cat_family' || item.id?.includes('family') || item.originalId?.includes('family'))
-              ? require('@/assets/images/giadinh.jpg')
-              : (item.title === 'cat_food' || item.id?.includes('food') || item.originalId?.includes('food'))
-              ? require('@/assets/images/monan.jpg')
-              : (item.title === 'cat_greetings' || item.id?.includes('greeting') || item.originalId?.includes('greeting'))
-              ? require('@/assets/images/chaohoi.jpg')
-              : (item.title === 'cat_numbers' || item.id?.includes('number') || item.originalId?.includes('number'))
-              ? require('@/assets/images/sodem.jpg')
-              : require('@/assets/images/giadinh.jpg')
-          }
-          style={styles.cardImage}
-        />
-      ) : (
-        <View style={[styles.cardImage, { backgroundColor: '#f1f5f9', justifyContent: 'center', alignItems: 'center' }]}>
-          <Ionicons name="image-outline" size={40} color="#cbd5e1" />
-        </View>
-      )}
-      <View style={styles.cardContent}>
-        <View style={styles.cardHeader}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.cardTitle}>{item.name || item.title || 'Không có tên'}</Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
-              <Text style={styles.cardSubTitle}>
-                Loại chủ đề: {item.originalCollection === 'vocab_categories' ? 'Học tập' :
-                  (item.category === 'pagoda' ? 'Chùa' : item.category === 'culture' ? 'Văn hóa' : 'Ẩm thực')}
-              </Text>
-              <View style={styles.timeBadge}>
-                <Text style={styles.timeText}>
-                  {item.deletedAt?.toDate ? item.deletedAt.toDate().toLocaleDateString('vi-VN') : 'Vừa xong'}
-                </Text>
-              </View>
-            </View>
+      <View style={styles.imageContainer}>
+        {item.imageUrl ? (
+          <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
+        ) : item.originalId?.includes('family') || item.title === 'cat_family' ? (
+          <Image source={require('@/assets/images/giadinh.jpg')} style={styles.cardImage} />
+        ) : item.originalCollection === 'vocab_categories' ? (
+          <Image
+            source={
+              (item.title === 'cat_family' || item.id?.includes('family') || item.originalId?.includes('family'))
+                ? require('@/assets/images/giadinh.jpg')
+                : (item.title === 'cat_food' || item.id?.includes('food') || item.originalId?.includes('food'))
+                  ? require('@/assets/images/monan.jpg')
+                  : (item.title === 'cat_greetings' || item.id?.includes('greeting') || item.originalId?.includes('greeting'))
+                    ? require('@/assets/images/chaohoi.jpg')
+                    : (item.title === 'cat_numbers' || item.id?.includes('number') || item.originalId?.includes('number'))
+                      ? require('@/assets/images/sodem.jpg')
+                      : require('@/assets/images/giadinh.jpg')
+            }
+            style={styles.cardImage}
+          />
+        ) : (
+          <View style={[styles.cardImage, { backgroundColor: '#f1f5f9', justifyContent: 'center', alignItems: 'center' }]}>
+            <Ionicons name="image-outline" size={32} color="#cbd5e1" />
           </View>
+        )}
+      </View>
+
+      <View style={styles.cardContent}>
+        <View style={styles.cardInfo}>
+          <Text style={styles.cardTitle} numberOfLines={1}>{item.name || item.title || 'Không có tên'}</Text>
+          <Text style={styles.cardSubTitle}>
+            Đã xóa ngày: {item.deletedAt?.toDate ? item.deletedAt.toDate().toLocaleDateString('vi-VN') : 'Mới xóa'}
+          </Text>
         </View>
 
         <View style={styles.cardActions}>
-          <TouchableOpacity style={styles.restoreBtn} onPress={() => handleRestore(item)}>
-            <Ionicons name="refresh-outline" size={18} color="#10b981" />
-            <Text style={styles.restoreBtnText}>Phục hồi</Text>
+          <TouchableOpacity
+            style={styles.restoreBtnSmall}
+            onPress={() => handleRestore(item)}
+          >
+            <Ionicons name="refresh" size={16} color="#3b82f6" />
+            <Text style={styles.restoreBtnTextSmall}>Khôi phục</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.deleteBtn} onPress={() => handlePermanentDelete(item.id, item.name)}>
-            <Ionicons name="trash-outline" size={18} color="#ef4444" />
-            <Text style={styles.deleteBtnText}>Xóa vĩnh viễn</Text>
+          <TouchableOpacity
+            style={styles.deleteBtnSmall}
+            onPress={() => handlePermanentDelete(item.id, item.name || item.title)}
+          >
+            <Ionicons name="trash-outline" size={16} color="#ef4444" />
+            <Text style={styles.deleteBtnTextSmall}>Xóa ngay</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -212,19 +213,91 @@ const styles = StyleSheet.create({
   headerTitle: { flex: 1, fontSize: 20, fontWeight: '800', color: '#1e293b', textAlign: 'center' },
   centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   listContent: { padding: 16 },
-  card: { backgroundColor: '#fff', borderRadius: 24, marginBottom: 16, overflow: 'hidden', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 10 },
-  cardImage: { width: '100%', height: 160, resizeMode: 'cover' },
-  cardContent: { padding: 16 },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
-  cardTitle: { fontSize: 18, fontWeight: '800', color: '#1e293b' },
-  cardSubTitle: { fontSize: 13, color: '#64748b', marginTop: 2 },
-  timeBadge: { backgroundColor: '#f1f5f9', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, alignSelf: 'flex-start' },
-  timeText: { fontSize: 11, fontWeight: '700', color: '#000000ff' },
-  cardActions: { flexDirection: 'row', gap: 12, marginTop: 4, borderTopWidth: 1, borderTopColor: '#f1f5f9', paddingTop: 16 },
-  restoreBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: '#f0fdf4', paddingVertical: 10, borderRadius: 12 },
-  restoreBtnText: { fontSize: 14, fontWeight: '700', color: '#10b981' },
-  deleteBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: '#fef2f2', paddingVertical: 10, borderRadius: 12 },
-  deleteBtnText: { fontSize: 14, fontWeight: '700', color: '#ef4444' },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    marginBottom: 16,
+    flexDirection: 'row',
+    padding: 10,
+    alignItems: 'center',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+  },
+  imageContainer: {
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  cardImage: {
+    width: 85,
+    height: 85,
+    borderRadius: 14,
+    resizeMode: 'contain',
+    backgroundColor: '#f8fafc',
+  },
+  cardContent: {
+    flex: 1,
+    marginLeft: 14,
+    height: 85,
+    justifyContent: 'space-between',
+    paddingVertical: 2,
+  },
+  cardInfo: {
+    flex: 1,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#1e293b',
+    marginBottom: 2,
+  },
+  cardSubTitle: {
+    fontSize: 12,
+    color: '#64748b',
+    fontWeight: '600',
+  },
+  cardActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 6,
+  },
+  restoreBtnSmall: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#eff6ff',
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    gap: 4,
+    borderWidth: 1,
+    borderColor: '#dbeafe',
+  },
+  restoreBtnTextSmall: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#3b82f6'
+  },
+  deleteBtnSmall: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fef2f2',
+    borderWidth: 1,
+    borderColor: '#fee2e2',
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    gap: 4,
+  },
+  deleteBtnTextSmall: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#ef4444'
+  },
   emptyContainer: { alignItems: 'center', marginTop: 290 },
   emptyText: { marginTop: 10, fontSize: 16, color: '#94a3b8', fontWeight: '600' },
   // Toast Styles
