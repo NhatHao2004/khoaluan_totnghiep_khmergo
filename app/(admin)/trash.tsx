@@ -81,7 +81,28 @@ const TrashManagement = () => {
 
   const renderTrashItem = ({ item }: { item: any }) => (
     <View style={styles.card}>
-      <Image source={{ uri: item.imageUrl || 'https://via.placeholder.com/150' }} style={styles.cardImage} />
+      {item.imageUrl ? (
+        <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
+      ) : item.originalCollection === 'vocab_categories' ? (
+        <Image
+          source={
+            (item.title === 'cat_family' || item.id?.includes('family') || item.originalId?.includes('family'))
+              ? require('@/assets/images/giadinh.jpg')
+              : (item.title === 'cat_food' || item.id?.includes('food') || item.originalId?.includes('food'))
+              ? require('@/assets/images/monan.jpg')
+              : (item.title === 'cat_greetings' || item.id?.includes('greeting') || item.originalId?.includes('greeting'))
+              ? require('@/assets/images/chaohoi.jpg')
+              : (item.title === 'cat_numbers' || item.id?.includes('number') || item.originalId?.includes('number'))
+              ? require('@/assets/images/sodem.jpg')
+              : require('@/assets/images/giadinh.jpg')
+          }
+          style={styles.cardImage}
+        />
+      ) : (
+        <View style={[styles.cardImage, { backgroundColor: '#f1f5f9', justifyContent: 'center', alignItems: 'center' }]}>
+          <Ionicons name="image-outline" size={40} color="#cbd5e1" />
+        </View>
+      )}
       <View style={styles.cardContent}>
         <View style={styles.cardHeader}>
           <View style={{ flex: 1 }}>

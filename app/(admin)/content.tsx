@@ -767,8 +767,7 @@ const ContentManagement = () => {
             </View>
             <Text style={[styles.modalTitle, { textAlign: 'center', marginBottom: 10 }]}>Xác nhận xóa</Text>
             <Text style={styles.confirmSubText}>
-              Bạn có chắc chắn muốn xóa {'\n'}
-              Nội dung sẽ được chuyển vào <Text style={{ color: '#ef4444', fontWeight: '700' }}>Thùng rác</Text>
+              Bạn có chắc chắn muốn xóa {deleteType === 'word' ? 'từ vựng' : deleteType === 'topic' ? 'chủ đề' : 'nội dung'} này
             </Text>
             <View style={[styles.modalActions, { justifyContent: 'center', gap: 15 }]}>
               <TouchableOpacity style={[styles.saveBtnSmall, { backgroundColor: '#3b82f6', flex: 1 }]} onPress={() => setDeleteConfirmVisible(false)}>
