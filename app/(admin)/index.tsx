@@ -1,9 +1,9 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { collection, onSnapshot } from 'firebase/firestore';
-import React, { useEffect, useRef, useState, useContext } from 'react';
-import { AuthContext } from '../../contexts/AuthContext';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Alert, Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AuthContext } from '../../contexts/AuthContext';
 import { db } from '../../utils/firebaseConfig';
 
 const { width } = Dimensions.get('window');
@@ -133,24 +133,24 @@ const AdminDashboard = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Quản trị viên</Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => {
             Alert.alert(
               'Quản trị viên',
               `Tài khoản: ${user?.name || user?.email}\nBạn muốn thực hiện hành động gì?`,
               [
                 { text: 'Hủy', style: 'cancel' },
-                { 
-                  text: 'Đăng xuất', 
+                {
+                  text: 'Đăng xuất',
                   onPress: async () => {
                     await logout();
                     router.replace('/login');
                   },
-                  style: 'destructive' 
+                  style: 'destructive'
                 },
               ]
             );
-          }} 
+          }}
           style={styles.menuBtn}
         >
           <Ionicons name="menu" size={30} color="#1e293b" />
@@ -287,18 +287,18 @@ const AdminDashboard = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8fafc',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 10,
-    backgroundColor: '#fff',
+    paddingTop: 40,
+    paddingBottom: 5,
+    backgroundColor: 'transparent',
     borderBottomWidth: 0,
-    minHeight: 80,
+    minHeight: 70,
   },
   headerTitle: {
     fontSize: 22,
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 12,
     marginBottom: 30,
-    marginTop: 10,
+    marginTop: 5,
   },
   statCard: {
     width: CARD_WIDTH,

@@ -46,7 +46,7 @@ export default function AdminLayout() {
     <Stack
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#fff',
+          backgroundColor: '#f8fafc',
         },
         headerShadowVisible: false,
         headerTitleStyle: {
@@ -54,6 +54,7 @@ export default function AdminLayout() {
           color: '#1e293b',
         },
         animation: 'slide_from_right',
+        contentStyle: { backgroundColor: '#f8fafc' }, // Nền xám cho toàn bộ stack admin
       }}
     >
       <Stack.Screen

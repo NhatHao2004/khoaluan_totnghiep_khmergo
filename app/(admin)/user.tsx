@@ -1,13 +1,17 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { collection, doc, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, onSnapshot, orderBy, query, updateDoc, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { Alert, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { db } from '../../utils/firebaseConfig';
 
 const UserManagement = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [feedbackVisible, setFeedbackVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [userFeedbacks, setUserFeedbacks] = useState<any[]>([]);
+  const [fetchingFeedback, setFetchingFeedback] = useState(false);
 
   useEffect(() => {
     const unsub = onSnapshot(query(collection(db, 'users'), orderBy('name')), (snap) => {
@@ -23,6 +27,7 @@ const UserManagement = () => {
   }, []);
 
   const toggleUserLock = async (userId: string, currentStatus: boolean) => {
+    // ... (rest of the function stays same)
     const action = currentStatus ? 'mở khóa' : 'khóa';
     Alert.alert(
       'Xác nhận',
@@ -45,6 +50,54 @@ const UserManagement = () => {
         }
       ]
     );
+  };
+
+  const openFeedback = async (user: any) => {
+    setSelectedUser(user);
+    setFeedbackVisible(true);
+    setFetchingFeedback(true);
+    setUserFeedbacks([]);
+
+    try {
+      // Dựa theo ảnh console: Collection là 'feedback' và field là 'e-mail'
+      const q = query(
+        collection(db, 'feedback'),
+        where('e-mail', '==', user.email),
+        orderBy('createdAt', 'desc')
+      );
+
+      const snap = await getDocs(q);
+      const feedbacks = snap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      setUserFeedbacks(feedbacks);
+    } catch (error) {
+      // Tạm thời ẩn log lỗi index để tránh gây rối mắt khi index đang được build
+      // console.error('Error fetching feedbacks:', error);
+
+      // Fallback nếu có vấn đề về index hoặc field
+      try {
+        const qSimple = query(
+          collection(db, 'feedback'),
+          where('e-mail', '==', user.email)
+        );
+        const snapSimple = await getDocs(qSimple);
+        const rawData = snapSimple.docs.map(d => ({ id: d.id, ...d.data() }));
+        // Sắp xếp thủ công tại client
+        const sorted = rawData.sort((a: any, b: any) => {
+          const dateA = a.createdAt?.seconds || 0;
+          const dateB = b.createdAt?.seconds || 0;
+          return dateB - dateA;
+        });
+        setUserFeedbacks(sorted);
+      } catch (err) {
+        console.error('Simple fetch failed too:', err);
+      }
+    } finally {
+      setFetchingFeedback(false);
+    }
   };
 
   const renderUserItem = ({ item }: { item: any }) => (
@@ -84,7 +137,7 @@ const UserManagement = () => {
       <View style={[styles.actionRow, item.isBlocked && styles.actionRowLocked]}>
         <TouchableOpacity
           style={[styles.actionBtn, styles.feedbackBtn]}
-          onPress={() => Alert.alert('Thông báo', 'Tính năng xem phản hồi đang được phát triển.')}
+          onPress={() => openFeedback(item)}
         >
           <MaterialCommunityIcons
             name="comment-text-outline"
@@ -133,6 +186,55 @@ const UserManagement = () => {
         }
       />
 
+      {/* Feedback Modal */}
+      <Modal
+        visible={feedbackVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setFeedbackVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Phản hồi từ {selectedUser?.name}</Text>
+              <TouchableOpacity onPress={() => setFeedbackVisible(false)}>
+                <Ionicons name="close-circle" size={32} color="#94a3b8" />
+              </TouchableOpacity>
+            </View>
+
+            {fetchingFeedback ? (
+              <View style={styles.centerContainer}>
+                <ActivityIndicator size="large" color="#3b82f6" />
+                <Text style={styles.loadingText}>Đang tải phản hồi...</Text>
+              </View>
+            ) : userFeedbacks.length > 0 ? (
+              <FlatList
+                data={userFeedbacks}
+                keyExtractor={(item) => item.id}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item }) => (
+                  <View style={styles.feedbackItem}>
+                    <View style={styles.feedbackTimeRow}>
+                      <Ionicons name="time-outline" size={16} color="#ff0000ff" />
+                      <Text style={styles.feedbackTime}>
+                        {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleString('vi-VN') : 'Vừa xong'}
+                      </Text>
+                    </View>
+                    <Text style={styles.feedbackSubject}>{item.subject || 'Không có tiêu đề'}</Text>
+                    <Text style={styles.feedbackMessage}>{item.message || item.content}</Text>
+                  </View>
+                )}
+                contentContainerStyle={styles.feedbackList}
+              />
+            ) : (
+              <View style={styles.centerContainer}>
+                <Text style={styles.noFeedbackText}>Người dùng này chưa có phản hồi nào</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 };
@@ -140,7 +242,7 @@ const UserManagement = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#f8fafc', // Nền xám nhạt toàn màn hình
   },
   header: {
     flexDirection: 'row',
@@ -148,9 +250,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 45,
     paddingBottom: 15,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    backgroundColor: 'transparent',
     position: 'relative',
     minHeight: 85,
   },
@@ -313,6 +413,80 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
     marginTop: 100,
     fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#f8fafc',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    height: '70%',
+    padding: 24,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#1e293b',
+    flex: 1,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 30,
+  },
+  loadingText: {
+    color: '#64748b',
+    fontSize: 15,
+  },
+  noFeedbackText: {
+    color: '#94a3b8',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 5,
+  },
+  feedbackList: {
+    paddingBottom: 20,
+  },
+  feedbackItem: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  feedbackTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 8,
+  },
+  feedbackTime: {
+    fontSize: 12,
+    color: '#64748b',
+    fontWeight: '500',
+  },
+  feedbackSubject: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1e293b',
+    marginBottom: 6,
+  },
+  feedbackMessage: {
+    fontSize: 14,
+    color: '#475569',
+    lineHeight: 20,
   },
 });
 
