@@ -185,12 +185,12 @@ const UserManagement = () => {
         }
       />
 
-      {/* Feedback Modal */}
       <Modal
         visible={feedbackVisible}
         animationType="slide"
         transparent={true}
         onRequestClose={() => setFeedbackVisible(false)}
+        statusBarTranslucent={true}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -234,11 +234,11 @@ const UserManagement = () => {
         </View>
       </Modal>
 
-      {/* Confirmation Modal */}
       <Modal
         visible={confirmVisible}
         transparent={true}
         animationType="fade"
+        statusBarTranslucent={true}
       >
         <View style={styles.confirmOverlay}>
           <View style={styles.confirmContent}>
@@ -286,13 +286,13 @@ const UserManagement = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc', // Nền xám nhạt toàn màn hình
+    backgroundColor: '#ffffff',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
-    marginTop: 35,
+    marginTop: 45,
     height: 50,
     backgroundColor: 'transparent',
     position: 'relative',

@@ -61,7 +61,13 @@ export default function VocabQuizScreen() {
                 id: doc.id,
                 ...doc.data()
             }));
-            setCategories(cats);
+            const sortedData = cats.sort((a: any, b: any) => {
+                if ((a.order || 99) !== (b.order || 99)) return (a.order || 99) - (b.order || 99);
+                const timeA = a.createdAt?.seconds || 0;
+                const timeB = b.createdAt?.seconds || 0;
+                return timeB - timeA;
+            });
+            setCategories(sortedData);
             setLoading(false);
         });
         return () => unsubscribe();

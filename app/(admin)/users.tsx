@@ -85,13 +85,13 @@ const UsersActivity = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#ffffff',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
-    marginTop: 35,
+    marginTop: 45,
     height: 50,
     backgroundColor: 'transparent',
     position: 'relative',

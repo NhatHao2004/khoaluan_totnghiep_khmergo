@@ -480,7 +480,7 @@ const ContentManagement = () => {
 
       {/* --- Word Management Modal (FULL SCREEN) --- */}
       <Modal visible={!!managingTopicId} animationType="slide" statusBarTranslucent={true}>
-        <View style={[styles.container, { paddingTop: 35, backgroundColor: '#ffffff' }]}>
+        <View style={[styles.container, { paddingTop: 45, backgroundColor: '#ffffff' }]}>
           <View style={[styles.header, { marginTop: 0, paddingHorizontal: 12, backgroundColor: '#ffffff' }]}>
             <TouchableOpacity style={styles.backBtn} onPress={() => setManagingTopicId(null)}>
               <Ionicons name="arrow-back" size={28} color="#1e293b" />
@@ -558,7 +558,7 @@ const ContentManagement = () => {
       <Modal visible={destModalVisible} animationType="slide" transparent statusBarTranslucent={true}>
         <View style={styles.modalBg}>
           <View style={styles.modalContentFull}>
-            <View style={[styles.modalHeader, { marginBottom: editingDest ? 10 : 20 }]}>
+            <View style={[styles.modalHeader, { marginBottom: editingDest ? 10 : 10 }]}>
               <View style={{ width: 40 }} />
               <Text style={[styles.modalTitle, { flex: 1, textAlign: 'center' }]} numberOfLines={1} adjustsFontSizeToFit>
                 {editingDest ? 'Sửa nội dung' : 'Thêm nội dung'}
@@ -690,7 +690,7 @@ const ContentManagement = () => {
       </Modal>
 
       {/* --- Vocabulary Category Modal --- */}
-      <Modal visible={topicModalVisible} animationType="fade" transparent>
+      <Modal visible={topicModalVisible} animationType="fade" transparent statusBarTranslucent={true}>
         <View style={styles.modalBg}>
           <View style={styles.modalContentSmall}>
             <Text style={styles.modalTitle}>{editingTopic ? 'Sửa chủ đề' : 'Thêm chủ đề mới'}</Text>
@@ -715,7 +715,7 @@ const ContentManagement = () => {
       </Modal>
 
       {/* --- Word Modal --- */}
-      <Modal visible={wordModalVisible} animationType="fade" transparent>
+      <Modal visible={wordModalVisible} animationType="fade" transparent statusBarTranslucent={true}>
         <View style={styles.modalBg}>
           <View style={styles.modalContentSmall}>
             <Text style={[styles.modalTitle, { textAlign: 'center', marginBottom: 15 }]}>
@@ -759,7 +759,7 @@ const ContentManagement = () => {
       </Modal>
 
       {/* --- Custom Delete Confirmation Modal --- */}
-      <Modal visible={deleteConfirmVisible} transparent animationType="fade">
+      <Modal visible={deleteConfirmVisible} transparent animationType="fade" statusBarTranslucent={true}>
         <View style={styles.modalBg}>
           <View style={styles.modalContentSmall}>
             <View style={styles.confirmIconBg}>
@@ -801,11 +801,11 @@ const ContentManagement = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, marginTop: 35, height: 50, position: 'relative' },
+  container: { flex: 1, backgroundColor: '#ffffff' },
+  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, marginTop: 45, height: 60, position: 'relative' },
   backBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', zIndex: 10 },
-  addBtnHeader: { position: 'absolute', right: 12, width: 42, height: 42, backgroundColor: '#f1f5f9', borderRadius: 12, justifyContent: 'center', alignItems: 'center', zIndex: 10 },
-  headerTitle: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, fontSize: 20, fontWeight: '800', color: '#1e293b', textAlign: 'center', lineHeight: 50 },
+  addBtnHeader: { width: 42, height: 42, backgroundColor: '#f1f5f9', borderRadius: 12, justifyContent: 'center', alignItems: 'center', zIndex: 10 },
+  headerTitle: { flex: 1, fontSize: 20, fontWeight: '800', color: '#1e293b', textAlign: 'center' },
   tabBar: { flexDirection: 'row', marginHorizontal: 16, marginTop: 10, backgroundColor: '#f1f5f9', borderRadius: 12, padding: 4 },
   tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
   activeTab: { backgroundColor: '#fff', elevation: 2, shadowOpacity: 0.1 },

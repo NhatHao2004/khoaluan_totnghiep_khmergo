@@ -1,9 +1,9 @@
-import { Stack } from 'expo-router';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, StatusBar as RNStatusBar } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { auth, db } from '../../utils/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
-import { router } from 'expo-router';
+import { Stack, router } from 'expo-router';
 
 export default function AdminLayout() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
@@ -43,50 +43,53 @@ export default function AdminLayout() {
   }
 
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: '#f8fafc',
-        },
-        headerShadowVisible: false,
-        headerTitleStyle: {
-          fontWeight: '800',
-          color: '#1e293b',
-        },
-        animation: 'slide_from_right',
-        contentStyle: { backgroundColor: '#f8fafc' }, // Nền xám cho toàn bộ stack admin
-      }}
-    >
-      <Stack.Screen
-        name="index"
-        options={{
-          headerShown: false,
+    <>
+      <StatusBar style="dark" />
+      <Stack
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: '#ffffff',
+          },
+          headerShadowVisible: false,
+          headerTitleStyle: {
+            fontWeight: '800',
+            color: '#1e293b',
+          },
+          animation: 'slide_from_right',
+          contentStyle: { backgroundColor: '#ffffff' }, 
         }}
-      />
-      <Stack.Screen
-        name="users"
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="user"
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="content"
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="trash"
-        options={{
-          headerShown: false,
-        }}
-      />
-    </Stack>
+      >
+        <Stack.Screen
+          name="index"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="users"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="user"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="content"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="trash"
+          options={{
+            headerShown: false,
+          }}
+        />
+      </Stack>
+    </>
   );
 }

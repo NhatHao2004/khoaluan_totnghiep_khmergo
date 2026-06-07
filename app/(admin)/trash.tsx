@@ -168,7 +168,7 @@ const TrashManagement = () => {
       )}
 
       {/* --- Custom Delete Confirmation Modal --- */}
-      <Modal visible={deleteConfirmVisible} transparent animationType="fade">
+      <Modal visible={deleteConfirmVisible} transparent animationType="fade" statusBarTranslucent={true}>
         <View style={styles.modalBg}>
           <View style={styles.modalContentSmall}>
             <View style={styles.confirmIconBg}>
@@ -207,8 +207,8 @@ const TrashManagement = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, marginTop: 35, height: 50, position: 'relative' },
+  container: { flex: 1, backgroundColor: '#ffffff' },
+  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, marginTop: 45, height: 50, position: 'relative' },
   backBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', zIndex: 10 },
   headerTitle: { flex: 1, fontSize: 20, fontWeight: '800', color: '#1e293b', textAlign: 'center' },
   centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
