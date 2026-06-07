@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { db } from '../../utils/firebaseConfig';
 
-const UsersManagement = () => {
+const UsersActivity = () => {
   const [users, setUsers] = useState<any[]>([]);
 
   useEffect(() => {
@@ -66,7 +66,6 @@ const UsersManagement = () => {
           <Ionicons name="arrow-back" size={28} color="#1e293b" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Hoạt động gần đây</Text>
-        <View style={{ width: 40 }} />
       </View>
 
       <FlatList
@@ -90,19 +89,30 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingTop: 45,
-    paddingBottom: 20,
+    paddingBottom: 15,
     backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+    position: 'relative',
+    minHeight: 85,
   },
   backBtn: {
     padding: 8,
+    zIndex: 10,
   },
   headerTitle: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 15,
     fontSize: 19,
     fontWeight: '800',
     color: '#1e293b',
+    textAlign: 'center',
+    zIndex: 1,
+    paddingHorizontal: 60,
   },
   listContent: {
     padding: 16,
@@ -149,4 +159,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UsersManagement;
+export default UsersActivity;

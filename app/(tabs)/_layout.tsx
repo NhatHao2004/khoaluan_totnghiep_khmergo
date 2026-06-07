@@ -233,61 +233,13 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="pagoda"
-          options={{
-            href: null, // Hide from tab bar
-          }}
-        />
-        <Tabs.Screen
-          name="pagoda-detail"
-          options={{
-            href: null, // Hide from tab bar
-          }}
-        />
-        <Tabs.Screen
-          name="directions"
-          options={{
-            href: null, // Hide from tab bar
-          }}
-        />
-        <Tabs.Screen
-          name="edit-profile"
-          options={{
-            href: null,
-          }}
-        />
-        <Tabs.Screen
           name="personal-info"
           options={{
             href: null,
           }}
         />
         <Tabs.Screen
-          name="change-password"
-          options={{
-            href: null, // Hide from tab bar
-          }}
-        />
-        <Tabs.Screen
-          name="language"
-          options={{
-            href: null, // Hide from tab bar
-          }}
-        />
-        <Tabs.Screen
-          name="do-quiz/[id]"
-          options={{
-            href: null, // Hide from tab bar
-          }}
-        />
-        <Tabs.Screen
           name="favorites"
-          options={{
-            href: null, // Hide from tab bar
-          }}
-        />
-        <Tabs.Screen
-          name="learning-progress"
           options={{
             href: null, // Hide from tab bar
           }}
@@ -335,6 +287,7 @@ export default function TabsLayout() {
                 <Image
                   source={require('@/assets/images/AI.jpg')}
                   style={styles.chatIconImage}
+                  resizeMode="cover"
                 />
               </TouchableOpacity>
             </Animated.View>
@@ -373,7 +326,6 @@ const styles = StyleSheet.create({
   chatIconImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
   },
   tooltipContainer: {
     position: 'absolute',

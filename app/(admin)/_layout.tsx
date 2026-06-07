@@ -68,6 +68,12 @@ export default function AdminLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="user"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

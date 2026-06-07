@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { auth, db } from '../utils/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { Alert } from 'react-native';
 
 export interface UserProfile {
   uid: string;
@@ -45,8 +46,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (userDoc.exists()) {
         const data = userDoc.data();
         
-        // Kiểm tra xem người dùng có bị chặn không
-        if (data.isBlocked) {
+        // Kiểm tra xem người dùng có bị chặn không (Ngoại trừ Admin)
+        const userRole = data.role || data['quyền'] || 'Người dùng';
+        if (data.isBlocked && userRole !== 'Quản trị viên') {
           await signOut(auth);
           setUser(null);
           throw new Error('ACCOUNT_BLOCKED');
@@ -104,23 +106,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    const { signInAnonymously } = require('firebase/auth');
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
+    let unsubDoc: (() => void) | null = null;
+    
+    const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
       if (firebaseUser) {
         try {
           await fetchAndSetUser(firebaseUser);
+          
+          // Thiết lập listener thời gian thực cho tài khoản đang đăng nhập
+          if (unsubDoc) unsubDoc();
+          unsubDoc = onSnapshot(doc(db, 'users', firebaseUser.uid), async (snap) => {
+            if (snap.exists()) {
+              const data = snap.data();
+              const userRole = data.role || data['quyền'] || 'Người dùng';
+              
+              if (data.isBlocked && userRole !== 'Quản trị viên') {
+                await signOut(auth);
+                setUser(null);
+                Alert.alert('Thông báo', 'Tài khoản của bạn đã bị khóa bởi quản trị viên.');
+              }
+            }
+          });
+
         } catch (error: any) {
           if (error.message !== 'ACCOUNT_BLOCKED' && error.message !== 'AUTH_FAILED') {
             console.error("Unexpected auth error:", error);
           }
         }
       } else {
+        if (unsubDoc) {
+          unsubDoc();
+          unsubDoc = null;
+        }
         setUser(null);
       }
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeAuth();
+      if (unsubDoc) unsubDoc();
+    };
   }, []);
 
   const logout = async () => {

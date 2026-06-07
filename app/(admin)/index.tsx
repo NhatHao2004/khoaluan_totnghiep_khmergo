@@ -1,8 +1,9 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { collection, onSnapshot } from 'firebase/firestore';
-import React, { useEffect, useRef, useState } from 'react';
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useRef, useState, useContext } from 'react';
+import { AuthContext } from '../../contexts/AuthContext';
+import { Alert, Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { db } from '../../utils/firebaseConfig';
 
 const { width } = Dimensions.get('window');
@@ -18,8 +19,8 @@ const AdminDashboard = () => {
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [allSortedUsers, setAllSortedUsers] = useState<any[]>([]);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState('weekly');
   const leaderboardRef = useRef<ScrollView>(null);
+  const { logout, user } = useContext(AuthContext);
 
   useEffect(() => {
     // Lấy số lượng người dùng (loại bỏ Admin một cách an toàn)
@@ -118,9 +119,9 @@ const AdminDashboard = () => {
     };
   }, []);
 
-  // Tính danh sách hiển thị dựa trên tab (không gọi lại Firebase)
+  // Tính danh sách hiển thị (mặc định lấy top 20)
   const displayedLeaderboard = (() => {
-    const leaderboardLimit = activeTab === 'all' ? 20 : 10;
+    const leaderboardLimit = 20;
     const topUsers = allSortedUsers.slice(0, leaderboardLimit);
     return Array.from({ length: leaderboardLimit }, (_, i) => {
       return topUsers[i] || { id: `empty-${i}`, name: '---', points: 0, dummy: true };
@@ -129,10 +130,39 @@ const AdminDashboard = () => {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Quản trị viên</Text>
+        <TouchableOpacity 
+          onPress={() => {
+            Alert.alert(
+              'Quản trị viên',
+              `Tài khoản: ${user?.name || user?.email}\nBạn muốn thực hiện hành động gì?`,
+              [
+                { text: 'Hủy', style: 'cancel' },
+                { 
+                  text: 'Đăng xuất', 
+                  onPress: async () => {
+                    await logout();
+                    router.replace('/login');
+                  },
+                  style: 'destructive' 
+                },
+              ]
+            );
+          }} 
+          style={styles.menuBtn}
+        >
+          <Ionicons name="menu" size={30} color="#1e293b" />
+        </TouchableOpacity>
+      </View>
 
       {/* Statistics Grid */}
       <View style={styles.statsGrid}>
-        <View style={styles.statCard}>
+        <TouchableOpacity
+          style={styles.statCard}
+          onPress={() => router.push('/(admin)/user' as any)}
+        >
           <View style={styles.iconBox}>
             <Ionicons name="person-outline" size={22} color="#ef4444" />
           </View>
@@ -142,7 +172,7 @@ const AdminDashboard = () => {
               <Text style={styles.statNumber}>{stats.users}</Text>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
 
         <View style={styles.statCard}>
           <View style={styles.iconBox}>
@@ -184,20 +214,6 @@ const AdminDashboard = () => {
       {/* Leaderboard Chart Section */}
       <View style={styles.chartHeader}>
         <Text style={styles.chartTitle}>Biểu đồ bảng xếp hạng</Text>
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'weekly' && styles.tabActive]}
-            onPress={() => { leaderboardRef.current?.scrollTo({ x: 0, animated: false }); setActiveTab('weekly'); }}
-          >
-            <Text style={[styles.tabText, activeTab === 'weekly' && styles.tabTextActive]}>Hàng ngày</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'all' && styles.tabActive]}
-            onPress={() => { leaderboardRef.current?.scrollTo({ x: 0, animated: false }); setActiveTab('all'); }}
-          >
-            <Text style={[styles.tabText, activeTab === 'all' && styles.tabTextActive]}>Tất cả</Text>
-          </TouchableOpacity>
-        </View>
       </View>
 
       <View style={styles.podiumContainer}>
@@ -225,7 +241,7 @@ const AdminDashboard = () => {
                       <Ionicons name="person" size={rank === 1 ? 24 : 16} color="#cbd5e1" />
                     </View>
                   )}
-                  <Text style={styles.podiumName} numberOfLines={1}>{user.name || '---'}</Text>
+                  <Text style={styles.podiumName}>{user.name || '---'}</Text>
                   <Text style={styles.podiumPoints}>{user.points || 0} điểm</Text>
                 </View>
                 <View style={[styles.bar, { height: barHeight, backgroundColor: barColor }]}>
@@ -273,17 +289,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  topActions: {
+  header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 45,
-    marginBottom: 20,
+    paddingTop: 50,
+    paddingBottom: 10,
+    backgroundColor: '#fff',
+    borderBottomWidth: 0,
+    minHeight: 80,
   },
-  iconBtn: {
-    padding: 3,
-    borderRadius: 14,
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#1e293b',
+    letterSpacing: -0.5,
+  },
+  menuBtn: {
+    padding: 8,
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -292,13 +318,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 12,
     marginBottom: 30,
-    marginTop: 50,
+    marginTop: 10,
   },
   statCard: {
     width: CARD_WIDTH,
     backgroundColor: '#fff',
     borderRadius: 24,
-    padding: 16,
+    padding: 14,
     borderWidth: 1,
     borderColor: '#f1f5f9',
     alignItems: 'flex-start',
@@ -314,24 +340,25 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   statInfoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    marginTop: 2,
+    marginTop: 4,
   },
   statLabel: {
     fontSize: 12,
     fontWeight: '700',
     color: '#64748b',
+    flex: 1,
   },
   statNumberGroup: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: 2,
+    marginLeft: 4,
   },
   statNumber: {
     fontSize: 15,
@@ -354,28 +381,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '800',
     color: '#1e293b',
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#f1f5f9',
-    borderRadius: 10,
-    padding: 3,
-  },
-  tab: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  tabActive: {
-    backgroundColor: '#3b82f6',
-  },
-  tabText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#64748b',
-  },
-  tabTextActive: {
-    color: '#fff',
   },
   podiumContainer: {
     marginHorizontal: 16,
@@ -475,14 +480,18 @@ const styles = StyleSheet.create({
   },
   seeAllBtn: {
     backgroundColor: '#3b82f6',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 10,
+    minWidth: 90, // Đảm bảo không bị co lại
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   seeAllText: {
     fontSize: 12,
     fontWeight: '700',
     color: '#fff',
+    textAlign: 'center',
   },
   activityContainer: {
     paddingHorizontal: 16,

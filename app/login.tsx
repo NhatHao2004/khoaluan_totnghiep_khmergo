@@ -93,11 +93,19 @@ export default function LoginScreen() {
       const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
       const firebaseUser = userCredential.user;
       
-      // Lấy role ngay lập tức để chuyển trang
+      // Lấy role và trạng thái block ngay lập tức để chuyển trang hoặc chặn
       const { getDoc, doc } = await import('firebase/firestore');
       const { db: firestoreDb } = await import('@/utils/firebaseConfig');
       const userDoc = await getDoc(doc(firestoreDb, 'users', firebaseUser.uid));
       const userData = userDoc.data();
+
+      if (userData?.isBlocked && userData?.role !== 'Quản trị viên') {
+        setLoading(false);
+        const { signOut } = await import('firebase/auth');
+        await signOut(auth);
+        triggerToast(t('account_blocked'), 'error');
+        return;
+      }
 
       await refreshUser();
 
@@ -112,6 +120,7 @@ export default function LoginScreen() {
         router.replace({ pathname: '/(tabs)', params: { toast: 'login_success' } });
       }
     } catch (error: any) {
+      console.log('Login error:', error);
       let msg = t('update_failed');
       if (error.message === 'ACCOUNT_BLOCKED' || error.message === 'AUTH_FAILED') {
         msg = t('account_blocked');
