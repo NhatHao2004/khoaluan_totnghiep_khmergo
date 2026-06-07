@@ -84,6 +84,12 @@ export default function AdminLayout() {
           }}
         />
         <Stack.Screen
+          name="challenges"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
           name="trash"
           options={{
             headerShown: false,

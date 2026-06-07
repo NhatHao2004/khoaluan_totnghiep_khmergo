@@ -198,7 +198,10 @@ const AdminDashboard = () => {
           </View>
         </TouchableOpacity>
 
-        <View style={styles.statCard}>
+        <TouchableOpacity 
+          style={styles.statCard}
+          onPress={() => router.push('/(admin)/challenges' as any)}
+        >
           <View style={styles.iconBox}>
             <Ionicons name="help-circle-outline" size={26} color="#f59e0b" />
           </View>
@@ -208,7 +211,7 @@ const AdminDashboard = () => {
               <Text style={styles.statNumber}>{stats.challenges}</Text>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
 
         <View style={styles.statCard}>
           <View style={styles.iconBox}>
