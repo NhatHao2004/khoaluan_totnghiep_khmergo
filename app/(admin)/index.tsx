@@ -279,10 +279,11 @@ const AdminDashboard = () => {
       <View style={styles.activityContainer}>
         {recentActivities.map((activity, index) => (
           <View key={activity.id} style={styles.activityCard}>
-            <View style={styles.activityInfo}>
-              <Text style={styles.activityItemTitle}>{activity.name} vừa đăng ký tài khoản thành công</Text>
+            <Text style={styles.activityItemTitle}>{activity.name}</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+              <Text style={styles.activityDesc} numberOfLines={1}>Đã đăng ký tài khoản thành công</Text>
+              <Text style={styles.activityTime}>{activity.timeAgo || 'Vừa xong'}</Text>
             </View>
-            <Text style={styles.activityTime}>{activity.timeAgo || 'Vừa xong'}</Text>
           </View>
         ))}
         {recentActivities.length === 0 && (
@@ -521,11 +522,9 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   activityCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#fff',
     borderRadius: 16,
-    padding: 12,
+    padding: 14,
     marginBottom: 12,
     borderWidth: 1,
     borderColor: '#f1f5f9',
@@ -540,22 +539,23 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   activityInfo: {
-    flex: 1,
+    marginBottom: 6,
   },
   activityItemTitle: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '800',
     color: '#1e293b',
-    marginBottom: 2,
   },
   activityDesc: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#64748b',
+    fontWeight: '500',
+    flex: 1,
   },
   activityTime: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#94a3b8',
-    fontWeight: '500',
+    fontWeight: '600',
     marginLeft: 10,
   },
   emptyText: {

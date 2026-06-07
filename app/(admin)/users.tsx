@@ -51,10 +51,11 @@ const UsersActivity = () => {
 
   const renderUserItem = ({ item }: { item: any }) => (
     <View style={styles.activityCard}>
-      <View style={styles.activityInfo}>
-        <Text style={styles.activityItemTitle}>{item.name || 'Người dùng mới'}</Text>
+      <Text style={styles.activityItemTitle}>{item.name || 'Người dùng mới'}</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+        <Text style={styles.activityDesc} numberOfLines={1}>Đã đăng ký tài khoản thành công</Text>
+        <Text style={styles.activityTime}>{getTimeAgo(item.createdAt)}</Text>
       </View>
-      <Text style={styles.activityTime}>{getTimeAgo(item.createdAt)}</Text>
     </View>
   );
 
@@ -119,11 +120,9 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   activityCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#fff',
     borderRadius: 16,
-    padding: 12,
+    padding: 14,
     marginBottom: 12,
     borderWidth: 1,
     borderColor: '#f1f5f9',
@@ -138,18 +137,23 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   activityInfo: {
-    flex: 1,
+    marginBottom: 6,
   },
   activityItemTitle: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '800',
     color: '#1e293b',
-    marginBottom: 2,
+  },
+  activityDesc: {
+    fontSize: 14,
+    color: '#64748b',
+    fontWeight: '500',
+    flex: 1,
   },
   activityTime: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#94a3b8',
-    fontWeight: '500',
+    fontWeight: '600',
     marginLeft: 10,
   },
   emptyText: {
