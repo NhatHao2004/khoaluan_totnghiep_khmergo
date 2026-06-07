@@ -45,8 +45,7 @@ export default function QuizPagodaSelectScreen() {
         color: quiz.color,
         questionCount: quiz.questions?.length || 0,
       };
-    })
-    .sort((a, b) => a.pagodaId.localeCompare(b.pagodaId));
+    });
 
   const handleSelect = (pagodaId: string, imageUrl: string, pagodaLocation: string) => {
     if (!user || user.isAnonymous) {

@@ -55,8 +55,7 @@ export default function QuizFoodSelectScreen() {
         color: colors[food.id as keyof typeof colors] || '#0179e9ff',
         questionCount: quiz?.questions?.length || 0,
       };
-    })
-    .sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+    });
 
   const handleSelect = (foodId: string, imageUrl: string, foodLocation: string) => {
     if (!user || user.isAnonymous) {

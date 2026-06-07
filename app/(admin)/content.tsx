@@ -25,6 +25,13 @@ const ContentManagement = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const getImageSource = (uri: string, fallback: any = { uri: 'https://via.placeholder.com/150' }) => {
+    if (uri && (uri.startsWith('http://') || uri.startsWith('https://'))) {
+      return { uri };
+    }
+    return fallback;
+  };
+
   // Destination Form State
   const [destModalVisible, setDestModalVisible] = useState(false);
   const [editingDest, setEditingDest] = useState<any>(null);
@@ -312,7 +319,7 @@ const ContentManagement = () => {
 
   const renderDestItem = ({ item }: { item: any }) => (
     <View style={styles.card}>
-      <Image source={{ uri: item.imageUrl || 'https://via.placeholder.com/150' }} style={styles.cardImage} />
+      <Image source={getImageSource(item.imageUrl)} style={styles.cardImage} />
       <View style={styles.cardContent}>
         <View style={styles.cardHeader}>
           <View style={{ flex: 1 }}><Text style={styles.cardTitle}>{item.name}</Text></View>
@@ -376,15 +383,13 @@ const ContentManagement = () => {
       >
         <View style={styles.vocabLargeImageContainer}>
           <Image
-            source={
-              item.imageUrl
-                ? { uri: item.imageUrl }
-                : (item.title === 'cat_family' || item.id === 'family') ? require('@/assets/images/giadinh.jpg') :
-                  (item.title === 'cat_food' || item.id === 'food') ? require('@/assets/images/monan.jpg') :
-                    (item.title === 'cat_greetings' || item.id === 'greetings') ? require('@/assets/images/chaohoi.jpg') :
-                      (item.title === 'cat_numbers' || item.id === 'numbers') ? require('@/assets/images/sodem.jpg') :
-                        require('@/assets/images/giadinh.jpg')
-            }
+            source={getImageSource(item.imageUrl, 
+              (item.title === 'cat_family' || item.id === 'family') ? require('@/assets/images/giadinh.jpg') :
+              (item.title === 'cat_food' || item.id === 'food') ? require('@/assets/images/monan.jpg') :
+              (item.title === 'cat_greetings' || item.id === 'greetings') ? require('@/assets/images/chaohoi.jpg') :
+              (item.title === 'cat_numbers' || item.id === 'numbers') ? require('@/assets/images/sodem.jpg') :
+              require('@/assets/images/giadinh.jpg')
+            )}
             style={styles.vocabLargeImage}
           />
         </View>
@@ -468,13 +473,7 @@ const ContentManagement = () => {
       {loading ? <ActivityIndicator size="large" color="#3b82f6" style={{ marginTop: 50 }} /> : (
         <FlatList
           data={activeTab === 'destinations'
-            ? destinations.filter(d => {
-                const cat = d.category;
-                if (dCat === 'pagoda') return cat === 'pagoda' || cat === 'Chùa';
-                if (dCat === 'food') return cat === 'food' || cat === 'Ẩm thực';
-                if (dCat === 'culture') return cat === 'culture' || cat === 'Văn hóa';
-                return false;
-              })
+            ? destinations
             : categories.filter(c => c.title.toLowerCase().includes(vocabSearchQuery.toLowerCase()))
           }
           keyExtractor={(item) => item.id}

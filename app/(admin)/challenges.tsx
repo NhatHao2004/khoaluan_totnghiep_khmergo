@@ -74,7 +74,13 @@ const ChallengeManagement = () => {
     const qQuiz = query(collection(db, 'quizzes'));
     const unsubQuiz = onSnapshot(qQuiz, (snap) => {
       const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setQuizzes(data);
+      // Sort by newest first
+      const sorted = data.sort((a: any, b: any) => {
+        const dateA = a.createdAt?.seconds || (a.createdAt instanceof Date ? a.createdAt.getTime() / 1000 : 0);
+        const dateB = b.createdAt?.seconds || (b.createdAt instanceof Date ? b.createdAt.getTime() / 1000 : 0);
+        return dateB - dateA;
+      });
+      setQuizzes(sorted);
     });
 
     // Fetch Destinations (to link quizzes)

@@ -135,6 +135,8 @@ export default function HomeScreen() {
           name: data.name || '',
           category: data.category,
           image: getAppImage(data),
+          createdAt: data.createdAt,
+          isNew: true, // Marker for fresh data
           route: {
             pathname: detailRoute,
             params: {
@@ -148,44 +150,51 @@ export default function HomeScreen() {
           }
         };
       });
+      // Sort everything by newest first
+      const sortedByNewest = [...allItems].sort((a, b) => {
+        const dateA = a.createdAt?.seconds || (a.createdAt instanceof Date ? a.createdAt.getTime() / 1000 : 0);
+        const dateB = b.createdAt?.seconds || (b.createdAt instanceof Date ? b.createdAt.getTime() / 1000 : 0);
+        return dateB - dateA;
+      });
 
-      // Group by category after processing all items
-      const pagodas = allItems.filter(i => i.category === 'Chùa');
-      const cultures = allItems.filter(i => i.category === 'Văn hóa');
-      const foods = allItems.filter(i => i.category === 'Ẩm thực');
+      const pagodas = sortedByNewest.filter(i => i.category === 'Chùa');
+      const cultures = sortedByNewest.filter(i => i.category === 'Văn hóa');
+      const foods = sortedByNewest.filter(i => i.category === 'Ẩm thực');
 
-      // Interest-based picking logic
-      const featured: any[] = [];
+      let featured: any[] = [];
       const userInterests: string[] = user?.interests || [];
 
-      const getRandom = (arr: any[], n: number) => {
-        const shuffled = [...arr].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, n);
-      };
-
       if (userInterests.length > 0 && !forceRandom) {
-        if (userInterests.includes('Chùa') && userInterests.includes('Văn hóa') && userInterests.length === 2) {
-          featured.push(...getRandom(pagodas, 2));
-          featured.push(...getRandom(cultures, 1));
-        } else if (userInterests.length === 1) {
-          const cat = userInterests[0];
-          const pool = allItems
-            .filter(i => i.category === cat)
-            .sort((a, b) => a.name.localeCompare(b.name, 'vi'));
-          featured.push(...pool.slice(0, 3));
-        } else {
-          // If 3 interests or other combinations, pick evenly
-          userInterests.forEach(cat => {
-            const pool = allItems.filter(i => i.category === cat);
-            featured.push(...getRandom(pool, 1));
-          });
+        // Pick newest from each interest
+        userInterests.forEach(cat => {
+          const newestOfCat = sortedByNewest.find(i => i.category === cat);
+          if (newestOfCat) featured.push(newestOfCat);
+        });
+        
+        // Fill up to 3 if needed
+        if (featured.length < 3) {
+          const others = sortedByNewest.filter(i => !featured.find(f => f.id === i.id));
+          featured.push(...others.slice(0, 3 - featured.length));
         }
       } else {
-        // Default random pick (Guest, no interests, or Pull-to-refresh)
-        if (pagodas.length > 0) featured.push(pagodas[Math.floor(Math.random() * pagodas.length)]);
-        if (cultures.length > 0) featured.push(cultures[Math.floor(Math.random() * cultures.length)]);
-        if (foods.length > 0) featured.push(foods[Math.floor(Math.random() * foods.length)]);
+        // Default: 3 newest items from DIFFERENT categories if possible
+        const newestPagoda = pagodas[0];
+        const newestCulture = cultures[0];
+        const newestFood = foods[0];
+        
+        if (newestPagoda) featured.push(newestPagoda);
+        if (newestCulture) featured.push(newestCulture);
+        if (newestFood) featured.push(newestFood);
+        
+        // If still less than 3, just take newest from any
+        if (featured.length < 3) {
+          const remaining = sortedByNewest.filter(i => !featured.find(f => f.id === i.id));
+          featured.push(...remaining.slice(0, 3 - featured.length));
+        }
       }
+      
+      // Final unique & limit
+      featured = featured.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i).slice(0, 3);
 
       setFeaturedDestinations(featured);
       setIsLoading(false);

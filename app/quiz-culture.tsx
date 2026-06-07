@@ -66,8 +66,7 @@ export default function QuizCultureSelectScreen() {
         color: quiz.color,
         questionCount: quiz.questions?.length || 0,
       };
-    })
-    .sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+    });
 
   const handleSelect = (pagodaId: string, imageUrl: string, pagodaLocation: string) => {
     if (!user || user.isAnonymous) {
