@@ -133,28 +133,37 @@ const AdminDashboard = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Quản trị viên</Text>
-        <TouchableOpacity
-          onPress={() => {
-            Alert.alert(
-              'Quản trị viên',
-              `Tài khoản: ${user?.name || user?.email}\nBạn muốn thực hiện hành động gì?`,
-              [
-                { text: 'Hủy', style: 'cancel' },
-                {
-                  text: 'Đăng xuất',
-                  onPress: async () => {
-                    await logout();
-                    router.replace('/login');
+        <View style={styles.headerRightActions}>
+          <TouchableOpacity
+            onPress={() => {
+              Alert.alert(
+                'Quản trị viên',
+                `Tài khoản: ${user?.name || user?.email}\nBạn muốn thực hiện hành động gì?`,
+                [
+                  { text: 'Hủy', style: 'cancel' },
+                  {
+                    text: 'Đăng xuất',
+                    onPress: async () => {
+                      await logout();
+                      router.replace('/login');
+                    },
+                    style: 'destructive'
                   },
-                  style: 'destructive'
-                },
-              ]
-            );
-          }}
-          style={styles.menuBtn}
-        >
-          <Ionicons name="menu" size={30} color="#1e293b" />
-        </TouchableOpacity>
+                ]
+              );
+            }}
+            style={styles.menuBtn}
+          >
+            <Ionicons name="menu" size={30} color="#1e293b" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push('/(admin)/trash' as any)}
+            style={styles.trashBtnHeader}
+          >
+            <Ionicons name="trash-outline" size={26} color="#ef4444" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Statistics Grid */}
@@ -174,7 +183,7 @@ const AdminDashboard = () => {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.statCard}
           onPress={() => router.push('/(admin)/content' as any)}
         >
@@ -270,11 +279,8 @@ const AdminDashboard = () => {
       <View style={styles.activityContainer}>
         {recentActivities.map((activity, index) => (
           <View key={activity.id} style={styles.activityCard}>
-            <View style={styles.activityIconBox}>
-              <Ionicons name="person-outline" size={20} color="#10b981" />
-            </View>
             <View style={styles.activityInfo}>
-              <Text style={styles.activityItemTitle}>{activity.name} vừa đăng ký</Text>
+              <Text style={styles.activityItemTitle}>{activity.name} vừa đăng ký tài khoản thành công</Text>
             </View>
             <Text style={styles.activityTime}>{activity.timeAgo || 'Vừa xong'}</Text>
           </View>
@@ -310,9 +316,23 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   menuBtn: {
-    padding: 8,
-    backgroundColor: '#f8fafc',
+    padding: 6,
+    backgroundColor: '#fff',
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+  },
+  headerRightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  trashBtnHeader: {
+    padding: 8,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   statsGrid: {
     flexDirection: 'row',

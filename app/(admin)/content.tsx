@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, onSnapshot, orderBy, query, setDoc, updateDoc } from 'firebase/firestore';
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query, setDoc, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -43,6 +43,10 @@ const ContentManagement = () => {
   const [dCat, setDCat] = useState<'pagoda' | 'culture' | 'food'>('pagoda');
   const [dLat, setDLat] = useState('');
   const [dLng, setDLng] = useState('');
+
+  // Delete Confirm Modal State
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<{ id: string, name: string } | null>(null);
 
   // Toast State
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
@@ -163,19 +167,32 @@ const ContentManagement = () => {
   };
 
   const handleDeleteDest = (id: string, name: string) => {
-    Alert.alert('Xóa địa điểm', `Xóa "${name}"?`, [
-      { text: 'Hủy', style: 'cancel' },
-      {
-        text: 'Xóa', style: 'destructive', onPress: async () => {
-          try {
-            await deleteDoc(doc(db, 'destinations', id));
-            showToast('Đã xóa nội dung thành công', 'success');
-          } catch (e) {
-            showToast('Lỗi khi xóa nội dung', 'error');
-          }
-        }
+    setPendingDelete({ id, name });
+    setDeleteConfirmVisible(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    try {
+      const docRef = doc(db, 'destinations', pendingDelete.id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        await setDoc(doc(db, 'system_trash', pendingDelete.id), {
+          ...data,
+          originalId: pendingDelete.id,
+          originalCollection: 'destinations',
+          deletedAt: new Date()
+        });
+        await deleteDoc(docRef);
+        setDeleteConfirmVisible(false);
+        setPendingDelete(null);
+        showToast('Đã chuyển vào thùng rác thành công', 'success');
       }
-    ]);
+    } catch (e) {
+      console.error(e);
+      showToast('Lỗi khi chuyển vào thùng rác', 'error');
+    }
   };
 
   // --- Vocabulary Logic ---
@@ -504,6 +521,30 @@ const ContentManagement = () => {
         </View>
       </Modal>
 
+      {/* --- Custom Delete Confirmation Modal --- */}
+      <Modal visible={deleteConfirmVisible} transparent animationType="fade">
+        <View style={styles.modalBg}>
+          <View style={styles.modalContentSmall}>
+            <View style={styles.confirmIconBg}>
+              <Ionicons name="trash" size={34} color="#ef4444" />
+            </View>
+            <Text style={[styles.modalTitle, { textAlign: 'center', marginBottom: 10 }]}>Xác nhận xóa</Text>
+            <Text style={styles.confirmSubText}>
+              Bạn có chắc chắn muốn xóa nội dung này
+              sẽ được chuyển vào <Text style={{ color: '#ef4444', fontWeight: '700' }}>Thùng rác</Text>
+            </Text>
+            <View style={[styles.modalActions, { justifyContent: 'center', gap: 15 }]}>
+              <TouchableOpacity style={[styles.saveBtnSmall, { backgroundColor: '#3b82f6', flex: 1 }]} onPress={() => setDeleteConfirmVisible(false)}>
+                <Text style={styles.saveBtnText}>Hủy bỏ</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.saveBtnSmall, { backgroundColor: '#ef4444', flex: 1 }]} onPress={confirmDelete}>
+                <Text style={styles.saveBtnText}>Xác nhận</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       {/* --- Premium Toast Notification --- */}
       {toast.visible && (
         <Animated.View style={[
@@ -598,8 +639,8 @@ const styles = StyleSheet.create({
   catBtnText: { fontSize: 12, fontWeight: '700', color: '#64748b' },
   activeCatBtnText: { color: '#fff' },
   saveBtn: { backgroundColor: '#3b82f6', paddingVertical: 15, borderRadius: 12, alignItems: 'center', marginTop: 20 },
-  saveBtnSmall: { backgroundColor: '#3b82f6', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10 },
-  saveBtnText: { color: '#fff', fontWeight: '800', fontSize: 16 },
+  saveBtnSmall: { backgroundColor: '#3b82f6', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
+  saveBtnText: { color: '#fff', fontWeight: '800', fontSize: 16, textAlign: 'center' },
   modalActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10, marginTop: 20 },
   cancelBtn: { paddingHorizontal: 20, paddingVertical: 10 },
   cancelBtnText: { color: '#64748b', fontWeight: '700' },
@@ -639,6 +680,23 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     flex: 1,
+  },
+  confirmIconBg: {
+    width: 66,
+    height: 66,
+    borderRadius: 33,
+    backgroundColor: '#fef2f2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
+  confirmSubText: {
+    fontSize: 14,
+    color: '#64748b',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 5,
   },
 });
 

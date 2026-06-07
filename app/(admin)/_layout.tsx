@@ -81,6 +81,12 @@ export default function AdminLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="trash"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }
