@@ -180,9 +180,11 @@ export default function PagodaDetailScreen() {
               <Ionicons name="arrow-back" size={24} color="#000" />
             </TouchableOpacity>
             <View style={{ flexDirection: 'row', gap: 12 }}>
-              <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
-                <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={22} color={isFavorite ? "#FF4B4B" : "#000"} />
-              </TouchableOpacity>
+              {user?.role !== 'Quản trị viên' && (
+                <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
+                  <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={22} color={isFavorite ? "#FF4B4B" : "#000"} />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </View>
@@ -233,15 +235,17 @@ export default function PagodaDetailScreen() {
                 <Text style={[styles.tabBtnText, activeTab === 'map' && styles.tabBtnTextActive]} numberOfLines={1} adjustsFontSizeToFit>{t('map_location')}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={() => setActiveTab('quiz')}
-                style={[
-                  styles.tabBtn,
-                  activeTab === 'quiz' && { backgroundColor: '#FF6B2C', borderColor: '#FF6B2C' }
-                ]}
-              >
-                <Text style={[styles.tabBtnText, activeTab === 'quiz' && styles.tabBtnTextActive]} numberOfLines={1} adjustsFontSizeToFit>{isKm ? 'ការប្រកួត' : 'THỬ THÁCH'}</Text>
-              </TouchableOpacity>
+              {user?.role !== 'Quản trị viên' && (
+                <TouchableOpacity
+                  onPress={() => setActiveTab('quiz')}
+                  style={[
+                    styles.tabBtn,
+                    activeTab === 'quiz' && { backgroundColor: '#FF6B2C', borderColor: '#FF6B2C' }
+                  ]}
+                >
+                  <Text style={[styles.tabBtnText, activeTab === 'quiz' && styles.tabBtnTextActive]} numberOfLines={1} adjustsFontSizeToFit>{isKm ? 'ការប្រកួត' : 'THỬ THÁCH'}</Text>
+                </TouchableOpacity>
+              )}
             </View>
 
             {activeTab === 'map' ? (
@@ -286,7 +290,8 @@ export default function PagodaDetailScreen() {
                 <TouchableOpacity
                   style={styles.quizStartBtn}
                   onPress={() => {
-                    if (!user || user.isAnonymous) {
+                    const isAdmin = user?.role === 'Quản trị viên';
+                    if (!isAdmin && (!user || user.isAnonymous)) {
                       setShowLoginModal(true);
                       return;
                     }

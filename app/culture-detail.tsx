@@ -107,9 +107,11 @@ export default function CultureDetailScreen() {
               <Ionicons name="arrow-back" size={24} color="#000" />
             </TouchableOpacity>
             <View style={{ flexDirection: 'row', gap: 12 }}>
-              <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
-                <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={22} color={isFavorite ? "#FF4B4B" : "#000"} />
-              </TouchableOpacity>
+              {user?.role !== 'Quản trị viên' && (
+                <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
+                  <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={22} color={isFavorite ? "#FF4B4B" : "#000"} />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </View>
@@ -152,15 +154,17 @@ export default function CultureDetailScreen() {
                 <Text style={[styles.tabBtnText, activeTab === 'gallery' && styles.tabBtnTextActive]} numberOfLines={1} adjustsFontSizeToFit>{isKm ? 'រូបភាព' : 'HÌNH ẢNH'}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={() => setActiveTab('quiz')}
-                style={[
-                  styles.tabBtn,
-                  activeTab === 'quiz' && { backgroundColor: '#FF6B2C', borderColor: '#FF6B2C' }
-                ]}
-              >
-                <Text style={[styles.tabBtnText, activeTab === 'quiz' && styles.tabBtnTextActive]} numberOfLines={1} adjustsFontSizeToFit>{isKm ? 'ការប្រកួត' : 'THỬ THÁCH'}</Text>
-              </TouchableOpacity>
+              {user?.role !== 'Quản trị viên' && (
+                <TouchableOpacity
+                  onPress={() => setActiveTab('quiz')}
+                  style={[
+                    styles.tabBtn,
+                    activeTab === 'quiz' && { backgroundColor: '#FF6B2C', borderColor: '#FF6B2C' }
+                  ]}
+                >
+                  <Text style={[styles.tabBtnText, activeTab === 'quiz' && styles.tabBtnTextActive]} numberOfLines={1} adjustsFontSizeToFit>{isKm ? 'ការប្រកួត' : 'THỬ THÁCH'}</Text>
+                </TouchableOpacity>
+              )}
             </View>
 
             <View style={{ minHeight: 250 }}>
@@ -220,7 +224,10 @@ export default function CultureDetailScreen() {
                   <TouchableOpacity
                     style={styles.quizStartBtn}
                     onPress={() => {
-                      if (!user || user.isAnonymous) {
+                      // Nếu là Admin thì cho phép vào thử thách luôn không cần check login thường
+                      const isAdmin = user?.role === 'Quản trị viên';
+                      
+                      if (!isAdmin && (!user || user.isAnonymous)) {
                         setShowLoginModal(true);
                         return;
                       }

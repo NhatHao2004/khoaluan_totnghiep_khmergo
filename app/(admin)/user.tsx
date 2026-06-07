@@ -12,6 +12,8 @@ const UserManagement = () => {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [userFeedbacks, setUserFeedbacks] = useState<any[]>([]);
   const [fetchingFeedback, setFetchingFeedback] = useState(false);
+  const [confirmVisible, setConfirmVisible] = useState(false);
+  const [pendingUser, setPendingUser] = useState<{ id: string, isBlocked: boolean, name: string } | null>(null);
 
   useEffect(() => {
     const unsub = onSnapshot(query(collection(db, 'users'), orderBy('name')), (snap) => {
@@ -26,30 +28,27 @@ const UserManagement = () => {
     return () => unsub();
   }, []);
 
-  const toggleUserLock = async (userId: string, currentStatus: boolean) => {
-    // ... (rest of the function stays same)
-    const action = currentStatus ? 'mở khóa' : 'khóa';
-    Alert.alert(
-      'Xác nhận',
-      `Bạn có chắc muốn ${action} người dùng này?`,
-      [
-        { text: 'Hủy', style: 'cancel' },
-        {
-          text: 'Đồng ý',
-          onPress: async () => {
-            try {
-              const userRef = doc(db, 'users', userId);
-              await updateDoc(userRef, {
-                isBlocked: !currentStatus
-              });
-            } catch (error) {
-              console.error('Error toggling lock:', error);
-              Alert.alert('Lỗi', 'Không thể thực hiện thao tác này.');
-            }
-          }
-        }
-      ]
-    );
+  const toggleUserLock = async (userId: string, currentStatus: boolean, userName: string) => {
+    setPendingUser({ id: userId, isBlocked: currentStatus, name: userName });
+    setConfirmVisible(true);
+  };
+
+  const handleConfirmLock = async () => {
+    if (!pendingUser) return;
+
+    setConfirmVisible(false);
+    try {
+      const userRef = doc(db, 'users', pendingUser.id);
+      await updateDoc(userRef, {
+        isBlocked: !pendingUser.isBlocked
+      });
+      // Hiển thị thông báo thành công nhẹ nhàng nếu cần
+    } catch (error) {
+      console.error('Error toggling lock:', error);
+      Alert.alert('Lỗi', 'Không thể thực hiện thao tác này.');
+    } finally {
+      setPendingUser(null);
+    }
   };
 
   const openFeedback = async (user: any) => {
@@ -120,13 +119,13 @@ const UserManagement = () => {
 
           <View style={styles.userStatsRow}>
             <View style={[styles.statChip, item.isBlocked && styles.statChipLocked]}>
-              <Text style={[styles.statChipText, item.isBlocked && styles.textWhite]}>
+              <Text style={[styles.statChipText, item.isBlocked && styles.textWhite]} numberOfLines={1} adjustsFontSizeToFit>
                 {item.points || 0} Điểm
               </Text>
             </View>
 
             <View style={[styles.statChip, item.isBlocked && styles.statChipLocked]}>
-              <Text style={[styles.statChipText, item.isBlocked && styles.textWhite]}>
+              <Text style={[styles.statChipText, item.isBlocked && styles.textWhite]} numberOfLines={1} adjustsFontSizeToFit>
                 {item.completedQuizzes || 0} bài quiz
               </Text>
             </View>
@@ -142,7 +141,7 @@ const UserManagement = () => {
           <MaterialCommunityIcons
             name="comment-text-outline"
             size={18}
-            color="#fff"
+            color="#3b82f6"
           />
           <Text style={[styles.actionBtnText, styles.feedbackBtnText]}>
             Phản hồi
@@ -151,7 +150,7 @@ const UserManagement = () => {
 
         <TouchableOpacity
           style={[styles.actionBtn, item.isBlocked ? styles.unlockBtn : styles.lockBtn]}
-          onPress={() => toggleUserLock(item.id, !!item.isBlocked)}
+          onPress={() => toggleUserLock(item.id, !!item.isBlocked, item.name || 'Người dùng')}
         >
           <Ionicons
             name={item.isBlocked ? "lock-open-outline" : "lock-closed-outline"}
@@ -182,7 +181,7 @@ const UserManagement = () => {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          !loading ? <Text style={styles.emptyText}>Không tìm thấy người dùng nào</Text> : null
+          !loading ? <Text style={styles.emptyText}>Chưa có người dùng nào</Text> : null
         }
       />
 
@@ -198,7 +197,7 @@ const UserManagement = () => {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Phản hồi từ {selectedUser?.name}</Text>
               <TouchableOpacity onPress={() => setFeedbackVisible(false)}>
-                <Ionicons name="close-circle" size={32} color="#94a3b8" />
+                <Ionicons name="close-circle" size={32} color="#ff0000ff" />
               </TouchableOpacity>
             </View>
 
@@ -235,6 +234,51 @@ const UserManagement = () => {
         </View>
       </Modal>
 
+      {/* Confirmation Modal */}
+      <Modal
+        visible={confirmVisible}
+        transparent={true}
+        animationType="fade"
+      >
+        <View style={styles.confirmOverlay}>
+          <View style={styles.confirmContent}>
+            <View style={[styles.confirmIconBg, { backgroundColor: pendingUser?.isBlocked ? '#ecfdf5' : '#fef2f2' }]}>
+              <Ionicons
+                name={pendingUser?.isBlocked ? "lock-open" : "lock-closed"}
+                size={34}
+                color={pendingUser?.isBlocked ? "#10b981" : "#ef4444"}
+              />
+            </View>
+
+            <Text style={styles.confirmTitle}>
+              {pendingUser?.isBlocked ? 'Mở khóa tài khoản' : 'Khóa tài khoản'}
+            </Text>
+
+            <Text style={styles.confirmSub}>
+              Bạn có chắc chắn muốn {pendingUser?.isBlocked ? 'mở lại quyền truy cập' : 'tạm đình chỉ'} cho người dùng <Text style={styles.boldText}>{pendingUser?.name}</Text>
+            </Text>
+
+            <View style={styles.confirmActions}>
+              <TouchableOpacity
+                style={styles.cancelActionBtn}
+                onPress={() => setConfirmVisible(false)}
+              >
+                <Text style={styles.cancelActionText}>Hủy bỏ</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.confirmActionBtn, { backgroundColor: pendingUser?.isBlocked ? '#10b981' : '#ef4444' }]}
+                onPress={handleConfirmLock}
+              >
+                <Text style={styles.confirmActionText}>
+                  {pendingUser?.isBlocked ? 'Mở khóa' : 'Khóa ngay'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 };
@@ -247,28 +291,31 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 45,
-    paddingBottom: 15,
+    paddingHorizontal: 12,
+    marginTop: 35,
+    height: 50,
     backgroundColor: 'transparent',
     position: 'relative',
-    minHeight: 85,
   },
   backBtn: {
-    padding: 8,
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
     zIndex: 10,
   },
   headerTitle: {
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 15,
+    top: 0,
+    bottom: 0,
     fontSize: 20,
     fontWeight: '800',
     color: '#1e293b',
     textAlign: 'center',
+    lineHeight: 50, // Giúp text căn giữa theo chiều dọc của header (50px)
     zIndex: 1,
-    paddingHorizontal: 60, // Tránh đè lên nút back
   },
   listContent: {
     padding: 16,
@@ -382,10 +429,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   feedbackBtn: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#eff6ff',
+    borderWidth: 1,
+    borderColor: '#dbeafe',
   },
   feedbackBtnText: {
-    color: '#fff',
+    color: '#3b82f6',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -411,7 +460,7 @@ const styles = StyleSheet.create({
   emptyText: {
     textAlign: 'center',
     color: '#94a3b8',
-    marginTop: 100,
+    marginTop: 350,
     fontSize: 16,
   },
   modalOverlay: {
@@ -487,6 +536,77 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#475569',
     lineHeight: 20,
+  },
+  confirmOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  confirmContent: {
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    padding: 24,
+    width: '100%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  confirmIconBg: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  confirmTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#1e293b',
+    marginBottom: 10,
+  },
+  confirmSub: {
+    fontSize: 15,
+    color: '#64748b',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  boldText: {
+    fontWeight: '700',
+    color: '#1e293b',
+  },
+  confirmActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  cancelActionBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: '#0080ffff',
+    alignItems: 'center',
+  },
+  cancelActionText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#ffffffff',
+  },
+  confirmActionBtn: {
+    flex: 2,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  confirmActionText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#fff',
   },
 });
 

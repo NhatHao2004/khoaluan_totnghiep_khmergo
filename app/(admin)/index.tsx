@@ -167,31 +167,34 @@ const AdminDashboard = () => {
             <Ionicons name="person-outline" size={22} color="#ef4444" />
           </View>
           <View style={styles.statInfoRow}>
-            <Text style={styles.statLabel}>Người dùng</Text>
+            <Text style={styles.statLabel} numberOfLines={1} adjustsFontSizeToFit>Người dùng</Text>
             <View style={styles.statNumberGroup}>
               <Text style={styles.statNumber}>{stats.users}</Text>
             </View>
           </View>
         </TouchableOpacity>
 
-        <View style={styles.statCard}>
+        <TouchableOpacity 
+          style={styles.statCard}
+          onPress={() => router.push('/(admin)/content' as any)}
+        >
           <View style={styles.iconBox}>
             <Ionicons name="book-outline" size={22} color="#10b981" />
           </View>
           <View style={styles.statInfoRow}>
-            <Text style={styles.statLabel}>Nội dung</Text>
+            <Text style={styles.statLabel} numberOfLines={1} adjustsFontSizeToFit>Nội dung</Text>
             <View style={styles.statNumberGroup}>
               <Text style={styles.statNumber}>{stats.content}</Text>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
 
         <View style={styles.statCard}>
           <View style={styles.iconBox}>
             <Ionicons name="help-circle-outline" size={26} color="#f59e0b" />
           </View>
           <View style={styles.statInfoRow}>
-            <Text style={styles.statLabel}>Thử thách</Text>
+            <Text style={styles.statLabel} numberOfLines={1} adjustsFontSizeToFit>Thử thách</Text>
             <View style={styles.statNumberGroup}>
               <Text style={styles.statNumber}>{stats.challenges}</Text>
             </View>
@@ -203,7 +206,7 @@ const AdminDashboard = () => {
             <MaterialCommunityIcons name="chat-outline" size={25} color="#ec4899" />
           </View>
           <View style={styles.statInfoRow}>
-            <Text style={styles.statLabel}>Bài viết</Text>
+            <Text style={styles.statLabel} numberOfLines={1} adjustsFontSizeToFit>Bài viết</Text>
             <View style={styles.statNumberGroup}>
               <Text style={styles.statNumber}>{stats.posts}</Text>
             </View>
@@ -242,7 +245,7 @@ const AdminDashboard = () => {
                     </View>
                   )}
                   <Text style={styles.podiumName}>{user.name || '---'}</Text>
-                  <Text style={styles.podiumPoints}>{user.points || 0} điểm</Text>
+                  <Text style={styles.podiumPoints} numberOfLines={1} adjustsFontSizeToFit>{user.points || 0} điểm</Text>
                 </View>
                 <View style={[styles.bar, { height: barHeight, backgroundColor: barColor }]}>
                   <Text style={styles.rankNum}>{rank}</Text>
@@ -260,7 +263,7 @@ const AdminDashboard = () => {
           style={styles.seeAllBtn}
           onPress={() => router.push('/(admin)/users' as any)}
         >
-          <Text style={styles.seeAllText}>Xem tất cả</Text>
+          <Text style={styles.seeAllText} numberOfLines={1} adjustsFontSizeToFit>Xem tất cả</Text>
         </TouchableOpacity>
       </View>
 
