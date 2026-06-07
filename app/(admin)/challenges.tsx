@@ -5,7 +5,6 @@ import { arrayRemove, arrayUnion, collection, deleteDoc, doc, onSnapshot, query,
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Animated,
   FlatList,
   Modal,
@@ -50,6 +49,21 @@ const ChallengeManagement = () => {
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
   const translateY = useRef(new Animated.Value(-100)).current;
 
+  // Confirm Dialog State
+  const [confirmDialog, setConfirmDialog] = useState<{
+    visible: boolean;
+    title: string;
+    message: string;
+    icon: string;
+    iconColor: string;
+    onConfirm: () => void;
+  }>({ visible: false, title: '', message: '', icon: 'trash-outline', iconColor: '#ef4444', onConfirm: () => { } });
+
+  const showConfirm = (title: string, message: string, icon: string, iconColor: string, onConfirm: () => void) => {
+    setConfirmDialog({ visible: true, title, message, icon, iconColor, onConfirm });
+  };
+  const hideConfirm = () => setConfirmDialog(prev => ({ ...prev, visible: false }));
+
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     setToast({ visible: true, message: msg, type });
     Animated.spring(translateY, {
@@ -64,7 +78,7 @@ const ChallengeManagement = () => {
         toValue: -100,
         duration: 500,
         useNativeDriver: true
-      }).start(() => setToast({ ...toast, visible: false }));
+      }).start(() => setToast(prev => ({ ...prev, visible: false })));
     }, 3000);
   };
 
@@ -202,33 +216,31 @@ const ChallengeManagement = () => {
   };
 
   const deleteQuiz = (id: string) => {
-    Alert.alert('Xác nhận', 'Bạn có chắc muốn xóa bộ thử thách này?', [
-      { text: 'Hủy', style: 'cancel' },
-      {
-        text: 'Xóa',
-        style: 'destructive',
-        onPress: async () => {
-          await deleteDoc(doc(db, 'quizzes', id));
-          showToast('Đã xóa bộ thử thách');
-        }
+    showConfirm(
+      'Xóa bộ thử thách',
+      'Tất cả câu hỏi trong bộ này sẽ bị xóa',
+      'trash-outline', '#ef4444',
+      async () => {
+        hideConfirm();
+        await deleteDoc(doc(db, 'quizzes', id));
+        showToast('Đã xóa bộ thử thách');
       }
-    ]);
+    );
   };
 
   const deleteQuestion = (quizId: string, question: any) => {
-    Alert.alert('Xác nhận', 'Xóa câu hỏi này?', [
-      { text: 'Hủy', style: 'cancel' },
-      {
-        text: 'Xóa',
-        style: 'destructive',
-        onPress: async () => {
-          await updateDoc(doc(db, 'quizzes', quizId), {
-            questions: arrayRemove(question)
-          });
-          showToast('Đã xóa câu hỏi');
-        }
+    showConfirm(
+      'Xóa câu hỏi',
+      'Câu hỏi này sẽ bị xóa vĩnh viễn. Bạn có chắc chắn?',
+      'help-circle-outline', '#f59e0b',
+      async () => {
+        hideConfirm();
+        await updateDoc(doc(db, 'quizzes', quizId), {
+          questions: arrayRemove(question)
+        });
+        showToast('Đã xóa câu hỏi');
       }
-    ]);
+    );
   };
 
   const getQuizDisplayTitle = (item: any) => {
@@ -403,6 +415,14 @@ const ChallengeManagement = () => {
               </View>
             }
           />
+
+          {/* Toast inside quiz management modal */}
+          {toast.visible && (
+            <Animated.View style={[styles.toastContainer, toast.type === 'error' ? styles.toastError : styles.toastSuccess, { transform: [{ translateY }] }]}>
+              <Ionicons name={toast.type === 'success' ? 'checkmark-circle' : 'alert-circle'} size={24} color="#fff" />
+              <Text style={styles.toastText}>{toast.message}</Text>
+            </Animated.View>
+          )}
         </View>
       </Modal>
 
@@ -412,7 +432,7 @@ const ChallengeManagement = () => {
           <View style={styles.modalContentSmall}>
             <Text style={styles.modalTitle}>{editingQuiz ? 'Sửa Thử thách' : 'Thêm Thử thách'}</Text>
 
-            <Text style={styles.inputLabel}>Tên tiếng Việt</Text>
+            <Text style={styles.inputLabel}>Tên thử thách (tiếng Việt)</Text>
             <TextInput
               style={styles.input}
               value={qTitle}
@@ -420,17 +440,17 @@ const ChallengeManagement = () => {
               placeholder="Nhập tên thử thách..."
             />
 
-            <Text style={styles.inputLabel}>Tên tiếng Khmer</Text>
+            <Text style={styles.inputLabel}>Tên thử thách (tiếng Khmer)</Text>
             <TextInput
               style={styles.input}
               value={qTitleKm}
               onChangeText={setQTitleKm}
-              placeholder="Nhập tên Khmer..."
+              placeholder="Nhập tên tiếng Khmer..."
             />
 
             {!editingQuiz && (
               <>
-                <Text style={styles.inputLabel}>Liên kết Địa điểm (ID)</Text>
+                <Text style={styles.inputLabel}>Liên kết với nội dung</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 10 }}>
                   {destinations
                     .filter(d => {
@@ -472,16 +492,14 @@ const ChallengeManagement = () => {
         <View style={[styles.container, { paddingTop: 35 }]}>
           <View style={styles.modalHeaderFixed}>
             <TouchableOpacity style={styles.backBtn} onPress={() => setQuestionModalVisible(false)}>
-              <Ionicons name="close" size={28} color="#1e293b" />
+              <Ionicons name="arrow-back" size={28} color="#1e293b" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>{editingQuestion ? 'Sửa câu hỏi' : 'Thêm câu hỏi'}</Text>
-            <TouchableOpacity style={styles.saveBtnSmall} onPress={handleSaveQuestion}>
-              <Text style={styles.saveBtnText}>Lưu</Text>
-            </TouchableOpacity>
+            <View style={{ width: 44 }} />
           </View>
 
           <ScrollView style={styles.formScroll} contentContainerStyle={{ padding: 20 }}>
-            <Text style={styles.inputLabel}>Nội dung câu hỏi (VIE)</Text>
+            <Text style={styles.inputLabel}>Nội dung câu hỏi</Text>
             <TextInput
               style={[styles.input, { height: 80 }]}
               multiline
@@ -490,16 +508,8 @@ const ChallengeManagement = () => {
               placeholder="Nhập câu hỏi..."
             />
 
-            <Text style={styles.inputLabel}>Nội dung câu hỏi (KMR)</Text>
-            <TextInput
-              style={[styles.input, { height: 80 }]}
-              multiline
-              value={questTextKm}
-              onChangeText={setQuestTextKm}
-              placeholder="Nhập câu hỏi Khmer..."
-            />
 
-            <Text style={styles.inputLabel}>Các đáp án (Nhấn chọn đáp án đúng)</Text>
+            <Text style={[styles.inputLabel, { marginTop: 12 }]}>Các đáp án (Nhấn chọn đáp án đúng)</Text>
             {options.map((opt, i) => (
               <View key={i} style={styles.optionInputRow}>
                 <TouchableOpacity
@@ -512,38 +522,42 @@ const ChallengeManagement = () => {
                 </TouchableOpacity>
                 <View style={{ flex: 1 }}>
                   <TextInput
-                    style={[styles.input, { marginBottom: 5 }]}
+                    style={styles.input}
                     value={opt}
                     onChangeText={(val) => {
                       const newOpts = [...options];
                       newOpts[i] = val;
                       setOptions(newOpts);
                     }}
-                    placeholder={`Đáp án ${String.fromCharCode(65 + i)} (VIE)`}
-                  />
-                  <TextInput
-                    style={styles.input}
-                    value={optionsKm[i]}
-                    onChangeText={(val) => {
-                      const newOpts = [...optionsKm];
-                      newOpts[i] = val;
-                      setOptionsKm(newOpts);
-                    }}
-                    placeholder={`Đáp án ${String.fromCharCode(65 + i)} (KMR)`}
+                    placeholder={`Nhập nội dung đáp án ${String.fromCharCode(65 + i)}`}
                   />
                 </View>
               </View>
             ))}
 
-            <Text style={styles.inputLabel}>Giải thích đáp án</Text>
+            <Text style={[styles.inputLabel, { marginTop: 0 }]}>Giải thích đáp án đúng</Text>
             <TextInput
-              style={[styles.input, { height: 100 }]}
+              style={[styles.input, { height: 100, marginBottom: 20 }]}
               multiline
               value={explanation}
               onChangeText={setExplanation}
               placeholder="Nhập giải thích vì sao đáp án này đúng..."
             />
           </ScrollView>
+
+          <View style={styles.modalFooter}>
+            <TouchableOpacity style={styles.saveBtnLarge} onPress={handleSaveQuestion}>
+              <Text style={styles.saveBtnText}>Lưu câu hỏi</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Toast inside question modal */}
+          {toast.visible && (
+            <Animated.View style={[styles.toastContainer, toast.type === 'error' ? styles.toastError : styles.toastSuccess, { transform: [{ translateY }] }]}>
+              <Ionicons name={toast.type === 'success' ? 'checkmark-circle' : 'alert-circle'} size={24} color="#fff" />
+              <Text style={styles.toastText}>{toast.message}</Text>
+            </Animated.View>
+          )}
         </View>
       </Modal>
 
@@ -554,6 +568,30 @@ const ChallengeManagement = () => {
           <Text style={styles.toastText}>{toast.message}</Text>
         </Animated.View>
       )}
+
+      {/* --- Custom Confirm Dialog --- */}
+      <Modal visible={confirmDialog.visible} transparent animationType="fade" statusBarTranslucent>
+        <View style={styles.confirmOverlay}>
+          <View style={styles.confirmBox}>
+            <View style={[styles.confirmIconCircle, { backgroundColor: confirmDialog.iconColor + '18' }]}>
+              <Ionicons name={confirmDialog.icon as any} size={32} color={confirmDialog.iconColor} />
+            </View>
+            <Text style={styles.confirmTitle}>{confirmDialog.title}</Text>
+            <Text style={styles.confirmMessage}>{confirmDialog.message}</Text>
+            <View style={styles.confirmActions}>
+              <TouchableOpacity style={styles.confirmCancelBtn} onPress={hideConfirm}>
+                <Text style={styles.confirmCancelText}>Hủy bỏ</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.confirmDeleteBtn, { backgroundColor: confirmDialog.iconColor }]}
+                onPress={confirmDialog.onConfirm}
+              >
+                <Text style={styles.confirmDeleteText}>Xác nhận</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -583,7 +621,7 @@ const styles = StyleSheet.create({
   metaText: { fontSize: 12, color: '#64748b', fontWeight: '600' },
   quizActions: { flexDirection: 'row', gap: 5 },
   actionIcon: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#f8fafc', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#e2e8f0' },
-  emptyContainer: { alignItems: 'center', marginTop: 100, opacity: 0.5 },
+  emptyContainer: { alignItems: 'center', marginTop: 350, opacity: 0.5 },
   emptyText: { fontSize: 15, color: '#64748b', marginTop: 10, fontWeight: '600' },
   // Modal Full Screen Question Styles
   questionCard: { backgroundColor: '#fff', borderRadius: 20, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: '#e2e8f0', elevation: 1 },
@@ -600,7 +638,7 @@ const styles = StyleSheet.create({
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modalContentSmall: { width: '90%', backgroundColor: '#fff', borderRadius: 24, padding: 24 },
   modalTitle: { fontSize: 22, fontWeight: '900', color: '#1e293b', marginBottom: 20, textAlign: 'center' },
-  inputLabel: { fontSize: 13, fontWeight: '800', color: '#64748b', marginBottom: 8, marginTop: 15 },
+  inputLabel: { fontSize: 13, fontWeight: '800', color: '#64748b', marginBottom: 8, marginTop: 7 },
   input: { backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 12, padding: 12, fontSize: 15, color: '#1e293b' },
   destChip: { paddingHorizontal: 15, paddingVertical: 8, borderRadius: 20, backgroundColor: '#f1f5f9', marginRight: 8, borderWidth: 1, borderColor: '#e2e8f0' },
   activeDestChip: { backgroundColor: '#3b82f6', borderColor: '#3b82f6' },
@@ -622,10 +660,99 @@ const styles = StyleSheet.create({
   indicatorText: { fontSize: 16, fontWeight: '900', color: '#64748b' },
   indicatorTextActive: { color: '#fff' },
   // Toast Styles
-  toastContainer: { position: 'absolute', top: 0, left: 20, right: 20, flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, zIndex: 9999, gap: 12 },
+  toastContainer: { position: 'absolute', top: 7, left: 20, right: 20, flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, zIndex: 9999, gap: 12 },
   toastSuccess: { backgroundColor: '#10b981' },
   toastError: { backgroundColor: '#ef4444' },
-  toastText: { color: '#fff', fontWeight: '700', fontSize: 14 }
+  toastText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  modalFooter: {
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#f1f5f9',
+    backgroundColor: '#fff',
+  },
+  saveBtnLarge: {
+    backgroundColor: '#3b82f6',
+    paddingVertical: 15,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#3b82f6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  // Confirm Dialog Styles
+  confirmOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  confirmBox: {
+    backgroundColor: '#fff',
+    borderRadius: 28,
+    padding: 28,
+    width: '100%',
+    maxWidth: 340,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  confirmIconCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 18,
+  },
+  confirmTitle: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#1e293b',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  confirmMessage: {
+    fontSize: 14,
+    color: '#64748b',
+    textAlign: 'center',
+    lineHeight: 21,
+    marginBottom: 24,
+    fontWeight: '500',
+  },
+  confirmActions: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+  },
+  confirmCancelBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 14,
+    backgroundColor: '#3b82f6',
+    alignItems: 'center',
+  },
+  confirmCancelText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  confirmDeleteBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: 'center',
+  },
+  confirmDeleteText: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#fff',
+  },
 });
 
 export default ChallengeManagement;

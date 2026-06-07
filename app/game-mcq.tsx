@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLanguage } from '@/contexts/LanguageContext';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -27,6 +28,8 @@ export default function GameMCQScreen() {
   const router = useRouter();
   const { pagodaId, imageUrl, pagodaLocation } = useLocalSearchParams<{ pagodaId: string; imageUrl?: string; pagodaLocation?: string }>();
   const { user, refreshUser } = useAuth();
+  const { language } = useLanguage();
+  const isKm = language === 'km';
 
   const [quizData, setQuizData] = useState<PagodaQuizData | null>(null);
   const [dataLoading, setDataLoading] = useState(true);
@@ -416,7 +419,7 @@ export default function GameMCQScreen() {
             style={[styles.mainCard, { transform: [{ translateX: cardShake }] }]}
           >
             <Text style={styles.mainQuestionText}>
-              {currentQuestion?.question}
+              {isKm ? (currentQuestion?.questionKm || currentQuestion?.question) : currentQuestion?.question}
             </Text>
           </Animated.View>
 
@@ -444,7 +447,9 @@ export default function GameMCQScreen() {
                     </Text>
                   )}
                 </View>
-                <Text style={styles.optText}>{option}</Text>
+                <Text style={styles.optText}>
+                  {isKm ? (currentQuestion?.optionsKm?.[index] || option) : option}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>

@@ -6,7 +6,9 @@ import { useAuth } from '@/contexts/AuthContext';
 export interface MCQQuestion {
   id: string;
   question: string;
+  questionKm?: string;
   options: string[];
+  optionsKm?: string[];
   correctIndex: number;
   explanation: string;
 }
