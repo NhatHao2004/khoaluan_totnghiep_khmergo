@@ -253,7 +253,7 @@ const AdminDashboard = () => {
                       <Ionicons name="person" size={rank === 1 ? 24 : 16} color="#cbd5e1" />
                     </View>
                   )}
-                  <Text style={styles.podiumName}>{user.name || '---'}</Text>
+                  <Text style={styles.podiumName} numberOfLines={1} adjustsFontSizeToFit>{user.name || '---'}</Text>
                   <Text style={styles.podiumPoints} numberOfLines={1} adjustsFontSizeToFit>{user.points || 0} điểm</Text>
                 </View>
                 <View style={[styles.bar, { height: barHeight, backgroundColor: barColor }]}>
@@ -279,7 +279,7 @@ const AdminDashboard = () => {
       <View style={styles.activityContainer}>
         {recentActivities.map((activity, index) => (
           <View key={activity.id} style={styles.activityCard}>
-            <Text style={styles.activityItemTitle}>{activity.name}</Text>
+            <Text style={styles.activityItemTitle} numberOfLines={1}>{activity.name}</Text>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
               <Text style={styles.activityDesc} numberOfLines={1}>Đã đăng ký tài khoản thành công</Text>
               <Text style={styles.activityTime}>{activity.timeAgo || 'Vừa xong'}</Text>
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   podiumCol: {
-    width: 80,
+    width: 90,
     alignItems: 'center',
     paddingHorizontal: 4,
   },
@@ -463,6 +463,7 @@ const styles = StyleSheet.create({
     color: '#1e293b',
     marginTop: 6,
     textAlign: 'center',
+    width: '100%',
   },
   podiumPoints: {
     fontSize: 9,
