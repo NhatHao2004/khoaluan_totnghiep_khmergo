@@ -70,11 +70,7 @@ export default function CultureScreen() {
       .replace(/đ/g, 'd');
   };
 
-  const sortedCultures = [...cultures].sort((a, b) => {
-    const nameA = normalizeText(a.name || '');
-    const nameB = normalizeText(b.name || '');
-    return nameA.localeCompare(nameB, 'vi', { sensitivity: 'base' });
-  });
+  const sortedCultures = [...cultures];
 
   return (
     <View style={styles.container}>

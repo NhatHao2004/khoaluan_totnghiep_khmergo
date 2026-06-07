@@ -110,8 +110,7 @@ export default function PagodaScreen() {
 
 
   // Sắp xếp theo ID (pagoda_1 → pagoda_2 → ... → pagoda_5)
-  const filteredPagodas = [...temples]
-    .sort((a, b) => (a.id || '').localeCompare(b.id || ''));
+  const filteredPagodas = [...temples];
 
   return (
     <View style={styles.container}>

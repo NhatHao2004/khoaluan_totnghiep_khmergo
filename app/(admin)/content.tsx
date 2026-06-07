@@ -159,7 +159,7 @@ const ContentManagement = () => {
         imageUrl6: dImg6,
         latitude: dLat,
         longitude: dLng,
-        category: dCat,
+        category: dCat === 'pagoda' ? 'Chùa' : dCat === 'food' ? 'Ẩm thực' : 'Văn hóa',
         contentBlocks: dBlocks.filter(b => b.value.trim() !== '' || b.images.trim() !== ''),
         createdAt: editingDest ? (editingDest.createdAt || new Date()) : new Date()
       };
@@ -468,7 +468,13 @@ const ContentManagement = () => {
       {loading ? <ActivityIndicator size="large" color="#3b82f6" style={{ marginTop: 50 }} /> : (
         <FlatList
           data={activeTab === 'destinations'
-            ? destinations
+            ? destinations.filter(d => {
+                const cat = d.category;
+                if (dCat === 'pagoda') return cat === 'pagoda' || cat === 'Chùa';
+                if (dCat === 'food') return cat === 'food' || cat === 'Ẩm thực';
+                if (dCat === 'culture') return cat === 'culture' || cat === 'Văn hóa';
+                return false;
+              })
             : categories.filter(c => c.title.toLowerCase().includes(vocabSearchQuery.toLowerCase()))
           }
           keyExtractor={(item) => item.id}

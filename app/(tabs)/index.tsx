@@ -129,6 +129,7 @@ export default function HomeScreen() {
         else if (data.category === 'Ẩm thực') detailRoute = '/food-detail';
 
         return {
+          id: doc.id,
           ...data,
           id_num: data.id,
           name: data.name || '',

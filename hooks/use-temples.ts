@@ -15,7 +15,7 @@ export const useTemples = () => {
     // Truy vấn collection destinations để lọc ra những địa điểm thuộc loại "Chùa"
     const q = query(
       collection(db, 'destinations'),
-      where('category', '==', 'Chùa')
+      where('category', 'in', ['Chùa', 'pagoda'])
     );
 
     // Lắng nghe dữ liệu thay đổi realtime từ Firebase
@@ -30,9 +30,14 @@ export const useTemples = () => {
           });
         });
         
-        // Sắp xếp theo ID để hiển thị chuẩn xác hơn
-        fetchedTemples.sort((a, b) => (a.id > b.id ? 1 : -1));
-        
+        // Sắp xếp theo ngày tạo (mới nhất lên đầu)
+        fetchedTemples.sort((a, b) => {
+          const dateA = a.createdAt?.seconds || (a.createdAt instanceof Date ? a.createdAt.getTime() / 1000 : 0);
+          const dateB = b.createdAt?.seconds || (b.createdAt instanceof Date ? b.createdAt.getTime() / 1000 : 0);
+          if (dateA !== dateB) return dateB - dateA;
+          return b.id.localeCompare(a.id);
+        });
+
         setTemples(fetchedTemples);
         setLoading(false);
       },

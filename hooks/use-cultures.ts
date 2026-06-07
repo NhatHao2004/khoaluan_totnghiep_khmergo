@@ -11,7 +11,7 @@ export const useCultures = () => {
     // Truy vấn collection destinations để lọc ra những địa điểm thuộc loại "Văn hóa"
     const q = query(
       collection(db, 'destinations'),
-      where('category', '==', 'Văn hóa')
+      where('category', 'in', ['Văn hóa', 'culture'])
     );
 
     // Lắng nghe dữ liệu thay đổi realtime từ Firebase
@@ -26,8 +26,13 @@ export const useCultures = () => {
           });
         });
         
-        // Sắp xếp theo ID hoặc tên
-        fetchedCultures.sort((a, b) => (a.name > b.name ? 1 : -1));
+        // Sắp xếp theo ngày tạo (mới nhất lên đầu)
+        fetchedCultures.sort((a, b) => {
+          const dateA = a.createdAt?.seconds || (a.createdAt instanceof Date ? a.createdAt.getTime() / 1000 : 0);
+          const dateB = b.createdAt?.seconds || (b.createdAt instanceof Date ? b.createdAt.getTime() / 1000 : 0);
+          if (dateA !== dateB) return dateB - dateA;
+          return b.id.localeCompare(a.id);
+        });
         
         setCultures(fetchedCultures);
         setLoading(false);

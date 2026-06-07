@@ -68,11 +68,7 @@ export default function FoodScreen() {
       .replace(/đ/g, 'd');
   };
 
-  const sortedFoods = [...foods].sort((a, b) => {
-    const nameA = normalizeText(a.name || '');
-    const nameB = normalizeText(b.name || '');
-    return nameA.localeCompare(nameB, 'vi', { sensitivity: 'base' });
-  });
+  const sortedFoods = [...foods];
 
   return (
     <View style={styles.container}>

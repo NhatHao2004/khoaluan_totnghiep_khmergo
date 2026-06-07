@@ -15,7 +15,7 @@ export const useFoods = () => {
     // Truy vấn collection destinations để lọc ra những địa điểm thuộc loại "Ẩm thực"
     const q = query(
       collection(db, 'destinations'),
-      where('category', '==', 'Ẩm thực')
+      where('category', 'in', ['Ẩm thực', 'food'])
     );
 
     // Lắng nghe dữ liệu thay đổi realtime từ Firebase
@@ -31,7 +31,13 @@ export const useFoods = () => {
         });
         
         // Sắp xếp theo tên
-        fetchedFoods.sort((a, b) => (a.name > b.name ? 1 : -1));
+        // Sắp xếp theo ngày tạo (mới nhất lên đầu)
+        fetchedFoods.sort((a, b) => {
+          const dateA = a.createdAt?.seconds || (a.createdAt instanceof Date ? a.createdAt.getTime() / 1000 : 0);
+          const dateB = b.createdAt?.seconds || (b.createdAt instanceof Date ? b.createdAt.getTime() / 1000 : 0);
+          if (dateA !== dateB) return dateB - dateA;
+          return b.id.localeCompare(a.id);
+        });
         
         setFoods(fetchedFoods);
         setLoading(false);
