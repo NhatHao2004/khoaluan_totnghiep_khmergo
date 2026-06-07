@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
-    marginTop: 45,
+    marginTop: 35,
     height: 50,
     backgroundColor: 'transparent',
     position: 'relative',

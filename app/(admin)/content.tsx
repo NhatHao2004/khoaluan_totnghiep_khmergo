@@ -480,7 +480,7 @@ const ContentManagement = () => {
 
       {/* --- Word Management Modal (FULL SCREEN) --- */}
       <Modal visible={!!managingTopicId} animationType="slide" statusBarTranslucent={true}>
-        <View style={[styles.container, { paddingTop: 45, backgroundColor: '#ffffff' }]}>
+        <View style={[styles.container, { paddingTop: 35, backgroundColor: '#ffffff' }]}>
           <View style={[styles.header, { marginTop: 0, paddingHorizontal: 12, backgroundColor: '#ffffff' }]}>
             <TouchableOpacity style={styles.backBtn} onPress={() => setManagingTopicId(null)}>
               <Ionicons name="arrow-back" size={28} color="#1e293b" />
@@ -488,7 +488,9 @@ const ContentManagement = () => {
             <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
               {managingTopic?.title === 'cat_family' ? 'Gia đình thân yêu' :
                 managingTopic?.title === 'cat_food' ? 'Ẩm thực đặc sắc' :
-                  managingTopic?.title}
+                  managingTopic?.title === 'cat_greetings' ? 'Chào hỏi thông dụng' :
+                    managingTopic?.title === 'cat_numbers' ? 'Số đếm cơ bản' :
+                      managingTopic?.title}
             </Text>
             <TouchableOpacity
               style={styles.addBtnHeader}
@@ -802,7 +804,7 @@ const ContentManagement = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#ffffff' },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, marginTop: 45, height: 60, position: 'relative' },
+  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, marginTop: 35, height: 60, position: 'relative' },
   backBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', zIndex: 10 },
   addBtnHeader: { width: 42, height: 42, backgroundColor: '#f1f5f9', borderRadius: 12, justifyContent: 'center', alignItems: 'center', zIndex: 10 },
   headerTitle: { flex: 1, fontSize: 20, fontWeight: '800', color: '#1e293b', textAlign: 'center' },
@@ -952,7 +954,7 @@ const styles = StyleSheet.create({
   },
   // Form Styles
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modalContentFull: { width: '100%', height: '100%', backgroundColor: '#fff', padding: 20, paddingTop: 45 },
+  modalContentFull: { width: '100%', height: '100%', backgroundColor: '#fff', padding: 20, paddingTop: 35 },
   modalContentSmall: { width: '85%', backgroundColor: '#fff', borderRadius: 20, padding: 20 },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   modalTitle: { fontSize: 22, fontWeight: '800', color: '#1e293b', textAlign: 'center' },
