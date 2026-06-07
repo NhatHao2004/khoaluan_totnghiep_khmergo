@@ -85,9 +85,12 @@ const TrashManagement = () => {
       <View style={styles.cardContent}>
         <View style={styles.cardHeader}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.cardTitle}>{item.name}</Text>
+            <Text style={styles.cardTitle}>{item.name || item.title || 'Không có tên'}</Text>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
-              <Text style={styles.cardSubTitle}>Loại nội dung: {item.category === 'pagoda' ? 'Chùa' : item.category === 'culture' ? 'Văn hóa' : 'Ẩm thực'}</Text>
+              <Text style={styles.cardSubTitle}>
+                Loại chủ đề: {item.originalCollection === 'vocab_categories' ? 'Học tập' :
+                  (item.category === 'pagoda' ? 'Chùa' : item.category === 'culture' ? 'Văn hóa' : 'Ẩm thực')}
+              </Text>
               <View style={styles.timeBadge}>
                 <Text style={styles.timeText}>
                   {item.deletedAt?.toDate ? item.deletedAt.toDate().toLocaleDateString('vi-VN') : 'Vừa xong'}

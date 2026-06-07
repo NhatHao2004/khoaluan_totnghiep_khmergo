@@ -41,7 +41,13 @@ export default function LanguageStudyScreen() {
         id: doc.id,
         ...doc.data()
       }));
-      setCategories(cats.sort((a: any, b: any) => (a.order || 0) - (b.order || 0)));
+      const sortedData = cats.sort((a: any, b: any) => {
+        if ((a.order || 99) !== (b.order || 99)) return (a.order || 99) - (b.order || 99);
+        const timeA = a.createdAt?.seconds || 0;
+        const timeB = b.createdAt?.seconds || 0;
+        return timeB - timeA;
+      });
+      setCategories(sortedData);
       setLoadingCats(false);
     });
     return () => unsubscribe();
