@@ -172,10 +172,9 @@ const ContentManagement = () => {
       const sortedData = data.sort((a: any, b: any) => {
         const getPrio = (item: any) => {
           const cat = item.category || '';
-          const id = item.id || '';
-          if (cat === 'pagoda' || id.includes('pagoda')) return 1;
-          if (cat === 'culture' || id.includes('culture')) return 2;
-          if (cat === 'food' || id.includes('food')) return 3;
+          if (cat === 'Chùa') return 1;
+          if (cat === 'Văn hóa') return 2;
+          if (cat === 'Ẩm thực') return 3;
           return 4;
         };
         const orderA = getPrio(a);
@@ -424,7 +423,8 @@ const ContentManagement = () => {
                 setDLat(item.latitude || '');
                 setDLng(item.longitude || '');
                 setDBlocks(item.contentBlocks || []);
-                setDCat(item.id.includes('food') ? 'food' : item.id.includes('culture') ? 'culture' : 'pagoda');
+                const currentCat = item.category === 'Chùa' ? 'pagoda' : item.category === 'Ẩm thực' ? 'food' : 'culture';
+                setDCat(currentCat);
                 setDestModalVisible(true);
               }}
             >
@@ -676,7 +676,7 @@ const ContentManagement = () => {
               <TextInput style={[styles.input, { height: 110 }]} value={dDescKm} onChangeText={setDDescKm} multiline numberOfLines={4} placeholder="Mô tả tiếng Khmer..." />
 
               <ImageSelector label="Ảnh đại diện chính" value={dImg} onChange={setDImg} />
-              <ImageSelector label="Ảnh đại diện phụ" value={dImg1} onChange={setDImg1} />
+              <ImageSelector label="Ảnh đại diện phụ 1" value={dImg1} onChange={setDImg1} />
 
               {dCat !== 'pagoda' && (
                 <>
