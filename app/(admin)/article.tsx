@@ -1,12 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import { arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, onSnapshot, query, setDoc, updateDoc, orderBy, serverTimestamp } from 'firebase/firestore';
+import { collection, deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   Animated,
+  Dimensions,
   FlatList,
   Image,
   Modal,
@@ -15,8 +16,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
-  Dimensions
+  View
 } from 'react-native';
 import { db } from '../../utils/firebaseConfig';
 
@@ -36,7 +36,7 @@ const ArticleManagement = () => {
   const [summary, setSummary] = useState('');
   const [content, setContent] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  
+
   // Delete Confirm State
   const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<any>(null);
@@ -151,7 +151,7 @@ const ArticleManagement = () => {
     }
   };
 
-  const filteredArticles = articles.filter(a => 
+  const filteredArticles = articles.filter(a =>
     a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     a.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -168,9 +168,9 @@ const ArticleManagement = () => {
         </View>
         <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
         <Text style={styles.cardSummary} numberOfLines={2}>{item.summary}</Text>
-        
+
         <View style={styles.cardActions}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.editBtn}
             onPress={() => {
               setEditingArticle(item);
@@ -202,25 +202,12 @@ const ArticleManagement = () => {
           <Ionicons name="chevron-back" size={28} color="#1e293b" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Quản lý bài viết</Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.addBtnHeader}
           onPress={() => { resetForm(); setModalVisible(true); }}
         >
           <Ionicons name="add" size={28} color="#3b82f6" />
         </TouchableOpacity>
-      </View>
-
-      {/* Search Bar */}
-      <View style={styles.searchSection}>
-        <View style={styles.searchContainer}>
-          <Ionicons name="search-outline" size={20} color="#94a3b8" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Tìm kiếm bài viết..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
       </View>
 
       {loading ? (
@@ -287,21 +274,21 @@ const ArticleManagement = () => {
               </TouchableOpacity>
 
               <Text style={styles.inputLabel}>Mô tả ngắn</Text>
-              <TextInput 
-                style={[styles.input, { height: 80 }]} 
-                value={summary} 
-                onChangeText={setSummary} 
-                multiline 
-                placeholder="Tóm tắt nội dung bài viết..." 
+              <TextInput
+                style={[styles.input, { height: 80 }]}
+                value={summary}
+                onChangeText={setSummary}
+                multiline
+                placeholder="Tóm tắt nội dung bài viết..."
               />
 
               <Text style={styles.inputLabel}>Nội dung bài viết</Text>
-              <TextInput 
-                style={[styles.input, { height: 250, textAlignVertical: 'top' }]} 
-                value={content} 
-                onChangeText={setContent} 
-                multiline 
-                placeholder="Nhập nội dung chi tiết..." 
+              <TextInput
+                style={[styles.input, { height: 250, textAlignVertical: 'top' }]}
+                value={content}
+                onChangeText={setContent}
+                multiline
+                placeholder="Nhập nội dung chi tiết..."
               />
               <View style={{ height: 40 }} />
             </ScrollView>
@@ -360,14 +347,14 @@ const styles = StyleSheet.create({
   backBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center' },
   headerTitle: { flex: 1, fontSize: 22, fontWeight: '800', color: '#1e293b', textAlign: 'center' },
   addBtnHeader: { width: 44, height: 44, backgroundColor: '#f0f9ff', borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
-  
+
   searchSection: { padding: 16, backgroundColor: '#fff' },
   searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f8fafc', borderRadius: 16, borderWidth: 1, borderColor: '#e2e8f0', paddingHorizontal: 15, height: 50 },
   searchInput: { flex: 1, marginLeft: 10, fontSize: 16, color: '#1e293b' },
-  
+
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   listContent: { padding: 16 },
-  
+
   card: { backgroundColor: '#fff', borderRadius: 24, marginBottom: 20, overflow: 'hidden', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.08, shadowRadius: 24, borderWidth: 1, borderColor: '#f1f5f9' },
   cardImage: { width: '100%', height: 180, resizeMode: 'cover' },
   cardContent: { padding: 20 },
@@ -376,13 +363,13 @@ const styles = StyleSheet.create({
   cardDate: { fontSize: 12, color: '#94a3b8', fontWeight: '600' },
   cardTitle: { fontSize: 18, fontWeight: '800', color: '#1e293b', marginBottom: 8, lineHeight: 24 },
   cardSummary: { fontSize: 14, color: '#64748b', lineHeight: 20, marginBottom: 18 },
-  
+
   cardActions: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: '#f8fafc', paddingTop: 15 },
   editBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#f0f9ff', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12 },
   editBtnText: { fontSize: 14, fontWeight: '700', color: '#3b82f6' },
   deleteBtn: { width: 40, height: 40, backgroundColor: '#fff1f2', borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
 
-  emptyContainer: { alignItems: 'center', marginTop: 100 },
+  emptyContainer: { alignItems: 'center', marginTop: 300 },
   emptyText: { marginTop: 16, fontSize: 16, color: '#94a3b8', fontWeight: '600' },
 
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
@@ -391,21 +378,21 @@ const styles = StyleSheet.create({
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 },
   modalTitle: { fontSize: 24, fontWeight: '800', color: '#1e293b' },
   modalForm: { flex: 1 },
-  
+
   inputLabel: { fontSize: 14, fontWeight: '700', color: '#64748b', marginBottom: 8, marginTop: 15 },
   input: { backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 14, padding: 15, fontSize: 16, color: '#1e293b' },
-  
+
   catRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 5 },
   catBtn: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, backgroundColor: '#f1f5f9', borderWidth: 1, borderColor: '#e2e8f0' },
   activeCatBtn: { backgroundColor: '#3b82f6', borderColor: '#3b82f6' },
   catBtnText: { fontSize: 14, fontWeight: '700', color: '#64748b' },
   activeCatBtnText: { color: '#fff' },
-  
+
   imagePickerBtn: { width: '100%', height: 200, backgroundColor: '#f8fafc', borderRadius: 20, borderWidth: 2, borderColor: '#e2e8f0', borderStyle: 'dashed', overflow: 'hidden', marginTop: 5 },
   imagePickerPlaceholder: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 8 },
   imagePickerText: { fontSize: 14, color: '#94a3b8', fontWeight: '600' },
   pickedImagePreview: { width: '100%', height: '100%', resizeMode: 'cover' },
-  
+
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 25 },
   cancelBtn: { flex: 1, paddingVertical: 15, borderRadius: 14, alignItems: 'center', backgroundColor: '#fff' },
   cancelBtnText: { fontSize: 16, fontWeight: '700', color: '#ef4444' },

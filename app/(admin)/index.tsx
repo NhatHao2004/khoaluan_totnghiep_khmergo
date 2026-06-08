@@ -198,7 +198,7 @@ const AdminDashboard = () => {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.statCard}
           onPress={() => router.push('/(admin)/challenges' as any)}
         >
@@ -213,7 +213,7 @@ const AdminDashboard = () => {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.statCard}
           onPress={() => router.push('/(admin)/article' as any)}
         >
