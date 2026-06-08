@@ -95,6 +95,12 @@ export default function AdminLayout() {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="article"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
     </>
   );

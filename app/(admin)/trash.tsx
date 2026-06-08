@@ -110,7 +110,7 @@ const TrashManagement = () => {
 
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle} numberOfLines={1}>{item.name || item.title || 'Không có tên'}</Text>
-        
+
         <View style={styles.divider} />
 
         <View style={styles.cardFooter}>
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ffe4e6',
   },
-  emptyContainer: { alignItems: 'center', marginTop: 100 },
+  emptyContainer: { alignItems: 'center', marginTop: 280 },
   emptyText: { marginTop: 14, fontSize: 16, color: '#94a3b8', fontWeight: '600' },
   // Toast Styles
   toastContainer: { position: 'absolute', top: 0, left: 20, right: 20, flexDirection: 'row', alignItems: 'center', paddingVertical: 15, paddingHorizontal: 20, borderRadius: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.15, shadowRadius: 20, elevation: 10, zIndex: 9999, gap: 12 },

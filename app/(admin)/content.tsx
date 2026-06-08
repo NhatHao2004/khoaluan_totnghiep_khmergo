@@ -640,7 +640,7 @@ const ContentManagement = () => {
                 {editingDest ? 'Sửa nội dung' : 'Thêm nội dung'}
               </Text>
               <TouchableOpacity onPress={() => setDestModalVisible(false)}>
-                <Ionicons name="close" size={28} color="#ff0000ff" />
+                <Ionicons name="close" size={30} color="#ff0000ff" />
               </TouchableOpacity>
             </View>
 
@@ -1061,7 +1061,7 @@ const styles = StyleSheet.create({
   },
   // Form Styles
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modalContentFull: { width: '100%', height: '100%', backgroundColor: '#fff', padding: 20, paddingTop: 35 },
+  modalContentFull: { width: '100%', height: '100%', backgroundColor: '#fff', padding: 20, paddingTop: 45 },
   modalContentSmall: { width: '85%', backgroundColor: '#fff', borderRadius: 20, padding: 20 },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   modalTitle: { fontSize: 22, fontWeight: '800', color: '#1e293b', textAlign: 'center' },

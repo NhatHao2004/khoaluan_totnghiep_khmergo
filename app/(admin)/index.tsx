@@ -213,7 +213,10 @@ const AdminDashboard = () => {
           </View>
         </TouchableOpacity>
 
-        <View style={styles.statCard}>
+        <TouchableOpacity 
+          style={styles.statCard}
+          onPress={() => router.push('/(admin)/article' as any)}
+        >
           <View style={styles.iconBox}>
             <MaterialCommunityIcons name="chat-outline" size={25} color="#ec4899" />
           </View>
@@ -223,7 +226,7 @@ const AdminDashboard = () => {
               <Text style={styles.statNumber}>{stats.posts}</Text>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* Leaderboard Chart Section */}
