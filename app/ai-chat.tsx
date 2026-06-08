@@ -279,7 +279,7 @@ export default function AIAssistantScreen() {
           style={styles.menuBtn}
           onPress={() => activeTab === 'camera' ? resetCamera() : clearChat()}
         >
-          <Ionicons name="trash-outline" size={24} color="#1F2937" />
+          <Ionicons name="trash-outline" size={24} color="rgba(255, 0, 0, 1)ff" />
         </TouchableOpacity>
       </View>
 
