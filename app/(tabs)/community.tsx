@@ -624,7 +624,7 @@ export default function CommunityScreen() {
             setCreateModalVisible(true);
           }}
         >
-          <Ionicons name="add" size={28} color="#1A1A1A" />
+          <Ionicons name="add" size={28} color="#000dffff" />
         </TouchableOpacity>
       </View>
 
@@ -763,7 +763,7 @@ export default function CommunityScreen() {
                 <TouchableOpacity onPress={() => {
                   Keyboard.dismiss();
                   setModalVisible(false);
-                }}><Ionicons name="close" size={28} color="#1A1A1A" /></TouchableOpacity>
+                }}><Ionicons name="close" size={28} color="#ff0000ff" /></TouchableOpacity>
               </View>
             </View>
 
@@ -851,11 +851,11 @@ export default function CommunityScreen() {
         <TouchableOpacity style={styles.optionsOverlay} activeOpacity={1} onPress={() => setOptionsModalVisible(false)}>
           <Animated.View style={[styles.optionsContent, animatedOptionsStyle, { paddingBottom: insets.bottom + 10 }]}>
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleEditPost(selectedPost); }}>
-              <View style={styles.optionIconContainer}><Ionicons name="create-outline" size={24} color="#1A1A1A" /></View>
+              <View style={styles.optionIconContainer}><Ionicons name="create-outline" size={24} color="#3960ffff" /></View>
               <View><Text style={styles.optionText}>{t('edit_post_menu')}</Text></View>
             </TouchableOpacity>
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleDeletePost(selectedPost.id, selectedPost.userId); }}>
-              <View style={styles.optionIconContainer}><Ionicons name="trash-outline" size={24} color="#1A1A1A" /></View>
+              <View style={styles.optionIconContainer}><Ionicons name="trash-outline" size={24} color="#ff0000ff" /></View>
               <View><Text style={styles.optionText}>{t('delete_post_menu')}</Text></View>
             </TouchableOpacity>
             <View style={{ height: 8 }} />
@@ -1025,7 +1025,7 @@ const styles = StyleSheet.create({
   optionsHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: 12 },
   optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: 10, paddingHorizontal: 25, width: '100%' },
   optionIconContainer: { width: 30, height: 30, justifyContent: 'center', alignItems: 'center', marginRight: 15 },
-  optionText: { fontSize: 16, fontWeight: '700', color: '#1A1A1A' },
+  optionText: { fontSize: 16, fontWeight: '600', color: '#000000ff' },
 
   // --- Premium Login Modal Styles (Unique Names to avoid conflict) ---
   pModalOverlay: {
