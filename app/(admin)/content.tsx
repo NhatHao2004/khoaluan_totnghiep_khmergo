@@ -319,7 +319,7 @@ const ContentManagement = () => {
         await setDoc(doc(db, 'vocab_categories', finalId), topicData);
       }
       setTopicModalVisible(false);
-      showToast('Cập nhật chủ đề thành công!', 'success');
+      showToast('Cập nhật chủ đề thành công', 'success');
     } catch (e) {
       showToast('Lỗi khi lưu chủ đề', 'error');
     }
@@ -425,9 +425,9 @@ const ContentManagement = () => {
                 setDBlocks(item.contentBlocks || []);
                 const lowerCat = (item.category || '').toLowerCase();
                 const lowerId = (item.id || '').toLowerCase();
-                const currentCat = (lowerCat === 'ẩm thực' || lowerCat === 'food' || lowerId.includes('food')) ? 'food' : 
-                                   (lowerCat === 'văn hóa' || lowerCat === 'culture' || lowerId.includes('culture')) ? 'culture' : 
-                                   'pagoda';
+                const currentCat = (lowerCat === 'ẩm thực' || lowerCat === 'food' || lowerId.includes('food')) ? 'food' :
+                  (lowerCat === 'văn hóa' || lowerCat === 'culture' || lowerId.includes('culture')) ? 'culture' :
+                    'pagoda';
                 setDCat(currentCat);
                 setDestModalVisible(true);
               }}
@@ -645,14 +645,6 @@ const ContentManagement = () => {
             </View>
 
             <ScrollView style={styles.modalForm} showsVerticalScrollIndicator={false}>
-              {editingDest && (
-                <View style={{ alignSelf: 'center', backgroundColor: '#eff6ff', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 10, marginBottom: 15 }}>
-                  <Text style={{ fontSize: 13, fontWeight: '800', color: '#3b82f6' }}>
-                    Chế độ: {dCat === 'pagoda' ? 'Ngôi chùa' : dCat === 'culture' ? 'Văn hóa' : 'Ẩm thực'}
-                  </Text>
-                </View>
-              )}
-              
               {!editingDest && (
                 <View style={styles.catRow}>
                   {['pagoda', 'culture', 'food'].map(cat => (
@@ -701,35 +693,35 @@ const ContentManagement = () => {
                 <>
                   <Text style={styles.inputLabel}>Bộ sưu tập ảnh</Text>
                   <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap', marginBottom: 15 }}>
-                    <ImageSelector 
-                      label="Ảnh 1" 
-                      value={dCat === 'culture' ? dImg1 : dImg2} 
-                      onChange={dCat === 'culture' ? setDImg1 : setDImg2} 
-                      style={{ flex: 1, minWidth: '45%' }} 
+                    <ImageSelector
+                      label="Ảnh 1"
+                      value={dCat === 'culture' ? dImg1 : dImg2}
+                      onChange={dCat === 'culture' ? setDImg1 : setDImg2}
+                      style={{ flex: 1, minWidth: '45%' }}
                     />
-                    <ImageSelector 
-                      label="Ảnh 2" 
-                      value={dCat === 'culture' ? dImg2 : dImg3} 
-                      onChange={dCat === 'culture' ? setDImg2 : setDImg3} 
-                      style={{ flex: 1, minWidth: '45%' }} 
+                    <ImageSelector
+                      label="Ảnh 2"
+                      value={dCat === 'culture' ? dImg2 : dImg3}
+                      onChange={dCat === 'culture' ? setDImg2 : setDImg3}
+                      style={{ flex: 1, minWidth: '45%' }}
                     />
-                    <ImageSelector 
-                      label="Ảnh 3" 
-                      value={dCat === 'culture' ? dImg3 : dImg4} 
-                      onChange={dCat === 'culture' ? setDImg3 : setDImg4} 
-                      style={{ flex: 1, minWidth: '45%' }} 
+                    <ImageSelector
+                      label="Ảnh 3"
+                      value={dCat === 'culture' ? dImg3 : dImg4}
+                      onChange={dCat === 'culture' ? setDImg3 : setDImg4}
+                      style={{ flex: 1, minWidth: '45%' }}
                     />
-                    <ImageSelector 
-                      label="Ảnh 4" 
-                      value={dCat === 'culture' ? dImg4 : dImg5} 
-                      onChange={dCat === 'culture' ? setDImg4 : setDImg5} 
-                      style={{ flex: 1, minWidth: '45%' }} 
+                    <ImageSelector
+                      label="Ảnh 4"
+                      value={dCat === 'culture' ? dImg4 : dImg5}
+                      onChange={dCat === 'culture' ? setDImg4 : setDImg5}
+                      style={{ flex: 1, minWidth: '45%' }}
                     />
-                    <ImageSelector 
-                      label="Ảnh 5" 
-                      value={dCat === 'culture' ? dImg5 : dImg6} 
-                      onChange={dCat === 'culture' ? setDImg5 : setDImg6} 
-                      style={{ flex: 1, minWidth: '45%' }} 
+                    <ImageSelector
+                      label="Ảnh 5"
+                      value={dCat === 'culture' ? dImg5 : dImg6}
+                      onChange={dCat === 'culture' ? setDImg5 : setDImg6}
+                      style={{ flex: 1, minWidth: '45%' }}
                     />
                   </View>
                 </>
