@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, onSnapshot, query, setDoc, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useRef, useState } from 'react';
@@ -26,11 +27,75 @@ const ContentManagement = () => {
   const [loading, setLoading] = useState(true);
 
   const getImageSource = (uri: string, fallback: any = { uri: 'https://via.placeholder.com/150' }) => {
-    if (uri && (uri.startsWith('http://') || uri.startsWith('https://'))) {
+    if (uri && (uri.startsWith('http') || uri.startsWith('data:'))) {
       return { uri };
     }
+    // Map pagoda IDs to local assets
+    const pagodaImages: any = {
+      'pagoda_1': require('@/assets/images/chuaang.jpg'),
+      'pagoda_2': require('@/assets/images/chuahang.jpg'),
+      'pagoda_3': require('@/assets/images/kampong.jpg'),
+      'pagoda_4': require('@/assets/images/salengcu.jpg'),
+      'pagoda_5': require('@/assets/images/veluvana.jpg'),
+    };
+    if (pagodaImages[uri]) return pagodaImages[uri];
+    
     return fallback;
   };
+
+  const pickImage = async (onSelected: (val: string) => void) => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Quyền truy cập', 'Vui lòng cho phép truy cập thư viện ảnh để sử dụng tính năng này');
+        return;
+      }
+
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        quality: 0.6,
+        base64: true,
+      });
+
+      if (!result.canceled && result.assets[0].base64) {
+        onSelected(`data:image/jpeg;base64,${result.assets[0].base64}`);
+      }
+    } catch (error) {
+      Alert.alert('Lỗi', 'Không thể chọn ảnh');
+    }
+  };
+
+  const ImageSelector = ({ value, onChange, label, style }: { value: string, onChange: (val: string) => void, label: string, style?: any }) => (
+    <View style={[{ marginBottom: 15 }, style]}>
+      <Text style={styles.inputLabel}>{label}</Text>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        style={styles.imagePickerBtn}
+        onPress={() => pickImage(onChange)}
+      >
+        {value ? (
+          <View style={{ width: '100%', height: '100%' }}>
+            <Image source={getImageSource(value)} style={styles.pickedImagePreview} />
+            <TouchableOpacity
+              style={styles.removeImageBtn}
+              onPress={(e) => {
+                e.stopPropagation();
+                onChange('');
+              }}
+            >
+              <Ionicons name="close-circle" size={24} color="#ef4444" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.imagePickerPlaceholder}>
+            <Ionicons name="image-outline" size={32} color="#94a3b8" />
+            <Text style={styles.imagePickerText}>Nhấn để chọn ảnh</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    </View>
+  );
 
   // Destination Form State
   const [destModalVisible, setDestModalVisible] = useState(false);
@@ -383,12 +448,12 @@ const ContentManagement = () => {
       >
         <View style={styles.vocabLargeImageContainer}>
           <Image
-            source={getImageSource(item.imageUrl, 
+            source={getImageSource(item.imageUrl,
               (item.title === 'cat_family' || item.id === 'family') ? require('@/assets/images/giadinh.jpg') :
-              (item.title === 'cat_food' || item.id === 'food') ? require('@/assets/images/monan.jpg') :
-              (item.title === 'cat_greetings' || item.id === 'greetings') ? require('@/assets/images/chaohoi.jpg') :
-              (item.title === 'cat_numbers' || item.id === 'numbers') ? require('@/assets/images/sodem.jpg') :
-              require('@/assets/images/giadinh.jpg')
+                (item.title === 'cat_food' || item.id === 'food') ? require('@/assets/images/monan.jpg') :
+                  (item.title === 'cat_greetings' || item.id === 'greetings') ? require('@/assets/images/chaohoi.jpg') :
+                    (item.title === 'cat_numbers' || item.id === 'numbers') ? require('@/assets/images/sodem.jpg') :
+                      require('@/assets/images/giadinh.jpg')
             )}
             style={styles.vocabLargeImage}
           />
@@ -610,21 +675,18 @@ const ContentManagement = () => {
               <Text style={styles.inputLabel}>Mô tả chính (Khmer)</Text>
               <TextInput style={[styles.input, { height: 110 }]} value={dDescKm} onChangeText={setDDescKm} multiline numberOfLines={4} placeholder="Mô tả tiếng Khmer..." />
 
-              <Text style={styles.inputLabel}>Link ảnh đại diện</Text>
-              <TextInput style={styles.input} value={dImg} onChangeText={setDImg} placeholder="Nhập link ảnh chính..." />
-
-              <Text style={styles.inputLabel}>Link ảnh phụ</Text>
-              <TextInput style={styles.input} value={dImg1} onChangeText={setDImg1} placeholder="Nhập link ảnh phụ..." />
+              <ImageSelector label="Ảnh đại diện chính" value={dImg} onChange={setDImg} />
+              <ImageSelector label="Ảnh đại diện phụ" value={dImg1} onChange={setDImg1} />
 
               {dCat !== 'pagoda' && (
                 <>
                   <Text style={styles.inputLabel}>Bộ sưu tập ảnh</Text>
-                  <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
-                    <TextInput style={[styles.input, { flex: 1, minWidth: '45%' }]} value={dImg2} onChangeText={setDImg2} placeholder="Ảnh 1..." />
-                    <TextInput style={[styles.input, { flex: 1, minWidth: '45%' }]} value={dImg3} onChangeText={setDImg3} placeholder="Ảnh 2..." />
-                    <TextInput style={[styles.input, { flex: 1, minWidth: '45%' }]} value={dImg4} onChangeText={setDImg4} placeholder="Ảnh 3..." />
-                    <TextInput style={[styles.input, { flex: 1, minWidth: '45%' }]} value={dImg5} onChangeText={setDImg5} placeholder="Ảnh 4..." />
-                    <TextInput style={[styles.input, { flex: 1, minWidth: '45%' }]} value={dImg6} onChangeText={setDImg6} placeholder="Ảnh 5..." />
+                  <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap', marginBottom: 15 }}>
+                    <ImageSelector label="Ảnh 1" value={dImg2} onChange={setDImg2} style={{ flex: 1, minWidth: '45%' }} />
+                    <ImageSelector label="Ảnh 2" value={dImg3} onChange={setDImg3} style={{ flex: 1, minWidth: '45%' }} />
+                    <ImageSelector label="Ảnh 3" value={dImg4} onChange={setDImg4} style={{ flex: 1, minWidth: '45%' }} />
+                    <ImageSelector label="Ảnh 4" value={dImg5} onChange={setDImg5} style={{ flex: 1, minWidth: '45%' }} />
+                    <ImageSelector label="Ảnh 5" value={dImg6} onChange={setDImg6} style={{ flex: 1, minWidth: '45%' }} />
                   </View>
                 </>
               )}
@@ -655,12 +717,15 @@ const ContentManagement = () => {
                       </TouchableOpacity>
                     </View>
 
-                    <Text style={styles.inputLabel}>Link ảnh</Text>
-                    <TextInput style={styles.input} value={block.images} onChangeText={(val) => {
-                      const newBlocks = [...dBlocks];
-                      newBlocks[index].images = val;
-                      setDBlocks(newBlocks);
-                    }} placeholder="Nhập link ảnh..." />
+                    <ImageSelector
+                      label="Ảnh nội dung"
+                      value={block.images}
+                      onChange={(val) => {
+                        const newBlocks = [...dBlocks];
+                        newBlocks[index].images = val;
+                        setDBlocks(newBlocks);
+                      }}
+                    />
 
                     <Text style={styles.inputLabel}>Nội dung (Việt)</Text>
                     <TextInput style={[styles.input, { height: 80 }]} value={block.value} onChangeText={(val) => {
@@ -709,8 +774,7 @@ const ContentManagement = () => {
               <Text style={styles.inputLabel}>Tên chủ đề (tiếng Khmer)</Text>
               <TextInput style={styles.input} placeholder="Ví dụ: គ្រួសារ និងការហៅទូរសព្ទ" value={topicTitleKm} onChangeText={setTopicTitleKm} />
 
-              <Text style={styles.inputLabel}>Link ảnh của chủ đề</Text>
-              <TextInput style={styles.input} placeholder="Nhập link ảnh..." value={topicImg} onChangeText={setTopicImg} />
+              <ImageSelector label="Ảnh đại diện chủ đề" value={topicImg} onChange={setTopicImg} />
             </ScrollView>
 
             <View style={styles.modalActions}>
@@ -744,6 +808,8 @@ const ContentManagement = () => {
 
                 <Text style={styles.inputLabel}>Phiên âm (Phụ âm)</Text>
                 <TextInput style={styles.input} placeholder="Ví dụ: kruosaear" value={wordPron} onChangeText={setWordPron} />
+
+                <ImageSelector label="Ảnh từ vựng" value={wordImg} onChange={setWordImg} />
               </View>
             </ScrollView>
 
@@ -1030,6 +1096,46 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 5,
+  },
+  imagePickerBtn: {
+    width: '100%',
+    height: 150,
+    backgroundColor: '#f8fafc',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#e2e8f0',
+    borderStyle: 'dashed',
+    overflow: 'hidden',
+    marginTop: 8,
+  },
+  imagePickerPlaceholder: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+  },
+  imagePickerText: {
+    fontSize: 14,
+    color: '#94a3b8',
+    fontWeight: '600',
+  },
+  pickedImagePreview: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  removeImageBtn: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 2,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
 });
 

@@ -103,35 +103,33 @@ const TrashManagement = () => {
           />
         ) : (
           <View style={[styles.cardImage, { backgroundColor: '#f1f5f9', justifyContent: 'center', alignItems: 'center' }]}>
-            <Ionicons name="image-outline" size={32} color="#cbd5e1" />
+            <Ionicons name="image-outline" size={48} color="#cbd5e1" />
           </View>
         )}
       </View>
 
       <View style={styles.cardContent}>
-        <View style={styles.cardInfo}>
-          <Text style={styles.cardTitle} numberOfLines={1}>{item.name || item.title || 'Không có tên'}</Text>
-          <Text style={styles.cardSubTitle}>
-            Đã xóa ngày: {item.deletedAt?.toDate ? item.deletedAt.toDate().toLocaleDateString('vi-VN') : 'Mới xóa'}
-          </Text>
-        </View>
+        <Text style={styles.cardTitle} numberOfLines={1}>{item.name || item.title || 'Không có tên'}</Text>
+        
+        <View style={styles.divider} />
 
-        <View style={styles.cardActions}>
+        <View style={styles.cardFooter}>
           <TouchableOpacity
-            style={styles.restoreBtnSmall}
+            style={styles.restoreBtnLarge}
             onPress={() => handleRestore(item)}
           >
-            <Ionicons name="refresh" size={16} color="#3b82f6" />
-            <Text style={styles.restoreBtnTextSmall}>Khôi phục</Text>
+            <Ionicons name="refresh-outline" size={20} color="#3b82f6" />
+            <Text style={styles.restoreBtnText}>Khôi phục</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.deleteBtnSmall}
-            onPress={() => handlePermanentDelete(item.id, item.name || item.title)}
-          >
-            <Ionicons name="trash-outline" size={16} color="#ef4444" />
-            <Text style={styles.deleteBtnTextSmall}>Xóa ngay</Text>
-          </TouchableOpacity>
+          <View style={styles.footerRight}>
+            <TouchableOpacity
+              style={styles.deleteIconBtn}
+              onPress={() => handlePermanentDelete(item.id, item.name || item.title)}
+            >
+              <Ionicons name="trash-outline" size={22} color="#ef4444" />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -215,91 +213,79 @@ const styles = StyleSheet.create({
   listContent: { padding: 16 },
   card: {
     backgroundColor: '#fff',
-    borderRadius: 20,
-    marginBottom: 16,
-    flexDirection: 'row',
-    padding: 10,
-    alignItems: 'center',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
+    borderRadius: 24,
+    marginBottom: 20,
+    overflow: 'hidden',
+    elevation: 4,
+    shadowColor: '#1e293b',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
     borderWidth: 1,
     borderColor: '#f1f5f9',
   },
   imageContainer: {
-    borderRadius: 14,
-    overflow: 'hidden',
-  },
-  cardImage: {
-    width: 85,
-    height: 85,
-    borderRadius: 14,
-    resizeMode: 'contain',
+    width: '100%',
+    aspectRatio: 16 / 9,
     backgroundColor: '#f8fafc',
   },
-  cardContent: {
-    flex: 1,
-    marginLeft: 14,
-    height: 85,
-    justifyContent: 'space-between',
-    paddingVertical: 2,
+  cardImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
-  cardInfo: {
-    flex: 1,
+  cardContent: {
+    padding: 20,
   },
   cardTitle: {
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: 22,
+    fontWeight: '900',
     color: '#1e293b',
-    marginBottom: 2,
+    marginBottom: 16,
   },
-  cardSubTitle: {
-    fontSize: 12,
-    color: '#64748b',
-    fontWeight: '600',
+  divider: {
+    height: 1,
+    backgroundColor: '#f1f5f9',
+    marginBottom: 16,
   },
-  cardActions: {
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  restoreBtnLarge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    marginTop: 6,
-  },
-  restoreBtnSmall: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#eff6ff',
-    paddingVertical: 7,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    gap: 4,
+    backgroundColor: '#f0f7ff',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 14,
+    gap: 8,
     borderWidth: 1,
     borderColor: '#dbeafe',
   },
-  restoreBtnTextSmall: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#3b82f6'
+  restoreBtnText: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#3b82f6',
   },
-  deleteBtnSmall: {
+  footerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fef2f2',
+    gap: 12,
+  },
+  deleteIconBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: '#fff1f2',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#fee2e2',
-    paddingVertical: 7,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    gap: 4,
+    borderColor: '#ffe4e6',
   },
-  deleteBtnTextSmall: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#ef4444'
-  },
-  emptyContainer: { alignItems: 'center', marginTop: 290 },
-  emptyText: { marginTop: 10, fontSize: 16, color: '#94a3b8', fontWeight: '600' },
+  emptyContainer: { alignItems: 'center', marginTop: 100 },
+  emptyText: { marginTop: 14, fontSize: 16, color: '#94a3b8', fontWeight: '600' },
   // Toast Styles
   toastContainer: { position: 'absolute', top: 0, left: 20, right: 20, flexDirection: 'row', alignItems: 'center', paddingVertical: 15, paddingHorizontal: 20, borderRadius: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.15, shadowRadius: 20, elevation: 10, zIndex: 9999, gap: 12 },
   toastSuccess: { backgroundColor: '#10b981' },

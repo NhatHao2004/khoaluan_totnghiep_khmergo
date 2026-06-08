@@ -96,12 +96,8 @@ export default function HomeScreen() {
   // Animation for the notification bell
   const bellRotation = useSharedValue(0);
 
-  // Helper functions to get local images if needed
-  const getAppImage = (item: any) => {
-    const { id, name, category, imageUrl } = item;
-    if (imageUrl && imageUrl.startsWith('http')) return { uri: imageUrl };
-
-    // Fallback logic by category
+  // Helper: get local fallback image by category and id
+  const getFallbackImage = (category: string, docId?: string) => {
     if (category === 'Chùa') {
       const pagodaImages: any = {
         'pagoda_1': require('@/assets/images/chuaang.jpg'),
@@ -110,11 +106,22 @@ export default function HomeScreen() {
         'pagoda_4': require('@/assets/images/salengcu.jpg'),
         'pagoda_5': require('@/assets/images/veluvana.jpg'),
       };
-      return pagodaImages[id] || require('@/assets/images/pagoda.jpg');
+      return pagodaImages[docId || ''] || require('@/assets/images/pagoda.jpg');
     }
     if (category === 'Văn hóa') return require('@/assets/images/lehoi.jpg');
     if (category === 'Ẩm thực') return require('@/assets/images/amthuc.jpg');
     return require('@/assets/images/pagoda.jpg');
+  };
+
+  // Helper functions to get local images if needed
+  const getAppImage = (item: any, docId?: string) => {
+    const { category, imageUrl } = item;
+    // Support both HTTP URLs and base64 data URIs
+    if (imageUrl && (imageUrl.startsWith('http') || imageUrl.startsWith('data:'))) {
+      return { uri: imageUrl };
+    }
+    // Fallback logic by category
+    return getFallbackImage(category, docId || item.id);
   };
 
   const loadFeaturedData = (forceRandom = false) => {
@@ -134,13 +141,14 @@ export default function HomeScreen() {
           id_num: data.id,
           name: data.name || '',
           category: data.category,
-          image: getAppImage(data),
+          image: getAppImage(data, doc.id),
+          fallbackImage: getFallbackImage(data.category, doc.id),
           createdAt: data.createdAt,
           isNew: true, // Marker for fresh data
           route: {
             pathname: detailRoute,
             params: {
-              id: data.id,
+              id: doc.id,
               name: data.name,
               location: data.location,
               description: data.description,
@@ -324,6 +332,9 @@ export default function HomeScreen() {
     router.push(route);
   };
 
+  // Track image load errors per featured item
+  const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
+
   return (
     <View style={styles.container}>
       {/* Premium Toast System - At the very top for priority */}
@@ -470,10 +481,15 @@ export default function HomeScreen() {
               >
                 <View style={styles.cardImageContainer}>
                   <Image
-                    source={item.image}
+                    source={imgErrors[item.id] ? item.fallbackImage : item.image}
                     style={styles.cardImage}
                     transition={300}
                     contentFit="cover"
+                    onError={() => {
+                      if (!imgErrors[item.id]) {
+                        setImgErrors(prev => ({ ...prev, [item.id]: true }));
+                      }
+                    }}
                   />
                 </View>
 
