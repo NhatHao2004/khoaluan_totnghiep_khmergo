@@ -270,7 +270,7 @@ export default function TabsLayout() {
           {/* "Chat Ngay" Tooltip */}
           <Animated.View style={[styles.tooltipContainer, animatedTooltipStyle]}>
             <View style={styles.tooltipInner}>
-              <Animated.Text style={styles.tooltipText} numberOfLines={1}>Khám phá ngay</Animated.Text>
+              <Animated.Text style={styles.tooltipText}>Khám phá ngay</Animated.Text>
             </View>
           </Animated.View>
 
@@ -335,13 +335,17 @@ const styles = StyleSheet.create({
   },
   tooltipInner: {
     backgroundColor: '#1E3A8A',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     borderRadius: 12,
+    minWidth: 110,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   tooltipText: {
     color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '700',
+    textAlign: 'center',
   },
 });

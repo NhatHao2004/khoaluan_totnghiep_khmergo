@@ -448,31 +448,41 @@ const ChallengeManagement = () => {
               placeholder="Nhập tên tiếng Khmer..."
             />
 
-            {!editingQuiz && (
-              <>
                 <Text style={styles.inputLabel}>Liên kết với nội dung</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 10 }}>
-                  {destinations
-                    .filter(d => {
-                      if (editingQuiz && (editingQuiz.pagodaId === d.id || editingQuiz.id === d.id)) return true;
-                      return !quizzes.some(q => q.pagodaId === d.id || q.id === d.id);
-                    })
-                    .map(d => (
-                      <TouchableOpacity
-                        key={d.id}
-                        style={[styles.destChip, qPagodaId === d.id && styles.activeDestChip]}
-                        onPress={() => {
-                          setQPagodaId(d.id);
-                          if (!qTitle) setQTitle(d.name);
-                          if (!qTitleKm) setQTitleKm(d.name_khmer);
-                        }}
-                      >
-                        <Text style={[styles.destChipText, qPagodaId === d.id && styles.activeDestChipText]}>{d.name}</Text>
-                      </TouchableOpacity>
-                    ))}
-                </ScrollView>
-              </>
-            )}
+                {destinations.filter(d => {
+                  if (editingQuiz && (editingQuiz.pagodaId === d.id || editingQuiz.id === d.id)) return true;
+                  return !quizzes.some(q => q.pagodaId === d.id || q.id === d.id);
+                }).length > 0 ? (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 10 }}>
+                    {destinations
+                      .filter(d => {
+                        if (editingQuiz && (editingQuiz.pagodaId === d.id || editingQuiz.id === d.id)) return true;
+                        return !quizzes.some(q => q.pagodaId === d.id || q.id === d.id);
+                      })
+                      .map(d => (
+                        <TouchableOpacity
+                          key={d.id}
+                          style={[styles.destChip, qPagodaId === d.id && styles.activeDestChip]}
+                          onPress={() => {
+                            setQPagodaId(d.id);
+                            if (!qTitle) setQTitle(d.name);
+                            if (!qTitleKm) setQTitleKm(d.name_khmer);
+                          }}
+                        >
+                          <Text style={[styles.destChipText, qPagodaId === d.id && styles.activeDestChipText]}>{d.name}</Text>
+                        </TouchableOpacity>
+                      ))}
+                  </ScrollView>
+                ) : (
+                  <View style={{ marginBottom: 10 }}>
+                    <TextInput
+                      style={styles.input}
+                      value={qPagodaId}
+                      onChangeText={setQPagodaId}
+                      placeholder="Nhập ID nội dung..."
+                    />
+                  </View>
+                )}
 
 
             <View style={styles.modalActions}>
@@ -604,9 +614,9 @@ const styles = StyleSheet.create({
   addBtnHeader: { width: 42, height: 42, backgroundColor: '#f1f5f9', borderRadius: 12, justifyContent: 'center', alignItems: 'center', zIndex: 10 },
   headerTitle: { flex: 1, fontSize: 20, fontWeight: '800', color: '#1e293b', textAlign: 'center' },
   tabBar: { flexDirection: 'row', marginHorizontal: 16, marginTop: 10, backgroundColor: '#f1f5f9', borderRadius: 12, padding: 4 },
-  tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
+  tab: { flex: 1, paddingVertical: 10, paddingHorizontal: 2, alignItems: 'center', borderRadius: 10 },
   activeTab: { backgroundColor: '#fff', elevation: 2, shadowOpacity: 0.1 },
-  tabText: { fontSize: 14, fontWeight: '700', color: '#64748b' },
+  tabText: { fontSize: 11, fontWeight: '700', color: '#64748b', textAlign: 'center' },
   activeTabText: { color: '#3b82f6' },
   searchSection: { paddingHorizontal: 16, marginTop: 15 },
   searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f5f9', borderRadius: 12, paddingHorizontal: 12, height: 45 },

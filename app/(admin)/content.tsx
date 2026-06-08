@@ -653,8 +653,8 @@ const ContentManagement = () => {
                       style={[styles.catBtn, dCat === cat && styles.activeCatBtn]}
                       onPress={() => setDCat(cat as any)}
                     >
-                      <Text style={[styles.catBtnText, dCat === cat && styles.activeCatBtnText]} numberOfLines={1} adjustsFontSizeToFit>
-                        {cat === 'pagoda' ? 'Ngôi chùa' : cat === 'culture' ? 'Văn hóa' : 'Ẩm thực'}
+                      <Text style={[styles.catBtnText, dCat === cat && styles.activeCatBtnText]}>
+                        {cat === 'pagoda' ? 'Chùa Khmer' : cat === 'culture' ? 'Văn hóa' : 'Ẩm thực'}
                       </Text>
                     </TouchableOpacity>
                   ))}
@@ -1069,9 +1069,9 @@ const styles = StyleSheet.create({
   inputLabel: { fontSize: 13, fontWeight: '700', color: '#64748b', marginBottom: 8, marginTop: 12 },
   input: { backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 12, padding: 12, fontSize: 15, color: '#1e293b', marginBottom: 5 },
   catRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
-  catBtn: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10, backgroundColor: '#f1f5f9', borderWidth: 1, borderColor: '#e2e8f0' },
+  catBtn: { flex: 1, paddingVertical: 10, paddingHorizontal: 4, alignItems: 'center', borderRadius: 10, backgroundColor: '#f1f5f9', borderWidth: 1, borderColor: '#e2e8f0' },
   activeCatBtn: { backgroundColor: '#3b82f6', borderColor: '#3b82f6' },
-  catBtnText: { fontSize: 12, fontWeight: '700', color: '#64748b' },
+  catBtnText: { fontSize: 11, fontWeight: '700', color: '#64748b', textAlign: 'center' },
   activeCatBtnText: { color: '#fff' },
   saveBtn: { backgroundColor: '#3b82f6', paddingVertical: 15, borderRadius: 12, alignItems: 'center', marginTop: 20 },
   saveBtnSmall: { flex: 1, backgroundColor: '#3b82f6', paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
