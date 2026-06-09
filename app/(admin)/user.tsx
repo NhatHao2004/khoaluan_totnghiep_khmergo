@@ -263,7 +263,7 @@ const UserManagement = () => {
                 renderItem={({ item }) => (
                   <View style={styles.feedbackItem}>
                     <Text style={styles.feedbackSubject}>{item.subject || 'Không có tiêu đề'}</Text>
-                    <Text style={styles.feedbackMessage}>{item.message || item.content}</Text>
+                    <Text style={styles.feedbackMessage}>Nội dung: {item.message || item.content}</Text>
 
                     {item.adminReply && (
                       <View style={styles.adminReplyContainer}>
@@ -276,15 +276,13 @@ const UserManagement = () => {
                     )}
 
                     <View style={styles.feedbackFooter}>
+                      <View style={{ flex: 1 }} />
                       <TouchableOpacity
                         style={styles.replyBtn}
                         onPress={() => openReplyModal(item)}
                       >
-                        <Text style={styles.replyBtnText}>{item.adminReply ? 'Sửa trả lời' : 'Trả lời phản hồi'}</Text>
+                        <Text style={styles.replyBtnText}>{item.adminReply ? 'Sửa phản hồi' : 'Trả lời phản hồi'}</Text>
                       </TouchableOpacity>
-                      <Text style={styles.feedbackTime}>
-                        {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString('vi-VN') : 'Gần đây'}
-                      </Text>
                     </View>
                   </View>
                 )}

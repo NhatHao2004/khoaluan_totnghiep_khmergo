@@ -448,41 +448,41 @@ const ChallengeManagement = () => {
               placeholder="Nhập tên tiếng Khmer..."
             />
 
-                <Text style={styles.inputLabel}>Liên kết với nội dung</Text>
-                {destinations.filter(d => {
-                  if (editingQuiz && (editingQuiz.pagodaId === d.id || editingQuiz.id === d.id)) return true;
-                  return !quizzes.some(q => q.pagodaId === d.id || q.id === d.id);
-                }).length > 0 ? (
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 10 }}>
-                    {destinations
-                      .filter(d => {
-                        if (editingQuiz && (editingQuiz.pagodaId === d.id || editingQuiz.id === d.id)) return true;
-                        return !quizzes.some(q => q.pagodaId === d.id || q.id === d.id);
-                      })
-                      .map(d => (
-                        <TouchableOpacity
-                          key={d.id}
-                          style={[styles.destChip, qPagodaId === d.id && styles.activeDestChip]}
-                          onPress={() => {
-                            setQPagodaId(d.id);
-                            if (!qTitle) setQTitle(d.name);
-                            if (!qTitleKm) setQTitleKm(d.name_khmer);
-                          }}
-                        >
-                          <Text style={[styles.destChipText, qPagodaId === d.id && styles.activeDestChipText]}>{d.name}</Text>
-                        </TouchableOpacity>
-                      ))}
-                  </ScrollView>
-                ) : (
-                  <View style={{ marginBottom: 10 }}>
-                    <TextInput
-                      style={styles.input}
-                      value={qPagodaId}
-                      onChangeText={setQPagodaId}
-                      placeholder="Nhập ID nội dung..."
-                    />
-                  </View>
-                )}
+            <Text style={styles.inputLabel}>Liên kết với nội dung</Text>
+            {destinations.filter(d => {
+              if (editingQuiz && (editingQuiz.pagodaId === d.id || editingQuiz.id === d.id)) return true;
+              return !quizzes.some(q => q.pagodaId === d.id || q.id === d.id);
+            }).length > 0 ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 10 }}>
+                {destinations
+                  .filter(d => {
+                    if (editingQuiz && (editingQuiz.pagodaId === d.id || editingQuiz.id === d.id)) return true;
+                    return !quizzes.some(q => q.pagodaId === d.id || q.id === d.id);
+                  })
+                  .map(d => (
+                    <TouchableOpacity
+                      key={d.id}
+                      style={[styles.destChip, qPagodaId === d.id && styles.activeDestChip]}
+                      onPress={() => {
+                        setQPagodaId(d.id);
+                        if (!qTitle) setQTitle(d.name);
+                        if (!qTitleKm) setQTitleKm(d.name_khmer);
+                      }}
+                    >
+                      <Text style={[styles.destChipText, qPagodaId === d.id && styles.activeDestChipText]}>{d.name}</Text>
+                    </TouchableOpacity>
+                  ))}
+              </ScrollView>
+            ) : (
+              <View style={{ marginBottom: 10 }}>
+                <TextInput
+                  style={styles.input}
+                  value={qPagodaId}
+                  onChangeText={setQPagodaId}
+                  placeholder="Nhập ID nội dung cần liên kết..."
+                />
+              </View>
+            )}
 
 
             <View style={styles.modalActions}>
