@@ -131,12 +131,12 @@ export const translations: any = {
     // Support Screen Extra
     faq: 'Câu hỏi thường gặp',
     feedback_section: 'Gửi phản hồi cho chúng tôi',
-    feedback_placeholder: 'Chúng tôi luôn lắng nghe các ý kiến đóng góp của bạn để hoàn thiện ứng dụng...',
+    feedback_placeholder: 'Nhập nội dung phản hồi...',
     subject_placeholder: 'Nhập tiêu đề phản hồi...',
-    subject_required: 'Vui lòng nhập tiêu đề',
+    subject_required: 'Vui lòng nhập tiêu đề và nội dung',
     content_required: 'Vui lòng nhập nội dung phản hồi',
-    feedback_success: 'Đã gửi phản hồi thành công! Cảm ơn bạn.',
-    feedback_failed: 'Gửi phản hồi thất bại. Vui lòng thử lại.',
+    feedback_success: 'Đã gửi phản hồi thành công',
+    feedback_failed: 'Gửi phản hồi thất bại',
     tap_to_see_guide: 'Bấm để xem hướng dẫn chi tiết',
     // FAQ Extra
     faq_how_to_use: 'Cách sử dụng ứng dụng',
@@ -430,7 +430,7 @@ export const translations: any = {
     // Support Screen Extra
     faq: 'សំណួរដែលសួរញឹកញាប់',
     feedback_section: 'ផ្ញើមតិកែលម្អមកយើង',
-    feedback_placeholder: 'យើងតែងតែស្តាប់មតិរបស់អ្នកដើម្បីកែលម្អកម្មវិធី...',
+    feedback_placeholder: 'បញ្ចូលខ្លឹមសារមតិកែលម្អ...',
     subject_placeholder: 'បញ្ចូលប្រធានបទមតិ...',
     subject_required: 'សូមបញ្ចូលប្រធានបទ',
     content_required: 'សូមបញ្ចូលខ្លឹមសារមតិ',

@@ -213,14 +213,11 @@ const UserManagement = () => {
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item }) => (
                   <View style={styles.feedbackItem}>
-                    <View style={styles.feedbackTimeRow}>
-                      <Ionicons name="time-outline" size={16} color="#ff0000ff" />
-                      <Text style={styles.feedbackTime}>
-                        {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleString('vi-VN') : 'Vừa xong'}
-                      </Text>
-                    </View>
                     <Text style={styles.feedbackSubject}>{item.subject || 'Không có tiêu đề'}</Text>
                     <Text style={styles.feedbackMessage}>{item.message || item.content}</Text>
+                    <Text style={styles.feedbackTime}>
+                      {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString('vi-VN') : 'Gần đây'}
+                    </Text>
                   </View>
                 )}
                 contentContainerStyle={styles.feedbackList}
@@ -523,8 +520,10 @@ const styles = StyleSheet.create({
   },
   feedbackTime: {
     fontSize: 12,
-    color: '#64748b',
+    color: '#94a3b8',
     fontWeight: '500',
+    textAlign: 'right',
+    marginTop: 8,
   },
   feedbackSubject: {
     fontSize: 16,

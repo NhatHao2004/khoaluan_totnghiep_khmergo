@@ -1,11 +1,20 @@
+import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import React, { useState, useRef } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
+  Animated,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -14,6 +23,69 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function SupportScreen() {
   const router = useRouter();
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const [subject, setSubject] = useState('');
+  const [content, setContent] = useState('');
+  const [isSending, setIsSending] = useState(false);
+
+  // Toast State
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
+  const translateY = useRef(new Animated.Value(-100)).current;
+
+  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
+    setToast({ visible: true, message: msg, type });
+    Animated.spring(translateY, {
+      toValue: 40,
+      useNativeDriver: true,
+      friction: 8,
+    }).start();
+
+    setTimeout(() => {
+      Animated.timing(translateY, {
+        toValue: -100,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => setToast(prev => ({ ...prev, visible: false })));
+    }, 3000);
+  };
+
+  const handleSendFeedback = async () => {
+    if (!user) {
+      showToast(t('login_to_send'), 'error');
+      return;
+    }
+
+    if (!subject.trim()) {
+      showToast(t('subject_required'), 'error');
+      return;
+    }
+
+    if (!content.trim()) {
+      showToast(t('content_required'), 'error');
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      await addDoc(collection(db, 'feedback'), {
+        userId: user.uid,
+        userName: user.name || 'User',
+        'e-mail': user.email,
+        subject: subject.trim(),
+        content: content.trim(),
+        createdAt: serverTimestamp(),
+      });
+
+      showToast(t('feedback_success'), 'success');
+      setSubject('');
+      setContent('');
+    } catch (error) {
+      console.error('Error sending feedback:', error);
+      showToast(t('feedback_failed'), 'error');
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
@@ -63,7 +135,74 @@ export default function SupportScreen() {
             <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
           </TouchableOpacity>
         </View>
+
+        {/* Feedback Section */}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.section}
+        >
+          <Text style={styles.sectionTitle}>{t('feedback_section')}</Text>
+
+          <View style={styles.formContainer}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>{t('subject')}</Text>
+              <TextInput
+                style={styles.input}
+                placeholder={t('subject_placeholder')}
+                value={subject}
+                onChangeText={setSubject}
+                placeholderTextColor="#94A3B8"
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>{t('detail')}</Text>
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                placeholder={t('feedback_placeholder')}
+                value={content}
+                onChangeText={setContent}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+                placeholderTextColor="#94A3B8"
+              />
+            </View>
+
+            <TouchableOpacity
+              style={[styles.sendBtn, isSending && styles.sendBtnDisabled]}
+              onPress={handleSendFeedback}
+              disabled={isSending}
+            >
+              {isSending ? (
+                <ActivityIndicator color="#FFFFFF" size="small" />
+              ) : (
+                <>
+                  <Text style={styles.sendBtnText}>{t('send_feedback')}</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
       </ScrollView>
+
+      {/* Premium Toast */}
+      {toast.visible && (
+        <Animated.View
+          style={[
+            styles.toastContainer,
+            toast.type === 'success' ? styles.toastSuccess : styles.toastError,
+            { transform: [{ translateY }] }
+          ]}
+        >
+          <Ionicons
+            name={toast.type === 'success' ? "checkmark-circle" : "alert-circle"}
+            size={24}
+            color="#FFFFFF"
+          />
+          <Text style={styles.toastText}>{toast.message}</Text>
+        </Animated.View>
+      )}
     </SafeAreaView>
   );
 }
@@ -133,5 +272,98 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#94A3B8',
     fontWeight: '500',
+  },
+  sectionSub: {
+    fontSize: 14,
+    color: '#64748B',
+    marginTop: 6,
+    lineHeight: 20,
+    fontWeight: '500',
+    textAlign: 'justify',
+  },
+  formContainer: {
+    marginTop: 20,
+    backgroundColor: '#F8FAFC',
+    padding: 20,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#334155',
+    marginBottom: 8,
+    marginLeft: 4,
+  },
+  input: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: '#1E293B',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  textArea: {
+    height: 120,
+    paddingTop: 12,
+  },
+  sendBtn: {
+    backgroundColor: '#3B82F6',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 15,
+    borderRadius: 12,
+    marginTop: 10,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  sendBtnDisabled: {
+    backgroundColor: '#94A3B8',
+    shadowOpacity: 0,
+  },
+  sendBtnText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  // Toast Styles
+  toastContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 20,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
+    zIndex: 9999,
+    gap: 12,
+  },
+  toastSuccess: {
+    backgroundColor: '#10B981', // Emerald 500
+  },
+  toastError: {
+    backgroundColor: '#EF4444', // Red 500
+  },
+  toastText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
+    flex: 1,
   },
 });
