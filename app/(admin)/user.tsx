@@ -2,7 +2,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { collection, doc, getDocs, onSnapshot, orderBy, query, updateDoc, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { db } from '../../utils/firebaseConfig';
 
 const UserManagement = () => {
@@ -14,6 +14,10 @@ const UserManagement = () => {
   const [fetchingFeedback, setFetchingFeedback] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [pendingUser, setPendingUser] = useState<{ id: string, isBlocked: boolean, name: string } | null>(null);
+  const [replyModalVisible, setReplyModalVisible] = useState(false);
+  const [replyingFeedback, setReplyingFeedback] = useState<any>(null);
+  const [replyMessage, setReplyMessage] = useState('');
+  const [sendingReply, setSendingReply] = useState(false);
 
   useEffect(() => {
     const unsub = onSnapshot(query(collection(db, 'users'), orderBy('name')), (snap) => {
@@ -96,6 +100,41 @@ const UserManagement = () => {
       }
     } finally {
       setFetchingFeedback(false);
+    }
+  };
+
+  const openReplyModal = (feedback: any) => {
+    setReplyingFeedback(feedback);
+    setReplyMessage(feedback.adminReply || '');
+    setReplyModalVisible(true);
+  };
+
+  const handleSendReply = async () => {
+    if (!replyMessage.trim() || !replyingFeedback) return;
+
+    setSendingReply(true);
+    try {
+      await updateDoc(doc(db, 'feedback', replyingFeedback.id), {
+        adminReply: replyMessage.trim(),
+        repliedAt: new Date()
+      });
+
+      // Update local state
+      setUserFeedbacks(prev => prev.map(f =>
+        f.id === replyingFeedback.id
+          ? { ...f, adminReply: replyMessage.trim(), repliedAt: new Date() }
+          : f
+      ));
+
+      setReplyModalVisible(false);
+      setReplyingFeedback(null);
+      setReplyMessage('');
+      Alert.alert('Thành công', 'Đã gửi phản hồi tới người dùng.');
+    } catch (error) {
+      console.error('Error replying:', error);
+      Alert.alert('Lỗi', 'Không thể gửi phản hồi.');
+    } finally {
+      setSendingReply(false);
     }
   };
 
@@ -215,9 +254,28 @@ const UserManagement = () => {
                   <View style={styles.feedbackItem}>
                     <Text style={styles.feedbackSubject}>{item.subject || 'Không có tiêu đề'}</Text>
                     <Text style={styles.feedbackMessage}>{item.message || item.content}</Text>
-                    <Text style={styles.feedbackTime}>
-                      {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString('vi-VN') : 'Gần đây'}
-                    </Text>
+
+                    {item.adminReply && (
+                      <View style={styles.adminReplyContainer}>
+                        <View style={styles.adminReplyHeader}>
+                          <Ionicons name="chatbubble-ellipses" size={14} color="#3b82f6" />
+                          <Text style={styles.adminReplyTitle}>Quản trị viên trả lời:</Text>
+                        </View>
+                        <Text style={styles.adminReplyText}>{item.adminReply}</Text>
+                      </View>
+                    )}
+
+                    <View style={styles.feedbackFooter}>
+                      <TouchableOpacity
+                        style={styles.replyBtn}
+                        onPress={() => openReplyModal(item)}
+                      >
+                        <Text style={styles.replyBtnText}>{item.adminReply ? 'Sửa trả lời' : 'Trả lời phản hồi'}</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.feedbackTime}>
+                        {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString('vi-VN') : 'Gần đây'}
+                      </Text>
+                    </View>
                   </View>
                 )}
                 contentContainerStyle={styles.feedbackList}
@@ -270,6 +328,54 @@ const UserManagement = () => {
                 <Text style={styles.confirmActionText}>
                   {pendingUser?.isBlocked ? 'Mở khóa' : 'Khóa ngay'}
                 </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Reply Modal */}
+      <Modal
+        visible={replyModalVisible}
+        transparent={true}
+        animationType="fade"
+        statusBarTranslucent={true}
+      >
+        <View style={styles.replyOverlay}>
+          <View style={styles.replyContent}>
+            <Text style={styles.replyTitle}>Trả lời phản hồi</Text>
+            <View style={styles.originalFeedbackBox}>
+              <Text style={styles.replyOriginalMessage}>Nội dung: {replyingFeedback?.message || replyingFeedback?.content}</Text>
+            </View>
+
+            <TextInput
+              style={styles.replyInput}
+              placeholder="Nhập nội dung trả lời..."
+              value={replyMessage}
+              onChangeText={setReplyMessage}
+              multiline
+              numberOfLines={6}
+              textAlignVertical="top"
+            />
+
+            <View style={styles.replyActions}>
+              <TouchableOpacity
+                style={styles.cancelReplyBtn}
+                onPress={() => setReplyModalVisible(false)}
+              >
+                <Text style={styles.cancelReplyText}>Hủy</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.confirmReplyBtn, !replyMessage.trim() && styles.disabledBtn]}
+                onPress={handleSendReply}
+                disabled={sendingReply || !replyMessage.trim()}
+              >
+                {sendingReply ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.confirmReplyText}>Gửi trả lời</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -522,8 +628,132 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#94a3b8',
     fontWeight: '500',
-    textAlign: 'right',
-    marginTop: 8,
+  },
+  feedbackFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#f1f5f9',
+  },
+  replyBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  replyBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#3b82f6',
+  },
+  adminReplyContainer: {
+    backgroundColor: '#eff6ff',
+    padding: 12,
+    borderRadius: 12,
+    marginTop: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: '#3b82f6',
+  },
+  adminReplyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
+  adminReplyTitle: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#1e293b',
+  },
+  adminReplyText: {
+    fontSize: 14,
+    color: '#334155',
+    lineHeight: 20,
+  },
+  replyOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  replyContent: {
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 5,
+  },
+  replyTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#1e293b',
+    marginBottom: 8,
+  },
+  replySubject: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1e293b',
+    marginBottom: 4,
+  },
+  originalFeedbackBox: {
+    backgroundColor: '#f1f5f9',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  replyOriginalMessage: {
+    fontSize: 14,
+    color: '#475569',
+    lineHeight: 20,
+  },
+  replyInput: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 16,
+    padding: 16,
+    fontSize: 15,
+    color: '#1e293b',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    height: 150,
+    marginBottom: 20,
+  },
+  replyActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  cancelReplyBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: '#ef4444',
+    alignItems: 'center',
+  },
+  cancelReplyText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+  confirmReplyBtn: {
+    flex: 2,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: '#3b82f6',
+    alignItems: 'center',
+  },
+  confirmReplyText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  disabledBtn: {
+    backgroundColor: '#cbd5e1',
   },
   feedbackSubject: {
     fontSize: 16,

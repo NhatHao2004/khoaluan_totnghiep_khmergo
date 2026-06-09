@@ -4,10 +4,9 @@ import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import React, { useState, useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Animated,
   KeyboardAvoidingView,
   Platform,
@@ -16,7 +15,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -24,7 +23,6 @@ export default function SupportScreen() {
   const router = useRouter();
   const { t } = useLanguage();
   const { user } = useAuth();
-  const [subject, setSubject] = useState('');
   const [content, setContent] = useState('');
   const [isSending, setIsSending] = useState(false);
 
@@ -55,10 +53,6 @@ export default function SupportScreen() {
       return;
     }
 
-    if (!subject.trim()) {
-      showToast(t('subject_required'), 'error');
-      return;
-    }
 
     if (!content.trim()) {
       showToast(t('content_required'), 'error');
@@ -71,13 +65,12 @@ export default function SupportScreen() {
         userId: user.uid,
         userName: user.name || 'User',
         'e-mail': user.email,
-        subject: subject.trim(),
+        subject: 'Phản hồi đóng góp',
         content: content.trim(),
         createdAt: serverTimestamp(),
       });
 
       showToast(t('feedback_success'), 'success');
-      setSubject('');
       setContent('');
     } catch (error) {
       console.error('Error sending feedback:', error);
@@ -144,19 +137,8 @@ export default function SupportScreen() {
           <Text style={styles.sectionTitle}>{t('feedback_section')}</Text>
 
           <View style={styles.formContainer}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('subject')}</Text>
-              <TextInput
-                style={styles.input}
-                placeholder={t('subject_placeholder')}
-                value={subject}
-                onChangeText={setSubject}
-                placeholderTextColor="#94A3B8"
-              />
-            </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('detail')}</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
                 placeholder={t('feedback_placeholder')}
