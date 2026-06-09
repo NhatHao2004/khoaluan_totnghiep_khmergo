@@ -560,8 +560,10 @@ export default function HomeScreen() {
 
                       closeNotifications();
 
-                      // Chuyển hướng sang Community
-                      if (item.postId) {
+                      // Chuyển hướng
+                      if (item.type === 'reply') {
+                        router.push('/(tabs)/support' as any);
+                      } else if (item.postId) {
                         if (item.type === 'like') {
                           // Nếu là Like: Chỉ sang Community xem bài viết
                           router.push('/(tabs)/community' as any);

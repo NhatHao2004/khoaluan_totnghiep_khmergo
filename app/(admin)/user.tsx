@@ -1,6 +1,6 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { collection, doc, getDocs, onSnapshot, orderBy, query, updateDoc, where } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, onSnapshot, orderBy, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { db } from '../../utils/firebaseConfig';
@@ -117,6 +117,16 @@ const UserManagement = () => {
       await updateDoc(doc(db, 'feedback', replyingFeedback.id), {
         adminReply: replyMessage.trim(),
         repliedAt: new Date()
+      });
+
+      // Tạo thông báo cho người dùng
+      await addDoc(collection(db, 'notifications'), {
+        toUserId: replyingFeedback.userId,
+        fromUserName: 'Hệ thống',
+        message: 'đã phản hồi góp ý của bạn.',
+        type: 'reply',
+        isRead: false,
+        createdAt: serverTimestamp()
       });
 
       // Update local state
@@ -259,7 +269,7 @@ const UserManagement = () => {
                       <View style={styles.adminReplyContainer}>
                         <View style={styles.adminReplyHeader}>
                           <Ionicons name="chatbubble-ellipses" size={14} color="#3b82f6" />
-                          <Text style={styles.adminReplyTitle}>Quản trị viên trả lời:</Text>
+                          <Text style={styles.adminReplyTitle}>Hệ thống trả lời</Text>
                         </View>
                         <Text style={styles.adminReplyText}>{item.adminReply}</Text>
                       </View>

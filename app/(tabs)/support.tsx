@@ -3,8 +3,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import React, { useRef, useState } from 'react';
+import { addDoc, collection, deleteDoc, doc, onSnapshot, query, serverTimestamp, where } from 'firebase/firestore';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -25,6 +25,54 @@ export default function SupportScreen() {
   const { user } = useAuth();
   const [content, setContent] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [userFeedbacks, setUserFeedbacks] = useState<any[]>([]);
+  const [loadingFeedbacks, setLoadingFeedbacks] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Load user feedbacks
+  useEffect(() => {
+    if (!user) {
+      setUserFeedbacks([]);
+      setLoadingFeedbacks(false);
+      return;
+    }
+
+    const q = query(
+      collection(db, 'feedback'),
+      where('userId', '==', user.uid)
+      // Tạm thời bỏ orderBy để tránh lỗi Missing Index, sẽ sort thủ công ở dưới
+    );
+
+    const unsubscribe = onSnapshot(q,
+      (snapshot) => {
+        const data = snapshot.docs.map(doc => {
+          const item = doc.data();
+          return {
+            id: doc.id,
+            ...item,
+            // Ưu tiên adminReply, fallback sang message nếu cần (tùy cấu trúc cũ)
+            adminReply: item.adminReply || item.reply || null
+          };
+        });
+
+        // Sắp xếp thủ công tại client để tránh lỗi Index
+        data.sort((a: any, b: any) => {
+          const timeA = a.createdAt?.seconds || 0;
+          const timeB = b.createdAt?.seconds || 0;
+          return timeB - timeA;
+        });
+
+        setUserFeedbacks(data);
+        setLoadingFeedbacks(false);
+      },
+      (error) => {
+        console.error("Firebase onSnapshot error:", error);
+        setLoadingFeedbacks(false); // Quan trọng: tắt loading dù có lỗi
+      }
+    );
+
+    return () => unsubscribe();
+  }, [user]);
 
   // Toast State
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
@@ -61,14 +109,24 @@ export default function SupportScreen() {
 
     setIsSending(true);
     try {
-      await addDoc(collection(db, 'feedback'), {
+      const newFeedbackData = {
         userId: user.uid,
         userName: user.name || 'User',
         'e-mail': user.email,
         subject: 'Phản hồi đóng góp',
         content: content.trim(),
         createdAt: serverTimestamp(),
-      });
+      };
+
+      await addDoc(collection(db, 'feedback'), newFeedbackData);
+
+      // Cập nhật local state ngay lập tức để người dùng thấy luôn
+      const optimisticFeedback = {
+        id: Date.now().toString(),
+        ...newFeedbackData,
+        createdAt: { toDate: () => new Date() } // Giả lập để không bị lỗi khi render date
+      };
+      setUserFeedbacks(prev => [optimisticFeedback, ...prev]);
 
       showToast(t('feedback_success'), 'success');
       setContent('');
@@ -77,6 +135,21 @@ export default function SupportScreen() {
       showToast(t('feedback_failed'), 'error');
     } finally {
       setIsSending(false);
+    }
+  };
+
+  const handleDeleteFeedback = async (id: string) => {
+    // Cập nhật local state trước để UI biến mất ngay lập tức
+    setUserFeedbacks(prev => prev.filter(item => item.id !== id));
+
+    try {
+      await deleteDoc(doc(db, 'feedback', id));
+      showToast('Đã xóa phản hồi', 'success');
+      setDeletingId(null);
+    } catch (error) {
+      console.error('Error deleting feedback:', error);
+      showToast('Không thể xóa phản hồi', 'error');
+      // Nếu lỗi thì nên load lại data từ snapshot (onSnapshot sẽ tự động làm việc này)
     }
   };
 
@@ -166,6 +239,60 @@ export default function SupportScreen() {
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
+
+        {/* Feedback History Section */}
+        <View style={styles.historySection}>
+          <Text style={styles.historySectionTitle}>Lịch sử phản hồi</Text>
+
+          {loadingFeedbacks ? (
+            <ActivityIndicator size="small" color="#3B82F6" style={{ marginTop: 20 }} />
+          ) : userFeedbacks.length > 0 ? (
+            userFeedbacks.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.ultraSimpleCard}
+                onLongPress={() => setDeletingId(item.id)}
+                onPress={() => deletingId && setDeletingId(null)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.historyItemGroup}>
+                  <View style={styles.cardMainRow}>
+                    <Text style={[styles.userMsgText, { flex: 1 }]}>
+                      Nội dung: {item.content || item.message || (item.thrilled !== item.userName ? item.thrilled : '') || 'Không có nội dung'}
+                    </Text>
+                  </View>
+
+                  {(item.adminReply || item.reply || item.response) && (
+                    <View style={styles.systemReplyBox}>
+                      <View style={styles.systemReplyHeader}>
+                        <Ionicons name="chatbubble-ellipses" size={16} color="#0284C7" />
+                        <Text style={styles.systemReplyTitle}>Hệ thống phản hồi</Text>
+                      </View>
+                      <Text style={styles.systemReplyText}>
+                        {item.adminReply || item.reply || item.response}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+
+                <View style={styles.historyFooter}>
+                  {deletingId === item.id && (
+                    <TouchableOpacity
+                      onPress={() => handleDeleteFeedback(item.id)}
+                      style={styles.bottomDeleteBtn}
+                    >
+                      <Ionicons name="close-circle" size={24} color="#EF4444" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <View style={styles.emptyHistory}>
+              <Text style={styles.emptyText}>Bạn chưa có phản hồi nào</Text>
+            </View>
+          )}
+        </View>
       </ScrollView>
 
       {/* Premium Toast */}
@@ -317,6 +444,106 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
+  },
+  // Ultra Simple History Styles
+  historySection: {
+    paddingVertical: 10,
+    paddingHorizontal: 0,
+    marginTop: -10,
+  },
+  historySectionTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#1E293B',
+    marginBottom: 25,
+  },
+  ultraSimpleCard: {
+    backgroundColor: '#fff',
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+    paddingBottom: 15,
+  },
+  historyItemGroup: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+  },
+  userMsgText: {
+    fontSize: 15,
+    color: '#1E293B',
+    lineHeight: 22,
+    fontWeight: '500',
+    paddingLeft: 16,
+  },
+  cardMainRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  inlineDeleteBtn: {
+    paddingLeft: 10,
+  },
+  historyFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    marginTop: 10,
+  },
+  deletePlaceholder: {
+    width: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bottomDeleteBtn: {
+    padding: 2,
+  },
+  systemReplyBox: {
+    backgroundColor: '#E0F2FE',
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 14,
+    borderLeftWidth: 4,
+    borderLeftColor: '#0284C7',
+    shadowColor: '#0284C7',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  systemReplyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
+  systemReplyTitle: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: '#0369A1',
+    textTransform: 'uppercase',
+  },
+  systemReplyText: {
+    fontSize: 15,
+    color: '#0C4A6E',
+    lineHeight: 22,
+    fontWeight: '500',
+  },
+  historyDateText: {
+    fontSize: 11,
+    color: '#94A3B8',
+    textAlign: 'right',
+  },
+  emptyHistory: {
+    alignItems: 'center',
+    paddingVertical: 10,
+    gap: 12,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#94A3B8',
   },
   // Toast Styles
   toastContainer: {
