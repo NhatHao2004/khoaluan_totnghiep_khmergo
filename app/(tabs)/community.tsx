@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
+import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
@@ -26,7 +27,7 @@ import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withTi
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
-const TOP_GAP = SCREEN_HEIGHT * 0.3;
+const TOP_GAP = vs(180);
 
 interface Comment {
   id: string;
@@ -150,7 +151,7 @@ export default function CommunityScreen() {
   // Modal Top Gap Animation
   const modalGapHeight = useSharedValue(TOP_GAP);
   useEffect(() => {
-    modalGapHeight.value = withTiming(keyboardHeight > 0 ? (insets.top + 10) : TOP_GAP, {
+    modalGapHeight.value = withTiming(keyboardHeight > 0 ? (insets.top + vs(10)) : TOP_GAP, {
       duration: 300,
       easing: Easing.out(Easing.poly(3))
     });
@@ -669,7 +670,7 @@ export default function CommunityScreen() {
               }}
             />
           </Animated.View>
-          <Animated.View style={[styles.modalContent, animatedCreatePostStyle, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + 15) }]}>
+          <Animated.View style={[styles.modalContent, animatedCreatePostStyle, { flex: 1 }]}>
             <View style={styles.modalHeader}>
 
               <View style={styles.modalHeaderTitleBox}>
@@ -718,19 +719,26 @@ export default function CommunityScreen() {
               <View style={{ height: 10 }} />
 
               {selectedImage && (
-                <View style={[styles.previewImageContainer, keyboardHeight > 0 && { maxHeight: 150 }]}>
+                <View style={[styles.previewImageContainer, keyboardHeight > 0 && { maxHeight: vs(150) }]}>
                   <Image
                     source={{ uri: selectedImage }}
                     style={[styles.previewImage, { aspectRatio: imageRatio || 1 }]}
                   />
                   <TouchableOpacity style={styles.removeImageBtn} onPress={() => { setSelectedImage(null); setBase64Image(null); setImageRatio(null); }}>
-                    <Ionicons name="close-circle" size={24} color="rgba(0,0,0,0.6)" />
+                    <Ionicons name="close-circle" size={ms(24)} color="rgba(0,0,0,0.6)" />
                   </TouchableOpacity>
                 </View>
               )}
+              <View style={{ height: keyboardHeight > 0 ? vs(100) : vs(80) }} />
             </ScrollView>
 
-            <View style={[styles.createPostActions, { paddingBottom: keyboardHeight > 0 ? 10 : (insets.bottom + 5) }]}>
+            <View style={[styles.createPostActions, {
+              paddingBottom: keyboardHeight > 0 ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom : keyboardHeight) : (insets.bottom + vs(5)),
+              position: 'absolute',
+              bottom: 15,
+              left: 0,
+              right: 0
+            }]}>
               <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
                 <Ionicons name="image-outline" size={24} color="#1877F2" />
                 <Text style={styles.attachActionText}>{t('image_label')}</Text>
@@ -769,7 +777,7 @@ export default function CommunityScreen() {
               }}
             />
           </Animated.View>
-          <Animated.View style={[styles.modalContent, animatedCommentsStyle, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + 12) }]}>
+          <Animated.View style={[styles.modalContent, animatedCommentsStyle, { flex: 1 }]}>
             <View style={styles.modalHeader}>
 
               <View style={styles.modalHeaderTitleBox}>
@@ -843,7 +851,13 @@ export default function CommunityScreen() {
               </View>
             )}
 
-            <View style={[styles.commentInputContainer, { paddingBottom: keyboardHeight > 0 ? 12 : (insets.bottom + 12) }]}>
+            <View style={[styles.commentInputContainer, {
+              paddingBottom: keyboardHeight > 0 ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom : keyboardHeight) : (insets.bottom + vs(10)),
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0
+            }]}>
               <TextInput
                 ref={commentInputRef}
                 style={styles.commentInput}
@@ -958,168 +972,167 @@ const styles = StyleSheet.create({
   toastContainer: {
     position: 'absolute',
     top: 0,
-    left: 15,
-    right: 15,
+    left: s(15),
+    right: s(15),
     zIndex: 10000,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 22,
+    paddingVertical: vs(14),
+    paddingHorizontal: s(20),
+    borderRadius: ms(22),
     borderWidth: 0,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
+    shadowOffset: { width: 0, height: vs(12) },
     shadowOpacity: 0.2,
-    shadowRadius: 15,
+    shadowRadius: s(15),
     elevation: 25,
   },
   toastIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: s(32),
+    height: s(32),
+    borderRadius: s(16),
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  toastText: { color: '#FFF', fontSize: 15, fontWeight: '700', marginLeft: 15, flex: 1, letterSpacing: 0.3 },
-  screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 10, paddingBottom: 15, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
-  screenTitle: { fontSize: 22, fontWeight: '800', color: '#1A1A1A' },
-  plusBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#F7F7F7', justifyContent: 'center', alignItems: 'center' },
-  listContent: { paddingTop: 5, paddingBottom: 30 },
-  postContainer: { paddingHorizontal: 20, paddingVertical: 20, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
-  postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
-  avatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#F0F0F0' },
-  headerInfo: { marginLeft: 12, flex: 1, marginRight: 10, minWidth: 0 },
-  userName: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', paddingVertical: 2, paddingRight: 15, flexShrink: 1 },
-  postTime: { fontSize: 14, color: '#666', marginTop: 2 },
-  postContent: { fontSize: 16, color: '#1A1A1A', marginBottom: 15, paddingVertical: 2 },
-  postImage: { width: '100%', borderRadius: 24, backgroundColor: '#F0F0F0', marginBottom: 15 },
-  actionsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 5 },
-  leftActions: { flexDirection: 'row', alignItems: 'center', gap: 20 },
-  actionItem: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  actionCount: { fontSize: 16, fontWeight: '700', color: '#1A1A1A' },
+  toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '700', marginLeft: s(15), flex: 1, letterSpacing: 0.3 },
+  screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: s(20), paddingTop: vs(10), paddingBottom: vs(15), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
+  screenTitle: { fontSize: ms(22), fontWeight: '800', color: '#1A1A1A' },
+  plusBtn: { width: s(36), height: s(36), borderRadius: s(18), backgroundColor: '#F7F7F7', justifyContent: 'center', alignItems: 'center' },
+  listContent: { paddingTop: vs(5), paddingBottom: vs(30) },
+  postContainer: { paddingHorizontal: s(20), paddingVertical: vs(20), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
+  postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(15) },
+  avatar: { width: s(48), height: s(48), borderRadius: s(24), backgroundColor: '#F0F0F0' },
+  headerInfo: { marginLeft: s(12), flex: 1, marginRight: s(10), minWidth: 0 },
+  userName: { fontSize: ms(17), fontWeight: '700', color: '#1A1A1A', paddingVertical: vs(2), paddingRight: s(15), flexShrink: 1 },
+  postTime: { fontSize: ms(14), color: '#666', marginTop: vs(2) },
+  postContent: { fontSize: ms(16), color: '#1A1A1A', marginBottom: vs(15), paddingVertical: vs(2) },
+  postImage: { width: '100%', borderRadius: ms(24), backgroundColor: '#F0F0F0', marginBottom: vs(15) },
+  actionsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: vs(5) },
+  leftActions: { flexDirection: 'row', alignItems: 'center', gap: s(20) },
+  actionItem: { flexDirection: 'row', alignItems: 'center', gap: s(8) },
+  actionCount: { fontSize: ms(16), fontWeight: '700', color: '#1A1A1A' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 30, borderTopRightRadius: 30, overflow: 'hidden' },
-  modalHeader: { alignItems: 'center', paddingVertical: 12 },
-  modalHandle: { width: 40, height: 5, borderRadius: 3, backgroundColor: '#E0E0E0', marginBottom: 10 },
-  modalHeaderTitleBox: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginBottom: 10 },
-  modalTitle: { fontSize: 18, fontWeight: '800', color: '#1A1A1A' },
-  commentAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#F0F0F0' },
-  commentsList: { paddingHorizontal: 20, paddingBottom: 20 },
-  commentItem: { flexDirection: 'row', marginBottom: 15 },
-  commentBody: { marginLeft: 10, flex: 1, minWidth: 0 },
-  commentContentArea: { paddingVertical: 2 },
-  commentUserRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 2, flexWrap: 'wrap' },
-  repliedToUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A', paddingVertical: 1 },
-  commentUser: { fontSize: 14, fontWeight: '700', color: '#1A1A1A', paddingVertical: 1, paddingRight: 10, flexShrink: 1 },
-  commentText: { fontSize: 14, color: '#1A1A1A', paddingVertical: 2 },
-  commentTime: { fontSize: 12, color: '#999' },
-  footerActionText: { fontSize: 12, fontWeight: '700', color: '#666', paddingVertical: 5, paddingRight: 12, minWidth: 55 },
-  commentFooter: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
-  commentInputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFFFFF' },
-  commentInput: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: 20, paddingHorizontal: 15, paddingVertical: 8, fontSize: 16, maxHeight: 110 },
-  replyBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8F9FA', paddingHorizontal: 20, paddingVertical: 8, borderTopWidth: 1, borderTopColor: '#EEE' },
-  replyBarText: { fontSize: 14, color: '#666', flex: 1, marginRight: 10 },
-  sendBtn: { marginLeft: 10, width: 45, height: 45, justifyContent: 'center', alignItems: 'center' },
-  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 50 },
-  emptyText: { marginTop: 35, fontSize: 16, color: '#999', fontWeight: '500' },
+  modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: ms(30), borderTopRightRadius: ms(30), overflow: 'hidden' },
+  modalHeader: { alignItems: 'center', paddingVertical: vs(12) },
+  modalHandle: { width: s(40), height: vs(5), borderRadius: s(3), backgroundColor: '#E0E0E0', marginBottom: vs(10) },
+  modalHeaderTitleBox: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: s(20), marginBottom: vs(10) },
+  modalTitle: { fontSize: ms(18), fontWeight: '800', color: '#1A1A1A' },
+  commentAvatar: { width: s(36), height: s(36), borderRadius: s(18), backgroundColor: '#F0F0F0' },
+  commentsList: { paddingHorizontal: s(20), paddingBottom: vs(20) },
+  commentItem: { flexDirection: 'row', marginBottom: vs(15) },
+  commentBody: { marginLeft: s(10), flex: 1, minWidth: 0 },
+  commentContentArea: { paddingVertical: vs(2) },
+  commentUserRow: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(2), flexWrap: 'wrap' },
+  repliedToUser: { fontSize: ms(14), fontWeight: '700', color: '#1A1A1A', paddingVertical: vs(1) },
+  commentUser: { fontSize: ms(14), fontWeight: '700', color: '#1A1A1A', paddingVertical: vs(1), paddingRight: s(10), flexShrink: 1 },
+  commentText: { fontSize: ms(14), color: '#1A1A1A', paddingVertical: vs(2) },
+  commentTime: { fontSize: ms(12), color: '#999' },
+  footerActionText: { fontSize: ms(12), fontWeight: '700', color: '#666', paddingVertical: vs(5), paddingRight: s(12), minWidth: s(55) },
+  commentFooter: { flexDirection: 'row', alignItems: 'center', marginTop: vs(4) },
+  commentInputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(15), paddingTop: vs(12), borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFFFFF', zIndex: 10 },
+  commentInput: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: ms(20), paddingHorizontal: s(15), paddingVertical: vs(8), fontSize: ms(16), maxHeight: vs(110) },
+  replyBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8F9FA', paddingHorizontal: s(20), paddingVertical: vs(8), borderTopWidth: 1, borderTopColor: '#EEE' },
+  replyBarText: { fontSize: ms(14), color: '#666', flex: 1, marginRight: s(10) },
+  sendBtn: { marginLeft: s(10), width: s(45), height: s(45), justifyContent: 'center', alignItems: 'center' },
+  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: vs(50) },
+  emptyText: { marginTop: vs(35), fontSize: ms(16), color: '#999', fontWeight: '500' },
   createPostContent: { flexGrow: 1 },
-  userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20, paddingHorizontal: 20, paddingTop: 10 },
-  userNameInModal: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', marginLeft: 12, paddingRight: 15, flex: 1 },
-  createPostInput: { fontSize: 18, color: '#1A1A1A', textAlignVertical: 'top', minHeight: 65, paddingHorizontal: 20, marginBottom: 10 },
-  previewImageContainer: { position: 'relative', marginBottom: 12, paddingHorizontal: 20 },
-  previewImage: { width: '100%', borderRadius: 20, backgroundColor: '#F0F0F0' },
-  removeImageBtn: { position: 'absolute', top: 10, right: 30, backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 15 },
-  createPostActions: { flexDirection: 'row', padding: 15, borderTopWidth: 1, borderTopColor: '#F0F0F0', alignItems: 'center', backgroundColor: '#FFFFFF' },
-  attachAction: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0F7FF', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 22, gap: 8 },
-  attachActionText: { fontSize: 14, fontWeight: '700', color: '#1877F2', marginRight: 2 },
-  closeModalBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', borderRadius: 22, backgroundColor: '#FFF0F0' },
+  userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(20), paddingHorizontal: s(20), paddingTop: vs(10) },
+  userNameInModal: { fontSize: ms(17), fontWeight: '700', color: '#1A1A1A', marginLeft: s(12), paddingRight: s(15), flex: 1 },
+  createPostInput: { fontSize: ms(18), color: '#1A1A1A', textAlignVertical: 'top', minHeight: vs(65), paddingHorizontal: s(20), marginBottom: vs(10) },
+  previewImageContainer: { position: 'relative', marginBottom: vs(12), paddingHorizontal: s(20) },
+  previewImage: { width: '100%', borderRadius: ms(20), backgroundColor: '#F0F0F0' },
+  removeImageBtn: { position: 'absolute', top: vs(10), right: s(30), backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: s(15) },
+  createPostActions: { flexDirection: 'row', padding: s(15), borderTopWidth: 1, borderTopColor: '#F0F0F0', alignItems: 'center', backgroundColor: '#FFFFFF', zIndex: 10 },
+  attachAction: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0F7FF', paddingHorizontal: s(20), paddingVertical: vs(10), borderRadius: ms(22), gap: s(8) },
+  attachActionText: { fontSize: ms(14), fontWeight: '700', color: '#1877F2', marginRight: s(2) },
+  closeModalBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center', borderRadius: s(22), backgroundColor: '#FFF0F0' },
   optionsOverlay: { flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end' },
-  optionsContent: { backgroundColor: '#FFFFFF', borderRadius: 30, marginHorizontal: 15, marginBottom: 15, paddingHorizontal: 10, paddingTop: 20, paddingBottom: 5, shadowColor: '#000', shadowOffset: { width: 0, height: -10 }, shadowOpacity: 0.1, shadowRadius: 20, elevation: 20 },
-  optionsHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: 12 },
-  optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: 10, paddingHorizontal: 25, width: '100%' },
-  optionIconContainer: { width: 30, height: 30, justifyContent: 'center', alignItems: 'center', marginRight: 15 },
-  optionText: { fontSize: 16, fontWeight: '600', color: '#000000ff' },
+  optionsContent: { backgroundColor: '#FFFFFF', borderRadius: ms(30), marginHorizontal: s(15), marginBottom: vs(15), paddingHorizontal: s(10), paddingTop: vs(20), paddingBottom: vs(5), shadowColor: '#000', shadowOffset: { width: 0, height: vs(-10) }, shadowOpacity: 0.1, shadowRadius: s(20), elevation: 20 },
+  optionsHandle: { width: s(40), height: vs(4), borderRadius: s(2), backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: vs(12) },
+  optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: vs(10), paddingHorizontal: s(25), width: '100%' },
+  optionIconContainer: { width: s(30), height: s(30), justifyContent: 'center', alignItems: 'center', marginRight: s(15) },
+  optionText: { fontSize: ms(16), fontWeight: '600', color: '#000000ff' },
 
-  // --- Premium Login Modal Styles (Unique Names to avoid conflict) ---
   pModalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: s(24),
   },
   pModalContent: {
     backgroundColor: '#FFF',
-    borderRadius: 32,
-    padding: 30,
+    borderRadius: ms(32),
+    padding: s(30),
     width: '100%',
-    maxWidth: 340,
+    maxWidth: s(340),
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: vs(10) },
     shadowOpacity: 0.1,
-    shadowRadius: 20,
+    shadowRadius: s(20),
     elevation: 10,
   },
   pModalIconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: s(80),
+    height: s(80),
+    borderRadius: s(40),
     backgroundColor: '#EFF6FF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: vs(20),
     borderWidth: 1,
     borderColor: '#DBEAFE',
   },
   pModalTitle: {
-    fontSize: 20,
+    fontSize: ms(20),
     fontWeight: '900',
     color: '#1E293B',
-    marginBottom: 8,
+    marginBottom: vs(8),
     textAlign: 'center',
   },
   pModalSub: {
-    fontSize: 15,
+    fontSize: ms(15),
     color: '#64748B',
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 24,
+    lineHeight: vs(22),
+    marginBottom: vs(24),
   },
   pModalActionRow: {
     width: '100%',
-    gap: 12,
+    gap: vs(12),
   },
   pModalPrimaryBtn: {
     backgroundColor: '#3B82F6',
-    height: 56,
-    borderRadius: 18,
+    height: vs(56),
+    borderRadius: ms(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
     shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: vs(4) },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowRadius: s(8),
     elevation: 4,
   },
   pModalPrimaryBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: ms(16),
     fontWeight: '800',
   },
   pModalSecondaryBtn: {
     backgroundColor: '#EF4444',
-    height: 56,
-    borderRadius: 18,
+    height: vs(56),
+    borderRadius: ms(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
   pModalSecondaryBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: ms(16),
     fontWeight: '800',
   },
 });
