@@ -4,6 +4,7 @@ import { Animated, Dimensions, Image, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { s, vs, ms } from '@/utils/responsive';
 
 const { width } = Dimensions.get('window');
 
@@ -24,7 +25,10 @@ export function LoadingScreen({ onFinish }: { onFinish?: () => void }) {
     });
   }, [onFinish]);
 
-  const barWidth = width * 0.85;
+  const barWidth = s(width * 0.8 / (width / 393)); // Adjusted logic or just use s(330)
+  // Actually, barWidth in original was width * 0.85. 
+  // Let's use a fixed logic based on responsive width.
+  const responsiveBarWidth = s(320); 
 
   return (
     <ThemedView style={styles.container}>
@@ -40,7 +44,11 @@ export function LoadingScreen({ onFinish }: { onFinish?: () => void }) {
         <ThemedText style={styles.title}>
           KhmerGo
         </ThemedText>
-        <ThemedText style={styles.subtitle}>
+        <ThemedText 
+          style={styles.subtitle}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+        >
           {t('loading_preparing')}
         </ThemedText>
       </View>
@@ -53,7 +61,7 @@ export function LoadingScreen({ onFinish }: { onFinish?: () => void }) {
               {
                 width: progress.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [0, barWidth]
+                  outputRange: [0, responsiveBarWidth]
                 })
               }
             ]}
@@ -72,53 +80,55 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#ffffff',
     justifyContent: 'space-between',
-    paddingVertical: 80,
+    paddingVertical: vs(80),
   },
   centerContent: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: s(20),
   },
   logoContainer: {
-    marginBottom: 5,
+    marginBottom: vs(5),
   },
   logo: {
-    width: 250,
-    height: 180,
+    width: s(250),
+    height: vs(180),
   },
   title: {
-    fontSize: 42,
+    fontSize: ms(42),
     fontWeight: '800',
     color: '#000',
-    marginBottom: 8,
+    marginBottom: vs(8),
     includeFontPadding: false,
-    lineHeight: 52,
+    lineHeight: ms(52),
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: ms(16),
     color: '#666',
     fontWeight: '500',
     includeFontPadding: false,
+    textAlign: 'center',
   },
   bottomContent: {
     alignItems: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: s(40),
   },
   progressBarContainer: {
-    width: '85%',
-    height: 6,
+    width: s(320),
+    height: vs(6),
     backgroundColor: '#f0f0f0',
-    borderRadius: 3,
+    borderRadius: vs(3),
     overflow: 'hidden',
-    marginBottom: 15,
+    marginBottom: vs(15),
   },
   progressBar: {
     height: '100%',
     backgroundColor: '#FFCC00',
   },
   loadingText: {
-    fontSize: 14,
+    fontSize: ms(14),
     color: '#999',
     fontWeight: '500',
   },

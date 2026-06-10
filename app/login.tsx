@@ -19,6 +19,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { s, vs, ms } from '@/utils/responsive';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -93,7 +94,6 @@ export default function LoginScreen() {
       const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
       const firebaseUser = userCredential.user;
       
-      // Lấy role và trạng thái block ngay lập tức để chuyển trang hoặc chặn
       const { getDoc, doc } = await import('firebase/firestore');
       const { db: firestoreDb } = await import('@/utils/firebaseConfig');
       const userDoc = await getDoc(doc(firestoreDb, 'users', firebaseUser.uid));
@@ -155,7 +155,6 @@ export default function LoginScreen() {
           contentContainerStyle={styles.scrollContent}
         >
           <View style={styles.card}>
-            {/* Logo/Icon Wrapper */}
             <View style={styles.logoWrapper}>
               <Image
                 source={require('@/assets/images/icon.png')}
@@ -170,7 +169,6 @@ export default function LoginScreen() {
               </View>
             </View>
 
-            {/* Form */}
             <View style={styles.form}>
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Email</Text>
@@ -212,7 +210,6 @@ export default function LoginScreen() {
               </View>
             </View>
 
-            {/* Login Button */}
             <TouchableOpacity
               style={styles.mainBtn}
               onPress={handleLogin}
@@ -235,7 +232,6 @@ export default function LoginScreen() {
               </LinearGradient>
             </TouchableOpacity>
 
-            {/* Social Login Footer */}
             <View style={styles.socialFooter}>
               <View style={styles.dividerBox}>
                 <View style={styles.dividerLine} />
@@ -256,7 +252,6 @@ export default function LoginScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* Premium Toast System */}
       {showToast && (
         <Animated.View
           style={[
@@ -284,63 +279,59 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFF' },
-  fixedHeader: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 10, backgroundColor: '#FFF' },
-  scrollContent: { paddingHorizontal: 20, paddingTop: 40, paddingBottom: 40, backgroundColor: '#FFF' },
+  fixedHeader: { paddingHorizontal: s(20), paddingTop: vs(60), paddingBottom: vs(10), backgroundColor: '#FFF' },
+  scrollContent: { paddingHorizontal: s(20), paddingTop: vs(40), paddingBottom: vs(40), backgroundColor: '#FFF' },
   headerTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
-  titleText: { fontSize: 32, fontWeight: '900', color: '#0F172A', letterSpacing: -1 },
-  registerLinkText: { fontSize: 16, color: '#64748B', fontWeight: '600', marginBottom: 4 },
+  titleText: { fontSize: ms(32), fontWeight: '900', color: '#0F172A', letterSpacing: -1 },
+  registerLinkText: { fontSize: ms(16), color: '#64748B', fontWeight: '600', marginBottom: vs(4) },
 
-  card: { backgroundColor: 'transparent', borderRadius: 32, padding: 24 },
+  card: { backgroundColor: 'transparent', borderRadius: ms(32), padding: s(24) },
 
-  logoWrapper: { alignItems: 'center', marginBottom: 25 },
-  logoImage: { width: 130, height: 130 },
-  logoHintRow: { marginTop: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  logoHint: { fontSize: 17, color: '#64748B', fontWeight: '700' },
-  waveEmoji: { fontSize: 20 },
+  logoWrapper: { alignItems: 'center', marginBottom: vs(25) },
+  logoImage: { width: s(130), height: vs(130) },
+  logoHintRow: { marginTop: vs(5), flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
+  logoHint: { fontSize: ms(17), color: '#64748B', fontWeight: '700' },
+  waveEmoji: { fontSize: ms(20) },
 
-  form: { gap: 20, marginBottom: 30 },
-  inputGroup: { gap: 8 },
-  inputLabel: { fontSize: 14, fontWeight: '700', color: '#64748B', marginLeft: 4, flexShrink: 0 },
-  inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: 16, paddingHorizontal: 16, height: 56, borderWidth: 1, borderColor: '#F1F5F9' },
-  inputIcon: { marginRight: 12 },
-  input: { flex: 1, fontSize: 16, color: '#1E293B', fontWeight: '600', paddingVertical: 10 },
+  form: { gap: vs(20), marginBottom: vs(30) },
+  inputGroup: { gap: vs(8) },
+  inputLabel: { fontSize: ms(14), fontWeight: '700', color: '#64748B', marginLeft: s(4), flexShrink: 0 },
+  inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: ms(16), paddingHorizontal: s(16), height: vs(56), borderWidth: 1, borderColor: '#F1F5F9' },
+  inputIcon: { marginRight: s(12) },
+  input: { flex: 1, fontSize: ms(16), color: '#1E293B', fontWeight: '600', paddingVertical: vs(10) },
 
-  mainBtn: { borderRadius: 18, overflow: 'hidden' },
-  btnGradient: { height: 60, justifyContent: 'center', alignItems: 'center' },
-  btnText: { fontSize: 16, fontWeight: '800', color: '#FFF', letterSpacing: 1, lineHeight: 24, includeFontPadding: false },
-
-  footer: { marginTop: 30, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
-  footerText: { fontSize: 14, color: '#64748B', fontWeight: '500' },
-  footerLink: { fontSize: 14, color: '#10B981', fontWeight: '700' },
+  mainBtn: { borderRadius: ms(18), overflow: 'hidden' },
+  btnGradient: { height: vs(60), justifyContent: 'center', alignItems: 'center' },
+  btnText: { fontSize: ms(16), fontWeight: '800', color: '#FFF', letterSpacing: 1, lineHeight: ms(24), includeFontPadding: false },
 
   socialFooter: {
-    marginTop: 40,
+    marginTop: vs(40),
     alignItems: 'center',
   },
   dividerBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    marginBottom: 25,
+    gap: s(10),
+    marginBottom: vs(25),
   },
   dividerLine: {
     height: 1,
     backgroundColor: '#E2E8F0',
-    width: 60,
+    width: s(60),
   },
   dividerText: {
-    fontSize: 13,
+    fontSize: ms(13),
     color: '#94A3B8',
     fontWeight: '500',
   },
   socialIconsRow: {
     flexDirection: 'row',
-    gap: 25,
+    gap: s(25),
   },
   socialCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: s(50),
+    height: s(50),
+    borderRadius: s(25),
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -350,17 +341,16 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
 
-  // Toast Styles
   toastContainer: {
     position: 'absolute',
     top: 0,
-    left: 20,
-    right: 20,
-    height: 56,
-    borderRadius: 20,
+    left: s(20),
+    right: s(20),
+    height: vs(56),
+    borderRadius: ms(20),
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: s(16),
     zIndex: 9999,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
@@ -369,21 +359,21 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   toastIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: s(32),
+    height: s(32),
+    borderRadius: s(16),
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   toastText: {
     color: '#FFF',
-    fontSize: 15,
+    fontSize: ms(15),
     fontWeight: '700',
-    marginLeft: 12,
+    marginLeft: s(12),
     flex: 1,
     letterSpacing: 0.2,
     includeFontPadding: false,
-    lineHeight: 22,
+    lineHeight: ms(22),
   },
 });
