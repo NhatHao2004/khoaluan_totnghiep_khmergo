@@ -285,7 +285,7 @@ export default function RegisterScreen() {
                         onPress={() => toggleInterest(item.id)}
                         activeOpacity={0.8}
                       >
-                        <Text style={[styles.interestCardTextBig, { color: isSelected ? '#1E293B' : '#64748B' }]}>
+                        <Text style={[styles.interestCardTextBig, { color: isSelected ? '#1E293B' : '#64748B' }]} numberOfLines={1} adjustsFontSizeToFit>
                           {item.label}
                         </Text>
                         <Image
@@ -321,7 +321,7 @@ export default function RegisterScreen() {
                             style={styles.interestImgSmall}
                             resizeMode="contain"
                           />
-                          <Text style={[styles.interestCardTextSmall, { color: isSelected ? '#1E293B' : '#64748B' }]} numberOfLines={1}>
+                          <Text style={[styles.interestCardTextSmall, { color: isSelected ? '#1E293B' : '#64748B' }]} numberOfLines={1} adjustsFontSizeToFit>
                             {item.label}
                           </Text>
                         </View>
@@ -481,37 +481,35 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     padding: s(16),
     justifyContent: 'space-between',
-    position: 'relative',
     backgroundColor: '#FFFFFF',
   },
   interestCardSmall: {
     flex: 1,
     borderRadius: ms(20),
     borderWidth: 2,
-    padding: s(12),
+    padding: s(10),
     justifyContent: 'center',
-    position: 'relative',
     backgroundColor: '#FFFFFF',
   },
   smallCardContent: {
     alignItems: 'center',
-    gap: vs(6),
+    gap: vs(4),
   },
   interestImgBig: {
-    width: s(90),
-    height: s(90),
-    borderRadius: ms(16),
+    width: '100%',
+    height: vs(100),
     alignSelf: 'center',
   },
   interestImgSmall: {
-    width: s(45),
-    height: s(45),
-    borderRadius: ms(12),
+    width: s(40),
+    height: s(40),
+    alignSelf: 'center',
   },
   interestCardTextBig: {
-    fontSize: ms(16),
-    fontWeight: '900',
+    fontSize: ms(18),
+    fontWeight: '800',
     textAlign: 'center',
+    marginBottom: vs(5),
   },
   interestCardTextSmall: {
     fontSize: ms(12),

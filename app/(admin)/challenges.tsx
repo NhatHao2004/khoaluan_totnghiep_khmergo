@@ -128,7 +128,7 @@ const ChallengeManagement = () => {
 
   const handleSaveQuiz = async () => {
     if (!qTitle || !qPagodaId) {
-      showToast('Vui lòng điền đủ thông tin', 'error');
+      showToast('Điền đủ thông tin', 'error');
       return;
     }
 

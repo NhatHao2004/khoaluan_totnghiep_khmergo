@@ -124,7 +124,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 await signOut(auth);
                 setUser(null);
                 Alert.alert('Thông báo', 'Tài khoản của bạn đã bị khóa bởi quản trị viên.');
+                return;
               }
+
+              // Luôn cập nhật trạng thái người dùng khi có thay đổi từ Firestore
+              setUser({
+                uid: firebaseUser.uid,
+                email: firebaseUser.email,
+                name: data.name || data['tên'],
+                avatar: data.avatar || data['hình đại diện'] || null,
+                points: data.points ?? 0,
+                rank: data.rank || 'Đồng',
+                accuracy: data.accuracy ?? 0,
+                completedQuizzes: data.completedQuizzes ?? 0,
+                interests: data.interests || [],
+                isBlocked: data.isBlocked || false,
+                isAnonymous: firebaseUser.isAnonymous,
+                role: userRole,
+              });
             }
           });
 

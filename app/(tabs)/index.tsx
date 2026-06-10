@@ -174,13 +174,16 @@ export default function HomeScreen() {
       const userInterests: string[] = user?.interests || [];
 
       if (userInterests.length > 0 && !forceRandom) {
-        // Pick newest from each interest
-        userInterests.forEach(cat => {
-          const newestOfCat = sortedByNewest.find(i => i.category === cat);
-          if (newestOfCat) featured.push(newestOfCat);
-        });
+        // Lấy tất cả các mục thuộc các danh mục mà người dùng quan tâm
+        const itemsInInterests = sortedByNewest.filter(i => userInterests.includes(i.category));
         
-        // Fill up to 3 if needed
+        if (itemsInInterests.length > 0) {
+          // Trộn ngẫu nhiên các mục này để tạo sự đa dạng
+          const shuffled = [...itemsInInterests].sort(() => Math.random() - 0.5);
+          featured = shuffled.slice(0, 3);
+        }
+        
+        // Nếu vẫn chưa đủ 3 mục (do danh mục quan tâm ít dữ liệu), bù thêm từ các danh mục khác
         if (featured.length < 3) {
           const others = sortedByNewest.filter(i => !featured.find(f => f.id === i.id));
           featured.push(...others.slice(0, 3 - featured.length));
@@ -220,7 +223,7 @@ export default function HomeScreen() {
     if (authLoading) return;
     const unsubscribe = loadFeaturedData();
     return () => unsubscribe();
-  }, [language, t, authLoading]);
+  }, [language, t, authLoading, user?.uid, JSON.stringify(user?.interests)]);
 
   const onRefresh = React.useCallback(() => {
     if (refreshing) return;

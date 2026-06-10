@@ -184,7 +184,7 @@ export const translations: any = {
     registering: 'Đang tạo tài khoản...',
     login_with: 'Đăng nhập bằng',
     terms: 'Điều khoản dịch vụ',
-    error_required: 'Vui lòng điền đầy đủ thông tin',
+    error_required: 'Điền đầy đủ thông tin',
     email_in_use: 'Email đã tồn tại hoặc đã được sử dụng bởi tài khoản khác',
     fullname_label: 'Họ và tên',
     select_interests_title: 'Bạn quan tâm đến gì nào',
@@ -228,7 +228,7 @@ export const translations: any = {
     cat_family: 'Gia đình thân yêu',
     cat_food: 'Ẩm thực đặc sắc',
     // Toast Messages
-    login_success: 'Đăng nhập tài khoản thành công',
+    login_success: 'Đăng nhập thành công',
     logout_success: 'Tài khoản đã được đăng xuất',
     notif_on: 'Đã bật nhắc nhở học tập',
     notif_off: 'Đã tắt nhắc nhở học tập',
