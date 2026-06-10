@@ -147,6 +147,19 @@ export default function CommunityScreen() {
     transform: [{ translateX: createPostX.value }]
   }));
 
+  // Modal Top Gap Animation
+  const modalGapHeight = useSharedValue(TOP_GAP);
+  useEffect(() => {
+    modalGapHeight.value = withTiming(keyboardHeight > 0 ? (insets.top + 10) : TOP_GAP, {
+      duration: 300,
+      easing: Easing.out(Easing.poly(3))
+    });
+  }, [keyboardHeight]);
+
+  const animatedGapStyle = useAnimatedStyle(() => ({
+    height: modalGapHeight.value
+  }));
+
   // Animation for Comments Modal
   const commentsX = useSharedValue(SCREEN_WIDTH);
 
@@ -646,14 +659,16 @@ export default function CommunityScreen() {
       <Modal animationType="fade" transparent={true} statusBarTranslucent={true} visible={isCreateModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
         <View style={styles.modalOverlay}>
           {renderToast()}
-          <TouchableOpacity
-            style={{ height: TOP_GAP }}
-            activeOpacity={1}
-            onPress={() => {
-              Keyboard.dismiss();
-              setCreateModalVisible(false);
-            }}
-          />
+          <Animated.View style={animatedGapStyle}>
+            <TouchableOpacity
+              style={{ flex: 1 }}
+              activeOpacity={1}
+              onPress={() => {
+                Keyboard.dismiss();
+                setCreateModalVisible(false);
+              }}
+            />
+          </Animated.View>
           <Animated.View style={[styles.modalContent, animatedCreatePostStyle, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + 15) }]}>
             <View style={styles.modalHeader}>
 
@@ -703,8 +718,8 @@ export default function CommunityScreen() {
 
               <View style={{ flex: 1 }} />
 
-              {(selectedImage && keyboardHeight === 0) && (
-                <View style={styles.previewImageContainer}>
+              {selectedImage && (
+                <View style={[styles.previewImageContainer, keyboardHeight > 0 && { maxHeight: 150 }]}>
                   <Image
                     source={{ uri: selectedImage }}
                     style={[styles.previewImage, { aspectRatio: imageRatio || 1 }]}
@@ -716,13 +731,12 @@ export default function CommunityScreen() {
               )}
             </ScrollView>
 
-            {keyboardHeight === 0 && (
-              <View style={[styles.createPostActions, { paddingBottom: insets.bottom + 5 }]}>
-                <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
-                  <Ionicons name="image-outline" size={24} color="#1877F2" />
-                  <Text style={styles.attachActionText}>{t('image_label')}</Text>
-                </TouchableOpacity>
-                <View style={{ flex: 1 }} />
+            <View style={[styles.createPostActions, { paddingBottom: keyboardHeight > 0 ? 10 : (insets.bottom + 5) }]}>
+              <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
+                <Ionicons name="image-outline" size={24} color="#1877F2" />
+                <Text style={styles.attachActionText}>{t('image_label')}</Text>
+              </TouchableOpacity>
+              <View style={{ flex: 1 }} />
                 <TouchableOpacity
                   style={styles.closeModalBtn}
                   onPress={() => {
@@ -737,8 +751,7 @@ export default function CommunityScreen() {
                 >
                   <Ionicons name="close" size={28} color="#FF3B30" />
                 </TouchableOpacity>
-              </View>
-            )}
+            </View>
           </Animated.View>
         </View>
       </Modal>
@@ -747,14 +760,16 @@ export default function CommunityScreen() {
       <Modal animationType="fade" transparent={true} statusBarTranslucent={true} visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
           {renderToast()}
-          <TouchableOpacity
-            style={{ height: TOP_GAP }}
-            activeOpacity={1}
-            onPress={() => {
-              Keyboard.dismiss();
-              setModalVisible(false);
-            }}
-          />
+          <Animated.View style={animatedGapStyle}>
+            <TouchableOpacity
+              style={{ flex: 1 }}
+              activeOpacity={1}
+              onPress={() => {
+                Keyboard.dismiss();
+                setModalVisible(false);
+              }}
+            />
+          </Animated.View>
           <Animated.View style={[styles.modalContent, animatedCommentsStyle, { flex: 1, paddingBottom: keyboardHeight || (insets.bottom + 12) }]}>
             <View style={styles.modalHeader}>
 
@@ -829,7 +844,7 @@ export default function CommunityScreen() {
               </View>
             )}
 
-            <View style={[styles.commentInputContainer, { paddingBottom: insets.bottom + 12 }]}>
+            <View style={[styles.commentInputContainer, { paddingBottom: keyboardHeight > 0 ? 12 : (insets.bottom + 12) }]}>
               <TextInput
                 ref={commentInputRef}
                 style={styles.commentInput}
