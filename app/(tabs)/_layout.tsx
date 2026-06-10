@@ -11,6 +11,7 @@ const { width } = Dimensions.get('window');
 import { HapticTab } from '@/components/haptic-tab';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Ionicons } from '@expo/vector-icons';
+import { s, vs, ms } from '@/utils/responsive';
 
 // Prevent native splash screen from auto-hiding
 
@@ -83,10 +84,10 @@ export default function TabsLayout() {
   }, []);
 
   const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-  const BUTTON_SIZE = 60;
-  const MARGIN = 15;
-  const BTN_BOTTOM = 85;
-  const BTN_RIGHT = 15;
+  const BUTTON_SIZE = s(60);
+  const MARGIN = s(15);
+  const BTN_BOTTOM = vs(85);
+  const BTN_RIGHT = s(15);
 
   // X limits
   const MIN_X = -SCREEN_WIDTH + BUTTON_SIZE + (BTN_RIGHT * 2);
@@ -95,6 +96,7 @@ export default function TabsLayout() {
   // Y limits
   const MIN_Y = -SCREEN_HEIGHT + BTN_BOTTOM + BUTTON_SIZE + 40;
   const MAX_Y = 0;
+  const TOOLTIP_OFFSET = vs(5);
 
   const gesture = Gesture.Pan()
     .onStart(() => {
@@ -138,7 +140,7 @@ export default function TabsLayout() {
       opacity: tooltipOpacity.value,
       transform: [
         { translateX: translateX.value + tooltipSlideX.value },
-        { translateY: translateY.value - 5 },
+        { translateY: translateY.value - TOOLTIP_OFFSET },
       ],
     };
   });
@@ -156,9 +158,9 @@ export default function TabsLayout() {
           lazy: false, // Pre-render all screens to avoid mount-time jerking
           freezeOnBlur: true, // Freezes JS execution on inactive screens for speed
           tabBarStyle: {
-            height: 75,
-            paddingBottom: 5,
-            paddingTop: 8,
+            height: vs(75),
+            paddingBottom: vs(5),
+            paddingTop: vs(8),
             backgroundColor: COLORS.background,
             borderTopLeftRadius: 0, // Simplified for stability
             borderTopRightRadius: 0, // Simplified for stability
@@ -169,9 +171,9 @@ export default function TabsLayout() {
           },
           tabBarShowLabel: true,
           tabBarLabelStyle: {
-            fontSize: 11,
+            fontSize: ms(11),
             fontWeight: '600',
-            marginTop: 8,
+            marginTop: vs(8),
           }
         }}>
         <Tabs.Screen
@@ -303,11 +305,11 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   floatingChatBtn: {
     position: 'absolute',
-    bottom: 85,
-    right: 15,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    bottom: vs(85),
+    right: s(15),
+    width: s(60),
+    height: s(60),
+    borderRadius: s(30),
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
@@ -321,7 +323,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
-    borderRadius: 30,
+    borderRadius: s(30),
   },
   chatIconImage: {
     width: '100%',
@@ -329,22 +331,22 @@ const styles = StyleSheet.create({
   },
   tooltipContainer: {
     position: 'absolute',
-    bottom: 95, // Centered relative to the 60px button height
-    right: 80,  // Spaced from the 15px right margin + button width
+    bottom: vs(95),
+    right: s(80),
     zIndex: 99998,
   },
   tooltipInner: {
     backgroundColor: '#1E3A8A',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 12,
-    minWidth: 110,
+    paddingHorizontal: s(15),
+    paddingVertical: vs(10),
+    borderRadius: ms(12),
+    minWidth: s(110),
     alignItems: 'center',
     justifyContent: 'center',
   },
   tooltipText: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: ms(13),
     fontWeight: '700',
     textAlign: 'center',
   },

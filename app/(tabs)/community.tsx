@@ -887,7 +887,7 @@ export default function CommunityScreen() {
                   router.push('/login');
                 }}
               >
-                <Text style={styles.pModalPrimaryBtnText}>{t('login')}</Text>
+                <Text style={styles.pModalPrimaryBtnText}>{t('login_user')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity

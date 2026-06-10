@@ -27,6 +27,7 @@ export const translations: any = {
     continue: 'Tiếp tục',
     exit: 'Thoát',
     login: 'Đăng nhập tài khoản',
+    login_user: 'Đăng nhập',
 
     // Settings Screen
     notif_settings: 'Thông báo',
@@ -323,6 +324,7 @@ export const translations: any = {
     continue: 'បន្ត',
     exit: 'ចាកចេញ',
     login: 'ចូល',
+    login_user: 'ចូល',
     // Settings Screen
     notif_settings: 'ការជូនដំណឹង',
     study_reminder: 'រំលឹកការសិក្សារាល់ថ្ងៃ',

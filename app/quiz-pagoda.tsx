@@ -1,20 +1,19 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useTemples } from '@/hooks/use-temples';
 import { useQuizzes } from '@/hooks/use-quizzes';
+import { useTemples } from '@/hooks/use-temples';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Image,
   Modal,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
 export default function QuizPagodaSelectScreen() {
@@ -115,8 +114,8 @@ export default function QuizPagodaSelectScreen() {
                             const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
                             return n.toString().split('').map(d => khmerDigits[parseInt(d)] || d).join('');
                           };
-                          return isKm 
-                            ? `${toKhmerNum(count)} សំណួរ - បូក ៥ ពិន្ទុសម្រាប់រាល់ចម្លើយដែលត្រឹមត្រូវ` 
+                          return isKm
+                            ? `${toKhmerNum(count)} សំណួរ - បូក ៥ ពិន្ទុសម្រាប់រាល់ចម្លើយដែលត្រឹមត្រូវ`
                             : `${count} câu hỏi - cộng 5 điểm cho mỗi câu đúng`;
                         })()}
                       </Text>
@@ -154,9 +153,9 @@ export default function QuizPagodaSelectScreen() {
             <Text style={styles.modalSub}>
               {isKm ? 'អ្នកត្រូវចូលដើម្បីចូលរួមក្នុងបញ្ហាប្រឈមនេះ' : 'Bạn cần đăng nhập để tham gia thử thách và tích luỷ điểm xếp hạng'}
             </Text>
-            
+
             <View style={styles.modalActionRow}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.modalPrimaryBtn}
                 onPress={() => {
                   setShowLoginModal(false);
@@ -165,8 +164,8 @@ export default function QuizPagodaSelectScreen() {
               >
                 <Text style={styles.modalPrimaryBtnText}>{isKm ? 'ចូល' : 'Đăng nhập'}</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
                 style={styles.modalSecondaryBtn}
                 onPress={() => setShowLoginModal(false)}
               >

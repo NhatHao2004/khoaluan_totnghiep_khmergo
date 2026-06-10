@@ -19,6 +19,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { s, vs, ms } from '@/utils/responsive';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -32,7 +33,7 @@ import Animated, {
 const StyleSheet = RNStyleSheet;
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CATEGORY_CARD_WIDTH = (SCREEN_WIDTH - 40 - (3 * 8)) / 4; // 20px padding each side, 8px gaps between 4 cards
+const CATEGORY_CARD_WIDTH = (SCREEN_WIDTH - s(40) - (3 * s(8))) / 4;
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -377,7 +378,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
             <View style={styles.welcomeText}>
               <ThemedText style={styles.helloText}>{t('welcome_hello')}</ThemedText>
-              <ThemedText style={styles.userName} numberOfLines={1}>{user?.name || t('guest')}</ThemedText>
+              <ThemedText style={styles.userName} numberOfLines={1} adjustsFontSizeToFit>{user?.name || t('guest')}</ThemedText>
             </View>
           </View>
           <TouchableOpacity
@@ -427,7 +428,7 @@ export default function HomeScreen() {
 
           {/* Categories Grid */}
           <View style={styles.sectionHeader}>
-            <ThemedText style={styles.sectionTitle}>{t('explore_categories')}</ThemedText>
+            <ThemedText style={styles.sectionTitle} numberOfLines={1} adjustsFontSizeToFit>{t('explore_categories')}</ThemedText>
           </View>
 
           <View style={styles.categoryGrid}>
@@ -446,15 +447,15 @@ export default function HomeScreen() {
                     transition={200}
                     contentFit="contain"
                   />
-                  <ThemedText style={styles.serviceLabelMini} numberOfLines={2}>{item.label}</ThemedText>
+                  <ThemedText style={styles.serviceLabelMini} numberOfLines={2} adjustsFontSizeToFit>{item.label}</ThemedText>
                 </TouchableOpacity>
               </View>
             ))}
           </View>
 
           {/* Featured List Header */}
-          <View style={[styles.sectionHeader, { paddingBottom: 10, marginTop: 8 }]}>
-            <ThemedText style={[styles.sectionTitle, { flex: 1, marginRight: 10 }]} numberOfLines={1}>
+          <View style={[styles.sectionHeader, { paddingBottom: vs(10), marginTop: vs(8) }]}>
+            <ThemedText style={[styles.sectionTitle, { flex: 1, marginRight: s(10) }]} numberOfLines={1} adjustsFontSizeToFit>
               {t('suggestions_for_you')}
             </ThemedText>
             <TouchableOpacity
@@ -629,14 +630,14 @@ const styles = RNStyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    paddingTop: 40,
+    paddingTop: vs(40),
   },
   featuredCard: {
-    width: SCREEN_WIDTH - 32,
-    marginHorizontal: 16,
+    width: SCREEN_WIDTH - s(32),
+    marginHorizontal: s(16),
     backgroundColor: '#FFF',
-    borderRadius: 20,
-    marginBottom: 16,
+    borderRadius: ms(20),
+    marginBottom: vs(16),
     borderWidth: 1,
     borderColor: '#F1F5F9',
     shadowColor: '#1E293B',
@@ -649,24 +650,24 @@ const styles = RNStyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    marginBottom: 10,
+    paddingHorizontal: s(24),
+    marginBottom: vs(10),
   },
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: s(12),
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 26, // Half of 52 to make it a circle
+    width: s(50),
+    height: s(50),
+    borderRadius: s(25),
     backgroundColor: '#F1F5F9',
   },
   avatarPlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 25, // Half of 52 to make it a circle
+    width: s(50),
+    height: s(50),
+    borderRadius: s(25),
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F1F5F9',
@@ -675,30 +676,30 @@ const styles = RNStyleSheet.create({
     justifyContent: 'center',
   },
   helloText: {
-    fontSize: 13,
+    fontSize: ms(13),
     color: '#1E293B',
     fontWeight: '700',
     letterSpacing: 0.3,
   },
   userName: {
-    fontSize: 20,
+    fontSize: ms(20),
     fontWeight: '900',
     color: '#1E293B',
   },
   notificationBtnSimple: {
-    width: 52,
-    height: 52,
+    width: s(52),
+    height: s(52),
     justifyContent: 'center',
     alignItems: 'center',
   },
   notificationBadge: {
     position: 'absolute',
-    top: -2,
-    right: -4,
+    top: -vs(2),
+    right: -s(4),
     backgroundColor: '#EF4444',
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: s(18),
+    height: s(18),
+    borderRadius: s(9),
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1.5,
@@ -708,122 +709,67 @@ const styles = RNStyleSheet.create({
   },
   badgeText: {
     color: '#FFF',
-    fontSize: 10,
+    fontSize: ms(10),
     fontWeight: '900',
     textAlign: 'center',
-    textAlignVertical: 'center',
     includeFontPadding: false,
-    lineHeight: 14,
-  },
-  filterBtn: {
-    width: 58,
-    height: 58,
-    backgroundColor: '#1E293B',
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 5,
+    lineHeight: ms(14),
   },
   content: {
     flex: 1,
   },
   promoBanner: {
-    marginHorizontal: 24,
-    height: 170,
+    marginHorizontal: s(24),
+    height: vs(170),
     backgroundColor: '#DBEAFE',
-    borderRadius: 28,
+    borderRadius: ms(28),
     flexDirection: 'row',
     overflow: 'hidden',
-    marginBottom: 7,
+    marginBottom: vs(7),
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.5)',
-  },
-  promoLeft: {
-    flex: 1.3,
-    padding: 24,
-    justifyContent: 'center',
-    zIndex: 2,
-  },
-  promoOff: {
-    fontSize: 13,
-    color: '#3B82F6',
-    fontWeight: '800',
-    marginBottom: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  promoTitle: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#1E293B',
-    marginBottom: 18,
-    lineHeight: 24,
-  },
-  bookBtn: {
-    backgroundColor: '#1E293B',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 14,
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-  },
-  bookBtnText: {
-    color: '#FFF',
-    fontSize: 13,
-    fontWeight: '800',
   },
   promoImage: {
     ...StyleSheet.absoluteFillObject,
     width: '100%',
     height: '100%',
-    opacity: 1,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: s(20),
     marginTop: 0,
     marginBottom: 0,
-    paddingTop: 5,
+    paddingTop: vs(5),
     paddingBottom: 0,
   },
   viewAllText: {
     color: '#64748B',
-    fontSize: 13,
+    fontSize: ms(13),
     fontWeight: '600',
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: ms(20),
     fontWeight: '900',
     color: '#1E293B',
-    lineHeight: 30,
+    lineHeight: ms(30),
     paddingBottom: 0,
   },
   categoryGrid: {
     flexDirection: 'row',
-    paddingHorizontal: 20,
+    paddingHorizontal: s(20),
     justifyContent: 'space-between',
     marginBottom: 0,
-    marginTop: 10,
+    marginTop: vs(10),
   },
   categoryCol: {
     width: CATEGORY_CARD_WIDTH,
   },
   serviceCardMini: {
     backgroundColor: '#FFF',
-    borderRadius: 18,
-    paddingVertical: 12,
+    borderRadius: ms(18),
+    paddingVertical: vs(12),
     alignItems: 'center',
     shadowColor: '#1E293B',
     shadowOffset: { width: 0, height: 4 },
@@ -833,74 +779,30 @@ const styles = RNStyleSheet.create({
     borderWidth: 1,
     borderColor: '#F8FAFC',
   },
-  iconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#F8FAFC',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#F1F5F9',
-  },
   serviceIconImage: {
-    width: 38,
-    height: 38,
-    marginBottom: 8,
+    width: s(38),
+    height: s(38),
+    marginBottom: vs(8),
   },
   serviceLabelMini: {
-    fontSize: 10,
+    fontSize: ms(10),
     fontWeight: '800',
     color: '#334155',
     textAlign: 'center',
-    lineHeight: 16,
-    paddingHorizontal: 2,
-  },
-  iconContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconBox: {
-    width: 68,
-    height: 68,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-    backgroundColor: '#FFF',
-    shadowColor: '#1E293B',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
-    borderWidth: 1.5,
-    borderColor: '#FFF',
-  },
-  itemLabel: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#334155',
-    textAlign: 'center',
-    marginTop: 2,
-  },
-  comingSoonSub: {
-    fontSize: 16,
-    color: '#64748b',
-    textAlign: 'center',
-    marginTop: 10,
+    lineHeight: ms(16),
+    paddingHorizontal: s(2),
   },
   // Toast Styles
   toastContainer: {
     position: 'absolute',
     top: 0,
-    left: 20,
-    right: 20,
-    height: 56,
-    borderRadius: 20,
+    left: s(20),
+    right: s(20),
+    height: vs(56),
+    borderRadius: ms(20),
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: s(16),
     zIndex: 9999,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
@@ -908,18 +810,18 @@ const styles = RNStyleSheet.create({
     elevation: 10,
   },
   toastIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: s(32),
+    height: s(32),
+    borderRadius: s(16),
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   toastText: {
     color: '#FFF',
-    fontSize: 15,
+    fontSize: ms(15),
     fontWeight: '700',
-    marginLeft: 12,
+    marginLeft: s(12),
     flex: 1,
     letterSpacing: 0.2,
   },
@@ -928,92 +830,42 @@ const styles = RNStyleSheet.create({
     aspectRatio: 16 / 10,
     position: 'relative',
     overflow: 'hidden',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: ms(20),
+    borderTopRightRadius: ms(20),
   },
   cardImage: {
     width: '100%',
     height: '100%',
   },
-  cardOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    padding: 16,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'flex-start',
-  },
-  tagBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-  },
-  tagText: {
-    color: '#FFF',
-    fontSize: 9,
-    fontWeight: '800',
-    textTransform: 'uppercase',
-  },
-  heartBtn: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: '#ffffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   cardContent: {
-    padding: 18,
+    padding: s(18),
   },
   cardHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: vs(8),
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: ms(18),
     fontWeight: '900',
     color: '#1E293B',
     flex: 1,
-    marginRight: 10,
+    marginRight: s(10),
   },
   cardFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  locationInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  locationText: {
-    fontSize: 13,
-    color: '#64748B',
-    fontWeight: '600',
-  },
   reviewInfo: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   reviewText: {
-    fontSize: 12,
+    fontSize: ms(12),
     color: '#94A3B8',
     fontWeight: '500',
-  },
-  primaryBtnText: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: '#FFF',
-  },
-  featuredLoader: {
-    paddingVertical: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loaderText: {
-    marginTop: 10,
-    color: '#888',
-    fontSize: 14,
   },
   // Notification Styles
   modalOverlay: {
@@ -1023,11 +875,11 @@ const styles = RNStyleSheet.create({
   },
   notificationContainer: {
     backgroundColor: '#FFF',
-    borderTopLeftRadius: 30,
-    borderBottomLeftRadius: 30,
+    borderTopLeftRadius: ms(30),
+    borderBottomLeftRadius: ms(30),
     width: '85%',
     height: '100%',
-    padding: 24,
+    padding: s(24),
     alignSelf: 'flex-end',
     elevation: 20,
     shadowColor: '#000',
@@ -1039,45 +891,29 @@ const styles = RNStyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: vs(20),
   },
   nTitle: {
-    fontSize: 21,
+    fontSize: ms(21),
     fontWeight: '900',
     color: '#1E293B',
-    marginTop: 20,
+    marginTop: vs(20),
   },
   nList: {
     flex: 1,
   },
-  nPromo: {
-    marginBottom: 20,
-    borderRadius: 15,
-    overflow: 'hidden',
-  },
-  nPromoGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 15,
-    gap: 10,
-  },
-  nPromoText: {
-    color: '#FFF',
-    fontWeight: '800',
-    fontSize: 14,
-  },
   nItem: {
     flexDirection: 'row',
-    gap: 15,
-    marginBottom: 20,
-    paddingBottom: 15,
+    gap: s(15),
+    marginBottom: vs(20),
+    paddingBottom: vs(15),
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
   },
   nIcon: {
-    width: 45,
-    height: 43,
-    borderRadius: 10,
+    width: s(45),
+    height: s(43),
+    borderRadius: ms(10),
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1085,19 +921,13 @@ const styles = RNStyleSheet.create({
     flex: 1,
   },
   nItemTitle: {
-    fontSize: 15,
-    fontWeight: '500', // Chỉ dùng mức trung bình cho nội dung chung
+    fontSize: ms(15),
+    fontWeight: '500',
     color: '#1E293B',
-    marginBottom: 4,
-  },
-  nItemBody: {
-    fontSize: 13,
-    color: '#64748B',
-    marginBottom: 6,
-    lineHeight: 18,
+    marginBottom: vs(4),
   },
   nItemTime: {
-    fontSize: 11,
+    fontSize: ms(11),
     color: '#94A3B8',
     fontWeight: '500',
   },
