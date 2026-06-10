@@ -428,7 +428,7 @@ export default function RegisterScreen() {
               color="#FFF"
             />
           </View>
-          <Text style={styles.toastText}>{toastMsg}</Text>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
         </Animated.View>
       )}
     </View>
@@ -561,12 +561,10 @@ const styles = StyleSheet.create({
   },
   toastText: {
     color: '#FFF',
-    fontSize: ms(15),
+    fontSize: ms(13),
     fontWeight: '700',
     marginLeft: s(12),
     flex: 1,
     letterSpacing: 0.2,
-    includeFontPadding: false,
-    lineHeight: ms(22),
   },
 });
