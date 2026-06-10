@@ -715,8 +715,7 @@ export default function CommunityScreen() {
                 onChangeText={setCreatePostText}
                 scrollEnabled={false}
               />
-
-              <View style={{ flex: 1 }} />
+              <View style={{ height: 10 }} />
 
               {selectedImage && (
                 <View style={[styles.previewImageContainer, keyboardHeight > 0 && { maxHeight: 150 }]}>
@@ -737,20 +736,20 @@ export default function CommunityScreen() {
                 <Text style={styles.attachActionText}>{t('image_label')}</Text>
               </TouchableOpacity>
               <View style={{ flex: 1 }} />
-                <TouchableOpacity
-                  style={styles.closeModalBtn}
-                  onPress={() => {
-                    Keyboard.dismiss();
-                    setCreateModalVisible(false);
-                    setIsEditingPost(false);
-                    setEditingPostId(null);
-                    setCreatePostText('');
-                    setSelectedImage(null);
-                    setBase64Image(null);
-                  }}
-                >
-                  <Ionicons name="close" size={28} color="#FF3B30" />
-                </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.closeModalBtn}
+                onPress={() => {
+                  Keyboard.dismiss();
+                  setCreateModalVisible(false);
+                  setIsEditingPost(false);
+                  setEditingPostId(null);
+                  setCreatePostText('');
+                  setSelectedImage(null);
+                  setBase64Image(null);
+                }}
+              >
+                <Ionicons name="close" size={28} color="#FF3B30" />
+              </TouchableOpacity>
             </View>
           </Animated.View>
         </View>
@@ -1027,7 +1026,7 @@ const styles = StyleSheet.create({
   createPostContent: { flexGrow: 1 },
   userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20, paddingHorizontal: 20, paddingTop: 10 },
   userNameInModal: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', marginLeft: 12, paddingRight: 15, flex: 1 },
-  createPostInput: { fontSize: 18, color: '#1A1A1A', textAlignVertical: 'top', flex: 1, minHeight: 150, paddingHorizontal: 20 },
+  createPostInput: { fontSize: 18, color: '#1A1A1A', textAlignVertical: 'top', minHeight: 65, paddingHorizontal: 20, marginBottom: 10 },
   previewImageContainer: { position: 'relative', marginBottom: 12, paddingHorizontal: 20 },
   previewImage: { width: '100%', borderRadius: 20, backgroundColor: '#F0F0F0' },
   removeImageBtn: { position: 'absolute', top: 10, right: 30, backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: 15 },
