@@ -461,16 +461,19 @@ const AdminDashboard = () => {
         >
           <View style={[styles.feedbackModalContent, { paddingTop: insets.top + vs(5) }]}>
             <View style={styles.feedbackModalHeader}>
+              <TouchableOpacity
+                onPress={() => setShowFeedbackModal(false)}
+                style={styles.modalBackBtn}
+              >
+                <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
+              </TouchableOpacity>
               <Text
-                style={styles.feedbackModalTitle}
+                style={[styles.feedbackModalTitle, { textAlign: 'center', width: '100%' }]}
                 numberOfLines={1}
                 adjustsFontSizeToFit
               >
                 Phản hồi người dùng
               </Text>
-              <TouchableOpacity onPress={() => setShowFeedbackModal(false)} style={styles.feedbackCloseBtn}>
-                <Ionicons name="close" size={ms(25)} color="#ff0000ff" />
-              </TouchableOpacity>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
@@ -503,15 +506,17 @@ const AdminDashboard = () => {
                             </Text>
                           )}
                         </View>
-                        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Text style={styles.feedbackUserName} numberOfLines={1}>
-                            {f.name || f.userName || f.displayName || f['e-mail']?.split('@')[0] || 'Người dùng'}
-                          </Text>
-                          <Text style={styles.feedbackTime}>{f.createdAt ? getTimeAgo(f.createdAt) : 'Vừa xong'}</Text>
+                        <View style={{ flex: 1, gap: vs(2) }}>
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Text style={styles.feedbackUserName} numberOfLines={1}>
+                              {f.name || f.userName || f.displayName || f['e-mail']?.split('@')[0] || 'Người dùng'}
+                            </Text>
+                            <Text style={styles.feedbackTime}>{f.createdAt ? getTimeAgo(f.createdAt) : 'Vừa xong'}</Text>
+                          </View>
+                          <Text style={styles.feedbackSubText}>Đã gửi phản hồi, nhấn vào để xem chi tiết...</Text>
                         </View>
                       </View>
                     </View>
-                    <Text style={styles.feedbackPreview} numberOfLines={2}>{f.message || f.content}</Text>
                   </TouchableOpacity>
                 ))
               ) : (
@@ -566,18 +571,19 @@ const AdminDashboard = () => {
         >
           <View style={[styles.detailModalBox, { paddingTop: insets.top + vs(5), paddingBottom: Math.max(insets.bottom, vs(20)) }]}>
             <View style={styles.detailModalHeader}>
-              <View style={{ flex: 1 }}>
-                <Text
-                  style={styles.detailModalTitle}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                >
-                  Chi tiết phản hồi
-                </Text>
-              </View>
-              <TouchableOpacity onPress={() => setShowDetailModal(false)} style={styles.feedbackCloseBtn}>
-                <Ionicons name="close" size={ms(25)} color="#ff0000ff" />
+              <TouchableOpacity
+                onPress={() => setShowDetailModal(false)}
+                style={styles.modalBackBtn}
+              >
+                <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
               </TouchableOpacity>
+              <Text
+                style={[styles.detailModalTitle, { textAlign: 'center', width: '100%' }]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                Chi tiết phản hồi
+              </Text>
             </View>
 
             <ScrollView
@@ -616,7 +622,7 @@ const AdminDashboard = () => {
               </View>
 
               <View style={styles.replySection}>
-                <Text style={styles.replyLabel}>Trả lời nhanh:</Text>
+                <Text style={styles.replyLabel}>Trả lời nhanh</Text>
                 <TextInput
                   style={styles.replyInput}
                   value={quickReply}
@@ -1163,12 +1169,10 @@ const styles = StyleSheet.create({
     marginTop: vs(10),
   },
   feedbackModalTitle: {
-    fontSize: ms(24),
+    fontSize: ms(22),
     fontWeight: '900',
     color: '#1e293b',
     letterSpacing: -0.5,
-    flex: 1,
-    marginRight: s(10),
   },
   feedbackCloseBtn: {
     width: ms(36),
@@ -1212,9 +1216,12 @@ const styles = StyleSheet.create({
     fontSize: ms(13),
     color: '#475569',
     lineHeight: vs(20),
-    marginBottom: vs(6),
-    textAlign: 'justify',
-    includeFontPadding: false,
+  },
+  feedbackSubText: {
+    fontSize: ms(12),
+    color: '#64748b',
+    fontWeight: '500',
+    fontStyle: 'italic',
   },
   feedbackTime: {
     fontSize: ms(11),
@@ -1279,10 +1286,20 @@ const styles = StyleSheet.create({
     marginTop: vs(10),
   },
   detailModalTitle: {
-    fontSize: ms(24),
+    fontSize: ms(22),
     fontWeight: '900',
     color: '#1e293b',
     letterSpacing: -0.5,
+  },
+  modalBackBtn: {
+    width: ms(40),
+    height: ms(40),
+    borderRadius: ms(12),
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    left: -s(12),
+    zIndex: 10,
   },
   detailScroll: {
     flex: 1,
@@ -1326,7 +1343,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc',
     padding: s(16),
     borderRadius: s(16),
-    marginBottom: vs(20),
+    marginBottom: vs(10),
     borderWidth: 1,
     borderColor: '#f1f5f9',
   },
