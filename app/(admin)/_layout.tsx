@@ -101,6 +101,12 @@ export default function AdminLayout() {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="profile"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
     </>
   );

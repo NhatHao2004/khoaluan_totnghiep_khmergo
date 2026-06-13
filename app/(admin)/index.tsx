@@ -1,7 +1,7 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, doc, onSnapshot } from 'firebase/firestore';
 import React, { memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Dimensions, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -96,6 +96,7 @@ const AdminDashboard = () => {
   });
   const [allSortedUsers, setAllSortedUsers] = useState<any[]>([]);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
+  const [adminName, setAdminName] = useState('');
   const leaderboardRef = useRef<ScrollView>(null);
   const { logout, user } = useContext(AuthContext);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
@@ -165,10 +166,20 @@ const AdminDashboard = () => {
 
       setRecentActivities(activities);
     });
-
+ 
+    let unsubAdmin: any;
+    if (user?.uid) {
+      unsubAdmin = onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setAdminName(data.name || data['tên'] || '');
+        }
+      });
+    }
     return () => {
       unsubUsers();
       unsubRecent();
+      if (unsubAdmin) unsubAdmin();
     };
   }, []);
 
@@ -196,15 +207,7 @@ const AdminDashboard = () => {
     });
   }, [allSortedUsers]);
 
-  const handleAdminAction = useCallback(() => {
-    setLogoutModalVisible(true);
-  }, []);
 
-  const handleLogout = useCallback(async () => {
-    setLogoutModalVisible(false);
-    await logout();
-    router.replace('/login');
-  }, [logout]);
 
   return (
     <View style={[styles.container, { paddingTop: Math.max(insets.top, vs(15)) }]}>
@@ -215,21 +218,16 @@ const AdminDashboard = () => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>Quản trị viên</Text>
+          <TouchableOpacity 
+            onPress={() => router.push('/(admin)/profile' as any)}
+            activeOpacity={0.7}
+            style={{ flex: 1 }}
+          >
+            <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
+              {adminName || 'Quản trị viên'}
+            </Text>
+          </TouchableOpacity>
           <View style={styles.headerRightActions}>
-            <TouchableOpacity
-              onPress={handleAdminAction}
-              style={styles.menuBtn}
-            >
-              <Ionicons name="power" size={ms(28)} color="#ef4444" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => router.push('/(admin)/trash' as any)}
-              style={styles.trashBtnHeader}
-            >
-              <Ionicons name="trash-outline" size={ms(26)} color="#ef4444" />
-            </TouchableOpacity>
           </View>
         </View>
 
@@ -304,52 +302,7 @@ const AdminDashboard = () => {
         </View>
       </ScrollView>
 
-      {/* Premium Logout Modal */}
-      <Modal
-        visible={logoutModalVisible}
-        transparent
-        animationType="fade"
-        statusBarTranslucent
-        onRequestClose={() => setLogoutModalVisible(false)}
-      >
-        <TouchableOpacity
-          style={styles.logoutOverlay}
-          activeOpacity={1}
-          onPress={() => setLogoutModalVisible(false)}
-        >
-          <View style={styles.logoutBox} onStartShouldSetResponder={() => true}>
-            {/* Avatar / Icon */}
-            <View style={styles.logoutAvatarCircle}>
-              <Text style={styles.logoutAvatarInitial}>
-                {(user?.name || user?.email || 'A').charAt(0).toUpperCase()}
-              </Text>
-            </View>
-
-            {/* Info */}
-            <Text style={styles.logoutTitle}>Tài khoản Quản trị viên</Text>
-            <Text style={styles.logoutEmail} numberOfLines={1}>{user?.email || ''}</Text>
-
-            <View style={styles.logoutDivider} />
-
-            {/* Actions */}
-            <TouchableOpacity
-              style={styles.logoutConfirmBtn}
-              onPress={handleLogout}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.logoutConfirmText}>Đăng xuất</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.logoutCancelBtn}
-              onPress={() => setLogoutModalVisible(false)}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.logoutCancelText}>Hủy bỏ</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
+      {/* Logout Modal removed from here, moved to profile.tsx */}
     </View>
   );
 };
@@ -379,7 +332,7 @@ const styles = StyleSheet.create({
   headerRightActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: s(8),
+    gap: s(10),
   },
   menuBtn: {
     padding: s(6),
@@ -722,6 +675,19 @@ const styles = StyleSheet.create({
   },
   logoutCancelText: {
     color: '#ffffffff',
+    fontSize: ms(15),
+    fontWeight: '700',
+  },
+  profileDetailBtn: {
+    width: '100%',
+    backgroundColor: '#f1f5f9',
+    paddingVertical: vs(14),
+    borderRadius: s(18),
+    alignItems: 'center',
+    marginBottom: vs(12),
+  },
+  profileDetailText: {
+    color: '#475569',
     fontSize: ms(15),
     fontWeight: '700',
   },
