@@ -1,32 +1,40 @@
+import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toggleFavorite } from '@/services/firebase-service';
 import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   Image,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
-
 
 export default function FavoritesScreen() {
   const router = useRouter();
   const { t, language } = useLanguage();
+  const { user } = useAuth();
 
-  // Tích hợp dữ liệu realtime từ Firebase Firebase
   const [favorites, setFavorites] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!user?.uid) {
+      setFavorites([]);
+      setIsLoading(false);
+      return;
+    }
+
+    // Query User's specific favorites sub-collection
     const q = query(
-      collection(db, 'destinations'),
-      where('favorite', '==', true)
+      collection(db, 'users', user.uid, 'favorites'),
+      orderBy('favoriteAt', 'desc')
     );
 
     const unsubscribe = onSnapshot(
@@ -39,8 +47,6 @@ export default function FavoritesScreen() {
             ...doc.data()
           });
         });
-        // Sắp xếp: Cái nào thích sau (favoriteAt lớn hơn) thì hiện lên trước
-        dbFavs.sort((a, b) => (b.favoriteAt || 0) - (a.favoriteAt || 0));
         setFavorites(dbFavs);
         setIsLoading(false);
       },
@@ -51,12 +57,13 @@ export default function FavoritesScreen() {
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [user?.uid]);
 
-  const removeFavorite = async (id: string) => {
+  const removeFavorite = async (item: any) => {
+    if (!user?.uid) return;
     try {
-      await toggleFavorite(id, false);
-      // Dữ liệu sẽ tự động được xoá khỏi UI do onSnapshot
+      await toggleFavorite(user.uid, item, false);
+      // Data will auto-update via onSnapshot
     } catch (error) {
       console.error('Error removing favorite:', error);
     }
@@ -83,9 +90,35 @@ export default function FavoritesScreen() {
     });
   };
 
+  if (!user || user.isAnonymous) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={styles.backBtn}>
+            <Ionicons name="arrow-back" size={26} color="#1A1A1A" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{t('favorites')}</Text>
+          <View style={{ width: 40 }} />
+        </View>
+        <View style={styles.emptyContainer}>
+          <View style={styles.emptyIconCircle}>
+            <Ionicons name="lock-closed-outline" size={50} color="#3B82F6" />
+          </View>
+          <Text style={styles.emptyTitle}>Yêu cầu đăng nhập</Text>
+          <Text style={styles.emptySub}>Vui lòng đăng nhập để lưu và xem{'\n'}danh sách yêu thích của bạn</Text>
+          <TouchableOpacity
+            style={styles.exploreButton}
+            onPress={() => router.push('/login')}
+          >
+            <Text style={styles.exploreText}>Đăng nhập ngay</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={26} color="#1A1A1A" />
@@ -98,7 +131,9 @@ export default function FavoritesScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {favorites.length === 0 ? (
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#FF0050" style={{ marginTop: 50 }} />
+        ) : favorites.length === 0 ? (
           <View style={styles.emptyContainer}>
             <View style={styles.emptyIconCircle}>
               <Ionicons name="heart-dislike-outline" size={50} color="#FF4D4D" />
@@ -108,27 +143,38 @@ export default function FavoritesScreen() {
           </View>
         ) : (
           <View style={styles.listContainer}>
-            {favorites.map((item, index) => (
-              <View key={item.id}>
-                <TouchableOpacity
-                  style={styles.card}
-                  activeOpacity={0.8}
-                  onPress={() => handlePressItem(item)}
-                >
-                  <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
+            {favorites.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.card}
+                activeOpacity={0.8}
+                onPress={() => handlePressItem(item)}
+              >
+                <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
 
-                  <View style={styles.cardContent}>
+                <View style={styles.cardContent}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <Text style={styles.cardTitle} numberOfLines={1}>
                       {language === 'km' ? (item.name_khmer || item.name) : item.name}
                     </Text>
-                    <View style={styles.cardLocationBox}>
-                      <Text style={styles.cardLocation} numberOfLines={3}>
-                        {language === 'km' ? (item.location_khmer || item.location) : item.location}
-                      </Text>
-                    </View>
+                    <TouchableOpacity
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        removeFavorite(item);
+                      }}
+                      style={styles.heartBtnSmall}
+                    >
+                      <Ionicons name="heart" size={22} color="#FF4D4D" />
+                    </TouchableOpacity>
                   </View>
-                </TouchableOpacity>
-              </View>
+
+                  <View style={styles.cardLocationBox}>
+                    <Text style={styles.cardLocation} numberOfLines={2}>
+                      {language === 'km' ? (item.location_khmer || item.location) : item.location}
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
             ))}
           </View>
         )}
@@ -168,10 +214,9 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   emptyContainer: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 240,
+    paddingTop: 250,
     paddingHorizontal: 30,
   },
   emptyIconCircle: {
@@ -198,15 +243,11 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   exploreButton: {
-    backgroundColor: '#FF0050',
+    backgroundColor: '#3B82F6',
     paddingHorizontal: 30,
     paddingVertical: 15,
     borderRadius: 25,
     elevation: 3,
-    shadowColor: '#FF0050',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
   },
   exploreText: {
     color: '#FFF',
@@ -217,17 +258,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 10,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#1A1A1A',
-    marginBottom: 15,
-  },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    flexDirection: 'column',
-    alignItems: 'flex-start',
     padding: 15,
     marginBottom: 15,
     elevation: 2,
@@ -235,24 +268,25 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 5,
+    flexDirection: 'row',
+    gap: 12
   },
   cardImage: {
-    width: 110,
-    height: 85,
+    width: 100,
+    height: 100,
     borderRadius: 15,
-    marginBottom: 12,
     resizeMode: 'cover',
-    overflow: 'hidden',
-    alignSelf: 'center',
   },
   cardContent: {
-    width: '100%',
+    flex: 1,
+    justifyContent: 'center'
   },
   cardTitle: {
     fontSize: 17,
     fontWeight: '800',
     color: '#1A1A1A',
     marginBottom: 6,
+    flex: 1
   },
   cardLocationBox: {
     flexDirection: 'row',
@@ -263,14 +297,7 @@ const styles = StyleSheet.create({
     color: '#666',
     flexShrink: 1,
   },
-  heartButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 18,
-    borderWidth: 1.5,
-    borderColor: '#f6f1f1ff',
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  heartBtnSmall: {
+    padding: 4
+  }
 });

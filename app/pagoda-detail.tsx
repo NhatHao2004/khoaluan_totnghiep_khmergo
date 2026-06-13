@@ -3,7 +3,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, getDoc } from 'firebase/firestore';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -29,14 +29,15 @@ export default function PagodaDetailScreen() {
   const initialLocation = (params.location as string) || '';
   const initialDescription = (params.description as string) || '';
   const initialImageUrl = (params.imageUrl1 as string) || (params.imageUrl as string);
-  const initialIsFavorite = params.favorite === 'true';
 
   const [templeData, setTempleData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const [activeTab, setActiveTab] = useState<'map' | 'quiz'>('map');
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
 
+  // Fetch destination data
   useEffect(() => {
     if (!id) return;
     setLoading(true);
@@ -44,23 +45,15 @@ export default function PagodaDetailScreen() {
     const unsubscribe = onSnapshot(docRef, async (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setTempleData(data);
+        setTempleData({ id, ...data });
 
-        // Tải trước ảnh vào cache để khi hiện giao diện là có ảnh ngay lập tức
-        const targetImg = data.imageUrl1 || (params.imageUrl1 as string);
+        // Prefetch main image
+        const targetImg = data.imageUrl1 || data.imageUrl || initialImageUrl;
         if (targetImg) {
-          try {
-            await Image.prefetch(targetImg);
-          } catch (e) {
-            console.log("Prefetch error:", e);
-          }
+          try { await Image.prefetch(targetImg); } catch (e) {}
         }
       }
-
-      // Đảm bảo loading hiện đủ lâu để mọi thứ sẵn sàng
-      setTimeout(() => {
-        setLoading(false);
-      }, 800);
+      setTimeout(() => setLoading(false), 800);
     }, (error) => {
       console.error('Error fetching temple detail:', error);
       setLoading(false);
@@ -68,11 +61,24 @@ export default function PagodaDetailScreen() {
     return () => unsubscribe();
   }, [id]);
 
+  // Check unique favorite status for current user
+  useEffect(() => {
+    if (!id || !user?.uid) {
+      setIsFavorite(false);
+      return;
+    }
+    const favRef = doc(db, 'users', user.uid, 'favorites', id);
+    const unsubFav = onSnapshot(favRef, (snap) => {
+      setIsFavorite(snap.exists());
+    });
+    return () => unsubFav();
+  }, [id, user?.uid]);
+
   const name = isKm ? (templeData?.name_khmer || templeData?.name || initialName) : (templeData?.name || initialName);
   const location = isKm ? (templeData?.location_khmer || templeData?.location || initialLocation) : (templeData?.location || initialLocation);
   const description = isKm ? (templeData?.description_khmer || templeData?.description || templeData?.detailedDescription || initialDescription) : (templeData?.description || templeData?.detailedDescription || initialDescription);
   const contentBlocks = templeData?.contentBlocks || [];
-  const imageUrl = templeData?.imageUrl1 || (params.imageUrl1 as string);
+  const imageUrl = templeData?.imageUrl1 || templeData?.imageUrl || initialImageUrl;
 
   const imageSource = React.useMemo(() => {
     return imageUrl && typeof imageUrl === 'string' && imageUrl !== ''
@@ -84,14 +90,26 @@ export default function PagodaDetailScreen() {
     try { await Share.share({ message: `${name}\n${location}` }); } catch (e) { }
   };
 
-  const isFavorite = templeData?.favorite ?? initialIsFavorite;
-
   const handleToggleFavorite = async () => {
+    if (!user || user.isAnonymous) {
+      setShowLoginModal(true);
+      return;
+    }
     try {
       const { toggleFavorite } = require('@/services/firebase-service');
-      await toggleFavorite(id, !isFavorite);
+      // Pass the whole temple object to be saved in favorites for easy listing
+      const templeToFav = {
+        id,
+        name: templeData?.name || name,
+        name_khmer: templeData?.name_khmer || '',
+        location: templeData?.location || location,
+        location_khmer: templeData?.location_khmer || '',
+        imageUrl: templeData?.imageUrl || imageUrl,
+        category: templeData?.category || 'Chùa'
+      };
+      await toggleFavorite(user.uid, templeToFav, !isFavorite);
     } catch (e) {
-      console.error(e);
+      console.error("Favorite Error:", e);
     }
   };
 
@@ -160,7 +178,6 @@ export default function PagodaDetailScreen() {
         showsVerticalScrollIndicator={false}
         bounces={true}
       >
-        {/* --- Hero Image --- */}
         <View style={[styles.imageBlock, { backgroundColor: '#fff' }]}>
           {imageSource ? (
             <Image
@@ -174,7 +191,6 @@ export default function PagodaDetailScreen() {
             </View>
           )}
 
-          {/* --- Navigation inside Image --- */}
           <View style={styles.topNav}>
             <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
               <Ionicons name="arrow-back" size={24} color="#000" />
@@ -189,7 +205,6 @@ export default function PagodaDetailScreen() {
           </View>
         </View>
 
-        {/* --- Content Area --- */}
         <View style={styles.contentArea}>
           <View style={styles.titleBox}>
             <Text style={styles.mainTitle}>{name}</Text>
@@ -199,14 +214,12 @@ export default function PagodaDetailScreen() {
             </View>
           </View>
 
-          {/* Description Section */}
           {description ? (
             <View style={{ marginBottom: 0 }}>
               <Text style={[styles.piecePara, { textAlign: isKm ? 'left' : 'justify' }]}>{description}</Text>
             </View>
           ) : null}
 
-          {/* Dynamic Content Blocks */}
           {contentBlocks.map((block: any, index: number) => (
             <View key={index} style={styles.contentPiece}>
               {block.images && (
@@ -222,7 +235,6 @@ export default function PagodaDetailScreen() {
             </View>
           ))}
 
-          {/* Map & Quiz Section */}
           <View style={styles.mapWrap}>
             <View style={styles.sectionTabRow}>
               <TouchableOpacity
@@ -266,7 +278,6 @@ export default function PagodaDetailScreen() {
                   originWhitelist={['*']}
                 />
 
-                {/* Map Floating Controls */}
                 <View style={styles.mapControls}>
                   <TouchableOpacity style={styles.mapControlBtn} onPress={reCenterMap}>
                     <Ionicons name="locate" size={20} color="#0F172A" />
@@ -282,7 +293,7 @@ export default function PagodaDetailScreen() {
                 <Text style={styles.quizTitle}>{isKm ? 'សាកល្បងចំណេះដឹង' : 'Kiểm tra kiến thức'}</Text>
                 <Text style={styles.quizDesc}>
                   {isKm ? (
-                    <>តើអ្នកយល់ពី <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> យ៉ាងណា?{"\n"}ប្រកួតប្រជែងឥឡូវនេះដើម្បីទទួលបានពិន្ទុ</>
+                    <>តើអ្នកយល់ពី <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> យ៉ាងណា?{"\n"}ប្រកួតប្រជែងឥឡូវនេះ để nhận điểm thưởng</>
                   ) : (
                     <>Hiểu <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> như thế nào{"\n"}Thử thách ngay để nhận điểm thưởng</>
                   )}
@@ -316,7 +327,6 @@ export default function PagodaDetailScreen() {
         </View>
       </ScrollView>
 
-      {/* Custom Login Modal */}
       <Modal
         visible={showLoginModal}
         transparent={true}
@@ -331,7 +341,7 @@ export default function PagodaDetailScreen() {
             </View>
             <Text style={styles.modalTitle}>{t('login_required') || 'Yêu cầu đăng nhập'}</Text>
             <Text style={styles.modalSub}>
-              {t('login_to_use') || 'Bạn cần đăng nhập để tham gia thử thách này'}
+              {t('login_to_use') || 'Bạn cần đăng nhập để sử dụng tính năng này'}
             </Text>
 
             <View style={styles.modalActionRow}>
@@ -363,10 +373,7 @@ export default function PagodaDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
+  container: { flex: 1, backgroundColor: '#fff' },
   topNav: {
     position: 'absolute',
     top: 50,
@@ -389,21 +396,9 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 4,
   },
-  imageBlock: {
-    width: width,
-    height: HERO_HEIGHT,
-    backgroundColor: '#fff',
-  },
-  fullImg: {
-    width: '100%',
-    height: '100%',
-  },
-  noImg: {
-    flex: 1,
-    backgroundColor: '#F8FAFC',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  imageBlock: { width: width, height: HERO_HEIGHT, backgroundColor: '#fff' },
+  fullImg: { width: '100%', height: '100%' },
+  noImg: { flex: 1, backgroundColor: '#F8FAFC', justifyContent: 'center', alignItems: 'center' },
   contentArea: {
     paddingHorizontal: 25,
     paddingTop: 30,
@@ -413,59 +408,16 @@ const styles = StyleSheet.create({
     marginTop: -30,
     minHeight: height - HERO_HEIGHT + 30,
   },
-  titleBox: {
-    marginBottom: 20,
-  },
-  mainTitle: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: '#0F172A',
-    lineHeight: 36,
-  },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
-    gap: 6,
-  },
-  locationLabel: {
-    fontSize: 14,
-    color: '#64748B',
-    fontWeight: '500',
-  },
-  contentPiece: {
-    marginTop: 15,
-  },
-  blockPic: {
-    width: '100%',
-    height: 220,
-    borderRadius: 24,
-    marginBottom: 15,
-  },
-  blockTextWrap: {
-  },
-  pieceTitle: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: '#0F172A',
-    marginBottom: 8,
-  },
-  piecePara: {
-    fontSize: 16,
-    lineHeight: 26,
-    color: '#475569',
-    textAlign: 'left',
-  },
-  mapWrap: {
-    marginTop: 10,
-  },
-  headerLabel: {
-    fontSize: 13,
-    fontWeight: '900',
-    color: '#1E293B',
-    letterSpacing: 1.5,
-    marginBottom: 15,
-  },
+  titleBox: { marginBottom: 20 },
+  mainTitle: { fontSize: 28, fontWeight: '900', color: '#0F172A', lineHeight: 36 },
+  locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8, gap: 6 },
+  locationLabel: { fontSize: 14, color: '#64748B', fontWeight: '500' },
+  contentPiece: { marginTop: 15 },
+  blockPic: { width: '100%', height: 220, borderRadius: 24, marginBottom: 15 },
+  blockTextWrap: {},
+  pieceTitle: { fontSize: 20, fontWeight: '900', color: '#0F172A', marginBottom: 8 },
+  piecePara: { fontSize: 16, lineHeight: 26, color: '#475569', textAlign: 'left' },
+  mapWrap: { marginTop: 10 },
   mapBox: {
     height: 350,
     borderRadius: 28,
@@ -474,15 +426,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#F1F5F9',
   },
-  mapPreview: {
-    width: '100%',
-    height: '100%',
-  },
-  mapWebView: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'transparent',
-  },
+  mapWebView: { width: '100%', height: '100%', backgroundColor: 'transparent' },
   mapOpenBtn: {
     position: 'absolute',
     bottom: 15,
@@ -495,17 +439,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  mapOpenText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  mapControls: {
-    position: 'absolute',
-    top: 15,
-    right: 15,
-    gap: 10,
-  },
+  mapOpenText: { color: '#fff', fontSize: 12, fontWeight: '800' },
+  mapControls: { position: 'absolute', top: 15, right: 15, gap: 10 },
   mapControlBtn: {
     width: 40,
     height: 40,
@@ -519,27 +454,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  loaderContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loaderContent: {
-    alignItems: 'center',
-    gap: 15,
-  },
-  loaderText: {
-    fontSize: 14,
-    color: '#64748B',
-    fontWeight: '600',
-    letterSpacing: 0.5,
-  },
-  sectionTabRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 20,
-  },
+  loaderContainer: { flex: 1, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' },
+  loaderContent: { alignItems: 'center', gap: 15 },
+  loaderText: { fontSize: 14, color: '#64748B', fontWeight: '600', letterSpacing: 0.5 },
+  sectionTabRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
   tabBtn: {
     flex: 1,
     flexDirection: 'row',
@@ -552,16 +470,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
-  tabBtnText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#64748B',
-    textTransform: 'uppercase',
-    lineHeight: 20,
-  },
-  tabBtnTextActive: {
-    color: '#FFF',
-  },
+  tabBtnText: { fontSize: 13, fontWeight: '700', color: '#64748b', textTransform: 'uppercase', lineHeight: 20 },
+  tabBtnTextActive: { color: '#FFF' },
   quizCard: {
     height: 350,
     backgroundColor: '#FFF7ED',
@@ -572,28 +482,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 30,
   },
-  quizIconBg: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#FFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  quizTitle: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: '#1E293B',
-    marginBottom: 8,
-  },
-  quizDesc: {
-    fontSize: 14,
-    color: '#64748B',
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 12,
-  },
+  quizTitle: { fontSize: 20, fontWeight: '900', color: '#1E293B', marginBottom: 8 },
+  quizDesc: { fontSize: 14, color: '#64748B', textAlign: 'center', lineHeight: 22, marginBottom: 12 },
   quizStartBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -602,26 +492,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 14,
     borderRadius: 16,
-    shadowColor: '#FF6B2C',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowColor: '#FF6B2C', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8, elevation: 4,
   },
-  quizStartBtnText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '800',
-  },
-
-  // --- Premium Modal Styles ---
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
+  quizStartBtnText: { color: '#FFF', fontSize: 16, fontWeight: '800' },
   modalContent: {
     backgroundColor: '#FFF',
     borderRadius: 32,
@@ -629,70 +502,24 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 340,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-    elevation: 10,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.1, shadowRadius: 20, elevation: 10,
   },
   modalIconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#EFF6FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#DBEAFE',
+    width: 80, height: 80, borderRadius: 40, backgroundColor: '#EFF6FF',
+    justifyContent: 'center', alignItems: 'center', marginBottom: 20,
+    borderWidth: 1, borderColor: '#DBEAFE',
   },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: '#1E293B',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  modalSub: {
-    fontSize: 15,
-    color: '#64748B',
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 24,
-  },
-  modalActionRow: {
-    width: '100%',
-    gap: 12,
-  },
+  modalTitle: { fontSize: 20, fontWeight: '900', color: '#1E293B', marginBottom: 8, textAlign: 'center' },
+  modalSub: { fontSize: 15, color: '#64748B', textAlign: 'center', lineHeight: 22, marginBottom: 24 },
+  modalActionRow: { width: '100%', gap: 12 },
   modalPrimaryBtn: {
-    backgroundColor: '#3B82F6',
-    height: 56,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    backgroundColor: '#3B82F6', height: 56, borderRadius: 18,
+    justifyContent: 'center', alignItems: 'center', width: '100%',
   },
-  modalPrimaryBtnText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '800',
-  },
+  modalPrimaryBtnText: { color: '#FFF', fontSize: 16, fontWeight: '800' },
   modalSecondaryBtn: {
-    backgroundColor: '#EF4444',
-    height: 56,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
+    backgroundColor: '#EF4444', height: 56, borderRadius: 18,
+    justifyContent: 'center', alignItems: 'center', width: '100%',
   },
-  modalSecondaryBtnText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '800',
-  },
+  modalSecondaryBtnText: { color: '#FFF', fontSize: 16, fontWeight: '800' },
 });

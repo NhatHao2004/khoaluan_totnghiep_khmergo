@@ -1,4 +1,4 @@
-import { collection, getDocs, limit, orderBy, query, doc, updateDoc, increment, getDoc, arrayUnion } from "firebase/firestore";
+import { collection, getDocs, limit, orderBy, query, doc, updateDoc, increment, getDoc, arrayUnion, setDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../utils/firebaseConfig";
 
 export interface UserProfile {
@@ -24,14 +24,27 @@ export interface Temple {
   additionalImages?: string[];
 }
 
-export const toggleFavorite = async (templeId: string, isFavorite: boolean): Promise<void> => {
+export const toggleFavorite = async (userId: string, temple: any, isFavorite: boolean): Promise<void> => {
+  if (!userId) throw new Error('User not logged in');
   try {
-    const templeRef = doc(db, 'destinations', templeId);
-    await updateDoc(templeRef, { 
-      favorite: isFavorite,
-      favoriteAt: isFavorite ? new Date().getTime() : null
-    });
-    console.log('Toggled favorite for', templeId, 'to', isFavorite);
+    const favoriteRef = doc(db, 'users', userId, 'favorites', temple.id);
+    if (isFavorite) {
+      // Chỉ lưu các trường cần thiết để hiển thị trong danh sách yêu thích
+      const cleanTemple = {
+        id: temple.id,
+        name: temple.name || '',
+        name_khmer: temple.name_khmer || '',
+        location: temple.location || '',
+        location_khmer: temple.location_khmer || '',
+        imageUrl: temple.imageUrl || '',
+        category: temple.category || '',
+        favoriteAt: new Date().getTime()
+      };
+      await setDoc(favoriteRef, cleanTemple);
+    } else {
+      await deleteDoc(favoriteRef);
+    }
+    console.log('Toggled favorite for user', userId, 'temple', temple.id, 'to', isFavorite);
   } catch (error) {
     console.error('Error toggling favorite:', error);
     throw error;
