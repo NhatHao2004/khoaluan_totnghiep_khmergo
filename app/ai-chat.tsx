@@ -1,5 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
@@ -21,7 +22,6 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { s, vs, ms } from '@/utils/responsive';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import { analyzeImage, chatWithAI } from '../services/ai-service';
 
@@ -280,7 +280,7 @@ export default function AIAssistantScreen() {
           style={styles.menuBtn}
           onPress={() => activeTab === 'camera' ? resetCamera() : clearChat()}
         >
-          <Ionicons name="trash-outline" size={24} color="rgba(255, 0, 0, 1)ff" />
+          <Ionicons name="refresh-outline" size={26} color="rgba(255, 0, 0, 1)ff" />
         </TouchableOpacity>
       </View>
 

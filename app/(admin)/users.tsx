@@ -28,7 +28,7 @@ const ActivityCard = memo(({ item, getTimeAgo }: any) => (
       <Text style={styles.activityItemTitle} numberOfLines={1} adjustsFontSizeToFit>{item.name || 'Người dùng mới'}</Text>
     </View>
     <View style={styles.activityFooter}>
-      <Text style={styles.activityDesc} numberOfLines={1} adjustsFontSizeToFit>Thành thành viên chính thức từ hôm nay </Text>
+      <Text style={styles.activityDesc} numberOfLines={1} adjustsFontSizeToFit>Trở thành thành viên chính thức từ hôm nay </Text>
     </View>
   </View>
 ));

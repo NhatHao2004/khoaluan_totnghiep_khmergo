@@ -234,6 +234,7 @@ const AdminProfile = () => {
           style={styles.editBtn}
         >
           <Text style={styles.editBtnText}>{isEditing ? 'Lưu' : 'Sửa'}</Text>
+
         </TouchableOpacity>
       </View>
 
@@ -501,10 +502,9 @@ const styles = StyleSheet.create({
   editBtn: {
     paddingHorizontal: s(12),
     paddingVertical: vs(6),
-    backgroundColor: '#eff6ff',
     borderRadius: s(10),
   },
-  editBtnText: { color: '#3b82f6', fontWeight: '700', fontSize: ms(13) },
+  editBtnText: { color: '#3b82f6', fontWeight: '700', fontSize: ms(15) },
   profileCard: {
     backgroundColor: '#fff',
     alignItems: 'center',
