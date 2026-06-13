@@ -322,23 +322,24 @@ const ContentManagement = () => {
     setEditingDest(dest);
     setDName(dest.name || '');
     setDNameKm(dest.name_khmer || '');
-
-    // Always load base fields
-    setDLoc(dest.location || '');
-    setDLocKm(dest.location_khmer || '');
     setDDesc(dest.description || '');
     setDDescKm(dest.description_khmer || '');
 
     const lowerCat = (dest.category || '').toLowerCase();
     const lowerId = (dest.id || '').toLowerCase();
-    const isSpecialCat = lowerCat === 'ẩm thực' || lowerCat === 'food' || lowerId.includes('food') || lowerCat === 'văn hóa' || lowerCat === 'culture' || lowerId.includes('culture');
+    const isSpecialCat = lowerCat.includes('ẩm thực') || lowerCat.includes('food') || lowerId.includes('food') || lowerCat.includes('văn hóa') || lowerCat.includes('culture') || lowerId.includes('culture');
 
     if (isSpecialCat) {
       // Map 'location' to Vietnamese sub-desc and 'location_khmer' to Khmer sub-desc for food/culture
       setDSubDesc(dest.location || '');
       setDSubDescKm(dest.location_khmer || '');
+      // Clear address fields for food/culture as they use sub-desc instead
+      setDLoc('');
+      setDLocKm('');
     } else {
       // Normal pagoda logic
+      setDLoc(dest.location || '');
+      setDLocKm(dest.location_khmer || '');
       setDSubDesc(dest.subDescription || '');
       setDSubDescKm(dest.subDescription_khmer || '');
     }
@@ -354,7 +355,7 @@ const ContentManagement = () => {
     setDLng(String(dest.longitude || ''));
     setDBlocks(dest.contentBlocks || []);
 
-    const currentCat = (lowerCat === 'ẩm thực' || lowerCat === 'food' || lowerId.includes('food')) ? 'food' : (lowerCat === 'văn hóa' || lowerCat === 'culture' || lowerId.includes('culture')) ? 'culture' : 'pagoda';
+    const currentCat = (lowerCat.includes('ẩm thực') || lowerCat.includes('food') || lowerId.includes('food')) ? 'food' : (lowerCat.includes('văn hóa') || lowerCat.includes('culture') || lowerId.includes('culture')) ? 'culture' : 'pagoda';
     setDCat(currentCat);
     setDestModalVisible(true);
   }, []);
@@ -386,7 +387,7 @@ const ContentManagement = () => {
       };
 
       if (dCat === 'food' || dCat === 'culture') {
-        // Map back to location/location_khmer and DON'T save rental
+        // Map sub-desc inputs back to location/location_khmer and DON'T save rental
         destData.location = dSubDesc;
         destData.location_khmer = dSubDescKm;
       } else {
@@ -664,20 +665,20 @@ const ContentManagement = () => {
 
               {(dCat === 'culture' || dCat === 'food') && (
                 <>
-                  <Text style={styles.inputLabel}>Mô tả ngắn (Việt)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={dSubDesc}
-                    onChangeText={setDSubDesc}
-                    placeholder="Nhập mô tả ngắn..."
+                  <Text style={styles.inputLabel}>Mô tả phụ ngắn (Việt)</Text>
+                  <TextInput 
+                    style={styles.input} 
+                    value={dSubDesc} 
+                    onChangeText={setDSubDesc} 
+                    placeholder="Lấy từ trường 'location'..." 
                   />
 
-                  <Text style={styles.inputLabel}>Mô tả ngắn (Khmer)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={dSubDescKm}
-                    onChangeText={setDSubDescKm}
-                    placeholder="Nhập mô tả ngắn..."
+                  <Text style={styles.inputLabel}>Mô tả phụ ngắn (Khmer)</Text>
+                  <TextInput 
+                    style={styles.input} 
+                    value={dSubDescKm} 
+                    onChangeText={setDSubDescKm} 
+                    placeholder="Lấy từ trường 'location_khmer'..." 
                   />
                 </>
               )}
