@@ -359,7 +359,7 @@ const AdminDashboard = () => {
               onPress={() => setShowFeedbackModal(true)}
               style={styles.notificationBtn}
             >
-              <Ionicons name="chatbubbles-outline" size={ms(26)} color="#1e293b" />
+              <Ionicons name="chatbubbles-outline" size={ms(26)} color="#0022ffff" />
               {pendingFeedback > 0 && (
                 <View style={styles.notificationBadge}>
                   <Text style={styles.badgeText}>{pendingFeedback > 99 ? '99+' : pendingFeedback}</Text>
@@ -505,7 +505,6 @@ const AdminDashboard = () => {
                           <Text style={styles.feedbackTime}>{f.createdAt ? getTimeAgo(f.createdAt) : 'Vừa xong'}</Text>
                         </View>
                       </View>
-                      {(!f.adminReply || f.adminReply === '') && <View style={styles.newBadge} />}
                     </View>
                     <Text style={styles.feedbackPreview} numberOfLines={2}>{f.message || f.content}</Text>
                   </TouchableOpacity>
@@ -1106,22 +1105,22 @@ const styles = StyleSheet.create({
     top: vs(5),
     right: s(5),
     backgroundColor: '#ef4444',
-    minWidth: s(18),
-    height: s(18),
-    borderRadius: s(9),
+    width: s(22),
+    height: s(22),
+    borderRadius: s(11),
     justifyContent: 'center',
-    paddingHorizontal: s(4),
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#fff',
   },
   badgeText: {
     color: '#fff',
-    fontSize: ms(10),
+    fontSize: ms(9),
     fontWeight: '900',
     textAlign: 'center',
+    textAlignVertical: 'center',
     includeFontPadding: false,
-    lineHeight: ms(13),
+    paddingLeft: 0,
   },
   feedbackListAvatar: {
     width: s(24),
