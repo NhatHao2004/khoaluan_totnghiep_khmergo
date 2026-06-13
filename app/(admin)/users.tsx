@@ -94,7 +94,7 @@ const UsersActivity = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
+  container: { flex: 1, backgroundColor: '#ffffff' },
   header: { 
     flexDirection: 'row', 
     alignItems: 'center', 

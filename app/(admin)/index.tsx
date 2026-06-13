@@ -3,7 +3,7 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { collection, onSnapshot } from 'firebase/firestore';
 import React, { memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../../contexts/AuthContext';
 import { db } from '../../utils/firebaseConfig';
@@ -98,6 +98,7 @@ const AdminDashboard = () => {
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const leaderboardRef = useRef<ScrollView>(null);
   const { logout, user } = useContext(AuthContext);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
   const insets = useSafeAreaInsets();
 
@@ -196,22 +197,14 @@ const AdminDashboard = () => {
   }, [allSortedUsers]);
 
   const handleAdminAction = useCallback(() => {
-    Alert.alert(
-      'Quản trị viên',
-      `Tài khoản: ${user?.name || user?.email}\nBạn muốn thực hiện hành động gì?`,
-      [
-        { text: 'Hủy', style: 'cancel' },
-        {
-          text: 'Đăng xuất',
-          onPress: async () => {
-            await logout();
-            router.replace('/login');
-          },
-          style: 'destructive'
-        },
-      ]
-    );
-  }, [user, logout]);
+    setLogoutModalVisible(true);
+  }, []);
+
+  const handleLogout = useCallback(async () => {
+    setLogoutModalVisible(false);
+    await logout();
+    router.replace('/login');
+  }, [logout]);
 
   return (
     <View style={[styles.container, { paddingTop: Math.max(insets.top, vs(15)) }]}>
@@ -310,6 +303,53 @@ const AdminDashboard = () => {
           )}
         </View>
       </ScrollView>
+
+      {/* Premium Logout Modal */}
+      <Modal
+        visible={logoutModalVisible}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={() => setLogoutModalVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.logoutOverlay}
+          activeOpacity={1}
+          onPress={() => setLogoutModalVisible(false)}
+        >
+          <View style={styles.logoutBox} onStartShouldSetResponder={() => true}>
+            {/* Avatar / Icon */}
+            <View style={styles.logoutAvatarCircle}>
+              <Text style={styles.logoutAvatarInitial}>
+                {(user?.name || user?.email || 'A').charAt(0).toUpperCase()}
+              </Text>
+            </View>
+
+            {/* Info */}
+            <Text style={styles.logoutTitle}>Tài khoản Quản trị viên</Text>
+            <Text style={styles.logoutEmail} numberOfLines={1}>{user?.email || ''}</Text>
+
+            <View style={styles.logoutDivider} />
+
+            {/* Actions */}
+            <TouchableOpacity
+              style={styles.logoutConfirmBtn}
+              onPress={handleLogout}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.logoutConfirmText}>Đăng xuất</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.logoutCancelBtn}
+              onPress={() => setLogoutModalVisible(false)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.logoutCancelText}>Hủy bỏ</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
@@ -583,6 +623,107 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#94a3b8',
     fontSize: ms(14),
+  },
+
+  // Premium Logout Modal
+  logoutOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.55)',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  logoutBox: {
+    width: '100%',
+    backgroundColor: '#fff',
+    borderTopLeftRadius: ms(32),
+    borderTopRightRadius: ms(32),
+    paddingTop: vs(30),
+    paddingBottom: vs(40),
+    paddingHorizontal: s(28),
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 20,
+  },
+  logoutAvatarCircle: {
+    width: s(72),
+    height: s(72),
+    borderRadius: s(36),
+    backgroundColor: '#3b82f6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: vs(14),
+    shadowColor: '#3b82f6',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+    elevation: 10,
+  },
+  logoutAvatarInitial: {
+    fontSize: ms(28),
+    fontWeight: '900',
+    color: '#fff',
+  },
+  logoutTitle: {
+    fontSize: ms(12),
+    fontWeight: '700',
+    color: '#94a3b8',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginBottom: vs(4),
+  },
+  logoutName: {
+    fontSize: ms(20),
+    fontWeight: '900',
+    color: '#1e293b',
+    marginBottom: vs(2),
+  },
+  logoutEmail: {
+    fontSize: ms(13),
+    color: '#64748b',
+    fontWeight: '500',
+    marginBottom: vs(24),
+  },
+  logoutDivider: {
+    width: '100%',
+    height: 1,
+    backgroundColor: '#f1f5f9',
+    marginBottom: vs(24),
+  },
+  logoutConfirmBtn: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: s(10),
+    backgroundColor: '#ef4444',
+    paddingVertical: vs(16),
+    borderRadius: s(18),
+    marginBottom: vs(12),
+    shadowColor: '#ef4444',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  logoutConfirmText: {
+    color: '#fff',
+    fontSize: ms(16),
+    fontWeight: '800',
+  },
+  logoutCancelBtn: {
+    width: '100%',
+    paddingVertical: vs(14),
+    borderRadius: s(18),
+    backgroundColor: '#0080ffff',
+    alignItems: 'center',
+  },
+  logoutCancelText: {
+    color: '#ffffffff',
+    fontSize: ms(15),
+    fontWeight: '700',
   },
 });
 

@@ -236,7 +236,7 @@ const ArticleManagement = () => {
               color="#FFF"
             />
           </View>
-          <Text style={styles.toastText} numberOfLines={2}>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
             {toastMsg}
           </Text>
         </Animated.View>
@@ -356,7 +356,7 @@ const ArticleManagement = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
+  container: { flex: 1, backgroundColor: '#ffffff' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

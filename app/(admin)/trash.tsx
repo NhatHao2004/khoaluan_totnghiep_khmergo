@@ -24,8 +24,8 @@ const TrashItem = memo(({ item, onRestore, onDelete, getImageSource }: any) => {
     <View style={styles.card}>
       <View style={styles.imageContainer}>
         {item.imageUrl || fallback ? (
-          <Image 
-            source={item.imageUrl ? { uri: item.imageUrl } : fallback} 
+          <Image
+            source={item.imageUrl ? { uri: item.imageUrl } : fallback}
             style={styles.cardImage}
             contentFit="cover"
             transition={300}
@@ -39,7 +39,7 @@ const TrashItem = memo(({ item, onRestore, onDelete, getImageSource }: any) => {
 
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{item.name || item.title || 'Không có tên'}</Text>
-        
+
         <View style={styles.divider} />
 
         <View style={styles.cardFooter}>
@@ -166,7 +166,7 @@ const TrashManagement = () => {
               color="#FFF"
             />
           </View>
-          <Text style={styles.toastText} numberOfLines={2}>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
             {toastMsg}
           </Text>
         </Animated.View>
@@ -190,10 +190,10 @@ const TrashManagement = () => {
           data={trashedItems}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <TrashItem 
-              item={item} 
-              onRestore={handleRestore} 
-              onDelete={handlePermanentDelete} 
+            <TrashItem
+              item={item}
+              onRestore={handleRestore}
+              onDelete={handlePermanentDelete}
             />
           )}
           contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + vs(20) }]}
@@ -235,11 +235,11 @@ const TrashManagement = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8fafc' },
-  header: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    paddingHorizontal: s(16), 
+  container: { flex: 1, backgroundColor: '#ffffff' },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: s(16),
     paddingBottom: vs(15),
     backgroundColor: '#fff',
     borderBottomWidth: 1,
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ffe4e6',
   },
-  emptyContainer: { alignItems: 'center', marginTop: vs(150), opacity: 0.5 },
+  emptyContainer: { alignItems: 'center', marginTop: vs(300), opacity: 0.5 },
   emptyText: { marginTop: vs(14), fontSize: ms(16), color: '#94a3b8', fontWeight: '600' },
 
   // Modal Styles
