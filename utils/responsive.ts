@@ -4,7 +4,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // Base design dimensions (your test device ~6.5" Android FHD+)
 const BASE_WIDTH = 393;
-const BASE_HEIGHT = 873;
+const BASE_HEIGHT = 852;
 
 /**
  * Horizontal scale - based on screen width
