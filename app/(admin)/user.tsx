@@ -2,11 +2,14 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { addDoc, collection, doc, getDocs, onSnapshot, orderBy, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { memo, useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, FlatList, KeyboardAvoidingView, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { db } from '../../utils/firebaseConfig';
 import { ms, s, vs } from '../../utils/responsive';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // --- Memoized Components ---
 
@@ -14,9 +17,9 @@ const UserItem = memo(({ item, onFeedback, onToggleLock }: any) => (
   <View style={[styles.userCard, item.isBlocked && styles.userCardLocked]}>
     <View style={styles.userInfoRow}>
       {item.avatar ? (
-        <Image 
-          source={{ uri: item.avatar }} 
-          style={styles.avatar} 
+        <Image
+          source={{ uri: item.avatar }}
+          style={styles.avatar}
           contentFit="cover"
           transition={200}
         />
@@ -26,27 +29,27 @@ const UserItem = memo(({ item, onFeedback, onToggleLock }: any) => (
         </View>
       )}
       <View style={styles.userDetails}>
-        <Text style={[styles.userName, item.isBlocked && styles.textWhite]} numberOfLines={1}>
+        <Text style={[styles.userName, item.isBlocked && styles.textWhite]}>
           {item.name || 'N/A'}
         </Text>
-        <Text 
-          style={[styles.userEmail, item.isBlocked && styles.textWhiteLight]} 
-          numberOfLines={1} 
+        <Text
+          style={[styles.userEmail, item.isBlocked && styles.textWhiteLight]}
+          numberOfLines={2}
           adjustsFontSizeToFit
-          minimumFontScale={0.8}
+          minimumFontScale={0.7}
         >
           {item.email || 'No email'}
         </Text>
 
         <View style={styles.userStatsRow}>
           <View style={[styles.statChip, item.isBlocked && styles.statChipLocked]}>
-            <Text style={[styles.statChipText, item.isBlocked && styles.textWhite]} numberOfLines={1} adjustsFontSizeToFit>
+            <Text style={[styles.statChipText, item.isBlocked && styles.textWhite]} adjustsFontSizeToFit>
               {item.points || 0} Điểm
             </Text>
           </View>
 
           <View style={[styles.statChip, item.isBlocked && styles.statChipLocked]}>
-            <Text style={[styles.statChipText, item.isBlocked && styles.textWhite]} numberOfLines={1} adjustsFontSizeToFit>
+            <Text style={[styles.statChipText, item.isBlocked && styles.textWhite]} adjustsFontSizeToFit>
               {item.completedQuizzes || 0} bài quiz
             </Text>
           </View>
@@ -102,6 +105,32 @@ const UserManagement = () => {
   const [replyMessage, setReplyMessage] = useState('');
   const [sendingReply, setSendingReply] = useState(false);
 
+  // Toast States
+  const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const toastY = useSharedValue(-120);
+
+  const triggerToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMsg(msg);
+    setToastType(type);
+    setShowToast(true);
+    toastY.value = withSpring(Platform.OS === 'ios' ? 50 : 40, {
+      damping: 15,
+      stiffness: 120,
+    });
+
+    setTimeout(() => {
+      toastY.value = withTiming(-120, { duration: 400 });
+      setTimeout(() => setShowToast(false), 400);
+    }, 3000);
+  };
+
+  const animatedToastStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: toastY.value }],
+    opacity: interpolate(toastY.value, [-100, 40], [0, 1], 'clamp'),
+  }));
+
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -133,7 +162,7 @@ const UserManagement = () => {
       await updateDoc(userRef, { isBlocked: !pendingUser.isBlocked });
     } catch (error) {
       console.error('Error toggling lock:', error);
-      Alert.alert('Lỗi', 'Không thể thực hiện thao tác này.');
+      triggerToast('Không thể thực hiện thao tác này.', 'error');
     } finally {
       setPendingUser(null);
     }
@@ -196,10 +225,10 @@ const UserManagement = () => {
       setReplyModalVisible(false);
       setReplyingFeedback(null);
       setReplyMessage('');
-      Alert.alert('Thành công', 'Đã gửi phản hồi tới người dùng.');
+      triggerToast('Đã gửi phản hồi tới người dùng', 'success');
     } catch (error) {
       console.error('Error replying:', error);
-      Alert.alert('Lỗi', 'Không thể gửi phản hồi.');
+      triggerToast('Không thể gửi phản hồi.', 'error');
     } finally {
       setSendingReply(false);
     }
@@ -211,6 +240,29 @@ const UserManagement = () => {
 
   return (
     <View style={[styles.container, { paddingTop: Math.max(insets.top, vs(10)) }]}>
+      {/* Premium Toast System */}
+      {showToast && (
+        <Animated.View
+          style={[
+            styles.toastContainer,
+            animatedToastStyle,
+            {
+              backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
+              shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
+            }
+          ]}
+        >
+          <View style={styles.toastIcon}>
+            <Ionicons
+              name={toastType === 'success' ? "checkmark" : "close"}
+              size={ms(20)}
+              color="#FFF"
+            />
+          </View>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
+        </Animated.View>
+      )}
+
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
@@ -770,6 +822,43 @@ const styles = StyleSheet.create({
   },
   disabledBtn: {
     backgroundColor: '#cbd5e1',
+  },
+  // Toast Styles
+  toastContainer: {
+    position: 'absolute',
+    top: 0,
+    left: s(16),
+    right: s(16),
+    minHeight: vs(56),
+    paddingVertical: vs(8),
+    borderRadius: ms(18),
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: s(14),
+    zIndex: 9999,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  toastIcon: {
+    width: s(32),
+    height: s(32),
+    borderRadius: s(16),
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  toastText: {
+    color: '#FFF',
+    fontSize: ms(15),
+    fontWeight: '700',
+    marginLeft: s(12),
+    flex: 1,
+    letterSpacing: 0.2,
+    includeFontPadding: false,
+    lineHeight: ms(22),
   },
 });
 

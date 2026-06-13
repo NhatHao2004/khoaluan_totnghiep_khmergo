@@ -1,11 +1,72 @@
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { collection, deleteDoc, doc, onSnapshot, orderBy, query, setDoc } from 'firebase/firestore';
-import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, FlatList, Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { db } from '../../utils/firebaseConfig';
+import { ms, s, vs } from '../../utils/responsive';
+
+// --- Memoized Components ---
+
+const TrashItem = memo(({ item, onRestore, onDelete, getImageSource }: any) => {
+  const fallback = useMemo(() => {
+    if (item.originalId?.includes('family') || item.title === 'cat_family') return require('@/assets/images/giadinh.jpg');
+    if (item.originalId?.includes('food') || item.title === 'cat_food') return require('@/assets/images/monan.jpg');
+    if (item.originalId?.includes('greeting') || item.title === 'cat_greetings') return require('@/assets/images/chaohoi.jpg');
+    if (item.originalId?.includes('number') || item.title === 'cat_numbers') return require('@/assets/images/sodem.jpg');
+    return null;
+  }, [item.originalId, item.title]);
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.imageContainer}>
+        {item.imageUrl || fallback ? (
+          <Image 
+            source={item.imageUrl ? { uri: item.imageUrl } : fallback} 
+            style={styles.cardImage}
+            contentFit="cover"
+            transition={300}
+          />
+        ) : (
+          <View style={[styles.cardImage, { backgroundColor: '#f1f5f9', justifyContent: 'center', alignItems: 'center' }]}>
+            <Ionicons name="image-outline" size={ms(48)} color="#cbd5e1" />
+          </View>
+        )}
+      </View>
+
+      <View style={styles.cardContent}>
+        <Text style={styles.cardTitle}>{item.name || item.title || 'Không có tên'}</Text>
+        
+        <View style={styles.divider} />
+
+        <View style={styles.cardFooter}>
+          <TouchableOpacity
+            style={styles.restoreBtnLarge}
+            onPress={() => onRestore(item)}
+          >
+            <Ionicons name="refresh-outline" size={ms(20)} color="#3b82f6" />
+            <Text style={styles.restoreBtnText}>Khôi phục</Text>
+          </TouchableOpacity>
+
+          <View style={styles.footerRight}>
+            <TouchableOpacity
+              style={styles.deleteIconBtn}
+              onPress={() => onDelete(item.id, item.name || item.title)}
+            >
+              <Ionicons name="trash-outline" size={ms(22)} color="#ef4444" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+});
 
 const TrashManagement = () => {
+  const insets = useSafeAreaInsets();
   const [trashedItems, setTrashedItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -13,26 +74,31 @@ const TrashManagement = () => {
   const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<{ id: string, name: string } | null>(null);
 
-  // Toast State
-  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
-  const translateY = useRef(new Animated.Value(-100)).current;
+  // Toast States
+  const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const toastY = useSharedValue(-120);
 
-  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
-    setToast({ visible: true, message: msg, type });
-    Animated.spring(translateY, {
-      toValue: 40,
-      useNativeDriver: true,
-      friction: 8,
-    }).start();
+  const triggerToast = useCallback((msg: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMsg(msg);
+    setToastType(type);
+    setShowToast(true);
+    toastY.value = withSpring(Platform.OS === 'ios' ? 50 : 40, {
+      damping: 15,
+      stiffness: 120,
+    });
 
     setTimeout(() => {
-      Animated.timing(translateY, {
-        toValue: -100,
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => setToast({ ...toast, visible: false }));
+      toastY.value = withTiming(-120, { duration: 400 });
+      setTimeout(() => setShowToast(false), 400);
     }, 3000);
-  };
+  }, []);
+
+  const animatedToastStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: toastY.value }],
+    opacity: interpolate(toastY.value, [-100, 40], [0, 1], 'clamp'),
+  }));
 
   useEffect(() => {
     const q = query(collection(db, 'system_trash'), orderBy('deletedAt', 'desc'));
@@ -49,22 +115,22 @@ const TrashManagement = () => {
 
   const handleRestore = async (item: any) => {
     try {
-      const { originalCollection, originalId, deletedAt, ...rest } = item;
+      const { originalCollection, originalId, deletedAt, id: _, ...rest } = item;
       // 1. Chuyển lại vào collection gốc
       await setDoc(doc(db, originalCollection, originalId), rest);
       // 2. Xóa khỏi thùng rác
       await deleteDoc(doc(db, 'system_trash', item.id));
-      showToast('Đã phục hồi nội dung thành công', 'success');
+      triggerToast('Đã phục hồi nội dung thành công', 'success');
     } catch (e) {
       console.error(e);
-      showToast('Lỗi khi phục hồi nội dung', 'error');
+      triggerToast('Lỗi khi phục hồi nội dung', 'error');
     }
   };
 
-  const handlePermanentDelete = (id: string, name: string) => {
+  const handlePermanentDelete = useCallback((id: string, name: string) => {
     setPendingDelete({ id, name });
     setDeleteConfirmVisible(true);
-  };
+  }, []);
 
   const confirmPermanentDelete = async () => {
     if (!pendingDelete) return;
@@ -72,78 +138,47 @@ const TrashManagement = () => {
       await deleteDoc(doc(db, 'system_trash', pendingDelete.id));
       setDeleteConfirmVisible(false);
       setPendingDelete(null);
-      showToast('Đã xóa vĩnh viễn nội dung', 'success');
+      triggerToast('Đã xóa vĩnh viễn nội dung', 'success');
     } catch (e) {
       console.error(e);
-      showToast('Lỗi khi xóa vĩnh viễn', 'error');
+      triggerToast('Lỗi khi xóa vĩnh viễn', 'error');
     }
   };
 
-  const renderTrashItem = ({ item }: { item: any }) => (
-    <View style={styles.card}>
-      <View style={styles.imageContainer}>
-        {item.imageUrl ? (
-          <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
-        ) : item.originalId?.includes('family') || item.title === 'cat_family' ? (
-          <Image source={require('@/assets/images/giadinh.jpg')} style={styles.cardImage} />
-        ) : item.originalCollection === 'vocab_categories' ? (
-          <Image
-            source={
-              (item.title === 'cat_family' || item.id?.includes('family') || item.originalId?.includes('family'))
-                ? require('@/assets/images/giadinh.jpg')
-                : (item.title === 'cat_food' || item.id?.includes('food') || item.originalId?.includes('food'))
-                  ? require('@/assets/images/monan.jpg')
-                  : (item.title === 'cat_greetings' || item.id?.includes('greeting') || item.originalId?.includes('greeting'))
-                    ? require('@/assets/images/chaohoi.jpg')
-                    : (item.title === 'cat_numbers' || item.id?.includes('number') || item.originalId?.includes('number'))
-                      ? require('@/assets/images/sodem.jpg')
-                      : require('@/assets/images/giadinh.jpg')
-            }
-            style={styles.cardImage}
-          />
-        ) : (
-          <View style={[styles.cardImage, { backgroundColor: '#f1f5f9', justifyContent: 'center', alignItems: 'center' }]}>
-            <Ionicons name="image-outline" size={48} color="#cbd5e1" />
-          </View>
-        )}
-      </View>
-
-      <View style={styles.cardContent}>
-        <Text style={styles.cardTitle} numberOfLines={1}>{item.name || item.title || 'Không có tên'}</Text>
-
-        <View style={styles.divider} />
-
-        <View style={styles.cardFooter}>
-          <TouchableOpacity
-            style={styles.restoreBtnLarge}
-            onPress={() => handleRestore(item)}
-          >
-            <Ionicons name="refresh-outline" size={20} color="#3b82f6" />
-            <Text style={styles.restoreBtnText}>Khôi phục</Text>
-          </TouchableOpacity>
-
-          <View style={styles.footerRight}>
-            <TouchableOpacity
-              style={styles.deleteIconBtn}
-              onPress={() => handlePermanentDelete(item.id, item.name || item.title)}
-            >
-              <Ionicons name="trash-outline" size={22} color="#ef4444" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </View>
-  );
-
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, vs(10)) }]}>
+      {/* Premium Toast System */}
+      {showToast && (
+        <Animated.View
+          style={[
+            styles.toastContainer,
+            animatedToastStyle,
+            {
+              backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
+              shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
+            }
+          ]}
+        >
+          <View style={styles.toastIcon}>
+            <Ionicons
+              name={toastType === 'success' ? "checkmark" : "close"}
+              size={ms(20)}
+              color="#FFF"
+            />
+          </View>
+          <Text style={styles.toastText} numberOfLines={2}>
+            {toastMsg}
+          </Text>
+        </Animated.View>
+      )}
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={28} color="#1e293b" />
+          <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>Thùng rác hệ thống</Text>
-        <View style={{ width: 44 }} />
+        <View style={{ width: s(44) }} />
       </View>
 
       {loading ? (
@@ -154,11 +189,18 @@ const TrashManagement = () => {
         <FlatList
           data={trashedItems}
           keyExtractor={(item) => item.id}
-          renderItem={renderTrashItem}
-          contentContainerStyle={styles.listContent}
+          renderItem={({ item }) => (
+            <TrashItem 
+              item={item} 
+              onRestore={handleRestore} 
+              onDelete={handlePermanentDelete} 
+            />
+          )}
+          contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + vs(20) }]}
+          showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Ionicons name="trash-bin-outline" size={80} color="#e2e8f0" />
+              <Ionicons name="trash-bin-outline" size={ms(80)} color="#e2e8f0" />
               <Text style={styles.emptyText}>Thùng rác trống</Text>
             </View>
           }
@@ -170,51 +212,47 @@ const TrashManagement = () => {
         <View style={styles.modalBg}>
           <View style={styles.modalContentSmall}>
             <View style={styles.confirmIconBg}>
-              <Ionicons name="trash" size={34} color="#ef4444" />
+              <Ionicons name="trash" size={ms(34)} color="#ef4444" />
             </View>
-            <Text style={[styles.modalTitle, { textAlign: 'center', marginBottom: 10 }]}>Xóa vĩnh viễn</Text>
+            <Text style={styles.modalTitle}>Xóa vĩnh viễn</Text>
             <Text style={styles.confirmSubText}>
               Bạn có chắc chắn muốn xóa vĩnh viễn{"\n"}
               Thao tác này <Text style={{ color: '#ef4444', fontWeight: '700' }}>không thể hoàn tác</Text>
             </Text>
-            <View style={[styles.modalActions, { justifyContent: 'center', gap: 15 }]}>
-              <TouchableOpacity style={[styles.saveBtnSmall, { backgroundColor: '#3b82f6', flex: 1, alignItems: 'center' }]} onPress={() => setDeleteConfirmVisible(false)}>
-                <Text style={styles.saveBtnText}>Hủy bỏ</Text>
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={[styles.btnAction, { backgroundColor: '#3b82f6' }]} onPress={() => setDeleteConfirmVisible(false)}>
+                <Text style={styles.btnText}>Hủy bỏ</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.saveBtnSmall, { backgroundColor: '#ef4444', flex: 1, alignItems: 'center' }]} onPress={confirmPermanentDelete}>
-                <Text style={styles.saveBtnText}>Xác nhận</Text>
+              <TouchableOpacity style={[styles.btnAction, { backgroundColor: '#ef4444' }]} onPress={confirmPermanentDelete}>
+                <Text style={styles.btnText}>Xác nhận</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
-
-      {/* Toast Notification */}
-      {toast.visible && (
-        <Animated.View style={[
-          styles.toastContainer,
-          { transform: [{ translateY }] },
-          toast.type === 'success' ? styles.toastSuccess : styles.toastError
-        ]}>
-          <Ionicons name={toast.type === 'success' ? "checkmark-circle" : "alert-circle"} size={24} color="#fff" />
-          <Text style={styles.toastText}>{toast.message}</Text>
-        </Animated.View>
-      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, marginTop: 35, height: 50, position: 'relative' },
-  backBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', zIndex: 10 },
-  headerTitle: { flex: 1, fontSize: 20, fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+  container: { flex: 1, backgroundColor: '#f8fafc' },
+  header: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingHorizontal: s(16), 
+    paddingBottom: vs(15),
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9'
+  },
+  backBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center' },
+  headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
   centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  listContent: { padding: 16 },
+  listContent: { padding: s(16) },
   card: {
     backgroundColor: '#fff',
-    borderRadius: 24,
-    marginBottom: 20,
+    borderRadius: ms(24),
+    marginBottom: vs(20),
     overflow: 'hidden',
     elevation: 4,
     shadowColor: '#1e293b',
@@ -232,21 +270,20 @@ const styles = StyleSheet.create({
   cardImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
   },
   cardContent: {
-    padding: 20,
+    padding: s(20),
   },
   cardTitle: {
-    fontSize: 22,
+    fontSize: ms(22),
     fontWeight: '900',
     color: '#1e293b',
-    marginBottom: 16,
+    marginBottom: vs(16),
   },
   divider: {
     height: 1,
     backgroundColor: '#f1f5f9',
-    marginBottom: 16,
+    marginBottom: vs(16),
   },
   cardFooter: {
     flexDirection: 'row',
@@ -257,63 +294,96 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f0f7ff',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 14,
-    gap: 8,
+    paddingVertical: vs(12),
+    paddingHorizontal: s(20),
+    borderRadius: s(14),
+    gap: s(8),
     borderWidth: 1,
     borderColor: '#dbeafe',
   },
   restoreBtnText: {
-    fontSize: 15,
+    fontSize: ms(15),
     fontWeight: '800',
     color: '#3b82f6',
   },
   footerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: s(12),
   },
   deleteIconBtn: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
+    width: s(48),
+    height: s(48),
+    borderRadius: s(14),
     backgroundColor: '#fff1f2',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#ffe4e6',
   },
-  emptyContainer: { alignItems: 'center', marginTop: 280 },
-  emptyText: { marginTop: 14, fontSize: 16, color: '#94a3b8', fontWeight: '600' },
-  // Toast Styles
-  toastContainer: { position: 'absolute', top: 0, left: 20, right: 20, flexDirection: 'row', alignItems: 'center', paddingVertical: 15, paddingHorizontal: 20, borderRadius: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.15, shadowRadius: 20, elevation: 10, zIndex: 9999, gap: 12 },
-  toastSuccess: { backgroundColor: '#10b981' },
-  toastError: { backgroundColor: '#ef4444' },
-  toastText: { color: '#fff', fontSize: 14, fontWeight: '700', flex: 1 },
-  // Modal & Button Styles (Sync with content.tsx)
+  emptyContainer: { alignItems: 'center', marginTop: vs(150), opacity: 0.5 },
+  emptyText: { marginTop: vs(14), fontSize: ms(16), color: '#94a3b8', fontWeight: '600' },
+
+  // Modal Styles
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modalContentSmall: { width: '85%', backgroundColor: '#fff', borderRadius: 20, padding: 20 },
-  modalTitle: { fontSize: 22, fontWeight: '800', color: '#1e293b' },
-  modalActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10, marginTop: 20 },
-  saveBtnSmall: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10 },
-  saveBtnText: { color: '#fff', fontWeight: '800', fontSize: 16, textAlign: 'center' },
+  modalContentSmall: { width: '85%', backgroundColor: '#fff', borderRadius: ms(24), padding: s(24) },
+  modalTitle: { fontSize: ms(22), fontWeight: '800', color: '#1e293b', textAlign: 'center', marginBottom: vs(10) },
+  modalActions: { flexDirection: 'row', justifyContent: 'center', gap: s(12), marginTop: vs(25) },
+  btnAction: { flex: 1, paddingVertical: vs(14), borderRadius: s(14), alignItems: 'center' },
+  btnText: { color: '#fff', fontWeight: '800', fontSize: ms(15) },
   confirmIconBg: {
-    width: 66,
-    height: 66,
-    borderRadius: 33,
+    width: s(70),
+    height: s(70),
+    borderRadius: s(35),
     backgroundColor: '#fef2f2',
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
-    marginBottom: 16,
+    marginBottom: vs(20),
   },
   confirmSubText: {
-    fontSize: 14,
+    fontSize: ms(14),
     color: '#64748b',
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 10,
+    lineHeight: ms(22),
+  },
+
+  // Toast Styles
+  toastContainer: {
+    position: 'absolute',
+    top: 0,
+    left: s(16),
+    right: s(16),
+    minHeight: vs(56),
+    paddingVertical: vs(8),
+    borderRadius: ms(18),
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: s(14),
+    zIndex: 9999,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  toastIcon: {
+    width: s(32),
+    height: s(32),
+    borderRadius: s(16),
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  toastText: {
+    color: '#FFF',
+    fontSize: ms(15),
+    fontWeight: '700',
+    marginLeft: s(12),
+    flex: 1,
+    letterSpacing: 0.2,
+    includeFontPadding: false,
+    lineHeight: ms(22),
   },
 });
 

@@ -1,15 +1,17 @@
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, onSnapshot, query, setDoc, updateDoc } from 'firebase/firestore';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Animated,
+  Dimensions,
   FlatList,
-  Image,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,20 +19,142 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { db } from '../../utils/firebaseConfig';
+import { ms, s, vs } from '../../utils/responsive';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// --- Memoized Components ---
+
+const DestItem = memo(({ item, onEdit, onDelete, onPreview }: any) => (
+  <View style={styles.card}>
+    <Image source={item.imageUrl} style={styles.cardImage} contentFit="cover" transition={300} />
+    <View style={styles.cardContent}>
+      <View style={styles.cardHeader}>
+        <View style={{ flex: 1 }}><Text style={styles.cardTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{item.name}</Text></View>
+      </View>
+      <View style={styles.cardActions}>
+        <TouchableOpacity style={styles.viewBtn} onPress={() => onPreview(item)}>
+          <Ionicons name="eye-outline" size={ms(18)} color="#3b82f6" />
+          <Text style={styles.viewBtnText} numberOfLines={1} adjustsFontSizeToFit>Xem chi tiết</Text>
+        </TouchableOpacity>
+
+        <View style={styles.rightActions}>
+          <TouchableOpacity style={styles.editBtn} onPress={() => onEdit(item)}>
+            <Ionicons name="create-outline" size={ms(18)} color="#3b82f6" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.deleteBtn} onPress={() => onDelete(item.id, item.name)}>
+            <Ionicons name="trash-outline" size={ms(18)} color="#ef4444" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  </View>
+));
+
+const VocabItem = memo(({ item, onManage, onEdit, onDelete, getImageSource }: any) => {
+  const fallback = useMemo(() => {
+    if (item.title === 'cat_family' || item.id === 'family') return require('@/assets/images/giadinh.jpg');
+    if (item.title === 'cat_food' || item.id === 'food') return require('@/assets/images/monan.jpg');
+    if (item.title === 'cat_greetings' || item.id === 'greetings') return require('@/assets/images/chaohoi.jpg');
+    if (item.title === 'cat_numbers' || item.id === 'numbers') return require('@/assets/images/sodem.jpg');
+    return require('@/assets/images/giadinh.jpg');
+  }, [item.title, item.id]);
+
+  return (
+    <View style={styles.vocabPremiumCard}>
+      <TouchableOpacity activeOpacity={0.9} onPress={() => onManage(item.id)} style={styles.vocabPreviewTab}>
+        <View style={styles.vocabLargeImageContainer}>
+          <Image
+            source={getImageSource(item.imageUrl, fallback)}
+            style={styles.vocabLargeImage}
+            contentFit="contain"
+            transition={300}
+          />
+        </View>
+
+        <View style={styles.vocabCardFooter}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.vocabLargeTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+              {item.title === 'cat_family' ? 'Gia đình thân yêu' :
+                item.title === 'cat_food' ? 'Ẩm thực đặc sắc' :
+                  item.title === 'cat_greetings' ? 'Chào hỏi thông dụng' :
+                    item.title === 'cat_numbers' ? 'Số đếm cơ bản' :
+                      item.title}
+            </Text>
+          </View>
+          <View style={styles.footerActionGroup}>
+            <TouchableOpacity style={styles.footerActionBtn} onPress={() => onEdit(item)}>
+              <Ionicons name="pencil" size={ms(18)} color="#3b82f6" />
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.footerActionBtn, { borderColor: '#fee2e2' }]} onPress={() => onDelete(item)}>
+              <Ionicons name="trash-outline" size={ms(18)} color="#ef4444" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+});
+
+const WordItem = memo(({ word, onEdit, onDelete }: any) => (
+  <View style={styles.premiumWordItem}>
+    <View style={styles.wordMainContent}>
+      <Text style={styles.wordKhmText}>{word.khm}</Text>
+      <Text style={[styles.pronText, { marginTop: vs(4) }]}>{word.pronunciation}</Text>
+      <Text style={[styles.wordVieText, { color: '#3b82f6', marginTop: vs(4) }]}>{word.life || word.vie}</Text>
+    </View>
+
+    <View style={styles.wordActionGroup}>
+      <TouchableOpacity onPress={() => onEdit(word)} style={styles.miniActionBtn}>
+        <Ionicons name="pencil" size={ms(14)} color="#3b82f6" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => onDelete(word)} style={[styles.miniActionBtn, { borderColor: '#fee2e2' }]}>
+        <Ionicons name="trash-outline" size={ms(14)} color="#ef4444" />
+      </TouchableOpacity>
+    </View>
+  </View>
+));
 
 const ContentManagement = () => {
+  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<'destinations' | 'vocabulary'>('destinations');
-  const [vocabSubTab, setVocabSubTab] = useState<'topic' | 'translate'>('topic');
   const [destinations, setDestinations] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const getImageSource = (uri: string, fallback: any = { uri: 'https://via.placeholder.com/150' }) => {
+  // Toast States
+  const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const toastY = useSharedValue(-120);
+
+  const triggerToast = useCallback((msg: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMsg(msg);
+    setToastType(type);
+    setShowToast(true);
+    toastY.value = withSpring(Platform.OS === 'ios' ? 50 : 40, {
+      damping: 15,
+      stiffness: 120,
+    });
+
+    setTimeout(() => {
+      toastY.value = withTiming(-120, { duration: 400 });
+      setTimeout(() => setShowToast(false), 400);
+    }, 3000);
+  }, []);
+
+  const animatedToastStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: toastY.value }],
+    opacity: interpolate(toastY.value, [-100, 40], [0, 1], 'clamp'),
+  }));
+
+  const getImageSource = useCallback((uri: string, fallback: any = { uri: 'https://via.placeholder.com/150' }) => {
     if (uri && (uri.startsWith('http') || uri.startsWith('data:'))) {
       return { uri };
     }
-    // Map pagoda IDs to local assets
     const pagodaImages: any = {
       'pagoda_1': require('@/assets/images/chuaang.jpg'),
       'pagoda_2': require('@/assets/images/chuahang.jpg'),
@@ -38,10 +162,8 @@ const ContentManagement = () => {
       'pagoda_4': require('@/assets/images/salengcu.jpg'),
       'pagoda_5': require('@/assets/images/veluvana.jpg'),
     };
-    if (pagodaImages[uri]) return pagodaImages[uri];
-
-    return fallback;
-  };
+    return pagodaImages[uri] || fallback;
+  }, []);
 
   const pickImage = async (onSelected: (val: string) => void) => {
     try {
@@ -62,12 +184,12 @@ const ContentManagement = () => {
         onSelected(`data:image/jpeg;base64,${result.assets[0].base64}`);
       }
     } catch (error) {
-      Alert.alert('Lỗi', 'Không thể chọn ảnh');
+      triggerToast('Không thể chọn ảnh', 'error');
     }
   };
 
   const ImageSelector = ({ value, onChange, label, style }: { value: string, onChange: (val: string) => void, label: string, style?: any }) => (
-    <View style={[{ marginBottom: 15 }, style]}>
+    <View style={[{ marginBottom: vs(15) }, style]}>
       <Text style={styles.inputLabel}>{label}</Text>
       <TouchableOpacity
         activeOpacity={0.7}
@@ -76,7 +198,7 @@ const ContentManagement = () => {
       >
         {value ? (
           <View style={{ width: '100%', height: '100%' }}>
-            <Image source={getImageSource(value)} style={styles.pickedImagePreview} />
+            <Image source={getImageSource(value)} style={styles.pickedImagePreview} contentFit="cover" />
             <TouchableOpacity
               style={styles.removeImageBtn}
               onPress={(e) => {
@@ -84,18 +206,19 @@ const ContentManagement = () => {
                 onChange('');
               }}
             >
-              <Ionicons name="close-circle" size={24} color="#ef4444" />
+              <Ionicons name="close-circle" size={ms(24)} color="#ef4444" />
             </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.imagePickerPlaceholder}>
-            <Ionicons name="image-outline" size={32} color="#94a3b8" />
+            <Ionicons name="image-outline" size={ms(32)} color="#94a3b8" />
             <Text style={styles.imagePickerText}>Nhấn để chọn ảnh</Text>
           </View>
         )}
       </TouchableOpacity>
     </View>
   );
+  const [dBlocks, setDBlocks] = useState<any[]>([]);
 
   // Destination Form State
   const [destModalVisible, setDestModalVisible] = useState(false);
@@ -122,37 +245,12 @@ const ContentManagement = () => {
   const [pendingDelete, setPendingDelete] = useState<any>(null);
   const [deleteType, setDeleteType] = useState<'topic' | 'word' | 'destination'>('topic');
 
-  // Toast State
-  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
-  const translateY = useRef(new Animated.Value(-100)).current;
-
-  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
-    setToast({ visible: true, message: msg, type });
-    Animated.spring(translateY, {
-      toValue: 40,
-      useNativeDriver: true,
-      friction: 8,
-    }).start();
-
-    setTimeout(() => {
-      Animated.timing(translateY, {
-        toValue: -100,
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => setToast({ ...toast, visible: false }));
-    }, 3000);
-  };
-  const [dBlocks, setDBlocks] = useState<any[]>([]);
-
   // Vocabulary Form State
   const [topicModalVisible, setTopicModalVisible] = useState(false);
   const [editingTopic, setEditingTopic] = useState<any>(null);
   const [topicTitle, setTopicTitle] = useState('');
   const [topicTitleKm, setTopicTitleKm] = useState('');
   const [topicImg, setTopicImg] = useState('');
-  const [topicIconName, setTopicIconName] = useState('');
-  const [topicColor, setTopicColor] = useState('#3b82f6');
-  const [topicManualId, setTopicManualId] = useState('');
 
   const [wordModalVisible, setWordModalVisible] = useState(false);
   const [managingTopicId, setManagingTopicId] = useState<string | null>(null);
@@ -236,10 +334,10 @@ const ContentManagement = () => {
       };
       await setDoc(doc(db, 'destinations', finalId), destData);
       setDestModalVisible(false);
-      showToast('Đã lưu nội dung thành công', 'success');
+      triggerToast('Đã lưu nội dung thành công', 'success');
     } catch (e) {
       console.error(e);
-      showToast('Không thể lưu nội dung', 'error');
+      triggerToast('Không thể lưu nội dung', 'error');
     }
   };
 
@@ -263,7 +361,7 @@ const ContentManagement = () => {
             deletedAt: new Date()
           });
           await deleteDoc(docRef);
-          showToast('Đã chuyển nội dung vào thùng rác', 'success');
+          triggerToast('Đã chuyển nội dung vào thùng rác', 'success');
         }
       } else if (deleteType === 'topic') {
         const topic = pendingDelete;
@@ -274,17 +372,17 @@ const ContentManagement = () => {
           deletedAt: new Date()
         });
         await deleteDoc(doc(db, 'vocab_categories', topic.id));
-        showToast('Đã chuyển chủ đề vào thùng rác', 'success');
+        triggerToast('Đã chuyển chủ đề vào thùng rác', 'success');
       } else if (deleteType === 'word') {
         const { topicId, word } = pendingDelete;
         await updateDoc(doc(db, 'vocab_categories', topicId), {
           words: arrayRemove(word)
         });
-        showToast('Đã xóa từ vựng thành công', 'success');
+        triggerToast('Đã xóa từ vựng thành công', 'success');
       }
     } catch (e) {
       console.error(e);
-      showToast('Lỗi khi thực hiện xóa', 'error');
+      triggerToast('Lỗi khi thực hiện xóa', 'error');
     } finally {
       setDeleteConfirmVisible(false);
       setPendingDelete(null);
@@ -319,9 +417,9 @@ const ContentManagement = () => {
         await setDoc(doc(db, 'vocab_categories', finalId), topicData);
       }
       setTopicModalVisible(false);
-      showToast('Cập nhật chủ đề thành công', 'success');
+      triggerToast('Cập nhật chủ đề thành công', 'success');
     } catch (e) {
-      showToast('Lỗi khi lưu chủ đề', 'error');
+      triggerToast('Lỗi khi lưu chủ đề', 'error');
     }
   };
 
@@ -335,7 +433,6 @@ const ContentManagement = () => {
       const currentWords = topicSnap.data().words || [];
 
       if (editingWord) {
-        // Update existing word - match by id or khm
         const updatedWords = currentWords.map((w: any) => {
           const isMatch = (editingWord.id && w.id === editingWord.id) || (w.khm === editingWord.khm);
           if (isMatch) {
@@ -365,8 +462,8 @@ const ContentManagement = () => {
         });
       }
       setWordModalVisible(false);
-      showToast('Đã cập nhật từ vựng', 'success');
-    } catch (e) { Alert.alert('Lỗi', 'Không thể lưu từ vựng'); }
+      triggerToast('Đã cập nhật từ vựng', 'success');
+    } catch (e) { triggerToast('Không thể lưu từ vựng', 'error'); }
   };
 
   const deleteTopic = (topic: any) => {
@@ -381,130 +478,36 @@ const ContentManagement = () => {
     setDeleteConfirmVisible(true);
   };
 
-  const renderDestItem = ({ item }: { item: any }) => (
-    <View style={styles.card}>
-      <Image source={getImageSource(item.imageUrl)} style={styles.cardImage} />
-      <View style={styles.cardContent}>
-        <View style={styles.cardHeader}>
-          <View style={{ flex: 1 }}><Text style={styles.cardTitle}>{item.name}</Text></View>
-        </View>
-        <View style={styles.cardActions}>
-          <TouchableOpacity
-            style={styles.viewBtn}
-            onPress={() => {
-              const pathname = item.id.includes('pagoda') ? '/pagoda-detail' :
-                item.id.includes('culture') ? '/culture-detail' :
-                  '/food-detail';
-              router.push({ pathname: pathname as any, params: { id: item.id } });
-            }}
-          >
-            <Ionicons name="eye-outline" size={18} color="#3b82f6" />
-            <Text style={styles.viewBtnText} numberOfLines={1} adjustsFontSizeToFit>Xem chi tiết</Text>
-          </TouchableOpacity>
-
-          <View style={styles.rightActions}>
-            <TouchableOpacity
-              style={styles.editBtn}
-              onPress={() => {
-                setEditingDest(item);
-                setDName(item.name || '');
-                setDNameKm(item.name_khmer || '');
-                setDLoc(item.location || '');
-                setDLocKm(item.location_khmer || '');
-                setDDesc(item.description || '');
-                setDDescKm(item.description_khmer || '');
-                setDImg(item.imageUrl || '');
-                setDImg1(item.imageUrl1 || '');
-                setDImg2(item.imageUrl2 || '');
-                setDImg3(item.imageUrl3 || '');
-                setDImg4(item.imageUrl4 || '');
-                setDImg5(item.imageUrl5 || '');
-                setDImg6(item.imageUrl6 || '');
-                setDLat(item.latitude || '');
-                setDLng(item.longitude || '');
-                setDBlocks(item.contentBlocks || []);
-                const lowerCat = (item.category || '').toLowerCase();
-                const lowerId = (item.id || '').toLowerCase();
-                const currentCat = (lowerCat === 'ẩm thực' || lowerCat === 'food' || lowerId.includes('food')) ? 'food' :
-                  (lowerCat === 'văn hóa' || lowerCat === 'culture' || lowerId.includes('culture')) ? 'culture' :
-                    'pagoda';
-                setDCat(currentCat);
-                setDestModalVisible(true);
-              }}
-            >
-              <Ionicons name="create-outline" size={18} color="#3b82f6" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDeleteDest(item.id, item.name)}>
-              <Ionicons name="trash-outline" size={18} color="#ef4444" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </View>
-  );
-
-  const renderVocabItem = ({ item }: { item: any }) => (
-    <View style={styles.vocabPremiumCard}>
-      <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={() => setManagingTopicId(item.id)}
-        style={styles.vocabPreviewTab}
-      >
-        <View style={styles.vocabLargeImageContainer}>
-          <Image
-            source={getImageSource(item.imageUrl,
-              (item.title === 'cat_family' || item.id === 'family') ? require('@/assets/images/giadinh.jpg') :
-                (item.title === 'cat_food' || item.id === 'food') ? require('@/assets/images/monan.jpg') :
-                  (item.title === 'cat_greetings' || item.id === 'greetings') ? require('@/assets/images/chaohoi.jpg') :
-                    (item.title === 'cat_numbers' || item.id === 'numbers') ? require('@/assets/images/sodem.jpg') :
-                      require('@/assets/images/giadinh.jpg')
-            )}
-            style={styles.vocabLargeImage}
-          />
-        </View>
-
-        <View style={styles.vocabCardFooter}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.vocabLargeTitle}>
-              {item.title === 'cat_family' ? 'Gia đình thân yêu' :
-                item.title === 'cat_food' ? 'Ẩm thực đặc sắc' :
-                  item.title === 'cat_greetings' ? 'Chào hỏi thông dụng' :
-                    item.title === 'cat_numbers' ? 'Số đếm cơ bản' :
-                      item.title}
-            </Text>
-          </View>
-          <View style={styles.footerActionGroup}>
-            <TouchableOpacity
-              style={styles.footerActionBtn}
-              onPress={() => {
-                setEditingTopic(item);
-                setTopicTitle(item.title);
-                setTopicTitleKm(item.title_khmer || '');
-                setTopicImg(item.imageUrl || '');
-                setTopicModalVisible(true);
-              }}
-            >
-              <Ionicons name="pencil" size={18} color="#3b82f6" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.footerActionBtn, { borderColor: '#fee2e2' }]}
-              onPress={() => deleteTopic(item)}
-            >
-              <Ionicons name="trash-outline" size={18} color="#ef4444" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </TouchableOpacity>
-    </View>
-  );
-
   // Derived managingTopic
-  const managingTopic = categories.find(c => c.id === managingTopicId);
+  const managingTopic = useMemo(() => categories.find(c => c.id === managingTopicId), [categories, managingTopicId]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, vs(10)) }]}>
+      {/* Premium Toast System */}
+      {showToast && (
+        <Animated.View
+          style={[
+            styles.toastContainer,
+            animatedToastStyle,
+            {
+              backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
+              shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
+            }
+          ]}
+        >
+          <View style={styles.toastIcon}>
+            <Ionicons
+              name={toastType === 'success' ? "checkmark" : "close"}
+              size={ms(20)}
+              color="#FFF"
+            />
+          </View>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
+        </Animated.View>
+      )}
+
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}><Ionicons name="arrow-back" size={28} color="#1e293b" /></TouchableOpacity>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}><Ionicons name="arrow-back" size={ms(28)} color="#1e293b" /></TouchableOpacity>
         <Text style={styles.headerTitle}>Quản lý nội dung</Text>
         <TouchableOpacity
           onPress={() => {
@@ -526,7 +529,7 @@ const ContentManagement = () => {
           }}
           style={styles.addBtnHeader}
         >
-          <Ionicons name="add" size={32} color="#3b82f6" />
+          <Ionicons name="add" size={ms(32)} color="#3b82f6" />
         </TouchableOpacity>
       </View>
 
@@ -539,25 +542,79 @@ const ContentManagement = () => {
         </TouchableOpacity>
       </View>
 
-      {loading ? <ActivityIndicator size="large" color="#3b82f6" style={{ marginTop: 50 }} /> : (
+      {loading ? <ActivityIndicator size="large" color="#3b82f6" style={{ marginTop: vs(50) }} /> : (
         <FlatList
           data={activeTab === 'destinations'
             ? destinations
             : categories.filter(c => c.title.toLowerCase().includes(vocabSearchQuery.toLowerCase()))
           }
           keyExtractor={(item) => item.id}
-          renderItem={activeTab === 'destinations' ? renderDestItem : renderVocabItem}
+          renderItem={({ item }) => activeTab === 'destinations' ? (
+            <DestItem
+              item={item}
+              onPreview={(dest: any) => {
+                const pathname = dest.id.includes('pagoda') ? '/pagoda-detail' :
+                  dest.id.includes('culture') ? '/culture-detail' :
+                    '/food-detail';
+                router.push({ pathname: pathname as any, params: { id: dest.id } });
+              }}
+              onEdit={(dest: any) => {
+                setEditingDest(dest);
+                setDName(dest.name || '');
+                setDNameKm(dest.name_khmer || '');
+                setDLoc(dest.location || '');
+                setDLocKm(dest.location_khmer || '');
+                setDDesc(dest.description || '');
+                setDDescKm(dest.description_khmer || '');
+                setDImg(dest.imageUrl || '');
+                setDImg1(dest.imageUrl1 || '');
+                setDImg2(dest.imageUrl2 || '');
+                setDImg3(dest.imageUrl3 || '');
+                setDImg4(dest.imageUrl4 || '');
+                setDImg5(dest.imageUrl5 || '');
+                setDImg6(dest.imageUrl6 || '');
+                setDLat(dest.latitude || '');
+                setDLng(dest.longitude || '');
+                setDBlocks(dest.contentBlocks || []);
+                const lowerCat = (dest.category || '').toLowerCase();
+                const lowerId = (dest.id || '').toLowerCase();
+                const currentCat = (lowerCat === 'ẩm thực' || lowerCat === 'food' || lowerId.includes('food')) ? 'food' :
+                  (lowerCat === 'văn hóa' || lowerCat === 'culture' || lowerId.includes('culture')) ? 'culture' :
+                    'pagoda';
+                setDCat(currentCat);
+                setDestModalVisible(true);
+              }}
+              onDelete={handleDeleteDest}
+            />
+          ) : (
+            <VocabItem
+              item={item}
+              getImageSource={getImageSource}
+              onManage={(id: string) => setManagingTopicId(id)}
+              onEdit={(topic: any) => {
+                setEditingTopic(topic);
+                setTopicTitle(topic.title);
+                setTopicTitleKm(topic.title_khmer || '');
+                setTopicImg(topic.imageUrl || '');
+                setTopicModalVisible(true);
+              }}
+              onDelete={deleteTopic}
+            />
+          )}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          removeClippedSubviews={Platform.OS === 'android'}
+          maxToRenderPerBatch={10}
+          windowSize={10}
         />
       )}
 
-      {/* --- Word Management Modal (FULL SCREEN) --- */}
+      {/* --- Word Management Modal --- */}
       <Modal visible={!!managingTopicId} animationType="slide" statusBarTranslucent={true}>
-        <View style={[styles.container, { paddingTop: 35, backgroundColor: '#ffffff' }]}>
-          <View style={[styles.header, { marginTop: 0, paddingHorizontal: 12, backgroundColor: '#ffffff' }]}>
+        <View style={[styles.container, { paddingTop: Math.max(insets.top, vs(10)) }]}>
+          <View style={[styles.header, { marginTop: 0, paddingHorizontal: s(12) }]}>
             <TouchableOpacity style={styles.backBtn} onPress={() => setManagingTopicId(null)}>
-              <Ionicons name="arrow-back" size={28} color="#1e293b" />
+              <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
             </TouchableOpacity>
             <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
               {managingTopic?.title === 'cat_family' ? 'Gia đình thân yêu' :
@@ -578,51 +635,32 @@ const ContentManagement = () => {
                 setWordModalVisible(true);
               }}
             >
-              <Ionicons name="add" size={26} color="#3b82f6" />
+              <Ionicons name="add" size={ms(26)} color="#3b82f6" />
             </TouchableOpacity>
           </View>
 
           <FlatList
             data={managingTopic?.words || []}
             keyExtractor={(item, index) => item.id || index.toString()}
-            contentContainerStyle={{ padding: 16 }}
+            contentContainerStyle={{ padding: s(16) }}
             renderItem={({ item: word }) => (
-              <View style={styles.premiumWordItem}>
-                <View style={styles.wordMainContent}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={styles.wordKhmText}>{word.khm}</Text>
-                    <Text style={[styles.wordVieText, { color: '#3b82f6', marginTop: 0, marginLeft: 15 }]}>{word.life || word.vie}</Text>
-                  </View>
-                  <Text style={[styles.pronText, { marginTop: 4 }]}>{word.pronunciation}</Text>
-                </View>
-
-                <View style={styles.wordActionGroup}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setSelectedTopic(managingTopic);
-                      setEditingWord(word);
-                      setWordKhm(word.khm);
-                      setWordVie(word.life || word.vie);
-                      setWordPron(word.pronunciation);
-                      setWordImg(word.imageUrl || '');
-                      setWordModalVisible(true);
-                    }}
-                    style={styles.miniActionBtn}
-                  >
-                    <Ionicons name="pencil" size={14} color="#3b82f6" />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => deleteWord(managingTopic, word)}
-                    style={[styles.miniActionBtn, { borderColor: '#fee2e2' }]}
-                  >
-                    <Ionicons name="trash-outline" size={14} color="#ef4444" />
-                  </TouchableOpacity>
-                </View>
-              </View>
+              <WordItem
+                word={word}
+                onEdit={(w: any) => {
+                  setSelectedTopic(managingTopic);
+                  setEditingWord(w);
+                  setWordKhm(w.khm);
+                  setWordVie(w.life || w.vie);
+                  setWordPron(w.pronunciation);
+                  setWordImg(w.imageUrl || '');
+                  setWordModalVisible(true);
+                }}
+                onDelete={(w: any) => deleteWord(managingTopic, w)}
+              />
             )}
             ListEmptyComponent={
               <View style={styles.emptyStateContainer}>
-                <Ionicons name="book-outline" size={80} color="#e2e8f0" />
+                <Ionicons name="book-outline" size={ms(80)} color="#e2e8f0" />
                 <Text style={styles.emptyWords}>Chưa có từ vựng nào trong chủ đề này</Text>
               </View>
             }
@@ -632,15 +670,15 @@ const ContentManagement = () => {
 
       {/* --- Destination Modal --- */}
       <Modal visible={destModalVisible} animationType="slide" transparent statusBarTranslucent={true}>
-        <View style={styles.modalBg}>
-          <View style={styles.modalContentFull}>
-            <View style={[styles.modalHeader, { marginBottom: editingDest ? 10 : 10 }]}>
-              <View style={{ width: 40 }} />
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalBg}>
+          <View style={[styles.modalContentFull, { paddingTop: insets.top + vs(10) }]}>
+            <View style={[styles.modalHeader, { marginBottom: vs(10) }]}>
+              <View style={{ width: s(40) }} />
               <Text style={[styles.modalTitle, { flex: 1, textAlign: 'center' }]} numberOfLines={1} adjustsFontSizeToFit>
                 {editingDest ? 'Sửa nội dung' : 'Thêm nội dung'}
               </Text>
               <TouchableOpacity onPress={() => setDestModalVisible(false)}>
-                <Ionicons name="close" size={30} color="#ff0000ff" />
+                <Ionicons name="close" size={ms(30)} color="#ff0000ff" />
               </TouchableOpacity>
             </View>
 
@@ -794,7 +832,7 @@ const ContentManagement = () => {
               <Text style={styles.saveBtnText} numberOfLines={1} adjustsFontSizeToFit>Lưu nội dung</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* --- Vocabulary Category Modal --- */}
@@ -831,19 +869,14 @@ const ContentManagement = () => {
 
             <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 400 }}>
               <View style={styles.modalForm}>
-                <View style={{ flexDirection: 'row', gap: 12, marginBottom: 12 }}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.inputLabel}>Tiếng Khmer</Text>
-                    <TextInput style={styles.input} placeholder="Ví dụ: គ្រួសារ" value={wordKhm} onChangeText={setWordKhm} />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.inputLabel}>Tiếng Việt</Text>
-                    <TextInput style={styles.input} placeholder="Ví dụ: Gia đình" value={wordVie} onChangeText={setWordVie} />
-                  </View>
-                </View>
+                <Text style={styles.inputLabel}>Tiếng Khmer</Text>
+                <TextInput style={styles.input} placeholder="Ví dụ: គ្រួសារ" value={wordKhm} onChangeText={setWordKhm} />
 
                 <Text style={styles.inputLabel}>Phiên âm (Phụ âm)</Text>
                 <TextInput style={styles.input} placeholder="Ví dụ: kruosaear" value={wordPron} onChangeText={setWordPron} />
+
+                <Text style={styles.inputLabel}>Tiếng Việt</Text>
+                <TextInput style={styles.input} placeholder="Ví dụ: Gia đình" value={wordVie} onChangeText={setWordVie} />
 
                 <ImageSelector label="Ảnh từ vựng" value={wordImg} onChange={setWordImg} />
               </View>
@@ -890,56 +923,37 @@ const ContentManagement = () => {
         </View>
       </Modal>
 
-      {/* --- Premium Toast Notification --- */}
-      {toast.visible && (
-        <Animated.View style={[
-          styles.toastContainer,
-          { transform: [{ translateY }] },
-          toast.type === 'success' ? styles.toastSuccess : styles.toastError
-        ]}>
-          <Ionicons
-            name={toast.type === 'success' ? "checkmark-circle" : "alert-circle"}
-            size={24}
-            color="#fff"
-          />
-          <Text style={styles.toastText}>{toast.message}</Text>
-        </Animated.View>
-      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#ffffff' },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, marginTop: 35, height: 60, position: 'relative' },
-  backBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', zIndex: 10 },
-  addBtnHeader: { width: 42, height: 42, backgroundColor: '#f1f5f9', borderRadius: 12, justifyContent: 'center', alignItems: 'center', zIndex: 10 },
-  headerTitle: { flex: 1, fontSize: 20, fontWeight: '800', color: '#1e293b', textAlign: 'center' },
-  tabBar: { flexDirection: 'row', marginHorizontal: 16, marginTop: 10, backgroundColor: '#f1f5f9', borderRadius: 12, padding: 4 },
-  tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
+  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(12), height: vs(60), position: 'relative' },
+  backBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center', zIndex: 10 },
+  addBtnHeader: { width: s(42), height: s(42), backgroundColor: '#f1f5f9', borderRadius: s(12), justifyContent: 'center', alignItems: 'center', zIndex: 10 },
+  headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+  tabBar: { flexDirection: 'row', marginHorizontal: s(16), marginTop: vs(10), backgroundColor: '#f1f5f9', borderRadius: s(12), padding: s(4) },
+  tab: { flex: 1, paddingVertical: vs(10), alignItems: 'center', borderRadius: s(10) },
   activeTab: { backgroundColor: '#fff', elevation: 2, shadowOpacity: 0.1 },
-  tabText: { fontSize: 14, fontWeight: '700', color: '#64748b' },
+  tabText: { fontSize: ms(14), fontWeight: '700', color: '#64748b' },
   activeTabText: { color: '#3b82f6' },
-  listContent: { padding: 12 },
-  card: { backgroundColor: '#fff', borderRadius: 20, marginBottom: 12, overflow: 'hidden', elevation: 2 },
-  cardImage: { width: '100%', height: 200, resizeMode: 'cover' },
-  cardContent: { padding: 15 },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
-  cardTitle: { fontSize: 17, fontWeight: '800', color: '#1e293b' },
-  typeBadge: { backgroundColor: '#eff6ff', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
-  typeText: { fontSize: 10, fontWeight: '700', color: '#3b82f6' },
-  cardActions: { flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: '#f1f5f9', paddingTop: 10 },
-  rightActions: { flexDirection: 'row', gap: 12 },
-  viewBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#f1f5f9', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
-  viewBtnText: { fontSize: 12, fontWeight: '700', color: '#3b82f6' },
-  editBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#f0f9ff', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
-  editBtnText: { fontSize: 12, fontWeight: '700', color: '#3b82f6' },
-  deleteBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#fef2f2', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
-  deleteBtnText: { fontSize: 12, fontWeight: '700', color: '#ef4444' },
+  listContent: { padding: s(12), paddingBottom: vs(20) },
+  card: { backgroundColor: '#fff', borderRadius: ms(20), marginBottom: vs(12), overflow: 'hidden', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 },
+  cardImage: { width: '100%', height: vs(200) },
+  cardContent: { padding: s(15) },
+  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: vs(10) },
+  cardTitle: { fontSize: ms(13), fontWeight: '800', color: '#1e293b' },
+  cardActions: { flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: '#f1f5f9', paddingTop: vs(10), alignItems: 'center' },
+  rightActions: { flexDirection: 'row', gap: s(12) },
+  viewBtn: { flexDirection: 'row', alignItems: 'center', gap: s(5), backgroundColor: '#f1f5f9', paddingHorizontal: s(12), paddingVertical: vs(6), borderRadius: s(8) },
+  viewBtnText: { fontSize: ms(12), fontWeight: '700', color: '#3b82f6' },
+  editBtn: { backgroundColor: '#f0f9ff', paddingHorizontal: s(12), paddingVertical: vs(6), borderRadius: s(8), justifyContent: 'center', alignItems: 'center' },
+  deleteBtn: { backgroundColor: '#fef2f2', paddingHorizontal: s(12), paddingVertical: vs(6), borderRadius: s(8), justifyContent: 'center', alignItems: 'center' },
   vocabPremiumCard: {
     backgroundColor: '#fff',
-    borderRadius: 24,
-    marginBottom: 20,
+    borderRadius: ms(24),
+    marginBottom: vs(20),
     overflow: 'hidden',
     elevation: 4,
     shadowColor: '#000',
@@ -949,224 +963,147 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#f1f5f9'
   },
-  vocabPreviewTab: {
-    flex: 1
-  },
+  vocabPreviewTab: { flex: 1 },
   vocabLargeImageContainer: {
     width: '100%',
     aspectRatio: 16 / 10,
     backgroundColor: '#f8fafc',
-    padding: 20
+    padding: s(20)
   },
-  vocabLargeImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'contain'
-  },
-  vocabCardFooter: {
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-  vocabLargeTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#1e293b'
-  },
-  vocabLargeSubtitle: {
-    fontSize: 13,
-    color: '#94a3b8',
-    marginTop: 2
-  },
-  footerActionGroup: {
-    flexDirection: 'row',
-    gap: 8
-  },
+  vocabLargeImage: { width: '100%', height: '100%' },
+  vocabCardFooter: { padding: s(16), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  vocabLargeTitle: { fontSize: ms(13), fontWeight: '800', color: '#1e293b' },
+  footerActionGroup: { flexDirection: 'row', gap: s(8) },
   footerActionBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
+    width: s(38),
+    height: s(38),
+    borderRadius: s(12),
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#f1f5f9',
     justifyContent: 'center',
     alignItems: 'center'
   },
-  wordListContainerPremium: {
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
-    backgroundColor: '#f8fafc'
-  },
-  vocabCardActive: { borderColor: '#3b82f6', borderWidth: 1 },
-  wordSubHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, paddingHorizontal: 4 },
-  wordSubTitle: { fontSize: 14, fontWeight: '800', color: '#1e293b' },
-  addWordInlineBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#3b82f6', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
-  addWordInlineText: { fontSize: 11, fontWeight: '700', color: '#fff' },
-  wordGrid: { gap: 8 },
   premiumWordItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 16,
-    marginBottom: 12,
+    padding: s(15),
+    borderRadius: ms(16),
+    marginBottom: vs(12),
     borderWidth: 1,
     borderColor: '#f1f5f9',
   },
   wordMainContent: { flex: 1 },
-  wordLangRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  wordKhmText: { fontSize: 20, fontWeight: '800', color: '#1e293b' },
-  pronBadge: { backgroundColor: '#fff', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, borderWidth: 1, borderColor: '#e2e8f0' },
-  pronText: { fontSize: 12, color: '#64748b', fontStyle: 'italic' },
-  wordVieText: { fontSize: 12, color: '#3b82f6', fontWeight: '700', marginTop: 2 },
-  wordActionGroup: { flexDirection: 'row', gap: 6 },
-  miniActionBtn: { width: 32, height: 32, borderRadius: 10, backgroundColor: '#fff', borderWidth: 1, borderColor: '#f1f5f9', justifyContent: 'center', alignItems: 'center' },
-  emptyStateContainer: { marginTop: 250, alignItems: 'center', padding: 30, opacity: 0.5 },
-  emptyWords: { marginTop: 5, fontSize: 13, color: '#94a3b8', fontStyle: 'italic' },
-  vocabManagementHeader: { paddingHorizontal: 16, marginBottom: 10 },
-  statsRow: { flexDirection: 'row', gap: 12, marginBottom: 15 },
-  statBox: { flex: 1, backgroundColor: '#fff', borderRadius: 16, padding: 12, alignItems: 'center', elevation: 1, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2 },
-  statValue: { fontSize: 20, fontWeight: '800', color: '#3b82f6' },
-  statLabel: { fontSize: 11, color: '#64748b', marginTop: 2, fontWeight: '600' },
-  searchBarContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f5f9', borderRadius: 12, height: 44 },
-  searchInput: { flex: 1, paddingHorizontal: 10, fontSize: 14, color: '#1e293b' },
-  subTabBar: {
-    flexDirection: 'row',
-    marginHorizontal: 16,
-    marginTop: 12,
-    gap: 8
-  },
-  subTab: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#e2e8f0'
-  },
-  activeSubTab: {
-    backgroundColor: '#3b82f6',
-    borderColor: '#3b82f6'
-  },
-  subTabText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#64748b'
-  },
-  activeSubTabText: {
-    color: '#fff'
-  },
+  wordKhmText: { fontSize: ms(20), fontWeight: '800', color: '#1e293b' },
+  pronText: { fontSize: ms(12), color: '#64748b', fontStyle: 'italic' },
+  wordVieText: { fontSize: ms(12), color: '#3b82f6', fontWeight: '700', marginTop: vs(2) },
+  wordActionGroup: { flexDirection: 'row', gap: s(6) },
+  miniActionBtn: { width: s(32), height: s(32), borderRadius: s(10), backgroundColor: '#fff', borderWidth: 1, borderColor: '#f1f5f9', justifyContent: 'center', alignItems: 'center' },
+  emptyStateContainer: { marginTop: vs(150), alignItems: 'center', padding: s(30), opacity: 0.5 },
+  emptyWords: { marginTop: vs(5), fontSize: ms(13), color: '#94a3b8', fontStyle: 'italic' },
   // Form Styles
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modalContentFull: { width: '100%', height: '100%', backgroundColor: '#fff', padding: 20, paddingTop: 45 },
-  modalContentSmall: { width: '85%', backgroundColor: '#fff', borderRadius: 20, padding: 20 },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  modalTitle: { fontSize: 22, fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+  modalContentFull: { width: '100%', height: '100%', backgroundColor: '#fff', padding: s(20) },
+  modalContentSmall: { width: '85%', backgroundColor: '#fff', borderRadius: ms(20), padding: s(20) },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(20) },
+  modalTitle: { fontSize: ms(22), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
   modalForm: { flex: 1 },
-  inputLabel: { fontSize: 13, fontWeight: '700', color: '#64748b', marginBottom: 8, marginTop: 12 },
-  input: { backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 12, padding: 12, fontSize: 15, color: '#1e293b', marginBottom: 5 },
-  catRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
-  catBtn: { flex: 1, paddingVertical: 10, paddingHorizontal: 4, alignItems: 'center', borderRadius: 10, backgroundColor: '#f1f5f9', borderWidth: 1, borderColor: '#e2e8f0' },
+  inputLabel: { fontSize: ms(13), fontWeight: '700', color: '#64748b', marginBottom: vs(8), marginTop: vs(12) },
+  input: { backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#e2e8f0', borderRadius: s(12), padding: s(12), fontSize: ms(15), color: '#1e293b', marginBottom: vs(5) },
+  catRow: { flexDirection: 'row', gap: s(10), marginBottom: vs(10) },
+  catBtn: { flex: 1, paddingVertical: vs(10), paddingHorizontal: s(4), alignItems: 'center', borderRadius: s(10), backgroundColor: '#f1f5f9', borderWidth: 1, borderColor: '#e2e8f0' },
   activeCatBtn: { backgroundColor: '#3b82f6', borderColor: '#3b82f6' },
-  catBtnText: { fontSize: 11, fontWeight: '700', color: '#64748b', textAlign: 'center' },
+  catBtnText: { fontSize: ms(11), fontWeight: '700', color: '#64748b', textAlign: 'center' },
   activeCatBtnText: { color: '#fff' },
-  saveBtn: { backgroundColor: '#3b82f6', paddingVertical: 15, borderRadius: 12, alignItems: 'center', marginTop: 20 },
-  saveBtnSmall: { flex: 1, backgroundColor: '#3b82f6', paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
-  saveBtnText: { color: '#fff', fontWeight: '800', fontSize: 16, textAlign: 'center' },
-  modalActions: { flexDirection: 'row', justifyContent: 'center', gap: 10, marginTop: 20 },
-  cancelBtn: { flex: 1, backgroundColor: '#ef4444', paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
+  saveBtn: { backgroundColor: '#3b82f6', paddingVertical: vs(15), borderRadius: s(12), alignItems: 'center', marginTop: vs(20) },
+  saveBtnSmall: { flex: 1, backgroundColor: '#3b82f6', paddingVertical: vs(12), borderRadius: s(10), alignItems: 'center' },
+  saveBtnText: { color: '#fff', fontWeight: '800', fontSize: ms(16), textAlign: 'center' },
+  modalActions: { flexDirection: 'row', justifyContent: 'center', gap: s(10), marginTop: vs(20) },
+  cancelBtn: { flex: 1, backgroundColor: '#ef4444', paddingVertical: vs(12), borderRadius: s(10), alignItems: 'center' },
   cancelBtnText: { color: '#fff', fontWeight: '800' },
-  divider: { height: 1, backgroundColor: '#e2e8f0', marginVertical: 20 },
-  blockItem: { backgroundColor: '#f8fafc', padding: 15, borderRadius: 16, marginBottom: 15, borderWidth: 1, borderColor: '#e2e8f0' },
-  blockHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  blockNumber: { fontSize: 14, fontWeight: '800', color: '#1e293b' },
-  addBlockBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, borderStyle: 'dashed', borderWidth: 1, borderColor: '#3b82f6', borderRadius: 12, marginTop: 10 },
-  addBlockText: { fontSize: 14, fontWeight: '700', color: '#3b82f6' },
+  divider: { height: 1, backgroundColor: '#e2e8f0', marginVertical: vs(20) },
+  blockItem: { backgroundColor: '#f8fafc', padding: s(15), borderRadius: ms(16), marginBottom: vs(15), borderWidth: 1, borderColor: '#e2e8f0' },
+  blockHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(10) },
+  blockNumber: { fontSize: ms(14), fontWeight: '800', color: '#1e293b' },
+  addBlockBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: s(8), paddingVertical: vs(12), borderStyle: 'dashed', borderWidth: 1, borderColor: '#3b82f6', borderRadius: s(12), marginTop: vs(10) },
+  addBlockText: { fontSize: ms(14), fontWeight: '700', color: '#3b82f6' },
   // Toast Styles
   toastContainer: {
     position: 'absolute',
     top: 0,
-    left: 20,
-    right: 20,
+    left: s(16),
+    right: s(16),
+    minHeight: vs(56),
+    paddingVertical: vs(8),
+    borderRadius: ms(18),
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 16,
+    paddingHorizontal: s(14),
+    zIndex: 9999,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.3,
     shadowRadius: 20,
     elevation: 10,
-    zIndex: 9999,
-    gap: 12,
   },
-  toastSuccess: {
-    backgroundColor: '#10b981', // Emerald 500
-  },
-  toastError: {
-    backgroundColor: '#ef4444', // Red 500
+  toastIcon: {
+    width: s(32),
+    height: s(32),
+    borderRadius: s(16),
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   toastText: {
-    color: '#fff',
-    fontSize: 15,
+    color: '#FFF',
+    fontSize: ms(15),
     fontWeight: '700',
+    marginLeft: s(12),
     flex: 1,
+    letterSpacing: 0.2,
+    includeFontPadding: false,
+    lineHeight: ms(22),
   },
   confirmIconBg: {
-    width: 66,
-    height: 66,
-    borderRadius: 33,
+    width: s(66),
+    height: s(66),
+    borderRadius: s(33),
     backgroundColor: '#fef2f2',
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
-    marginBottom: 16,
+    marginBottom: vs(16),
   },
   confirmSubText: {
-    fontSize: 14,
+    fontSize: ms(14),
     color: '#64748b',
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 5,
+    lineHeight: vs(22),
+    marginBottom: vs(5),
   },
   imagePickerBtn: {
     width: '100%',
-    height: 150,
+    height: vs(150),
     backgroundColor: '#f8fafc',
-    borderRadius: 16,
+    borderRadius: s(16),
     borderWidth: 2,
     borderColor: '#e2e8f0',
     borderStyle: 'dashed',
     overflow: 'hidden',
-    marginTop: 8,
+    marginTop: vs(8),
   },
-  imagePickerPlaceholder: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-  },
-  imagePickerText: {
-    fontSize: 14,
-    color: '#94a3b8',
-    fontWeight: '600',
-  },
-  pickedImagePreview: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
+  imagePickerPlaceholder: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: vs(8) },
+  imagePickerText: { fontSize: ms(14), color: '#94a3b8', fontWeight: '600' },
+  pickedImagePreview: { width: '100%', height: '100%' },
   removeImageBtn: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: vs(10),
+    right: s(10),
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 2,
+    borderRadius: s(12),
+    padding: s(2),
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

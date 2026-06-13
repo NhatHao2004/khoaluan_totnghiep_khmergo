@@ -2,12 +2,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { arrayRemove, arrayUnion, collection, deleteDoc, doc, onSnapshot, query, setDoc, updateDoc } from 'firebase/firestore';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  Animated,
   FlatList,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,9 +16,84 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { db } from '../../utils/firebaseConfig';
+import { ms, s, vs } from '../../utils/responsive';
+
+// --- Memoized Components ---
+
+const QuizItem = memo(({ item, onEdit, onDelete, onManage, displayTitle }: any) => (
+  <View style={styles.quizCardWrapper}>
+    <TouchableOpacity
+      style={styles.quizCard}
+      onPress={() => onManage(item.id)}
+      activeOpacity={0.7}
+    >
+      <View style={styles.quizInfo}>
+        <Text style={styles.quizTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{displayTitle}</Text>
+        <View style={styles.quizMeta}>
+          <View style={styles.questionBadge}>
+            <Text style={styles.metaText}>{item.questions?.length || 0} câu hỏi</Text>
+          </View>
+        </View>
+      </View>
+      <View style={styles.quizActions}>
+        <TouchableOpacity
+          style={[styles.actionIcon, { backgroundColor: '#eff6ff' }]}
+          onPress={() => onEdit(item)}
+        >
+          <Ionicons name="pencil" size={ms(18)} color="#3b82f6" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.actionIcon, { backgroundColor: '#fef2f2' }]}
+          onPress={() => onDelete(item.id)}
+        >
+          <Ionicons name="trash-outline" size={ms(18)} color="#ef4444" />
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  </View>
+));
+
+const QuestionCard = memo(({ item, index, onEdit, onDelete }: any) => (
+  <View style={styles.questionCard}>
+    <View style={styles.questionHeader}>
+      <View style={styles.questionIndexBadge}>
+        <Text style={styles.questionIndexText}>Câu {index + 1}</Text>
+      </View>
+      <View style={styles.questionActions}>
+        <TouchableOpacity onPress={() => onEdit(item)} style={styles.miniActionBtn}>
+          <Ionicons name="pencil" size={ms(16)} color="#3b82f6" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => onDelete(item)} style={[styles.miniActionBtn, { borderColor: '#fee2e2' }]}>
+          <Ionicons name="trash-outline" size={ms(16)} color="#ef4444" />
+        </TouchableOpacity>
+      </View>
+    </View>
+    <Text style={styles.questionText}>{item.question}</Text>
+    <View style={styles.optionsList}>
+      {item.options.map((opt: string, i: number) => (
+        <View key={i} style={[styles.optionItem, i === item.correctIndex && styles.correctOption]}>
+          <View style={[styles.optionLetter, i === item.correctIndex && styles.correctLetter]}>
+            <Text style={[styles.optionLetterText, i === item.correctIndex && styles.correctLetterText]}>
+              {String.fromCharCode(65 + i)}
+            </Text>
+          </View>
+          <Text style={[styles.optionText, i === item.correctIndex && styles.correctOptionText]}>
+            {opt}
+          </Text>
+          {i === item.correctIndex && (
+            <Ionicons name="checkmark-circle" size={ms(18)} color="#22c55e" style={{ marginLeft: 'auto' }} />
+          )}
+        </View>
+      ))}
+    </View>
+  </View>
+));
 
 const ChallengeManagement = () => {
+  const insets = useSafeAreaInsets();
   const [quizzes, setQuizzes] = useState<any[]>([]);
   const [destinations, setDestinations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,9 +121,31 @@ const ChallengeManagement = () => {
   const [correctIndex, setCorrectIndex] = useState(0);
   const [explanation, setExplanation] = useState('');
 
-  // Toast State
-  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
-  const translateY = useRef(new Animated.Value(-100)).current;
+  // Toast States
+  const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const toastY = useSharedValue(-120);
+
+  const triggerToast = useCallback((msg: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMsg(msg);
+    setToastType(type);
+    setShowToast(true);
+    toastY.value = withSpring(Platform.OS === 'ios' ? 60 : 50, {
+      damping: 15,
+      stiffness: 120,
+    });
+
+    setTimeout(() => {
+      toastY.value = withTiming(-120, { duration: 400 });
+      setTimeout(() => setShowToast(false), 400);
+    }, 3000);
+  }, []);
+
+  const animatedToastStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: toastY.value }],
+    opacity: interpolate(toastY.value, [-100, 60], [0, 1], 'clamp'),
+  }));
 
   // Confirm Dialog State
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -59,36 +157,16 @@ const ChallengeManagement = () => {
     onConfirm: () => void;
   }>({ visible: false, title: '', message: '', icon: 'trash-outline', iconColor: '#ef4444', onConfirm: () => { } });
 
-  const showConfirm = (title: string, message: string, icon: string, iconColor: string, onConfirm: () => void) => {
+  const showConfirm = useCallback((title: string, message: string, icon: string, iconColor: string, onConfirm: () => void) => {
     setConfirmDialog({ visible: true, title, message, icon, iconColor, onConfirm });
-  };
+  }, []);
   const hideConfirm = () => setConfirmDialog(prev => ({ ...prev, visible: false }));
-
-  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
-    setToast({ visible: true, message: msg, type });
-    Animated.spring(translateY, {
-      toValue: 35,
-      useNativeDriver: true,
-      tension: 10,
-      friction: 5
-    }).start();
-
-    setTimeout(() => {
-      Animated.timing(translateY, {
-        toValue: -100,
-        duration: 500,
-        useNativeDriver: true
-      }).start(() => setToast(prev => ({ ...prev, visible: false })));
-    }, 3000);
-  };
 
   useEffect(() => {
     setLoading(true);
-    // Fetch Quizzes
     const qQuiz = query(collection(db, 'quizzes'));
     const unsubQuiz = onSnapshot(qQuiz, (snap) => {
       const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      // Sort by newest first
       const sorted = data.sort((a: any, b: any) => {
         const dateA = a.createdAt?.seconds || (a.createdAt instanceof Date ? a.createdAt.getTime() / 1000 : 0);
         const dateB = b.createdAt?.seconds || (b.createdAt instanceof Date ? b.createdAt.getTime() / 1000 : 0);
@@ -97,7 +175,6 @@ const ChallengeManagement = () => {
       setQuizzes(sorted);
     });
 
-    // Fetch Destinations (to link quizzes)
     const qDest = query(collection(db, 'destinations'));
     const unsubDest = onSnapshot(qDest, (snap) => {
       const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -111,24 +188,35 @@ const ChallengeManagement = () => {
     };
   }, []);
 
-  const filteredQuizzes = quizzes.filter(q => {
-    const id = q.id || '';
-    const isCulture = id.startsWith('culture_');
-    const isFood = id.startsWith('food_');
-    const isPagoda = !isCulture && !isFood;
+  const filteredQuizzes = useMemo(() => {
+    return quizzes.filter(q => {
+      const id = q.id || '';
+      const isCulture = id.startsWith('culture_');
+      const isFood = id.startsWith('food_');
+      const isPagoda = !isCulture && !isFood;
 
-    const matchesTab = (activeTab === 'pagoda' && isPagoda) ||
-      (activeTab === 'culture' && isCulture) ||
-      (activeTab === 'food' && isFood);
+      const matchesTab = (activeTab === 'pagoda' && isPagoda) ||
+        (activeTab === 'culture' && isCulture) ||
+        (activeTab === 'food' && isFood);
 
-    const matchesSearch = (q.pagodaName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (q.pagodaNameKm || '').toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesTab && matchesSearch;
-  });
+      const matchesSearch = (q.pagodaName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (q.pagodaNameKm || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (q.id || '').toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesTab && matchesSearch;
+    });
+  }, [quizzes, activeTab, searchQuery]);
+
+  const resetQuizForm = () => {
+    setEditingQuiz(null);
+    setQTitle('');
+    setQTitleKm('');
+    setQColor('#3b82f6');
+    setQPagodaId('');
+  };
 
   const handleSaveQuiz = async () => {
     if (!qTitle || !qPagodaId) {
-      showToast('Điền đủ thông tin', 'error');
+      triggerToast('Vui lòng điền đủ thông tin', 'error');
       return;
     }
 
@@ -143,35 +231,37 @@ const ChallengeManagement = () => {
     try {
       if (editingQuiz) {
         await updateDoc(doc(db, 'quizzes', editingQuiz.id), quizData);
-        showToast('Cập nhật thử thách thành công');
+        triggerToast('Cập nhật thử thách thành công', 'success');
       } else {
-        const newId = qPagodaId; // Use pagodaId as document ID for easy matching
+        const newId = qPagodaId;
         await setDoc(doc(db, 'quizzes', newId), {
           ...quizData,
           id: newId,
           questions: [],
           createdAt: new Date(),
         });
-        showToast('Thêm thử thách mới thành công');
+        triggerToast('Thêm thử thách mới thành công', 'success');
       }
       setQuizModalVisible(false);
       resetQuizForm();
     } catch (error) {
-      showToast('Lỗi khi lưu dữ liệu', 'error');
+      triggerToast('Lỗi khi lưu dữ liệu', 'error');
     }
   };
 
-  const resetQuizForm = () => {
-    setEditingQuiz(null);
-    setQTitle('');
-    setQTitleKm('');
-    setQColor('#3b82f6');
-    setQPagodaId('');
+  const resetQuestionForm = () => {
+    setEditingQuestion(null);
+    setQuestText('');
+    setQuestTextKm('');
+    setOptions(['', '', '', '']);
+    setOptionsKm(['', '', '', '']);
+    setCorrectIndex(0);
+    setExplanation('');
   };
 
   const handleSaveQuestion = async () => {
     if (!managingQuizId || !questText || options.some(o => !o)) {
-      showToast('Vui lòng điền đủ câu hỏi và 4 đáp án', 'error');
+      triggerToast('Vui lòng điền đủ câu hỏi và 4 đáp án', 'error');
       return;
     }
 
@@ -188,7 +278,6 @@ const ChallengeManagement = () => {
     try {
       const quizRef = doc(db, 'quizzes', managingQuizId);
       if (editingQuestion) {
-        // Update local state is safer than double hitting Firestore
         const currentQuiz = quizzes.find(q => q.id === managingQuizId);
         const newQuestions = currentQuiz.questions.map((q: any) => q.id === editingQuestion.id ? questionData : q);
         await updateDoc(quizRef, { questions: newQuestions });
@@ -197,108 +286,85 @@ const ChallengeManagement = () => {
           questions: arrayUnion(questionData)
         });
       }
-      showToast('Lưu câu hỏi thành công');
+      triggerToast('Lưu câu hỏi thành công', 'success');
       setQuestionModalVisible(false);
       resetQuestionForm();
     } catch (error) {
-      showToast('Lỗi khi lưu câu hỏi', 'error');
+      triggerToast('Lỗi khi lưu câu hỏi', 'error');
     }
   };
 
-  const resetQuestionForm = () => {
-    setEditingQuestion(null);
-    setQuestText('');
-    setQuestTextKm('');
-    setOptions(['', '', '', '']);
-    setOptionsKm(['', '', '', '']);
-    setCorrectIndex(0);
-    setExplanation('');
-  };
-
-  const deleteQuiz = (id: string) => {
+  const deleteQuiz = useCallback((id: string) => {
     showConfirm(
       'Xóa bộ thử thách',
-      'Tất cả câu hỏi trong bộ này sẽ bị xóa',
+      'Tất cả câu hỏi trong bộ này sẽ bị xóa vĩnh viễn và không thể khôi phục.',
       'trash-outline', '#ef4444',
       async () => {
         hideConfirm();
         await deleteDoc(doc(db, 'quizzes', id));
-        showToast('Đã xóa bộ thử thách');
+        triggerToast('Đã xóa bộ thử thách', 'success');
       }
     );
-  };
+  }, [showConfirm, triggerToast]);
 
-  const deleteQuestion = (quizId: string, question: any) => {
+  const deleteQuestion = useCallback((quizId: string, question: any) => {
     showConfirm(
       'Xóa câu hỏi',
-      'Câu hỏi này sẽ bị xóa vĩnh viễn. Bạn có chắc chắn?',
+      'Câu hỏi này sẽ bị xóa vĩnh viễn khỏi bộ thử thách.',
       'help-circle-outline', '#f59e0b',
       async () => {
         hideConfirm();
         await updateDoc(doc(db, 'quizzes', quizId), {
           questions: arrayRemove(question)
         });
-        showToast('Đã xóa câu hỏi');
+        triggerToast('Đã xóa câu hỏi', 'success');
       }
     );
-  };
+  }, [showConfirm, triggerToast]);
 
   const getQuizDisplayTitle = (item: any) => {
     if (item.pagodaName) return item.pagodaName;
     if (item.title) return item.title;
-
     const linkedDest = destinations.find(d => d.id === (item.pagodaId || item.id));
     if (linkedDest) return linkedDest.name;
-
     return item.id;
   };
 
-  const renderQuizItem = ({ item }: { item: any }) => (
-    <TouchableOpacity
-      style={styles.quizCard}
-      onPress={() => setManagingQuizId(item.id)}
-    >
-      <View style={styles.quizInfo}>
-        <Text style={styles.quizTitle}>{getQuizDisplayTitle(item)}</Text>
-        <View style={styles.quizMeta}>
-          <Text style={styles.metaText}>{item.questions?.length || 0} câu hỏi</Text>
-        </View>
-      </View>
-      <View style={styles.quizActions}>
-        <TouchableOpacity
-          style={styles.actionIcon}
-          onPress={() => {
-            setEditingQuiz(item);
-            setQTitle(getQuizDisplayTitle(item));
-            const linkedDest = destinations.find(d => d.id === (item.pagodaId || item.id));
-            setQTitleKm(item.pagodaNameKm || linkedDest?.name_khmer || '');
-            setQColor(item.color);
-            setQPagodaId(item.pagodaId);
-            setQuizModalVisible(true);
-          }}
-        >
-          <Ionicons name="pencil" size={20} color="#3b82f6" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.actionIcon}
-          onPress={() => deleteQuiz(item.id)}
-        >
-          <Ionicons name="trash-outline" size={20} color="#ef4444" />
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-  );
-
-  const managingQuiz = quizzes.find(q => q.id === managingQuizId);
+  const managingQuiz = useMemo(() => quizzes.find(q => q.id === managingQuizId), [quizzes, managingQuizId]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, vs(10)) }]}>
       <StatusBar style="dark" />
+
+      {/* Premium Toast System */}
+      {showToast && (
+        <Animated.View
+          style={[
+            styles.toastContainer,
+            animatedToastStyle,
+            {
+              backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
+              shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
+            }
+          ]}
+        >
+          <View style={styles.toastIcon}>
+            <Ionicons
+              name={toastType === 'success' ? "checkmark" : "close"}
+              size={ms(20)}
+              color="#FFF"
+            />
+          </View>
+          <Text style={styles.toastText} numberOfLines={2}>
+            {toastMsg}
+          </Text>
+        </Animated.View>
+      )}
 
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={28} color="#1e293b" />
+          <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Quản lý Thử thách</Text>
         <TouchableOpacity
@@ -308,8 +374,27 @@ const ChallengeManagement = () => {
             setQuizModalVisible(true);
           }}
         >
-          <Ionicons name="add" size={30} color="#3b82f6" />
+          <Ionicons name="add" size={ms(30)} color="#3b82f6" />
         </TouchableOpacity>
+      </View>
+
+      {/* Search Bar */}
+      <View style={styles.searchSection}>
+        <View style={styles.searchBar}>
+          <Ionicons name="search" size={ms(20)} color="#94a3b8" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Tìm kiếm bộ thử thách..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholderTextColor="#94a3b8"
+          />
+          {searchQuery !== '' && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <Ionicons name="close-circle" size={ms(18)} color="#94a3b8" />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       {/* Tabs */}
@@ -334,269 +419,266 @@ const ChallengeManagement = () => {
         </TouchableOpacity>
       </View>
 
-
       {loading ? (
-        <ActivityIndicator size="large" color="#3b82f6" style={{ marginTop: 50 }} />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#3b82f6" />
+        </View>
       ) : (
         <FlatList
           data={filteredQuizzes}
           keyExtractor={item => item.id}
-          renderItem={renderQuizItem}
-          contentContainerStyle={styles.listContent}
+          renderItem={({ item }) => (
+            <QuizItem
+              item={item}
+              displayTitle={getQuizDisplayTitle(item)}
+              onManage={(id: string) => setManagingQuizId(id)}
+              onEdit={(q: any) => {
+                setEditingQuiz(q);
+                setQTitle(getQuizDisplayTitle(q));
+                const linkedDest = destinations.find(d => d.id === (q.pagodaId || q.id));
+                setQTitleKm(q.pagodaNameKm || linkedDest?.name_khmer || '');
+                setQColor(q.color);
+                setQPagodaId(q.pagodaId);
+                setQuizModalVisible(true);
+              }}
+              onDelete={deleteQuiz}
+            />
+          )}
+          contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + vs(20) }]}
+          showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Ionicons name="help-circle-outline" size={60} color="#e2e8f0" />
+              <Ionicons name="help-circle-outline" size={ms(60)} color="#e2e8f0" />
               <Text style={styles.emptyText}>Chưa có bộ câu hỏi nào</Text>
             </View>
           }
         />
       )}
 
-      {/* --- Quiz Management Modal (Questions) --- */}
-      <Modal visible={!!managingQuizId} animationType="slide" statusBarTranslucent={true}>
-        <View style={[styles.container, { paddingTop: 35 }]}>
-          <View style={styles.modalHeaderFixed}>
-            <TouchableOpacity style={styles.backBtn} onPress={() => setManagingQuizId(null)}>
-              <Ionicons name="arrow-back" size={28} color="#1e293b" />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle} numberOfLines={1}>{managingQuiz ? getQuizDisplayTitle(managingQuiz) : ''}</Text>
-            <TouchableOpacity
-              style={styles.addBtnHeader}
-              onPress={() => {
-                resetQuestionForm();
-                setQuestionModalVisible(true);
-              }}
-            >
-              <Ionicons name="add" size={30} color="#3b82f6" />
-            </TouchableOpacity>
+      {/* --- Quiz Management Modal (Questions List) --- */}
+      <Modal visible={!!managingQuizId} animationType="slide" transparent statusBarTranslucent={true}>
+        <View style={styles.modalFullBg}>
+          <View style={[styles.modalContentFull, { paddingTop: insets.top + vs(10) }]}>
+            <View style={styles.modalHeaderFixed}>
+              <TouchableOpacity style={styles.backBtn} onPress={() => setManagingQuizId(null)}>
+                <Ionicons name="chevron-back" size={ms(32)} color="#1e293b" />
+              </TouchableOpacity>
+              <Text style={[styles.modalTitleFull, { fontSize: ms(13) }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+                {managingQuiz ? getQuizDisplayTitle(managingQuiz) : ''}
+              </Text>
+              <TouchableOpacity
+                style={styles.addBtnHeader}
+                onPress={() => {
+                  resetQuestionForm();
+                  setQuestionModalVisible(true);
+                }}
+              >
+                <Ionicons name="add" size={ms(30)} color="#3b82f6" />
+              </TouchableOpacity>
+            </View>
+
+            <FlatList
+              data={managingQuiz?.questions || []}
+              keyExtractor={(item, index) => item.id || index.toString()}
+              contentContainerStyle={{ padding: s(20), paddingBottom: insets.bottom + vs(50) }}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item, index }) => (
+                <QuestionCard
+                  item={item}
+                  index={index}
+                  onEdit={(q: any) => {
+                    setEditingQuestion(q);
+                    setQuestText(q.question);
+                    setQuestTextKm(q.questionKm);
+                    setOptions(q.options);
+                    setOptionsKm(q.optionsKm || ['', '', '', '']);
+                    setCorrectIndex(q.correctIndex);
+                    setExplanation(q.explanation || '');
+                    setQuestionModalVisible(true);
+                  }}
+                  onDelete={(q: any) => deleteQuestion(managingQuizId!, q)}
+                />
+              )}
+              ListEmptyComponent={
+                <View style={[styles.emptyContainer, { marginTop: vs(100) }]}>
+                  <Ionicons name="chatbubbles-outline" size={ms(60)} color="#e2e8f0" />
+                  <Text style={styles.emptyText}>Bộ thử thách chưa có câu hỏi nào</Text>
+                </View>
+              }
+            />
           </View>
-
-          <FlatList
-            data={managingQuiz?.questions || []}
-            keyExtractor={(item, index) => item.id || index.toString()}
-            contentContainerStyle={{ padding: 16 }}
-            renderItem={({ item, index }) => (
-              <View style={styles.questionCard}>
-                <View style={styles.questionHeader}>
-                  <Text style={styles.questionIndex}>Câu {index + 1}</Text>
-                  <View style={styles.questionActions}>
-                    <TouchableOpacity onPress={() => {
-                      setEditingQuestion(item);
-                      setQuestText(item.question);
-                      setQuestTextKm(item.questionKm);
-                      setOptions(item.options);
-                      setOptionsKm(item.optionsKm || ['', '', '', '']);
-                      setCorrectIndex(item.correctIndex);
-                      setExplanation(item.explanation || '');
-                      setQuestionModalVisible(true);
-                    }}>
-                      <Ionicons name="pencil" size={18} color="#3b82f6" />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => deleteQuestion(managingQuizId!, item)}>
-                      <Ionicons name="trash-outline" size={18} color="#ef4444" />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <Text style={styles.questionText}>{item.question}</Text>
-                <View style={styles.optionsList}>
-                  {item.options.map((opt: string, i: number) => (
-                    <View key={i} style={[styles.optionItem, i === item.correctIndex && styles.correctOption]}>
-                      <Text style={[styles.optionText, i === item.correctIndex && styles.correctOptionText]}>
-                        {String.fromCharCode(65 + i)}. {opt}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            )}
-            ListEmptyComponent={
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>Chưa có câu hỏi nào</Text>
-              </View>
-            }
-          />
-
-          {/* Toast inside quiz management modal */}
-          {toast.visible && (
-            <Animated.View style={[styles.toastContainer, toast.type === 'error' ? styles.toastError : styles.toastSuccess, { transform: [{ translateY }] }]}>
-              <Ionicons name={toast.type === 'success' ? 'checkmark-circle' : 'alert-circle'} size={24} color="#fff" />
-              <Text style={styles.toastText}>{toast.message}</Text>
-            </Animated.View>
-          )}
         </View>
       </Modal>
 
       {/* --- Add/Edit Quiz Modal --- */}
       <Modal visible={quizModalVisible} animationType="fade" transparent statusBarTranslucent={true}>
-        <View style={styles.modalBg}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalBg}
+        >
           <View style={styles.modalContentSmall}>
             <Text style={styles.modalTitle}>{editingQuiz ? 'Sửa Thử thách' : 'Thêm Thử thách'}</Text>
 
-            <Text style={styles.inputLabel}>Tên thử thách (tiếng Việt)</Text>
-            <TextInput
-              style={styles.input}
-              value={qTitle}
-              onChangeText={setQTitle}
-              placeholder="Nhập tên thử thách..."
-            />
+            <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: vs(400) }}>
+              <Text style={styles.inputLabel}>Tên thử thách (tiếng Việt)</Text>
+              <TextInput
+                style={styles.input}
+                value={qTitle}
+                onChangeText={setQTitle}
+                placeholder="Nhập tên thử thách..."
+                placeholderTextColor="#94a3b8"
+              />
 
-            <Text style={styles.inputLabel}>Tên thử thách (tiếng Khmer)</Text>
-            <TextInput
-              style={styles.input}
-              value={qTitleKm}
-              onChangeText={setQTitleKm}
-              placeholder="Nhập tên tiếng Khmer..."
-            />
+              <Text style={styles.inputLabel}>Tên thử thách (tiếng Khmer)</Text>
+              <TextInput
+                style={styles.input}
+                value={qTitleKm}
+                onChangeText={setQTitleKm}
+                placeholder="Nhập tên tiếng Khmer..."
+                placeholderTextColor="#94a3b8"
+              />
 
-            <Text style={styles.inputLabel}>Liên kết với nội dung</Text>
-            {destinations.filter(d => {
-              if (editingQuiz && (editingQuiz.pagodaId === d.id || editingQuiz.id === d.id)) return true;
-              return !quizzes.some(q => q.pagodaId === d.id || q.id === d.id);
-            }).length > 0 ? (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 10 }}>
-                {destinations
-                  .filter(d => {
-                    if (editingQuiz && (editingQuiz.pagodaId === d.id || editingQuiz.id === d.id)) return true;
-                    return !quizzes.some(q => q.pagodaId === d.id || q.id === d.id);
-                  })
-                  .map(d => (
-                    <TouchableOpacity
-                      key={d.id}
-                      style={[styles.destChip, qPagodaId === d.id && styles.activeDestChip]}
-                      onPress={() => {
-                        setQPagodaId(d.id);
-                        if (!qTitle) setQTitle(d.name);
-                        if (!qTitleKm) setQTitleKm(d.name_khmer);
-                      }}
-                    >
-                      <Text style={[styles.destChipText, qPagodaId === d.id && styles.activeDestChipText]}>{d.name}</Text>
-                    </TouchableOpacity>
-                  ))}
-              </ScrollView>
-            ) : (
-              <View style={{ marginBottom: 10 }}>
+              <Text style={styles.inputLabel}>Liên kết với nội dung</Text>
+              <View style={styles.destListContainer}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {destinations
+                    .filter(d => {
+                      if (editingQuiz && (editingQuiz.pagodaId === d.id || editingQuiz.id === d.id)) return true;
+                      return !quizzes.some(q => q.pagodaId === d.id || q.id === d.id);
+                    })
+                    .map(d => (
+                      <TouchableOpacity
+                        key={d.id}
+                        style={[styles.destChip, qPagodaId === d.id && styles.activeDestChip]}
+                        onPress={() => {
+                          setQPagodaId(d.id);
+                          if (!qTitle) setQTitle(d.name);
+                          if (!qTitleKm) setQTitleKm(d.name_khmer);
+                        }}
+                      >
+                        <Text style={[styles.destChipText, qPagodaId === d.id && styles.activeDestChipText]}>{d.name}</Text>
+                      </TouchableOpacity>
+                    ))}
+                </ScrollView>
+              </View>
+
+              {!qPagodaId && (
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { marginTop: vs(-5) }]}
                   value={qPagodaId}
                   onChangeText={setQPagodaId}
-                  placeholder="Nhập ID nội dung cần liên kết..."
+                  placeholder="Hoặc nhập ID nội dung thủ công..."
+                  placeholderTextColor="#94a3b8"
                 />
-              </View>
-            )}
-
+              )}
+            </ScrollView>
 
             <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setQuizModalVisible(false)}>
-                <Text style={styles.cancelBtnText}>Hủy</Text>
+              <TouchableOpacity style={[styles.btnAction, styles.cancelBtn]} onPress={() => setQuizModalVisible(false)}>
+                <Text style={styles.btnText}>Hủy</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtnSmall} onPress={handleSaveQuiz}>
-                <Text style={styles.saveBtnText}>Lưu</Text>
+              <TouchableOpacity style={[styles.btnAction, styles.saveBtn]} onPress={handleSaveQuiz}>
+                <Text style={styles.btnText}>Lưu</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      {/* --- Add/Edit Question Modal --- */}
+      <Modal visible={questionModalVisible} animationType="slide" transparent statusBarTranslucent={true}>
+        <View style={styles.modalFullBg}>
+          <View style={[styles.modalContentFull, { paddingTop: insets.top + vs(10) }]}>
+            <View style={styles.modalHeaderFixed}>
+              <TouchableOpacity style={styles.backBtn} onPress={() => setQuestionModalVisible(false)}>
+                <Ionicons name="chevron-back" size={ms(32)} color="#1e293b" />
+              </TouchableOpacity>
+              <Text style={styles.modalTitleFull}>{editingQuestion ? 'Sửa câu hỏi' : 'Thêm câu hỏi'}</Text>
+              <View style={{ width: s(44) }} />
+            </View>
+
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+              style={{ flex: 1 }}
+              keyboardVerticalOffset={Platform.OS === 'ios' ? vs(50) : 0}
+            >
+              <ScrollView style={styles.formScroll} contentContainerStyle={{ padding: s(20), paddingBottom: vs(120) }} showsVerticalScrollIndicator={false}>
+                <Text style={styles.inputLabel}>Nội dung câu hỏi</Text>
+                <TextInput
+                  style={[styles.input, { height: vs(100), textAlignVertical: 'top' }]}
+                  multiline
+                  value={questText}
+                  onChangeText={setQuestText}
+                  placeholder="Nhập câu hỏi..."
+                  placeholderTextColor="#94a3b8"
+                />
+
+                <Text style={[styles.inputLabel, { marginTop: vs(20) }]}>Các đáp án (Nhấn chọn đáp án đúng)</Text>
+                {options.map((opt, i) => (
+                  <View key={i} style={styles.optionInputRow}>
+                    <TouchableOpacity
+                      style={[styles.correctIndicator, correctIndex === i && styles.correctIndicatorActive]}
+                      onPress={() => setCorrectIndex(i)}
+                    >
+                      <Text style={[styles.indicatorText, correctIndex === i && styles.indicatorTextActive]}>
+                        {String.fromCharCode(65 + i)}
+                      </Text>
+                    </TouchableOpacity>
+                    <View style={{ flex: 1 }}>
+                      <TextInput
+                        style={styles.input}
+                        value={opt}
+                        onChangeText={(val) => {
+                          const newOpts = [...options];
+                          newOpts[i] = val;
+                          setOptions(newOpts);
+                        }}
+                        placeholder={`Đáp án ${String.fromCharCode(65 + i)}`}
+                        placeholderTextColor="#94a3b8"
+                      />
+                    </View>
+                  </View>
+                ))}
+
+                <Text style={[styles.inputLabel, { marginTop: vs(10) }]}>Giải thích đáp án</Text>
+                <TextInput
+                  style={[styles.input, { height: vs(100), textAlignVertical: 'top' }]}
+                  multiline
+                  value={explanation}
+                  onChangeText={setExplanation}
+                  placeholder="Giải thích vì sao đáp án này đúng..."
+                  placeholderTextColor="#94a3b8"
+                />
+              </ScrollView>
+            </KeyboardAvoidingView>
+
+            <View style={[styles.modalFooter, { paddingBottom: Math.max(insets.bottom, vs(20)) }]}>
+              <TouchableOpacity style={styles.saveBtnLarge} onPress={handleSaveQuestion}>
+                <Text style={styles.saveBtnText}>Lưu câu hỏi</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
-
-      {/* --- Add/Edit Question Modal --- */}
-      <Modal visible={questionModalVisible} animationType="slide" statusBarTranslucent={true}>
-        <View style={[styles.container, { paddingTop: 35 }]}>
-          <View style={styles.modalHeaderFixed}>
-            <TouchableOpacity style={styles.backBtn} onPress={() => setQuestionModalVisible(false)}>
-              <Ionicons name="arrow-back" size={28} color="#1e293b" />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>{editingQuestion ? 'Sửa câu hỏi' : 'Thêm câu hỏi'}</Text>
-            <View style={{ width: 44 }} />
-          </View>
-
-          <ScrollView style={styles.formScroll} contentContainerStyle={{ padding: 20 }}>
-            <Text style={styles.inputLabel}>Nội dung câu hỏi</Text>
-            <TextInput
-              style={[styles.input, { height: 80 }]}
-              multiline
-              value={questText}
-              onChangeText={setQuestText}
-              placeholder="Nhập câu hỏi..."
-            />
-
-
-            <Text style={[styles.inputLabel, { marginTop: 12 }]}>Các đáp án (Nhấn chọn đáp án đúng)</Text>
-            {options.map((opt, i) => (
-              <View key={i} style={styles.optionInputRow}>
-                <TouchableOpacity
-                  style={[styles.correctIndicator, correctIndex === i && styles.correctIndicatorActive]}
-                  onPress={() => setCorrectIndex(i)}
-                >
-                  <Text style={[styles.indicatorText, correctIndex === i && styles.indicatorTextActive]}>
-                    {String.fromCharCode(65 + i)}
-                  </Text>
-                </TouchableOpacity>
-                <View style={{ flex: 1 }}>
-                  <TextInput
-                    style={styles.input}
-                    value={opt}
-                    onChangeText={(val) => {
-                      const newOpts = [...options];
-                      newOpts[i] = val;
-                      setOptions(newOpts);
-                    }}
-                    placeholder={`Nhập nội dung đáp án ${String.fromCharCode(65 + i)}`}
-                  />
-                </View>
-              </View>
-            ))}
-
-            <Text style={[styles.inputLabel, { marginTop: 0 }]}>Giải thích đáp án đúng</Text>
-            <TextInput
-              style={[styles.input, { height: 100, marginBottom: 20 }]}
-              multiline
-              value={explanation}
-              onChangeText={setExplanation}
-              placeholder="Nhập giải thích vì sao đáp án này đúng..."
-            />
-          </ScrollView>
-
-          <View style={styles.modalFooter}>
-            <TouchableOpacity style={styles.saveBtnLarge} onPress={handleSaveQuestion}>
-              <Text style={styles.saveBtnText}>Lưu câu hỏi</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Toast inside question modal */}
-          {toast.visible && (
-            <Animated.View style={[styles.toastContainer, toast.type === 'error' ? styles.toastError : styles.toastSuccess, { transform: [{ translateY }] }]}>
-              <Ionicons name={toast.type === 'success' ? 'checkmark-circle' : 'alert-circle'} size={24} color="#fff" />
-              <Text style={styles.toastText}>{toast.message}</Text>
-            </Animated.View>
-          )}
-        </View>
-      </Modal>
-
-      {/* Toast Notification */}
-      {toast.visible && (
-        <Animated.View style={[styles.toastContainer, toast.type === 'error' ? styles.toastError : styles.toastSuccess, { transform: [{ translateY }] }]}>
-          <Ionicons name={toast.type === 'success' ? 'checkmark-circle' : 'alert-circle'} size={24} color="#fff" />
-          <Text style={styles.toastText}>{toast.message}</Text>
-        </Animated.View>
-      )}
 
       {/* --- Custom Confirm Dialog --- */}
       <Modal visible={confirmDialog.visible} transparent animationType="fade" statusBarTranslucent>
         <View style={styles.confirmOverlay}>
           <View style={styles.confirmBox}>
             <View style={[styles.confirmIconCircle, { backgroundColor: confirmDialog.iconColor + '18' }]}>
-              <Ionicons name={confirmDialog.icon as any} size={32} color={confirmDialog.iconColor} />
+              <Ionicons name={confirmDialog.icon as any} size={ms(32)} color={confirmDialog.iconColor} />
             </View>
-            <Text style={styles.confirmTitle}>{confirmDialog.title}</Text>
+            <Text style={styles.confirmTitleText}>{confirmDialog.title}</Text>
             <Text style={styles.confirmMessage}>{confirmDialog.message}</Text>
             <View style={styles.confirmActions}>
-              <TouchableOpacity style={styles.confirmCancelBtn} onPress={hideConfirm}>
-                <Text style={styles.confirmCancelText}>Hủy bỏ</Text>
+              <TouchableOpacity style={[styles.confirmBtn, { backgroundColor: '#f1f5f9' }]} onPress={hideConfirm}>
+                <Text style={[styles.confirmBtnText, { color: '#64748b' }]}>Hủy bỏ</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.confirmDeleteBtn, { backgroundColor: confirmDialog.iconColor }]}
+                style={[styles.confirmBtn, { backgroundColor: confirmDialog.iconColor }]}
                 onPress={confirmDialog.onConfirm}
               >
-                <Text style={styles.confirmDeleteText}>Xác nhận</Text>
+                <Text style={styles.confirmBtnText}>Xác nhận</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -607,161 +689,303 @@ const ChallengeManagement = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, marginTop: 35, height: 60, position: 'relative' },
-  modalHeaderFixed: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, height: 60, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
-  backBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center', zIndex: 10 },
-  addBtnHeader: { width: 42, height: 42, backgroundColor: '#f1f5f9', borderRadius: 12, justifyContent: 'center', alignItems: 'center', zIndex: 10 },
-  headerTitle: { flex: 1, fontSize: 20, fontWeight: '800', color: '#1e293b', textAlign: 'center' },
-  tabBar: { flexDirection: 'row', marginHorizontal: 16, marginTop: 10, backgroundColor: '#f1f5f9', borderRadius: 12, padding: 4 },
-  tab: { flex: 1, paddingVertical: 10, paddingHorizontal: 2, alignItems: 'center', borderRadius: 10 },
-  activeTab: { backgroundColor: '#fff', elevation: 2, shadowOpacity: 0.1 },
-  tabText: { fontSize: 11, fontWeight: '700', color: '#64748b', textAlign: 'center' },
+  container: { flex: 1, backgroundColor: '#f8fafc' },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: s(16),
+    paddingBottom: vs(12),
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9'
+  },
+  modalHeaderFixed: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingBottom: vs(10),
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9'
+  },
+  backBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center' },
+  addBtnHeader: { width: s(42), height: s(42), backgroundColor: '#eff6ff', borderRadius: s(12), justifyContent: 'center', alignItems: 'center' },
+  headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+
+  searchSection: { paddingHorizontal: s(16), marginTop: vs(15) },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: ms(16),
+    paddingHorizontal: s(14),
+    height: vs(50),
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+  },
+  searchInput: { flex: 1, marginLeft: s(10), fontSize: ms(15), color: '#1e293b', fontWeight: '500' },
+
+  tabBar: { flexDirection: 'row', marginHorizontal: s(16), marginTop: vs(15), backgroundColor: '#f1f5f9', borderRadius: s(14), padding: s(4) },
+  tab: { flex: 1, paddingVertical: vs(10), alignItems: 'center', borderRadius: s(12) },
+  activeTab: { backgroundColor: '#fff', elevation: 2, shadowOpacity: 0.1, shadowRadius: 5 },
+  tabText: { fontSize: ms(13), fontWeight: '700', color: '#64748b' },
   activeTabText: { color: '#3b82f6' },
-  searchSection: { paddingHorizontal: 16, marginTop: 15 },
-  searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f5f9', borderRadius: 12, paddingHorizontal: 12, height: 45 },
-  searchInput: { flex: 1, marginLeft: 8, fontSize: 15, color: '#1e293b' },
-  listContent: { padding: 16 },
-  quizCard: { backgroundColor: '#fff', borderRadius: 20, marginBottom: 12, flexDirection: 'row', alignItems: 'center', padding: 15, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 5, borderWidth: 1, borderColor: '#f1f5f9' },
-  colorIndicator: { width: 6, height: 40, borderRadius: 3, marginRight: 15 },
+
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  listContent: { padding: s(16) },
+
+  quizCardWrapper: {
+    marginBottom: vs(12),
+    borderRadius: ms(20),
+    backgroundColor: '#fff',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+  },
+  quizCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: s(16),
+    borderRadius: ms(20),
+    borderWidth: 1,
+    borderColor: '#f1f5f9'
+  },
   quizInfo: { flex: 1 },
-  quizTitle: { fontSize: 16, fontWeight: '800', color: '#1e293b' },
-  quizSubtitle: { fontSize: 12, color: '#64748b', marginTop: 2 },
-  quizMeta: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 },
-  metaText: { fontSize: 12, color: '#64748b', fontWeight: '600' },
-  quizActions: { flexDirection: 'row', gap: 5 },
-  actionIcon: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#f8fafc', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#e2e8f0' },
-  emptyContainer: { alignItems: 'center', marginTop: 350, opacity: 0.5 },
-  emptyText: { fontSize: 15, color: '#64748b', marginTop: 10, fontWeight: '600' },
-  // Modal Full Screen Question Styles
-  questionCard: { backgroundColor: '#fff', borderRadius: 20, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: '#e2e8f0', elevation: 1 },
-  questionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  questionIndex: { fontSize: 14, fontWeight: '900', color: '#3b82f6', backgroundColor: '#eff6ff', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
-  questionActions: { flexDirection: 'row', gap: 12 },
-  questionText: { fontSize: 16, fontWeight: '800', color: '#1e293b', marginBottom: 15 },
-  optionsList: { gap: 8 },
-  optionItem: { padding: 12, borderRadius: 12, backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#e2e8f0' },
-  correctOption: { backgroundColor: '#f0fdf4', borderColor: '#22c55e' },
-  optionText: { fontSize: 14, color: '#475569' },
-  correctOptionText: { color: '#166534', fontWeight: '700' },
-  // Form Styles
+  quizTitle: { fontSize: ms(13), fontWeight: '800', color: '#1e293b', marginBottom: vs(6) },
+  quizMeta: { flexDirection: 'row', alignItems: 'center' },
+  questionBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#eff6ff',
+    paddingHorizontal: s(10),
+    paddingVertical: vs(4),
+    borderRadius: s(10),
+    gap: s(4)
+  },
+  metaText: { fontSize: ms(12), color: '#3b82f6', fontWeight: '700' },
+  quizActions: { flexDirection: 'row', gap: s(8) },
+  actionIcon: {
+    width: s(40),
+    height: s(40),
+    borderRadius: s(12),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e2e8f0'
+  },
+
+  emptyContainer: { alignItems: 'center', marginTop: vs(150), opacity: 0.5 },
+  emptyText: { fontSize: ms(16), color: '#94a3b8', marginTop: vs(16), fontWeight: '600', textAlign: 'center', paddingHorizontal: s(40) },
+
+  // Modal Styles
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modalContentSmall: { width: '90%', backgroundColor: '#fff', borderRadius: 24, padding: 24 },
-  modalTitle: { fontSize: 22, fontWeight: '900', color: '#1e293b', marginBottom: 20, textAlign: 'center' },
-  inputLabel: { fontSize: 13, fontWeight: '800', color: '#64748b', marginBottom: 8, marginTop: 7 },
-  input: { backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 12, padding: 12, fontSize: 15, color: '#1e293b' },
-  destChip: { paddingHorizontal: 15, paddingVertical: 8, borderRadius: 4, backgroundColor: '#eff6ff', marginRight: 8, borderWidth: 1, borderColor: '#3b82f6' },
-  activeDestChip: { backgroundColor: '#3b82f6', borderColor: '#3b82f6', borderRadius: 4 },
-  destChipText: { fontSize: 12, color: '#3b82f6', fontWeight: '700' },
+  modalFullBg: { flex: 1, backgroundColor: '#fff' },
+  modalContentFull: { flex: 1, backgroundColor: '#fff', paddingHorizontal: s(20) },
+  modalContentSmall: { width: '88%', backgroundColor: '#fff', borderRadius: ms(28), padding: s(24) },
+  modalTitle: { fontSize: ms(22), fontWeight: '900', color: '#1e293b', marginBottom: vs(20), textAlign: 'center' },
+  modalTitleFull: { flex: 1, fontSize: ms(18), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+
+  inputLabel: { fontSize: ms(13), fontWeight: '800', color: '#64748b', marginBottom: vs(10), marginTop: vs(15) },
+  input: {
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: s(14),
+    padding: s(12),
+    fontSize: ms(12),
+    color: '#1e293b',
+    fontWeight: '500'
+  },
+
+  destListContainer: { marginTop: vs(10) },
+  destChip: {
+    paddingHorizontal: s(16),
+    paddingVertical: vs(10),
+    borderRadius: s(25),
+    backgroundColor: '#f1f5f9',
+    marginRight: s(10),
+    borderWidth: 1,
+    borderColor: '#e2e8f0'
+  },
+  activeDestChip: { backgroundColor: '#3b82f6', borderColor: '#3b82f6' },
+  destChipText: { fontSize: ms(12), color: '#64748b', fontWeight: '700' },
   activeDestChipText: { color: '#fff' },
-  colorRow: { flexDirection: 'row', gap: 12, marginTop: 5 },
-  colorBox: { width: 36, height: 36, borderRadius: 18, borderWidth: 2, borderColor: 'transparent' },
-  activeColorBox: { borderColor: '#1e293b' },
-  modalActions: { flexDirection: 'row', justifyContent: 'center', gap: 12, marginTop: 25 },
-  cancelBtn: { flex: 1, paddingVertical: 12, borderRadius: 12, backgroundColor: '#ef4444', alignItems: 'center' },
-  cancelBtnText: { color: '#ffffff', fontWeight: '700' },
-  saveBtnSmall: { flex: 1, paddingVertical: 12, borderRadius: 12, backgroundColor: '#3b82f6', alignItems: 'center' },
-  saveBtnText: { color: '#fff', fontWeight: '800' },
-  // Question Form Specific
+
+  modalActions: { flexDirection: 'row', gap: s(12), marginTop: vs(30) },
+  btnAction: { flex: 1, paddingVertical: vs(15), borderRadius: s(16), alignItems: 'center' },
+  cancelBtn: { backgroundColor: '#ff0000ff' },
+  saveBtn: { backgroundColor: '#3b82f6' },
+  btnText: { color: '#ffffffff', fontWeight: '800', fontSize: ms(15) },
+
+  // Question Card
+  questionCard: {
+    backgroundColor: '#fff',
+    borderRadius: ms(24),
+    padding: s(18),
+    marginBottom: vs(16),
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8
+  },
+  questionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(15) },
+  questionIndexBadge: {
+    backgroundColor: '#eff6ff',
+    paddingHorizontal: s(14),
+    paddingVertical: vs(6),
+    borderRadius: s(12)
+  },
+  questionIndexText: { fontSize: ms(13), fontWeight: '900', color: '#3b82f6' },
+  questionActions: { flexDirection: 'row', gap: s(10) },
+  miniActionBtn: {
+    width: s(36),
+    height: s(36),
+    borderRadius: s(10),
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff'
+  },
+  questionText: { fontSize: ms(17), fontWeight: '800', color: '#1e293b', marginBottom: vs(20), lineHeight: ms(24) },
+  optionsList: { gap: vs(10) },
+  optionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: s(14),
+    borderRadius: s(16),
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#e2e8f0'
+  },
+  correctOption: { backgroundColor: '#f0fdf4', borderColor: '#22c55e' },
+  optionLetter: {
+    width: s(28),
+    height: s(28),
+    borderRadius: s(14),
+    backgroundColor: '#e2e8f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: s(12)
+  },
+  correctLetter: { backgroundColor: '#22c55e' },
+  optionLetterText: { fontSize: ms(14), fontWeight: '800', color: '#64748b' },
+  correctLetterText: { color: '#fff' },
+  optionText: { fontSize: ms(14), color: '#475569', fontWeight: '500', flex: 1 },
+  correctOptionText: { color: '#166534', fontWeight: '700' },
+
   formScroll: { flex: 1 },
-  optionInputRow: { flexDirection: 'row', gap: 10, marginBottom: 15, alignItems: 'flex-start' },
-  correctIndicator: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#f1f5f9', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#e2e8f0', marginTop: 5 },
+  optionInputRow: { flexDirection: 'row', gap: s(12), marginBottom: vs(15), alignItems: 'center' },
+  correctIndicator: {
+    width: s(40),
+    height: s(40),
+    borderRadius: s(20),
+    backgroundColor: '#f1f5f9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e2e8f0'
+  },
   correctIndicatorActive: { backgroundColor: '#22c55e', borderColor: '#22c55e' },
-  indicatorText: { fontSize: 16, fontWeight: '900', color: '#64748b' },
+  indicatorText: { fontSize: ms(16), fontWeight: '900', color: '#64748b' },
   indicatorTextActive: { color: '#fff' },
-  // Toast Styles
-  toastContainer: { position: 'absolute', top: 7, left: 20, right: 20, flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, zIndex: 9999, gap: 12 },
-  toastSuccess: { backgroundColor: '#10b981' },
-  toastError: { backgroundColor: '#ef4444' },
-  toastText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+
   modalFooter: {
-    padding: 20,
+    paddingHorizontal: s(20),
+    backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#f1f5f9',
-    backgroundColor: '#fff',
   },
   saveBtnLarge: {
     backgroundColor: '#3b82f6',
-    paddingVertical: 15,
-    borderRadius: 16,
+    paddingVertical: vs(16),
+    borderRadius: s(18),
     alignItems: 'center',
     shadowColor: '#3b82f6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+    elevation: 8,
   },
-  // Confirm Dialog Styles
+  saveBtnText: { color: '#fff', fontWeight: '800', fontSize: ms(16) },
+
   confirmOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: s(24),
   },
   confirmBox: {
     backgroundColor: '#fff',
-    borderRadius: 28,
-    padding: 28,
+    borderRadius: ms(32),
+    padding: s(28),
     width: '100%',
-    maxWidth: 340,
+    maxWidth: s(340),
     alignItems: 'center',
+    elevation: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.12,
-    shadowRadius: 20,
-    elevation: 10,
+    shadowOffset: { width: 0, height: 15 },
+    shadowOpacity: 0.2,
+    shadowRadius: 30,
   },
   confirmIconCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 24,
+    width: s(72),
+    height: s(72),
+    borderRadius: ms(24),
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 18,
+    marginBottom: vs(20),
   },
-  confirmTitle: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#1e293b',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  confirmMessage: {
-    fontSize: 14,
-    color: '#64748b',
-    textAlign: 'center',
-    lineHeight: 21,
-    marginBottom: 24,
-    fontWeight: '500',
-  },
-  confirmActions: {
+  confirmTitleText: { fontSize: ms(19), fontWeight: '900', color: '#1e293b', marginBottom: vs(10), textAlign: 'center' },
+  confirmMessage: { fontSize: ms(14), color: '#64748b', textAlign: 'center', lineHeight: ms(22), marginBottom: vs(25), fontWeight: '500' },
+  confirmActions: { flexDirection: 'row', gap: s(12), width: '100%' },
+  confirmBtn: { flex: 1, paddingVertical: vs(15), borderRadius: s(16), alignItems: 'center' },
+  confirmBtnText: { fontSize: ms(15), fontWeight: '800', color: '#fff' },
+
+  // Toast Styles
+  toastContainer: {
+    position: 'absolute',
+    top: 0,
+    left: s(16),
+    right: s(16),
+    minHeight: vs(60),
+    paddingVertical: vs(10),
+    borderRadius: ms(20),
     flexDirection: 'row',
-    gap: 12,
-    width: '100%',
+    alignItems: 'center',
+    paddingHorizontal: s(16),
+    zIndex: 9999,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 15,
   },
-  confirmCancelBtn: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 14,
-    backgroundColor: '#3b82f6',
+  toastIcon: {
+    width: s(34),
+    height: s(34),
+    borderRadius: s(17),
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  confirmCancelText: {
-    fontSize: 15,
+  toastText: {
+    color: '#FFF',
+    fontSize: ms(15),
     fontWeight: '700',
-    color: '#fff',
-  },
-  confirmDeleteBtn: {
+    marginLeft: s(12),
     flex: 1,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-  },
-  confirmDeleteText: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#fff',
+    lineHeight: ms(22),
   },
 });
 

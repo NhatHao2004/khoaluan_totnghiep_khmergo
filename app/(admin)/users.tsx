@@ -1,11 +1,26 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { db } from '../../utils/firebaseConfig';
+import { ms, s, vs } from '../../utils/responsive';
+
+// --- Memoized Components ---
+
+const ActivityCard = memo(({ item, getTimeAgo }: any) => (
+  <View style={styles.activityCard}>
+    <Text style={styles.activityItemTitle}>{item.name || 'Người dùng mới'}</Text>
+    <View style={styles.activityFooter}>
+      <Text style={styles.activityDesc}>Đã đăng ký tài khoản thành công</Text>
+      <Text style={styles.activityTime}>{getTimeAgo(item.createdAt)}</Text>
+    </View>
+  </View>
+));
 
 const UsersActivity = () => {
+  const insets = useSafeAreaInsets();
   const [users, setUsers] = useState<any[]>([]);
 
   useEffect(() => {
@@ -35,8 +50,7 @@ const UsersActivity = () => {
     return () => unsub();
   }, []);
 
-  // Hàm tính thời gian tương đối
-  const getTimeAgo = (timestamp: any) => {
+  const getTimeAgo = useCallback((timestamp: any) => {
     if (!timestamp) return 'Vừa xong';
     const now = new Date();
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
@@ -47,35 +61,32 @@ const UsersActivity = () => {
     const diffInHours = Math.floor(diffInMinutes / 60);
     if (diffInHours < 24) return `${diffInHours} giờ trước`;
     return `${Math.floor(diffInHours / 24)} ngày trước`;
-  };
-
-  const renderUserItem = ({ item }: { item: any }) => (
-    <View style={styles.activityCard}>
-      <Text style={styles.activityItemTitle}>{item.name || 'Người dùng mới'}</Text>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
-        <Text style={styles.activityDesc} numberOfLines={1}>Đã đăng ký tài khoản thành công</Text>
-        <Text style={styles.activityTime}>{getTimeAgo(item.createdAt)}</Text>
-      </View>
-    </View>
-  );
+  }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, vs(10)) }]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={28} color="#1e293b" />
+          <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Hoạt động gần đây</Text>
+        <View style={{ width: s(44) }} />
       </View>
 
       <FlatList
         data={users}
         keyExtractor={(item) => item.id}
-        renderItem={renderUserItem}
-        contentContainerStyle={styles.listContent}
+        renderItem={({ item }) => (
+          <ActivityCard item={item} getTimeAgo={getTimeAgo} />
+        )}
+        contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + vs(20) }]}
+        showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>Chưa có hoạt động mới nào</Text>
+          <View style={styles.emptyContainer}>
+            <Ionicons name="notifications-off-outline" size={ms(64)} color="#e2e8f0" />
+            <Text style={styles.emptyText}>Chưa có hoạt động mới nào</Text>
+          </View>
         }
       />
     </View>
@@ -83,84 +94,62 @@ const UsersActivity = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
+  container: { flex: 1, backgroundColor: '#f8fafc' },
+  header: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingHorizontal: s(16), 
+    paddingBottom: vs(15), 
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9'
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    marginTop: 35,
-    height: 50,
-    backgroundColor: 'transparent',
-    position: 'relative',
-  },
-  backBtn: {
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
-  },
-  headerTitle: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#1e293b',
-    textAlign: 'center',
-    lineHeight: 50,
-    zIndex: 1,
-  },
-  listContent: {
-    padding: 16,
-  },
+  backBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center' },
+  headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+  listContent: { padding: s(16) },
   activityCard: {
     backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 14,
-    marginBottom: 12,
+    borderRadius: ms(16),
+    padding: s(16),
+    marginBottom: vs(12),
     borderWidth: 1,
     borderColor: '#f1f5f9',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
   },
-  activityIconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: '#f0fdf4',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  activityInfo: {
-    marginBottom: 6,
+  activityFooter: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    marginTop: vs(6) 
   },
   activityItemTitle: {
-    fontSize: 16,
+    fontSize: ms(16),
     fontWeight: '800',
     color: '#1e293b',
   },
   activityDesc: {
-    fontSize: 14,
+    fontSize: ms(14),
     color: '#64748b',
     fontWeight: '500',
     flex: 1,
   },
   activityTime: {
-    fontSize: 12,
+    fontSize: ms(12),
     color: '#94a3b8',
     fontWeight: '600',
-    marginLeft: 10,
+    marginLeft: s(10),
   },
+  emptyContainer: { alignItems: 'center', marginTop: vs(150), opacity: 0.5 },
   emptyText: {
     textAlign: 'center',
     color: '#94a3b8',
-    marginTop: 340,
-    fontSize: 16,
+    marginTop: vs(16),
+    fontSize: ms(16),
+    fontWeight: '600'
   },
 });
 
