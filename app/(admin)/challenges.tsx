@@ -21,6 +21,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { db } from '../../utils/firebaseConfig';
 import { ms, s, vs } from '../../utils/responsive';
 
+// Clamp font size between min and max regardless of device size
+const clamp = (val: number, min: number, max: number) => Math.min(Math.max(val, min), max);
+const fs = (size: number) => clamp(ms(size), 11, 13);
+
 // --- Memoized Components ---
 
 const QuizItem = memo(({ item, onEdit, onDelete, onManage, displayTitle }: any) => (
@@ -463,7 +467,7 @@ const ChallengeManagement = () => {
               <TouchableOpacity style={styles.backBtn} onPress={() => setManagingQuizId(null)}>
                 <Ionicons name="chevron-back" size={ms(32)} color="#1e293b" />
               </TouchableOpacity>
-              <Text style={[styles.modalTitleFull, { fontSize: ms(13) }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+              <Text style={[styles.modalTitleFull, { fontSize: ms(17) }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
                 {managingQuiz ? getQuizDisplayTitle(managingQuiz) : ''}
               </Text>
               <TouchableOpacity
@@ -567,7 +571,7 @@ const ChallengeManagement = () => {
                   style={[styles.input, { marginTop: vs(-5) }]}
                   value={qPagodaId}
                   onChangeText={setQPagodaId}
-                  placeholder="Hoặc nhập ID nội dung thủ công..."
+                  placeholder="Nhập ID nội dung thủ công..."
                   placeholderTextColor="#94a3b8"
                 />
               )}
@@ -757,7 +761,7 @@ const styles = StyleSheet.create({
     borderColor: '#f1f5f9'
   },
   quizInfo: { flex: 1 },
-  quizTitle: { fontSize: ms(13), fontWeight: '800', color: '#1e293b', marginBottom: vs(6) },
+  quizTitle: { fontSize: fs(15), fontWeight: '800', color: '#1e293b', marginBottom: vs(6) },
   quizMeta: { flexDirection: 'row', alignItems: 'center' },
   questionBadge: {
     flexDirection: 'row',
@@ -768,7 +772,7 @@ const styles = StyleSheet.create({
     borderRadius: s(10),
     gap: s(4)
   },
-  metaText: { fontSize: ms(12), color: '#3b82f6', fontWeight: '700' },
+  metaText: { fontSize: clamp(ms(12), 12, 14), color: '#3b82f6', fontWeight: '700' },
   quizActions: { flexDirection: 'row', gap: s(8) },
   actionIcon: {
     width: s(40),
@@ -789,16 +793,16 @@ const styles = StyleSheet.create({
   modalContentFull: { flex: 1, backgroundColor: '#fff', paddingHorizontal: s(20) },
   modalContentSmall: { width: '88%', backgroundColor: '#fff', borderRadius: ms(28), padding: s(24) },
   modalTitle: { fontSize: ms(22), fontWeight: '900', color: '#1e293b', marginBottom: vs(20), textAlign: 'center' },
-  modalTitleFull: { flex: 1, fontSize: ms(18), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+  modalTitleFull: { flex: 1, fontSize: ms(17), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
 
-  inputLabel: { fontSize: ms(13), fontWeight: '800', color: '#64748b', marginBottom: vs(10), marginTop: vs(15) },
+  inputLabel: { fontSize: clamp(ms(13), 12, 14), fontWeight: '800', color: '#64748b', marginBottom: vs(10), marginTop: vs(15) },
   input: {
     backgroundColor: '#f8fafc',
     borderWidth: 1,
     borderColor: '#e2e8f0',
     borderRadius: s(14),
     padding: s(12),
-    fontSize: ms(12),
+    fontSize: clamp(ms(14), 13, 15),
     color: '#1e293b',
     fontWeight: '500'
   },
@@ -856,7 +860,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff'
   },
-  questionText: { fontSize: ms(17), fontWeight: '800', color: '#1e293b', marginBottom: vs(20), lineHeight: ms(24) },
+  questionText: {
+    fontSize: fs(16),
+    fontWeight: '800',
+    color: '#1e293b',
+    marginBottom: vs(20),
+    lineHeight: clamp(ms(22), 20, 24),
+  },
   optionsList: { gap: vs(10) },
   optionItem: {
     flexDirection: 'row',
@@ -878,9 +888,9 @@ const styles = StyleSheet.create({
     marginRight: s(12)
   },
   correctLetter: { backgroundColor: '#22c55e' },
-  optionLetterText: { fontSize: ms(14), fontWeight: '800', color: '#64748b' },
+  optionLetterText: { fontSize: clamp(ms(14), 12, 14), fontWeight: '800', color: '#64748b' },
   correctLetterText: { color: '#fff' },
-  optionText: { fontSize: ms(14), color: '#475569', fontWeight: '500', flex: 1 },
+  optionText: { fontSize: clamp(ms(14), 13, 15), color: '#475569', fontWeight: '500', flex: 1 },
   correctOptionText: { color: '#166534', fontWeight: '700' },
 
   formScroll: { flex: 1 },

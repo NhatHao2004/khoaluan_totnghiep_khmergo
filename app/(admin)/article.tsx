@@ -22,16 +22,16 @@ import { ms, s, vs } from '../../utils/responsive';
 
 const PostItem = memo(({ item, onDelete, onShowComments }: any) => {
   const formattedDate = useMemo(() => {
-    return item.createdAt?.seconds 
-      ? new Date(item.createdAt.seconds * 1000).toLocaleDateString('vi-VN') 
+    return item.createdAt?.seconds
+      ? new Date(item.createdAt.seconds * 1000).toLocaleDateString('vi-VN')
       : 'Mới nhất';
   }, [item.createdAt]);
 
   return (
     <View style={styles.postCard}>
       <View style={styles.postHeader}>
-        <Image 
-          source={{ uri: item.userAvatar || 'https://api.dicebear.com/7.x/avataaars/png?seed=' + item.id }} 
+        <Image
+          source={{ uri: item.userAvatar || 'https://api.dicebear.com/7.x/avataaars/png?seed=' + item.id }}
           style={styles.postAvatar}
           contentFit="cover"
           transition={300}
@@ -49,8 +49,8 @@ const PostItem = memo(({ item, onDelete, onShowComments }: any) => {
 
       {item.image && (
         <View style={[styles.postImageWrapper, { aspectRatio: item.imageAspectRatio || 1.3 }]}>
-          <Image 
-            source={{ uri: item.image }} 
+          <Image
+            source={{ uri: item.image }}
             style={styles.postImage}
             contentFit="cover"
             transition={300}
@@ -79,8 +79,8 @@ const PostItem = memo(({ item, onDelete, onShowComments }: any) => {
 
 const CommentItem = memo(({ item, onDelete }: any) => (
   <View style={styles.commentItem}>
-    <Image 
-      source={{ uri: item.userAvatar || item.avatar || 'https://api.dicebear.com/7.x/avataaars/png?seed=' + item.id }} 
+    <Image
+      source={{ uri: item.userAvatar || item.avatar || 'https://api.dicebear.com/7.x/avataaars/png?seed=' + item.id }}
       style={styles.commentAvatar}
       contentFit="cover"
       transition={200}
@@ -357,14 +357,14 @@ const ArticleManagement = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8fafc' },
-  header: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    paddingHorizontal: s(16), 
-    paddingBottom: vs(15), 
-    backgroundColor: '#fff', 
-    borderBottomWidth: 1, 
-    borderBottomColor: '#f1f5f9' 
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: s(16),
+    paddingBottom: vs(15),
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9'
   },
   backBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center' },
   headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
@@ -372,18 +372,18 @@ const styles = StyleSheet.create({
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   listContent: { padding: s(16) },
 
-  postCard: { 
-    backgroundColor: '#fff', 
-    borderRadius: ms(20), 
-    padding: s(16), 
-    marginBottom: vs(16), 
-    borderWidth: 1, 
-    borderColor: '#f1f5f9', 
-    elevation: 3, 
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 4 }, 
-    shadowOpacity: 0.08, 
-    shadowRadius: 12 
+  postCard: {
+    backgroundColor: '#fff',
+    borderRadius: ms(20),
+    padding: s(16),
+    marginBottom: vs(16),
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12
   },
   postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(12) },
   postAvatar: { width: s(44), height: s(44), borderRadius: s(22), backgroundColor: '#f1f5f9' },
@@ -398,12 +398,12 @@ const styles = StyleSheet.create({
   statItem: { flexDirection: 'row', alignItems: 'center', gap: s(6) },
   statText: { fontSize: ms(13), fontWeight: '600', color: '#64748b' },
 
-  commentItem: { 
-    flexDirection: 'row', 
-    paddingVertical: vs(12), 
-    borderBottomWidth: 1, 
-    borderBottomColor: '#f1f5f9', 
-    alignItems: 'flex-start' 
+  commentItem: {
+    flexDirection: 'row',
+    paddingVertical: vs(12),
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+    alignItems: 'flex-start'
   },
   commentAvatar: { width: s(36), height: s(36), borderRadius: s(18), backgroundColor: '#f1f5f9' },
   commentContent: { flex: 1, marginLeft: s(12) },
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
   commentText: { fontSize: ms(14), color: '#475569', lineHeight: ms(20) },
   deleteCommentBtn: { padding: s(8) },
 
-  emptyContainer: { alignItems: 'center', marginTop: vs(100), opacity: 0.5 },
+  emptyContainer: { alignItems: 'center', marginTop: vs(300), opacity: 0.5 },
   emptyText: { marginTop: vs(16), fontSize: ms(16), color: '#94a3b8', fontWeight: '600' },
 
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
@@ -429,14 +429,14 @@ const styles = StyleSheet.create({
   btnText: { color: '#fff', fontWeight: '800', fontSize: ms(15) },
   saveBtnSmall: { flex: 1, paddingVertical: vs(14), borderRadius: s(14), alignItems: 'center' },
 
-  confirmIconBg: { 
-    width: s(70), 
-    height: s(70), 
-    borderRadius: s(35), 
-    backgroundColor: '#fff1f2', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    marginBottom: vs(20) 
+  confirmIconBg: {
+    width: s(70),
+    height: s(70),
+    borderRadius: s(35),
+    backgroundColor: '#fff1f2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: vs(20)
   },
   confirmSubText: { fontSize: ms(14), color: '#64748b', textAlign: 'center', lineHeight: ms(22), marginTop: vs(10) },
 
