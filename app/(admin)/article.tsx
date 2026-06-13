@@ -37,8 +37,8 @@ const PostItem = memo(({ item, onDelete, onShowComments }: any) => {
           transition={300}
         />
         <View style={styles.postInfo}>
-          <Text style={styles.postUserName}>{item.user || 'Người dùng'}</Text>
-          <Text style={styles.postDate}>{formattedDate}</Text>
+          <Text style={styles.postUserName} numberOfLines={1} adjustsFontSizeToFit>{item.user || 'Người dùng'}</Text>
+          <Text style={styles.postDate} numberOfLines={1} adjustsFontSizeToFit>{formattedDate}</Text>
         </View>
         <TouchableOpacity style={styles.deletePostBtn} onPress={() => onDelete(item)}>
           <Ionicons name="trash-outline" size={ms(20)} color="#ef4444" />
@@ -87,7 +87,7 @@ const CommentItem = memo(({ item, onDelete }: any) => (
     />
     <View style={styles.commentContent}>
       <View style={styles.commentHeader}>
-        <Text style={styles.commentUserName}>{item.userName || item.user || 'Người dùng'}</Text>
+        <Text style={styles.commentUserName} numberOfLines={1} adjustsFontSizeToFit>{item.userName || item.user || 'Người dùng'}</Text>
       </View>
       <Text style={styles.commentText}>{item.text || item.content || ''}</Text>
     </View>
@@ -247,7 +247,7 @@ const ArticleManagement = () => {
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={ms(28)} color="#1e293b" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Quản lý bài viết</Text>
+        <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>Quản lý bài viết</Text>
         <View style={{ width: s(44) }} />
       </View>
 
@@ -267,7 +267,7 @@ const ArticleManagement = () => {
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Ionicons name="chatbubbles-outline" size={ms(64)} color="#e2e8f0" />
-              <Text style={styles.emptyText}>Chưa có bài đăng nào</Text>
+              <Text style={styles.emptyText} numberOfLines={1} adjustsFontSizeToFit>Chưa có bài đăng nào</Text>
             </View>
           }
         />
@@ -282,7 +282,7 @@ const ArticleManagement = () => {
                 <Ionicons name="chevron-back" size={ms(32)} color="#1e293b" />
               </TouchableOpacity>
               <View style={{ flex: 1 }}>
-                <Text style={styles.modalTitle}>Bình luận</Text>
+                <Text style={styles.modalTitle} numberOfLines={1} adjustsFontSizeToFit>Bình luận</Text>
                 <Text style={styles.modalSubTitle}>
                   Bài đăng của <Text style={{ fontWeight: '800', color: '#3b82f6' }}>{selectedPost?.user}</Text>
                 </Text>
@@ -338,7 +338,7 @@ const ArticleManagement = () => {
             <View style={styles.confirmIconBg}>
               <Ionicons name="trash" size={ms(32)} color="#ef4444" />
             </View>
-            <Text style={styles.confirmTitle}>Xác nhận xóa</Text>
+            <Text style={styles.confirmTitle} numberOfLines={1} adjustsFontSizeToFit>Xác nhận xóa</Text>
             <Text style={styles.confirmSubText}>Bài đăng của {pendingDelete?.user} sẽ được chuyển vào thùng rác</Text>
             <View style={styles.modalActions}>
               <TouchableOpacity style={[styles.cancelBtn, { backgroundColor: '#3b82f6' }]} onPress={() => setDeleteConfirmVisible(false)}>

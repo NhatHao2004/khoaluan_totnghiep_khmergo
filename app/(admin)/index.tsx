@@ -66,8 +66,8 @@ const PodiumItem = memo(({ user, index }: any) => {
           )}
         </View>
         <View style={styles.podiumTextGroup}>
-          <Text style={styles.podiumName} numberOfLines={1}>{user.name || '---'}</Text>
-          <Text style={styles.podiumPoints} numberOfLines={1}>{user.points || 0} điểm</Text>
+          <Text style={styles.podiumName} numberOfLines={1} adjustsFontSizeToFit>{user.name || '---'}</Text>
+          <Text style={styles.podiumPoints} numberOfLines={1} adjustsFontSizeToFit>{user.points || 0} điểm</Text>
         </View>
       </View>
       <View style={[styles.bar, { height: barHeight, backgroundColor: barColor }]}>
@@ -79,9 +79,9 @@ const PodiumItem = memo(({ user, index }: any) => {
 
 const ActivityCard = memo(({ activity }: any) => (
   <View style={styles.activityCard}>
-    <Text style={styles.activityItemTitle} numberOfLines={1}>{activity.name}</Text>
+    <Text style={styles.activityItemTitle} numberOfLines={1} adjustsFontSizeToFit>{activity.name}</Text>
     <View style={styles.activityBottomRow}>
-      <Text style={styles.activityDesc} numberOfLines={1}>Đã đăng ký tài khoản thành công</Text>
+      <Text style={styles.activityDesc} numberOfLines={1} adjustsFontSizeToFit>Đã đăng ký tài khoản thành công</Text>
       <Text style={styles.activityTime}>{activity.timeAgo || 'Vừa xong'}</Text>
     </View>
   </View>
@@ -215,13 +215,13 @@ const AdminDashboard = () => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Quản trị viên</Text>
+          <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>Quản trị viên</Text>
           <View style={styles.headerRightActions}>
             <TouchableOpacity
               onPress={handleAdminAction}
               style={styles.menuBtn}
             >
-              <Ionicons name="menu" size={ms(30)} color="#1e293b" />
+              <Ionicons name="power" size={ms(28)} color="#ef4444" />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -263,7 +263,7 @@ const AdminDashboard = () => {
 
         {/* Leaderboard Chart Section */}
         <View style={styles.chartHeader}>
-          <Text style={styles.chartTitle}>Biểu đồ bảng xếp hạng</Text>
+          <Text style={styles.chartTitle} numberOfLines={1} adjustsFontSizeToFit>Biểu đồ bảng xếp hạng</Text>
         </View>
 
         <View style={styles.podiumContainer}>
@@ -283,7 +283,7 @@ const AdminDashboard = () => {
 
         {/* Recent Activity Section */}
         <View style={styles.activityHeader}>
-          <Text style={styles.activityTitle}>Hoạt động gần đây</Text>
+          <Text style={styles.activityTitle} numberOfLines={1} adjustsFontSizeToFit>Hoạt động gần đây</Text>
           <TouchableOpacity
             style={styles.seeAllBtn}
             onPress={() => router.push('/(admin)/users' as any)}

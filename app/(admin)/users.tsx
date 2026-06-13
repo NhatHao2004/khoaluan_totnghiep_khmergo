@@ -11,9 +11,9 @@ import { ms, s, vs } from '../../utils/responsive';
 
 const ActivityCard = memo(({ item, getTimeAgo }: any) => (
   <View style={styles.activityCard}>
-    <Text style={styles.activityItemTitle}>{item.name || 'Người dùng mới'}</Text>
+    <Text style={styles.activityItemTitle} numberOfLines={1} adjustsFontSizeToFit>{item.name || 'Người dùng mới'}</Text>
     <View style={styles.activityFooter}>
-      <Text style={styles.activityDesc}>Đã đăng ký tài khoản thành công</Text>
+      <Text style={styles.activityDesc} numberOfLines={1} adjustsFontSizeToFit>Đã đăng ký tài khoản thành công</Text>
       <Text style={styles.activityTime}>{getTimeAgo(item.createdAt)}</Text>
     </View>
   </View>
@@ -70,7 +70,7 @@ const UsersActivity = () => {
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Hoạt động gần đây</Text>
+        <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>Hoạt động gần đây</Text>
         <View style={{ width: s(44) }} />
       </View>
 
@@ -85,7 +85,7 @@ const UsersActivity = () => {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="notifications-off-outline" size={ms(64)} color="#e2e8f0" />
-            <Text style={styles.emptyText}>Chưa có hoạt động mới nào</Text>
+            <Text style={styles.emptyText} numberOfLines={1} adjustsFontSizeToFit>Chưa có hoạt động mới nào</Text>
           </View>
         }
       />

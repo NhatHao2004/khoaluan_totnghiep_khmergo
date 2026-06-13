@@ -102,9 +102,9 @@ const VocabItem = memo(({ item, onManage, onEdit, onDelete, getImageSource }: an
 const WordItem = memo(({ word, onEdit, onDelete }: any) => (
   <View style={styles.premiumWordItem}>
     <View style={styles.wordMainContent}>
-      <Text style={styles.wordKhmText}>{word.khm}</Text>
-      <Text style={[styles.pronText, { marginTop: vs(4) }]}>{word.pronunciation}</Text>
-      <Text style={[styles.wordVieText, { color: '#3b82f6', marginTop: vs(4) }]}>{word.life || word.vie}</Text>
+      <Text style={styles.wordKhmText} numberOfLines={1} adjustsFontSizeToFit>{word.khm}</Text>
+      <Text style={[styles.pronText, { marginTop: vs(4) }]} numberOfLines={1} adjustsFontSizeToFit>{word.pronunciation}</Text>
+      <Text style={[styles.wordVieText, { color: '#3b82f6', marginTop: vs(4) }]} numberOfLines={1} adjustsFontSizeToFit>{word.life || word.vie}</Text>
     </View>
 
     <View style={styles.wordActionGroup}>
@@ -508,7 +508,7 @@ const ContentManagement = () => {
 
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}><Ionicons name="arrow-back" size={ms(28)} color="#1e293b" /></TouchableOpacity>
-        <Text style={styles.headerTitle}>Quản lý nội dung</Text>
+        <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>Quản lý nội dung</Text>
         <TouchableOpacity
           onPress={() => {
             if (activeTab === 'vocabulary') {
@@ -691,7 +691,7 @@ const ContentManagement = () => {
                       style={[styles.catBtn, dCat === cat && styles.activeCatBtn]}
                       onPress={() => setDCat(cat as any)}
                     >
-                      <Text style={[styles.catBtnText, dCat === cat && styles.activeCatBtnText]}>
+                      <Text style={[styles.catBtnText, dCat === cat && styles.activeCatBtnText]} numberOfLines={1} adjustsFontSizeToFit>
                         {cat === 'pagoda' ? 'Chùa Khmer' : cat === 'culture' ? 'Văn hóa' : 'Ẩm thực'}
                       </Text>
                     </TouchableOpacity>
@@ -932,22 +932,22 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(12), height: vs(60), position: 'relative' },
   backBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center', zIndex: 10 },
   addBtnHeader: { width: s(42), height: s(42), backgroundColor: '#f1f5f9', borderRadius: s(12), justifyContent: 'center', alignItems: 'center', zIndex: 10 },
-  headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+  headerTitle: { flex: 1, fontSize: ms(22), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
   tabBar: { flexDirection: 'row', marginHorizontal: s(16), marginTop: vs(10), backgroundColor: '#f1f5f9', borderRadius: s(12), padding: s(4) },
   tab: { flex: 1, paddingVertical: vs(10), alignItems: 'center', borderRadius: s(10) },
   activeTab: { backgroundColor: '#fff', elevation: 2, shadowOpacity: 0.1 },
-  tabText: { fontSize: ms(14), fontWeight: '700', color: '#64748b' },
+  tabText: { fontSize: ms(16), fontWeight: '700', color: '#64748b' },
   activeTabText: { color: '#3b82f6' },
   listContent: { padding: s(12), paddingBottom: vs(20) },
   card: { backgroundColor: '#fff', borderRadius: ms(20), marginBottom: vs(12), overflow: 'hidden', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 },
   cardImage: { width: '100%', height: vs(200) },
   cardContent: { padding: s(15) },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: vs(10) },
-  cardTitle: { fontSize: ms(13), fontWeight: '800', color: '#1e293b' },
+  cardTitle: { fontSize: ms(15), fontWeight: '800', color: '#1e293b' },
   cardActions: { flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: '#f1f5f9', paddingTop: vs(10), alignItems: 'center' },
   rightActions: { flexDirection: 'row', gap: s(12) },
   viewBtn: { flexDirection: 'row', alignItems: 'center', gap: s(5), backgroundColor: '#f1f5f9', paddingHorizontal: s(12), paddingVertical: vs(6), borderRadius: s(8) },
-  viewBtnText: { fontSize: ms(12), fontWeight: '700', color: '#3b82f6' },
+  viewBtnText: { fontSize: ms(14), fontWeight: '700', color: '#3b82f6' },
   editBtn: { backgroundColor: '#f0f9ff', paddingHorizontal: s(12), paddingVertical: vs(6), borderRadius: s(8), justifyContent: 'center', alignItems: 'center' },
   deleteBtn: { backgroundColor: '#fef2f2', paddingHorizontal: s(12), paddingVertical: vs(6), borderRadius: s(8), justifyContent: 'center', alignItems: 'center' },
   vocabPremiumCard: {
@@ -972,7 +972,7 @@ const styles = StyleSheet.create({
   },
   vocabLargeImage: { width: '100%', height: '100%' },
   vocabCardFooter: { padding: s(16), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  vocabLargeTitle: { fontSize: ms(13), fontWeight: '800', color: '#1e293b' },
+  vocabLargeTitle: { fontSize: ms(15), fontWeight: '800', color: '#1e293b' },
   footerActionGroup: { flexDirection: 'row', gap: s(8) },
   footerActionBtn: {
     width: s(38),
@@ -996,39 +996,39 @@ const styles = StyleSheet.create({
     borderColor: '#f1f5f9',
   },
   wordMainContent: { flex: 1 },
-  wordKhmText: { fontSize: ms(20), fontWeight: '800', color: '#1e293b' },
-  pronText: { fontSize: ms(12), color: '#64748b', fontStyle: 'italic' },
-  wordVieText: { fontSize: ms(12), color: '#3b82f6', fontWeight: '700', marginTop: vs(2) },
+  wordKhmText: { fontSize: ms(22), fontWeight: '800', color: '#1e293b' },
+  pronText: { fontSize: ms(14), color: '#64748b', fontStyle: 'italic' },
+  wordVieText: { fontSize: ms(14), color: '#3b82f6', fontWeight: '700', marginTop: vs(2) },
   wordActionGroup: { flexDirection: 'row', gap: s(6) },
   miniActionBtn: { width: s(32), height: s(32), borderRadius: s(10), backgroundColor: '#fff', borderWidth: 1, borderColor: '#f1f5f9', justifyContent: 'center', alignItems: 'center' },
   emptyStateContainer: { marginTop: vs(150), alignItems: 'center', padding: s(30), opacity: 0.5 },
-  emptyWords: { marginTop: vs(5), fontSize: ms(13), color: '#94a3b8', fontStyle: 'italic' },
+  emptyWords: { marginTop: vs(5), fontSize: ms(15), color: '#94a3b8', fontStyle: 'italic' },
   // Form Styles
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modalContentFull: { width: '100%', height: '100%', backgroundColor: '#fff', padding: s(20) },
   modalContentSmall: { width: '85%', backgroundColor: '#fff', borderRadius: ms(20), padding: s(20) },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(20) },
-  modalTitle: { fontSize: ms(22), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+  modalTitle: { fontSize: ms(24), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
   modalForm: { flex: 1 },
-  inputLabel: { fontSize: ms(13), fontWeight: '700', color: '#64748b', marginBottom: vs(8), marginTop: vs(12) },
-  input: { backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#e2e8f0', borderRadius: s(12), padding: s(12), fontSize: ms(15), color: '#1e293b', marginBottom: vs(5) },
+  inputLabel: { fontSize: ms(15), fontWeight: '700', color: '#64748b', marginBottom: vs(8), marginTop: vs(12) },
+  input: { backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#e2e8f0', borderRadius: s(12), padding: s(12), fontSize: ms(16), color: '#1e293b', marginBottom: vs(5) },
   catRow: { flexDirection: 'row', gap: s(10), marginBottom: vs(10) },
   catBtn: { flex: 1, paddingVertical: vs(10), paddingHorizontal: s(4), alignItems: 'center', borderRadius: s(10), backgroundColor: '#f1f5f9', borderWidth: 1, borderColor: '#e2e8f0' },
   activeCatBtn: { backgroundColor: '#3b82f6', borderColor: '#3b82f6' },
-  catBtnText: { fontSize: ms(11), fontWeight: '700', color: '#64748b', textAlign: 'center' },
+  catBtnText: { fontSize: ms(13), fontWeight: '700', color: '#64748b', textAlign: 'center' },
   activeCatBtnText: { color: '#fff' },
   saveBtn: { backgroundColor: '#3b82f6', paddingVertical: vs(15), borderRadius: s(12), alignItems: 'center', marginTop: vs(20) },
   saveBtnSmall: { flex: 1, backgroundColor: '#3b82f6', paddingVertical: vs(12), borderRadius: s(10), alignItems: 'center' },
-  saveBtnText: { color: '#fff', fontWeight: '800', fontSize: ms(16), textAlign: 'center' },
+  saveBtnText: { color: '#fff', fontWeight: '800', fontSize: ms(18), textAlign: 'center' },
   modalActions: { flexDirection: 'row', justifyContent: 'center', gap: s(10), marginTop: vs(20) },
   cancelBtn: { flex: 1, backgroundColor: '#ef4444', paddingVertical: vs(12), borderRadius: s(10), alignItems: 'center' },
-  cancelBtnText: { color: '#fff', fontWeight: '800' },
+  cancelBtnText: { color: '#fff', fontWeight: '800', fontSize: ms(16) },
   divider: { height: 1, backgroundColor: '#e2e8f0', marginVertical: vs(20) },
   blockItem: { backgroundColor: '#f8fafc', padding: s(15), borderRadius: ms(16), marginBottom: vs(15), borderWidth: 1, borderColor: '#e2e8f0' },
   blockHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(10) },
-  blockNumber: { fontSize: ms(14), fontWeight: '800', color: '#1e293b' },
+  blockNumber: { fontSize: ms(16), fontWeight: '800', color: '#1e293b' },
   addBlockBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: s(8), paddingVertical: vs(12), borderStyle: 'dashed', borderWidth: 1, borderColor: '#3b82f6', borderRadius: s(12), marginTop: vs(10) },
-  addBlockText: { fontSize: ms(14), fontWeight: '700', color: '#3b82f6' },
+  addBlockText: { fontSize: ms(16), fontWeight: '700', color: '#3b82f6' },
   // Toast Styles
   toastContainer: {
     position: 'absolute',
@@ -1058,7 +1058,7 @@ const styles = StyleSheet.create({
   },
   toastText: {
     color: '#FFF',
-    fontSize: ms(15),
+    fontSize: ms(16),
     fontWeight: '700',
     marginLeft: s(12),
     flex: 1,
@@ -1077,7 +1077,7 @@ const styles = StyleSheet.create({
     marginBottom: vs(16),
   },
   confirmSubText: {
-    fontSize: ms(14),
+    fontSize: ms(16),
     color: '#64748b',
     textAlign: 'center',
     lineHeight: vs(22),
@@ -1095,7 +1095,7 @@ const styles = StyleSheet.create({
     marginTop: vs(8),
   },
   imagePickerPlaceholder: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: vs(8) },
-  imagePickerText: { fontSize: ms(14), color: '#94a3b8', fontWeight: '600' },
+  imagePickerText: { fontSize: ms(16), color: '#94a3b8', fontWeight: '600' },
   pickedImagePreview: { width: '100%', height: '100%' },
   removeImageBtn: {
     position: 'absolute',

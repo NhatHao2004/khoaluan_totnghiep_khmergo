@@ -29,7 +29,7 @@ const UserItem = memo(({ item, onFeedback, onToggleLock }: any) => (
         </View>
       )}
       <View style={styles.userDetails}>
-        <Text style={[styles.userName, item.isBlocked && styles.textWhite]}>
+        <Text style={[styles.userName, item.isBlocked && styles.textWhite]} numberOfLines={1} adjustsFontSizeToFit>
           {item.name || 'N/A'}
         </Text>
         <Text
@@ -68,7 +68,7 @@ const UserItem = memo(({ item, onFeedback, onToggleLock }: any) => (
           size={ms(18)}
           color="#3b82f6"
         />
-        <Text style={[styles.actionBtnText, styles.feedbackBtnText]}>
+        <Text style={[styles.actionBtnText, styles.feedbackBtnText]} numberOfLines={1} adjustsFontSizeToFit>
           Phản hồi
         </Text>
       </TouchableOpacity>
@@ -83,7 +83,7 @@ const UserItem = memo(({ item, onFeedback, onToggleLock }: any) => (
           size={ms(18)}
           color={item.isBlocked ? "#10b981" : "#ef4444"}
         />
-        <Text style={[styles.actionBtnText, { color: item.isBlocked ? "#10b981" : "#ef4444" }]}>
+        <Text style={[styles.actionBtnText, { color: item.isBlocked ? "#10b981" : "#ef4444" }]} numberOfLines={1} adjustsFontSizeToFit>
           {item.isBlocked ? 'Mở khóa' : 'Khóa'}
         </Text>
       </TouchableOpacity>
@@ -267,7 +267,7 @@ const UserManagement = () => {
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Quản lý người dùng</Text>
+        <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>Quản lý người dùng</Text>
       </View>
 
       <FlatList
@@ -359,7 +359,7 @@ const UserManagement = () => {
                 color={pendingUser?.isBlocked ? "#10b981" : "#ef4444"}
               />
             </View>
-            <Text style={styles.confirmTitle}>
+            <Text style={styles.confirmTitle} numberOfLines={1} adjustsFontSizeToFit>
               {pendingUser?.isBlocked ? 'Mở khóa tài khoản' : 'Khóa tài khoản'}
             </Text>
             <Text style={styles.confirmSub}>
@@ -384,7 +384,7 @@ const UserManagement = () => {
       <Modal visible={replyModalVisible} transparent animationType="fade" statusBarTranslucent>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.replyOverlay}>
           <View style={styles.replyContent}>
-            <Text style={styles.replyTitle}>Trả lời phản hồi</Text>
+            <Text style={styles.replyTitle} numberOfLines={1} adjustsFontSizeToFit>Trả lời phản hồi</Text>
             <View style={styles.originalFeedbackBox}>
               <Text style={styles.replyOriginalMessage}>Nội dung: {(replyingFeedback?.message || replyingFeedback?.content) + ' '}</Text>
             </View>
