@@ -59,6 +59,7 @@ const QuizItem = memo(({ item, onEdit, onDelete, onManage, displayTitle }: any) 
     </TouchableOpacity>
   </View>
 ));
+QuizItem.displayName = 'QuizItem';
 
 const QuestionCard = memo(({ item, index, onEdit, onDelete }: any) => (
   <View style={styles.questionCard}>
@@ -95,6 +96,7 @@ const QuestionCard = memo(({ item, index, onEdit, onDelete }: any) => (
     </View>
   </View>
 ));
+QuestionCard.displayName = 'QuestionCard';
 
 const ChallengeManagement = () => {
   const insets = useSafeAreaInsets();
@@ -798,205 +800,66 @@ const styles = StyleSheet.create({
   inputLabel: { fontSize: clamp(ms(13), 12, 14), fontWeight: '800', color: '#64748b', marginBottom: vs(10), marginTop: vs(15) },
   input: {
     backgroundColor: '#f8fafc',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: s(14),
-    padding: s(12),
-    fontSize: clamp(ms(14), 13, 15),
-    color: '#1e293b',
-    fontWeight: '500'
-  },
-
-  destListContainer: { marginTop: vs(10) },
-  destChip: {
+    borderRadius: ms(14),
     paddingHorizontal: s(16),
-    paddingVertical: vs(10),
-    borderRadius: s(25),
-    backgroundColor: '#f1f5f9',
-    marginRight: s(10),
+    height: vs(52),
+    fontSize: ms(15),
+    color: '#1e293b',
     borderWidth: 1,
     borderColor: '#e2e8f0'
   },
+  modalActions: { flexDirection: 'row', gap: s(12), marginTop: vs(25) },
+  btnAction: { flex: 1, height: vs(50), borderRadius: s(14), justifyContent: 'center', alignItems: 'center', elevation: 2 },
+  cancelBtn: { backgroundColor: '#f1f5f9' },
+  saveBtn: { backgroundColor: '#3b82f6' },
+  btnText: { fontSize: ms(15), fontWeight: '800', color: '#fff' },
+
+  destListContainer: { marginBottom: vs(15) },
+  destChip: { paddingHorizontal: s(12), paddingVertical: vs(8), borderRadius: s(10), backgroundColor: '#f1f5f9', marginRight: s(8), borderWidth: 1, borderColor: '#e2e8f0' },
   activeDestChip: { backgroundColor: '#3b82f6', borderColor: '#3b82f6' },
-  destChipText: { fontSize: ms(12), color: '#64748b', fontWeight: '700' },
+  destChipText: { fontSize: ms(13), color: '#64748b', fontWeight: '700' },
   activeDestChipText: { color: '#fff' },
 
-  modalActions: { flexDirection: 'row', gap: s(12), marginTop: vs(30) },
-  btnAction: { flex: 1, paddingVertical: vs(15), borderRadius: s(16), alignItems: 'center' },
-  cancelBtn: { backgroundColor: '#ff0000ff' },
-  saveBtn: { backgroundColor: '#3b82f6' },
-  btnText: { color: '#ffffffff', fontWeight: '800', fontSize: ms(15) },
-
-  // Question Card
-  questionCard: {
-    backgroundColor: '#fff',
-    borderRadius: ms(24),
-    padding: s(18),
-    marginBottom: vs(16),
-    borderWidth: 1,
-    borderColor: '#f1f5f9',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8
-  },
-  questionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(15) },
-  questionIndexBadge: {
-    backgroundColor: '#eff6ff',
-    paddingHorizontal: s(14),
-    paddingVertical: vs(6),
-    borderRadius: s(12)
-  },
-  questionIndexText: { fontSize: ms(13), fontWeight: '900', color: '#3b82f6' },
+  questionCard: { backgroundColor: '#fff', borderRadius: ms(20), padding: s(16), marginBottom: vs(15), borderWidth: 1, borderColor: '#f1f5f9', elevation: 2 },
+  questionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(12) },
+  questionIndexBadge: { backgroundColor: '#eff6ff', paddingHorizontal: s(10), paddingVertical: vs(4), borderRadius: s(10) },
+  questionIndexText: { fontSize: ms(12), fontWeight: '800', color: '#3b82f6' },
   questionActions: { flexDirection: 'row', gap: s(10) },
-  miniActionBtn: {
-    width: s(36),
-    height: s(36),
-    borderRadius: s(10),
-    borderWidth: 1,
-    borderColor: '#f1f5f9',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff'
-  },
-  questionText: {
-    fontSize: fs(16),
-    fontWeight: '800',
-    color: '#1e293b',
-    marginBottom: vs(20),
-    lineHeight: clamp(ms(22), 20, 24),
-  },
+  miniActionBtn: { width: s(36), height: s(36), borderRadius: s(10), justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#eff6ff' },
+  questionText: { fontSize: ms(16), fontWeight: '700', color: '#1e293b', marginBottom: vs(15) },
   optionsList: { gap: vs(10) },
-  optionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: s(14),
-    borderRadius: s(16),
-    backgroundColor: '#f8fafc',
-    borderWidth: 1,
-    borderColor: '#e2e8f0'
-  },
-  correctOption: { backgroundColor: '#f0fdf4', borderColor: '#22c55e' },
-  optionLetter: {
-    width: s(28),
-    height: s(28),
-    borderRadius: s(14),
-    backgroundColor: '#e2e8f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: s(12)
-  },
+  optionItem: { flexDirection: 'row', alignItems: 'center', padding: s(12), borderRadius: s(12), backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#f1f5f9' },
+  correctOption: { backgroundColor: '#f0fdf4', borderColor: '#bcf0da' },
+  optionLetter: { width: s(28), height: s(28), borderRadius: s(14), backgroundColor: '#fff', borderWidth: 1, borderColor: '#e2e8f0', justifyContent: 'center', alignItems: 'center', marginRight: s(12) },
   correctLetter: { backgroundColor: '#22c55e' },
-  optionLetterText: { fontSize: clamp(ms(14), 12, 14), fontWeight: '800', color: '#64748b' },
+  optionLetterText: { fontSize: ms(13), fontWeight: '800', color: '#64748b' },
   correctLetterText: { color: '#fff' },
-  optionText: { fontSize: clamp(ms(14), 13, 15), color: '#475569', fontWeight: '500', flex: 1 },
+  optionText: { fontSize: ms(14), color: '#475569', fontWeight: '500', flex: 1 },
   correctOptionText: { color: '#166534', fontWeight: '700' },
 
   formScroll: { flex: 1 },
-  optionInputRow: { flexDirection: 'row', gap: s(12), marginBottom: vs(15), alignItems: 'center' },
-  correctIndicator: {
-    width: s(40),
-    height: s(40),
-    borderRadius: s(20),
-    backgroundColor: '#f1f5f9',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#e2e8f0'
-  },
+  optionInputRow: { flexDirection: 'row', alignItems: 'center', gap: s(12), marginBottom: vs(12) },
+  correctIndicator: { width: s(40), height: s(40), borderRadius: s(20), backgroundColor: '#f1f5f9', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#e2e8f0' },
   correctIndicatorActive: { backgroundColor: '#22c55e', borderColor: '#22c55e' },
-  indicatorText: { fontSize: ms(16), fontWeight: '900', color: '#64748b' },
+  indicatorText: { fontSize: ms(14), fontWeight: '800', color: '#64748b' },
   indicatorTextActive: { color: '#fff' },
 
-  modalFooter: {
-    paddingHorizontal: s(20),
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
-  },
-  saveBtnLarge: {
-    backgroundColor: '#3b82f6',
-    paddingVertical: vs(16),
-    borderRadius: s(18),
-    alignItems: 'center',
-    shadowColor: '#3b82f6',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 15,
-    elevation: 8,
-  },
-  saveBtnText: { color: '#fff', fontWeight: '800', fontSize: ms(16) },
+  modalFooter: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#fff', padding: s(20), borderTopWidth: 1, borderTopColor: '#f1f5f9' },
+  saveBtnLarge: { backgroundColor: '#3b82f6', height: vs(54), borderRadius: s(16), justifyContent: 'center', alignItems: 'center', elevation: 4 },
+  saveBtnText: { fontSize: ms(16), fontWeight: '800', color: '#fff' },
 
-  confirmOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: s(24),
-  },
-  confirmBox: {
-    backgroundColor: '#fff',
-    borderRadius: ms(32),
-    padding: s(28),
-    width: '100%',
-    maxWidth: s(340),
-    alignItems: 'center',
-    elevation: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 15 },
-    shadowOpacity: 0.2,
-    shadowRadius: 30,
-  },
-  confirmIconCircle: {
-    width: s(72),
-    height: s(72),
-    borderRadius: ms(24),
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: vs(20),
-  },
-  confirmTitleText: { fontSize: ms(19), fontWeight: '900', color: '#1e293b', marginBottom: vs(10), textAlign: 'center' },
-  confirmMessage: { fontSize: ms(14), color: '#64748b', textAlign: 'center', lineHeight: ms(22), marginBottom: vs(25), fontWeight: '500' },
-  confirmActions: { flexDirection: 'row', gap: s(12), width: '100%' },
-  confirmBtn: { flex: 1, paddingVertical: vs(15), borderRadius: s(16), alignItems: 'center' },
+  confirmOverlay: { flex: 1, backgroundColor: 'rgba(15, 23, 42, 0.65)', justifyContent: 'center', alignItems: 'center' },
+  confirmBox: { width: '85%', backgroundColor: '#fff', borderRadius: ms(28), padding: s(24), alignItems: 'center' },
+  confirmIconCircle: { width: s(70), height: s(70), borderRadius: s(35), justifyContent: 'center', alignItems: 'center', marginBottom: vs(20) },
+  confirmTitleText: { fontSize: ms(20), fontWeight: '800', color: '#1e293b', marginBottom: vs(10) },
+  confirmMessage: { fontSize: ms(14), color: '#64748b', textAlign: 'center', lineHeight: ms(22), marginBottom: vs(25) },
+  confirmActions: { flexDirection: 'row', gap: s(12) },
+  confirmBtn: { flex: 1, height: vs(50), borderRadius: s(14), justifyContent: 'center', alignItems: 'center' },
   confirmBtnText: { fontSize: ms(15), fontWeight: '800', color: '#fff' },
 
-  // Toast Styles
-  toastContainer: {
-    position: 'absolute',
-    top: 0,
-    left: s(16),
-    right: s(16),
-    minHeight: vs(60),
-    paddingVertical: vs(10),
-    borderRadius: ms(20),
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: s(16),
-    zIndex: 9999,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.4,
-    shadowRadius: 20,
-    elevation: 15,
-  },
-  toastIcon: {
-    width: s(34),
-    height: s(34),
-    borderRadius: s(17),
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  toastText: {
-    color: '#FFF',
-    fontSize: ms(15),
-    fontWeight: '700',
-    marginLeft: s(12),
-    flex: 1,
-    lineHeight: ms(22),
-  },
+  toastContainer: { position: 'absolute', top: 0, left: s(16), right: s(16), height: vs(56), borderRadius: ms(18), flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(14), zIndex: 9999, elevation: 10 },
+  toastIcon: { width: s(32), height: s(32), borderRadius: s(16), backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
+  toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '700', marginLeft: s(12), flex: 1 },
 });
 
 export default ChallengeManagement;

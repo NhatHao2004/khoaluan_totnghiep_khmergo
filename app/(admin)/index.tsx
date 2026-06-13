@@ -32,6 +32,7 @@ const StatCard = memo(({ label, count, icon, onPress }: any) => (
     </View>
   </TouchableOpacity>
 ));
+StatCard.displayName = 'StatCard';
 
 const PodiumItem = memo(({ user, index }: any) => {
   const rank = index + 1;
@@ -77,6 +78,7 @@ const PodiumItem = memo(({ user, index }: any) => {
     </View>
   );
 });
+PodiumItem.displayName = 'PodiumItem';
 
 const ActivityCard = memo(({ activity }: any) => (
   <View style={styles.activityCard}>
@@ -87,6 +89,7 @@ const ActivityCard = memo(({ activity }: any) => (
     </View>
   </View>
 ));
+ActivityCard.displayName = 'ActivityCard';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({

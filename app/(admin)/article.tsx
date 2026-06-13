@@ -76,6 +76,7 @@ const PostItem = memo(({ item, onDelete, onShowComments }: any) => {
     </View>
   );
 });
+PostItem.displayName = 'PostItem';
 
 const CommentItem = memo(({ item, onDelete }: any) => (
   <View style={styles.commentItem}>
@@ -96,6 +97,7 @@ const CommentItem = memo(({ item, onDelete }: any) => (
     </TouchableOpacity>
   </View>
 ));
+CommentItem.displayName = 'CommentItem';
 
 const ArticleManagement = () => {
   const insets = useSafeAreaInsets();

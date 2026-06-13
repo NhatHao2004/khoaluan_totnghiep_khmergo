@@ -153,7 +153,7 @@ export default function LanguageDetailScreen() {
 
               <View style={styles.wordContent}>
                 <ThemedText style={styles.khmerText} selectable={true}>{word.khm}</ThemedText>
-                <ThemedText style={styles.pronunciationText}>"{word.pronunciation}" </ThemedText>
+                <ThemedText style={styles.pronunciationText}>&quot;{word.pronunciation}&quot; </ThemedText>
 
                 <View style={styles.divider} />
 

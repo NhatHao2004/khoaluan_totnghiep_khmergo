@@ -32,6 +32,7 @@ const ActivityCard = memo(({ item, getTimeAgo }: any) => (
     </View>
   </View>
 ));
+ActivityCard.displayName = 'ActivityCard';
 
 const UsersActivity = () => {
   const insets = useSafeAreaInsets();
