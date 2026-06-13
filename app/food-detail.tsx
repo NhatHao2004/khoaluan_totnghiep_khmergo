@@ -128,17 +128,6 @@ export default function FoodDetailScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
-      <View style={[styles.topNav, { top: insets.top + vs(10) }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
-          <Ionicons name="arrow-back" size={ms(24)} color="#1E293B" />
-        </TouchableOpacity>
-        {!user?.role?.includes('Quản trị viên') && (
-          <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
-            <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={ms(22)} color={isFavorite ? "#EF4444" : "#1E293B"} />
-          </TouchableOpacity>
-        )}
-      </View>
-
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.heroWrapper}>
           <Image
@@ -147,6 +136,17 @@ export default function FoodDetailScreen() {
             contentFit="cover"
           />
           <View style={styles.heroOverlay} />
+
+          <View style={[styles.topNav, { top: insets.top + vs(10) }]}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
+              <Ionicons name="arrow-back" size={ms(24)} color="#1E293B" />
+            </TouchableOpacity>
+            {!user?.role?.includes('Quản trị viên') && (
+              <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
+                <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={ms(22)} color={isFavorite ? "#EF4444" : "#1E293B"} />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         <View style={styles.contentArea}>
