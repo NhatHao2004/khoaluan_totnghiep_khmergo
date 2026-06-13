@@ -73,8 +73,8 @@ export default function AIAssistantScreen() {
     }, 4000);
   };
 
-  // Persistence Key
-  const CHAT_HISTORY_KEY = 'KHMERGO_CHAT_HISTORY';
+  // Persistence Key - Tied to User ID for Privacy
+  const CHAT_HISTORY_KEY = user?.uid ? `KHMERGO_CHAT_HISTORY_${user.uid}` : 'KHMERGO_CHAT_HISTORY_GUEST';
 
   // Load History
   useEffect(() => {
@@ -83,14 +83,23 @@ export default function AIAssistantScreen() {
         const storedChat = await AsyncStorage.getItem(CHAT_HISTORY_KEY);
         if (storedChat) {
           const parsed = JSON.parse(storedChat);
-          // Convert string timestamps back to Date objects
           const formatted = parsed.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) }));
           setMessages(formatted);
+        } else {
+          // Reset to default welcome message if no history for this specific user/guest
+          setMessages([{
+            id: 'default',
+            text: t('ai_intro'),
+            sender: 'ai',
+            timestamp: new Date(),
+          }]);
         }
-      } catch (e) { console.error("Load error", e); }
+      } catch (e) { 
+        console.error("Load error", e); 
+      }
     };
     loadChat();
-  }, []);
+  }, [user?.uid, CHAT_HISTORY_KEY]); // Reload when user changes
 
   // Save History
   useEffect(() => {
