@@ -7,8 +7,8 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Dimensions, Image, Linking, Modal, ScrollView,
-  Share,
+  Dimensions, Image,
+  ScrollView,
   StatusBar,
   StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
@@ -47,7 +47,7 @@ export default function CultureDetailScreen() {
         setTempleData({ id, ...data });
         const targetImg = data.imageUrl1 || data.imageUrl || initialImageUrl;
         if (targetImg) {
-          try { await Image.prefetch(targetImg); } catch (e) {}
+          try { await Image.prefetch(targetImg); } catch (e) { }
         }
       }
       setTimeout(() => setLoading(false), 800);
@@ -165,7 +165,6 @@ export default function CultureDetailScreen() {
           <View style={styles.titleBox}>
             <Text style={styles.mainTitle}>{name}</Text>
             <View style={styles.locationRow}>
-              <Ionicons name="location" size={18} color="#FF6B6B" />
               <Text style={styles.locationLabel}>{location}</Text>
             </View>
           </View>

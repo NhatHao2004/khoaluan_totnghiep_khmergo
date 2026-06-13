@@ -38,6 +38,7 @@ export const toggleFavorite = async (userId: string, temple: any, isFavorite: bo
         location_khmer: temple.location_khmer || '',
         imageUrl: temple.imageUrl || '',
         category: temple.category || '',
+        rental: temple.rental || '',
         favoriteAt: new Date().getTime()
       };
       await setDoc(favoriteRef, cleanTemple);

@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { toggleFavorite } from '@/services/firebase-service';
+
 import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -59,15 +59,7 @@ export default function FavoritesScreen() {
     return () => unsubscribe();
   }, [user?.uid]);
 
-  const removeFavorite = async (item: any) => {
-    if (!user?.uid) return;
-    try {
-      await toggleFavorite(user.uid, item, false);
-      // Data will auto-update via onSnapshot
-    } catch (error) {
-      console.error('Error removing favorite:', error);
-    }
-  };
+
 
   const handlePressItem = (item: any) => {
     let detailRoute = '/(tabs)/index';
@@ -153,26 +145,8 @@ export default function FavoritesScreen() {
                 <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
 
                 <View style={styles.cardContent}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <Text style={styles.cardTitle} numberOfLines={1}>
-                      {language === 'km' ? (item.name_khmer || item.name) : item.name}
-                    </Text>
-                    <TouchableOpacity
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        removeFavorite(item);
-                      }}
-                      style={styles.heartBtnSmall}
-                    >
-                      <Ionicons name="heart" size={22} color="#FF4D4D" />
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={styles.cardLocationBox}>
-                    <Text style={styles.cardLocation} numberOfLines={2}>
-                      {language === 'km' ? (item.location_khmer || item.location) : item.location}
-                    </Text>
-                  </View>
+                  <Text style={styles.cardTitle} numberOfLines={1}>{item.name}</Text>
+                  <Text style={styles.cardRental} numberOfLines={1}>{item.rental}</Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -261,7 +235,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    padding: 15,
+
     marginBottom: 15,
     elevation: 2,
     shadowColor: '#000',
@@ -269,35 +243,30 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 5,
     flexDirection: 'row',
-    gap: 12
+    padding: 10,
+    alignItems: 'center',
+    gap: 12,
   },
   cardImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 15,
+    width: 80,
+    height: 80,
+    borderRadius: 10,
     resizeMode: 'cover',
   },
   cardContent: {
     flex: 1,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   cardTitle: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '800',
     color: '#1A1A1A',
-    marginBottom: 6,
-    flex: 1
+    marginBottom: -15,
   },
-  cardLocationBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cardLocation: {
-    fontSize: 13,
+  cardRental: {
+    fontSize: 14,
     color: '#666',
-    flexShrink: 1,
+    fontWeight: '500',
   },
-  heartBtnSmall: {
-    padding: 4
-  }
+
 });
