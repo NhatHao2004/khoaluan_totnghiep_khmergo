@@ -1,9 +1,10 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { collection, doc, onSnapshot } from 'firebase/firestore';
+import { collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import React, { memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Dimensions, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../../contexts/AuthContext';
 import { db } from '../../utils/firebaseConfig';
@@ -97,9 +98,42 @@ const AdminDashboard = () => {
   const [allSortedUsers, setAllSortedUsers] = useState<any[]>([]);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [adminName, setAdminName] = useState('');
+  const [pendingFeedback, setPendingFeedback] = useState(0);
+  const [recentFeedbacks, setRecentFeedbacks] = useState<any[]>([]);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [selectedFeedback, setSelectedFeedback] = useState<any>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [quickReply, setQuickReply] = useState('');
+  const [sendingReply, setSendingReply] = useState(false);
   const leaderboardRef = useRef<ScrollView>(null);
   const { logout, user } = useContext(AuthContext);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+
+  // Toast States
+  const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const toastY = useSharedValue(-120);
+
+  const triggerToast = useCallback((msg: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMsg(msg);
+    setToastType(type);
+    setShowToast(true);
+    toastY.value = withSpring(vs(10), {
+      damping: 15,
+      stiffness: 120,
+    });
+
+    setTimeout(() => {
+      toastY.value = withTiming(-120, { duration: 400 });
+      setTimeout(() => setShowToast(false), 400);
+    }, 3000);
+  }, []);
+
+  const animatedToastStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: toastY.value }],
+    opacity: interpolate(toastY.value, [-100, -40], [0, 1], 'clamp'),
+  }));
 
   const insets = useSafeAreaInsets();
 
@@ -166,7 +200,7 @@ const AdminDashboard = () => {
 
       setRecentActivities(activities);
     });
- 
+
     let unsubAdmin: any;
     if (user?.uid) {
       unsubAdmin = onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
@@ -183,19 +217,88 @@ const AdminDashboard = () => {
     };
   }, []);
 
+  const handleSendQuickReply = async () => {
+    if (!quickReply.trim() || !selectedFeedback) return;
+    setSendingReply(true);
+    try {
+      await updateDoc(doc(db, 'feedback', selectedFeedback.id), {
+        adminReply: quickReply.trim(),
+        repliedAt: new Date()
+      });
+
+      triggerToast('Đã gửi phản hồi thành công', 'success');
+      setQuickReply('');
+      setShowDetailModal(false);
+      setSelectedFeedback(null);
+    } catch (error) {
+      console.error(error);
+      triggerToast('Không thể gửi phản hồi', 'error');
+    } finally {
+      setSendingReply(false);
+    }
+  };
+
+  useEffect(() => {
+    // Listen for all feedback to handle count and recent list
+    // Removing orderBy from Firestore if it causes issues with missing fields or indexes
+    const unsubFeedback = onSnapshot(collection(db, 'feedback'), (snap) => {
+      const allData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+
+      // Sort in memory to be safe
+      const sorted = allData.sort((a, b) => {
+        const getTime = (ts: any) => {
+          if (!ts) return 0;
+          if (ts.seconds) return ts.seconds * 1000;
+          if (ts.toDate) return ts.toDate().getTime();
+          return new Date(ts).getTime();
+        };
+        return getTime(b.createdAt) - getTime(a.createdAt);
+      });
+
+      const unrepliedList = allData.filter((f: any) => {
+        const reply = f.adminReply;
+        return reply === null || reply === undefined || reply === '' || (typeof reply === 'string' && reply.trim() === '');
+      });
+      const unrepliedCount = unrepliedList.length;
+
+      setRecentFeedbacks(sorted.slice(0, 10));
+
+      setPendingFeedback(prev => {
+        if (unrepliedCount > prev && prev !== 0) {
+          triggerToast(`Bạn có phản hồi mới từ người dùng!`, 'info');
+        }
+        return unrepliedCount;
+      });
+    });
+
+    return () => unsubFeedback();
+  }, [triggerToast]);
+
   const getTimeAgo = useCallback((timestamp: any) => {
     if (!timestamp) return 'Vừa xong';
-    const now = new Date();
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    let date: Date;
 
-    if (diffInSeconds < 60) return 'Vừa xong';
-    const diffInMinutes = Math.floor(diffInSeconds / 60);
-    if (diffInMinutes < 60) return `${diffInMinutes} phút trước`;
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours} giờ trước`;
-    const diffInDays = Math.floor(diffInHours / 24);
-    return `${diffInDays} ngày trước`;
+    if (timestamp.toDate) {
+      date = timestamp.toDate();
+    } else if (timestamp.seconds) {
+      date = new Date(timestamp.seconds * 1000);
+    } else {
+      date = new Date(timestamp);
+    }
+
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+
+    const now = new Date();
+    const isToday = now.toDateString() === date.toDateString();
+
+    if (isToday) {
+      return `${hours}:${minutes}`;
+    } else {
+      return `${hours}:${minutes} ${day}/${month}`;
+    }
   }, []);
 
   // Tính danh sách hiển thị
@@ -211,6 +314,30 @@ const AdminDashboard = () => {
 
   return (
     <View style={[styles.container, { paddingTop: Math.max(insets.top, vs(15)) }]}>
+      {/* Premium Toast System */}
+      {showToast && (
+        <Animated.View
+          style={[
+            styles.toastContainer,
+            animatedToastStyle,
+            {
+              backgroundColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
+              shadowColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
+              top: insets.top,
+            }
+          ]}
+        >
+          <View style={styles.toastIcon}>
+            <Ionicons
+              name={toastType === 'success' ? "checkmark" : toastType === 'info' ? "notifications" : "close"}
+              size={ms(20)}
+              color="#FFF"
+            />
+          </View>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
+        </Animated.View>
+      )}
+
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -218,7 +345,7 @@ const AdminDashboard = () => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => router.push('/(admin)/profile' as any)}
             activeOpacity={0.7}
             style={{ flex: 1 }}
@@ -228,6 +355,17 @@ const AdminDashboard = () => {
             </Text>
           </TouchableOpacity>
           <View style={styles.headerRightActions}>
+            <TouchableOpacity
+              onPress={() => setShowFeedbackModal(true)}
+              style={styles.notificationBtn}
+            >
+              <Ionicons name="chatbubbles-outline" size={ms(26)} color="#1e293b" />
+              {pendingFeedback > 0 && (
+                <View style={styles.notificationBadge}>
+                  <Text style={styles.badgeText}>{pendingFeedback > 99 ? '99+' : pendingFeedback}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -242,9 +380,10 @@ const AdminDashboard = () => {
           <StatCard
             label="Nội dung"
             count={stats.content}
-            icon={<Ionicons name="book-outline" size={ms(22)} color="#10b981" />}
+            icon={<Ionicons name="chatbubbles-outline" size={ms(22)} color="#3b82f6" />}
             onPress={() => router.push('/(admin)/content' as any)}
           />
+
           <StatCard
             label="Thử thách"
             count={stats.challenges}
@@ -301,6 +440,237 @@ const AdminDashboard = () => {
           )}
         </View>
       </ScrollView>
+
+      {/* Feedback Quick View Modal */}
+      <Modal
+        visible={showFeedbackModal}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={() => setShowFeedbackModal(false)}
+      >
+        <TouchableOpacity
+          style={styles.feedbackModalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowFeedbackModal(false)}
+        >
+          <View style={[styles.feedbackModalContent, { paddingTop: insets.top + vs(5) }]}>
+            <View style={styles.feedbackModalHeader}>
+              <Text
+                style={styles.feedbackModalTitle}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                Phản hồi người dùng
+              </Text>
+              <TouchableOpacity onPress={() => setShowFeedbackModal(false)} style={styles.feedbackCloseBtn}>
+                <Ionicons name="close" size={ms(25)} color="#ff0000ff" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {recentFeedbacks.length > 0 ? (
+                recentFeedbacks.map((f, i) => (
+                  <TouchableOpacity
+                    key={f.id}
+                    style={[styles.feedbackSummaryItem, (!f.adminReply || f.adminReply === '') && styles.newFeedbackItem]}
+                    onPress={() => {
+                      setSelectedFeedback({
+                        ...f,
+                        avatar: f.avatar || allSortedUsers.find(u => u.email === f['e-mail'])?.avatar
+                      });
+                      setQuickReply(f.adminReply || '');
+                      setShowDetailModal(true);
+                    }}
+                  >
+                    <View style={styles.feedbackItemHeader}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: s(8) }}>
+                        <View style={styles.feedbackListAvatar}>
+                          {(f.avatar || allSortedUsers.find(u => u.email === f['e-mail'])?.avatar) ? (
+                            <Image
+                              source={{ uri: f.avatar || allSortedUsers.find(u => u.email === f['e-mail'])?.avatar }}
+                              style={styles.feedbackListAvatarImg}
+                              contentFit="cover"
+                            />
+                          ) : (
+                            <Text style={styles.feedbackListAvatarInitial}>
+                              {(f.name || f.userName || 'U').charAt(0).toUpperCase()}
+                            </Text>
+                          )}
+                        </View>
+                        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Text style={styles.feedbackUserName} numberOfLines={1}>
+                            {f.name || f.userName || f.displayName || f['e-mail']?.split('@')[0] || 'Người dùng'}
+                          </Text>
+                          <Text style={styles.feedbackTime}>{f.createdAt ? getTimeAgo(f.createdAt) : 'Vừa xong'}</Text>
+                        </View>
+                      </View>
+                      {(!f.adminReply || f.adminReply === '') && <View style={styles.newBadge} />}
+                    </View>
+                    <Text style={styles.feedbackPreview} numberOfLines={2}>{f.message || f.content}</Text>
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <View style={styles.emptyFeedback}>
+                  <View style={styles.emptyIconCircle}>
+                    <Ionicons name="chatbubble-ellipses-outline" size={ms(60)} color="#e2e8f0" />
+                  </View>
+                  <Text style={styles.emptyFeedbackText}>Chưa có phản hồi nào</Text>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+
+          {/* Toast System inside Feedback List Modal */}
+          {showToast && (
+            <Animated.View
+              style={[
+                styles.toastContainer,
+                animatedToastStyle,
+                {
+                  backgroundColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
+                  shadowColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
+                  top: insets.top,
+                }
+              ]}
+            >
+              <View style={styles.toastIcon}>
+                <Ionicons
+                  name={toastType === 'success' ? "checkmark" : toastType === 'info' ? "notifications" : "close"}
+                  size={ms(20)}
+                  color="#FFF"
+                />
+              </View>
+              <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
+            </Animated.View>
+          )}
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Quick Feedback Detail & Reply Modal */}
+      <Modal
+        visible={showDetailModal}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={() => setShowDetailModal(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+        >
+          <View style={[styles.detailModalBox, { paddingTop: insets.top + vs(5), paddingBottom: Math.max(insets.bottom, vs(20)) }]}>
+            <View style={styles.detailModalHeader}>
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={styles.detailModalTitle}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                >
+                  Chi tiết phản hồi
+                </Text>
+              </View>
+              <TouchableOpacity onPress={() => setShowDetailModal(false)} style={styles.feedbackCloseBtn}>
+                <Ionicons name="close" size={ms(25)} color="#ff0000ff" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              style={styles.detailScroll}
+              contentContainerStyle={{ paddingBottom: vs(20) }}
+            >
+              <View style={styles.detailUserRow}>
+                <View style={[styles.detailAvatar, { backgroundColor: '#eff6ff' }]}>
+                  {selectedFeedback?.avatar ? (
+                    <Image
+                      source={{ uri: selectedFeedback.avatar }}
+                      style={styles.detailAvatarImage}
+                      contentFit="cover"
+                      transition={200}
+                    />
+                  ) : (
+                    <Text style={styles.detailAvatarInitial}>
+                      {(selectedFeedback?.name || selectedFeedback?.userName || 'U').charAt(0).toUpperCase()}
+                    </Text>
+                  )}
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.detailNameText}>
+                    {selectedFeedback?.name || selectedFeedback?.userName || selectedFeedback?.['e-mail']?.split('@')[0] || 'Người dùng'}
+                  </Text>
+                  <Text style={styles.detailEmailText}>{selectedFeedback?.['e-mail']}</Text>
+                </View>
+              </View>
+
+              <View style={styles.msgBubble}>
+                <Text style={styles.msgContentText}>
+                  <Text style={{ fontWeight: '800', color: '#1e293b' }}>Nội dung: </Text>
+                  {selectedFeedback?.message || selectedFeedback?.content}
+                </Text>
+              </View>
+
+              <View style={styles.replySection}>
+                <Text style={styles.replyLabel}>Trả lời nhanh:</Text>
+                <TextInput
+                  style={styles.replyInput}
+                  value={quickReply}
+                  onChangeText={setQuickReply}
+                  placeholder="Nhập nội dung phản hồi..."
+                  multiline
+                  textAlignVertical="top"
+                />
+              </View>
+            </ScrollView>
+
+            <View style={styles.detailFooter}>
+              <TouchableOpacity
+                style={[styles.quickCancelBtn]}
+                onPress={() => setShowDetailModal(false)}
+              >
+                <Text style={styles.quickCancelText}>Đóng</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.quickSendBtn, (!quickReply.trim() || sendingReply || quickReply.trim() === selectedFeedback?.adminReply) && styles.disabledBtn]}
+                onPress={handleSendQuickReply}
+                disabled={!quickReply.trim() || sendingReply || quickReply.trim() === selectedFeedback?.adminReply}
+              >
+                {sendingReply ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.quickSendText}>Gửi phản hồi</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Toast System inside Modal */}
+          {showToast && (
+            <Animated.View
+              style={[
+                styles.toastContainer,
+                animatedToastStyle,
+                {
+                  backgroundColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
+                  shadowColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
+                  top: insets.top,
+                }
+              ]}
+            >
+              <View style={styles.toastIcon}>
+                <Ionicons
+                  name={toastType === 'success' ? "checkmark" : toastType === 'info' ? "notifications" : "close"}
+                  size={ms(20)}
+                  color="#FFF"
+                />
+              </View>
+              <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
+            </Animated.View>
+          )}
+        </KeyboardAvoidingView>
+      </Modal>
 
       {/* Logout Modal removed from here, moved to profile.tsx */}
     </View>
@@ -477,7 +847,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1e293b',
     textAlign: 'center',
-    width: '100%',
+    marginTop: vs(10),
   },
   podiumPoints: {
     fontSize: ms(9),
@@ -690,6 +1060,347 @@ const styles = StyleSheet.create({
     color: '#475569',
     fontSize: ms(15),
     fontWeight: '700',
+  },
+  // Toast System
+  toastContainer: {
+    position: 'absolute',
+    top: 0,
+    left: s(20),
+    right: s(20),
+    height: vs(55),
+    borderRadius: s(18),
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: s(20),
+    zIndex: 9999,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 10,
+  },
+  toastIcon: {
+    width: s(32),
+    height: s(32),
+    borderRadius: s(16),
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: s(12),
+  },
+  toastText: {
+    color: '#FFF',
+    fontSize: ms(15),
+    fontWeight: '800',
+    flex: 1,
+  },
+  notificationBtn: {
+    width: s(42),
+    height: s(42),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8fafc',
+    borderRadius: s(12),
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: vs(5),
+    right: s(5),
+    backgroundColor: '#ef4444',
+    minWidth: s(18),
+    height: s(18),
+    borderRadius: s(9),
+    justifyContent: 'center',
+    paddingHorizontal: s(4),
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: ms(10),
+    fontWeight: '900',
+    textAlign: 'center',
+    includeFontPadding: false,
+    lineHeight: ms(13),
+  },
+  feedbackListAvatar: {
+    width: s(24),
+    height: s(24),
+    borderRadius: s(12),
+    backgroundColor: '#f1f5f9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  feedbackListAvatarImg: {
+    width: '100%',
+    height: '100%',
+  },
+  feedbackListAvatarInitial: {
+    fontSize: ms(10),
+    fontWeight: '800',
+    color: '#94a3b8',
+  },
+  // Feedback Modal Styles
+  feedbackModalOverlay: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  feedbackModalContent: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingHorizontal: s(25),
+  },
+  feedbackModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: vs(30),
+    marginTop: vs(10),
+  },
+  feedbackModalTitle: {
+    fontSize: ms(24),
+    fontWeight: '900',
+    color: '#1e293b',
+    letterSpacing: -0.5,
+    flex: 1,
+    marginRight: s(10),
+  },
+  feedbackCloseBtn: {
+    width: ms(36),
+    height: ms(36),
+    borderRadius: ms(18),
+    backgroundColor: '#f1f5f9',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  feedbackSummaryItem: {
+    padding: s(12),
+    borderRadius: s(12),
+    backgroundColor: '#f8fafc',
+    marginBottom: vs(10),
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+  },
+  newFeedbackItem: {
+    backgroundColor: '#eff6ff',
+    borderColor: '#dbeafe',
+  },
+  feedbackItemHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: vs(4),
+  },
+  feedbackUserName: {
+    fontSize: ms(14),
+    fontWeight: '700',
+    color: '#1e293b',
+    flex: 1,
+  },
+  newBadge: {
+    width: s(8),
+    height: s(8),
+    borderRadius: s(4),
+    backgroundColor: '#3b82f6',
+  },
+  feedbackPreview: {
+    fontSize: ms(13),
+    color: '#475569',
+    lineHeight: vs(20),
+    marginBottom: vs(6),
+    textAlign: 'justify',
+    includeFontPadding: false,
+  },
+  feedbackTime: {
+    fontSize: ms(11),
+    color: '#94a3b8',
+    fontWeight: '600',
+    marginLeft: s(8),
+  },
+  emptyFeedback: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: vs(100),
+  },
+  emptyIconCircle: {
+    width: s(120),
+    height: s(120),
+    borderRadius: s(60),
+    backgroundColor: '#f8fafc',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: vs(25),
+  },
+  emptyFeedbackText: {
+    fontSize: ms(15),
+    color: '#94a3b8',
+    fontWeight: '700',
+    opacity: 0.8,
+    textAlign: 'center',
+    paddingHorizontal: s(20),
+  },
+  viewAllBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: s(6),
+    marginTop: vs(10),
+    paddingTop: vs(12),
+    borderTopWidth: 1,
+    borderTopColor: '#f1f5f9',
+  },
+  viewAllText: {
+    fontSize: ms(14),
+    fontWeight: '700',
+    color: '#3b82f6',
+  },
+  // Quick Detail Modal Styles
+  detailModalOverlay: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  detailModalBox: {
+    flex: 1,
+    width: '100%',
+    backgroundColor: '#fff',
+    paddingHorizontal: s(25),
+  },
+  detailModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: vs(25),
+    marginTop: vs(10),
+  },
+  detailModalTitle: {
+    fontSize: ms(24),
+    fontWeight: '900',
+    color: '#1e293b',
+    letterSpacing: -0.5,
+  },
+  detailScroll: {
+    flex: 1,
+  },
+  detailUserRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: vs(20),
+    gap: s(12),
+  },
+  detailAvatar: {
+    width: s(46),
+    height: s(46),
+    borderRadius: s(23),
+    backgroundColor: '#eff6ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#dbeafe',
+  },
+  detailAvatarInitial: {
+    fontSize: ms(18),
+    fontWeight: '800',
+    color: '#3b82f6',
+  },
+  detailAvatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: s(23),
+  },
+  detailNameText: {
+    fontSize: ms(16),
+    fontWeight: '700',
+    color: '#1e293b',
+  },
+  detailEmailText: {
+    fontSize: ms(13),
+    color: '#64748b',
+  },
+  msgBubble: {
+    backgroundColor: '#f8fafc',
+    padding: s(16),
+    borderRadius: s(16),
+    marginBottom: vs(20),
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+  },
+  msgLabel: {
+    fontSize: ms(12),
+    fontWeight: '800',
+    color: '#94a3b8',
+    textTransform: 'uppercase',
+    marginBottom: vs(4),
+  },
+  msgContentText: {
+    fontSize: ms(15),
+    color: '#334155',
+    lineHeight: vs(24),
+    textAlign: 'justify',
+    includeFontPadding: false,
+    paddingBottom: vs(2),
+  },
+  msgTimeText: {
+    fontSize: ms(11),
+    color: '#94a3b8',
+    marginTop: vs(8),
+    textAlign: 'right',
+  },
+  replySection: {
+    marginBottom: vs(10),
+  },
+  replyLabel: {
+    fontSize: ms(13),
+    fontWeight: '700',
+    color: '#1e293b',
+    marginBottom: vs(8),
+  },
+  replyInput: {
+    backgroundColor: '#f8fafc',
+    borderRadius: s(12),
+    padding: s(12),
+    fontSize: ms(15),
+    color: '#1e293b',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    height: vs(120),
+  },
+  detailFooter: {
+    flexDirection: 'row',
+    gap: s(12),
+    marginTop: vs(20),
+  },
+  quickCancelBtn: {
+    flex: 1,
+    height: vs(46),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ff0000ff',
+    borderRadius: s(14),
+  },
+  quickCancelText: {
+    fontSize: ms(15),
+    fontWeight: '700',
+    color: '#ffffffff',
+  },
+  quickSendBtn: {
+    flex: 2,
+    height: vs(46),
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#3b82f6',
+    borderRadius: s(14),
+    gap: s(8),
+  },
+  quickSendText: {
+    fontSize: ms(15),
+    fontWeight: '700',
+    color: '#fff',
+  },
+  disabledBtn: {
+    opacity: 0.6,
   },
 });
 

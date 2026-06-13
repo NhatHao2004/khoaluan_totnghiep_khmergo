@@ -112,6 +112,7 @@ export default function SupportScreen() {
       const newFeedbackData = {
         userId: user.uid,
         userName: user.name || 'User',
+        avatar: user.avatar || null,
         'e-mail': user.email,
         subject: 'Phản hồi đóng góp',
         content: content.trim(),
