@@ -116,7 +116,10 @@ export default function FoodDetailScreen() {
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#FF6B2C" />
+        <ActivityIndicator size="large" color="#FF0050" />
+        <Text style={styles.loaderText}>
+          {isKm ? 'កំពុងផ្ទុកមាតិកា...' : 'Đang tải nội dung...'}
+        </Text>
       </View>
     );
   }
@@ -231,7 +234,19 @@ export default function FoodDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
-  loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF' },
+  loaderContainer: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    backgroundColor: '#FFF' 
+  },
+  loaderText: {
+    marginTop: vs(15),
+    fontSize: ms(14),
+    color: '#64748B',
+    fontWeight: '600',
+    letterSpacing: 0.5
+  },
   topNav: {
     position: 'absolute',
     left: s(20),
@@ -266,9 +281,9 @@ const styles = StyleSheet.create({
     minHeight: height - HERO_HEIGHT + vs(30),
   },
   titleBox: { marginBottom: vs(20), paddingHorizontal: s(5) },
-  mainTitle: { fontSize: ms(24), fontWeight: '900', color: '#1E293B', lineHeight: ms(32) },
+  mainTitle: { fontSize: ms(28), fontWeight: '900', color: '#1E293B', lineHeight: ms(36) },
   locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: vs(6), gap: s(4) },
-  locationLabel: { fontSize: ms(13), color: '#64748B', fontWeight: '500' },
+  locationLabel: { fontSize: ms(14), color: '#64748B', fontWeight: '500' },
 
   tabHeader: {
     flexDirection: 'row',
@@ -291,14 +306,26 @@ const styles = StyleSheet.create({
   tabLabelActive: { color: '#1E293B' },
 
   tabContent: { marginTop: vs(10) },
-  galleryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: s(12), marginBottom: vs(25) },
-  galleryItem: { width: (width - s(52)) / 2, height: vs(150), borderRadius: s(16), overflow: 'hidden' },
+  galleryGrid: { 
+    flexDirection: 'row', 
+    flexWrap: 'wrap', 
+    justifyContent: 'space-between',
+    paddingHorizontal: s(2),
+    marginBottom: 0
+  },
+  galleryItem: { 
+    width: (width - s(40) - s(15)) / 2, 
+    height: vs(130), 
+    borderRadius: s(16), 
+    overflow: 'hidden',
+    marginBottom: vs(12)
+  },
   gridImg: { width: '100%', height: '100%' },
 
   contentPiece: { marginBottom: vs(25) },
   blockPic: { width: '100%', height: vs(220), borderRadius: s(24), marginBottom: vs(15) },
-  pieceTitle: { fontSize: ms(18), fontWeight: '900', color: '#1E293B', marginBottom: vs(8) },
-  piecePara: { fontSize: ms(15), lineHeight: ms(24), color: '#475569', textAlign: 'justify', marginBottom: vs(15) },
+  pieceTitle: { fontSize: ms(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(8) },
+  piecePara: { fontSize: ms(16), lineHeight: ms(26), color: '#475569', textAlign: 'justify', marginBottom: vs(15) },
 
   quizCard: {
     backgroundColor: '#FFF7ED',

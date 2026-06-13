@@ -116,7 +116,10 @@ export default function CultureDetailScreen() {
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#FF6B2C" />
+        <ActivityIndicator size="large" color="#FF0050" />
+        <Text style={styles.loaderText}>
+          {isKm ? 'កំពុងផ្ទុកមាតិកា...' : 'Đang tải nội dung...'}
+        </Text>
       </View>
     );
   }
@@ -124,17 +127,6 @@ export default function CultureDetailScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
-
-      <View style={[styles.topNav, { top: insets.top + vs(10) }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
-          <Ionicons name="arrow-back" size={ms(24)} color="#1E293B" />
-        </TouchableOpacity>
-        {!user?.role?.includes('Quản trị viên') && (
-          <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
-            <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={ms(22)} color={isFavorite ? "#EF4444" : "#1E293B"} />
-          </TouchableOpacity>
-        )}
-      </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.heroWrapper}>
@@ -144,6 +136,17 @@ export default function CultureDetailScreen() {
             contentFit="cover"
           />
           <View style={styles.heroOverlay} />
+
+          <View style={[styles.topNav, { top: insets.top + vs(10) }]}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
+              <Ionicons name="arrow-back" size={ms(24)} color="#1E293B" />
+            </TouchableOpacity>
+            {!user?.role?.includes('Quản trị viên') && (
+              <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
+                <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={ms(ms(22))} color={isFavorite ? "#EF4444" : "#1E293B"} />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         <View style={styles.contentArea}>
@@ -231,7 +234,19 @@ export default function CultureDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
-  loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF' },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFF'
+  },
+  loaderText: {
+    marginTop: vs(15),
+    fontSize: ms(14),
+    color: '#64748B',
+    fontWeight: '600',
+    letterSpacing: 0.5
+  },
   topNav: {
     position: 'absolute',
     left: s(20),
@@ -266,9 +281,9 @@ const styles = StyleSheet.create({
     minHeight: height - HERO_HEIGHT + vs(30),
   },
   titleBox: { marginBottom: vs(20), paddingHorizontal: s(5) },
-  mainTitle: { fontSize: ms(24), fontWeight: '900', color: '#1E293B', lineHeight: ms(32) },
+  mainTitle: { fontSize: ms(28), fontWeight: '900', color: '#1E293B', lineHeight: ms(36) },
   locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: vs(6), gap: s(4) },
-  locationLabel: { fontSize: ms(13), color: '#64748B', fontWeight: '500' },
+  locationLabel: { fontSize: ms(14), color: '#64748B', fontWeight: '500' },
 
   tabHeader: {
     flexDirection: 'row',
@@ -296,7 +311,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     paddingHorizontal: s(2),
-    marginBottom: vs(25)
+    marginBottom: 0
   },
   galleryItem: {
     width: (width - s(40) - s(15)) / 2,
@@ -309,8 +324,8 @@ const styles = StyleSheet.create({
 
   contentPiece: { marginBottom: vs(25) },
   blockPic: { width: '100%', height: vs(220), borderRadius: s(24), marginBottom: vs(15) },
-  pieceTitle: { fontSize: ms(18), fontWeight: '900', color: '#1E293B', marginBottom: vs(8) },
-  piecePara: { fontSize: ms(15), lineHeight: ms(24), color: '#475569', textAlign: 'justify', marginBottom: vs(15) },
+  pieceTitle: { fontSize: ms(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(8) },
+  piecePara: { fontSize: ms(16), lineHeight: ms(26), color: '#475569', textAlign: 'justify', marginBottom: vs(15) },
 
   quizCard: {
     backgroundColor: '#FFF7ED',
