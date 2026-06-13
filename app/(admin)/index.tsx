@@ -468,7 +468,7 @@ const AdminDashboard = () => {
               </TouchableOpacity>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
               {recentFeedbacks.length > 0 ? (
                 recentFeedbacks.map((f, i) => (
                   <TouchableOpacity
@@ -724,7 +724,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: s(16),
     justifyContent: 'space-between',
     gap: s(12),
-    marginBottom: vs(30),
+    marginBottom: vs(15),
     marginTop: vs(5),
   },
   statCard: {
@@ -1222,7 +1222,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom: vs(100),
+    paddingBottom: vs(140),
   },
   emptyIconCircle: {
     width: s(120),

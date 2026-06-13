@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
   emptyText: {
     textAlign: 'center',
     color: '#94a3b8',
-    marginTop: vs(100),
+    marginTop: vs(330),
     fontSize: ms(16),
   },
   modalOverlay: {
