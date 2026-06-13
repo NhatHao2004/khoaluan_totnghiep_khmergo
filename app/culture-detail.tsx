@@ -1,18 +1,14 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
+import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, onSnapshot } from 'firebase/firestore';
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  Dimensions, Image,
-  ScrollView,
-  StatusBar,
-  StyleSheet, Text, TouchableOpacity, View
-} from 'react-native';
-import { WebView } from 'react-native-webview';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 const HERO_HEIGHT = height * 0.40;
@@ -33,7 +29,7 @@ export default function CultureDetailScreen() {
   const [templeData, setTempleData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [scrollEnabled, setScrollEnabled] = useState(true);
-  const [activeTab, setActiveTab] = useState<'map' | 'quiz'>('map');
+  const [activeTab, setActiveTab] = useState<'gallery' | 'quiz'>('gallery');
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -104,100 +100,129 @@ export default function CultureDetailScreen() {
     }
   };
 
-  const lat = (templeData?.latitude || params.latitude || '9.5898') as string;
-  const lng = (templeData?.longitude || params.longitude || '105.9754') as string;
-
-  const webViewRef = useRef<any>(null);
-  const leafletHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body, #map { width: 100%; height: 100%; background-color: #000; }
-  </style>
-</head>
-<body>
-  <div id="map"></div>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    var map = L.map('map', { zoomControl: false, attributionControl: false, maxZoom: 18 }).setView([${lat}, ${lng}], 16);
-    L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 20, detectRetina: true }).addTo(map);
-    var icon = L.divIcon({
-      html: '<div style="width:28px;height:28px;background:#FF4B4B;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>',
-      iconSize: [28, 28], iconAnchor: [14, 28]
-    });
-    L.marker([${lat}, ${lng}], { icon: icon }).addTo(map);
-  </script>
-</body>
-</html>
-  `;
+  const insets = useSafeAreaInsets();
+  const galleryImages = React.useMemo(() => {
+    const imgs = [];
+    for (let i = 1; i <= 5; i++) {
+      const url = templeData?.[`imageUrl${i}`] || params?.[`imageUrl${i}`];
+      if (url) imgs.push(url);
+    }
+    if (imgs.length === 0 && (templeData?.imageUrl || initialImageUrl)) {
+      imgs.push(templeData?.imageUrl || initialImageUrl);
+    }
+    return imgs;
+  }, [templeData, params, initialImageUrl]);
 
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#FF0050" />
+        <ActivityIndicator size="large" color="#FF6B2C" />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
-      <ScrollView scrollEnabled={scrollEnabled} showsVerticalScrollIndicator={false}>
-        <View style={styles.imageBlock}>
-          {imageSource && <Image source={imageSource} style={styles.fullImg} />}
-          <View style={styles.topNav}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
-              <Ionicons name="arrow-back" size={24} color="#000" />
-            </TouchableOpacity>
-            {!user?.role?.includes('Quản trị viên') && (
-              <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
-                <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={22} color={isFavorite ? "#FF4B4B" : "#000"} />
-              </TouchableOpacity>
-            )}
-          </View>
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+
+      <View style={[styles.topNav, { top: insets.top + vs(10) }]}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
+          <Ionicons name="arrow-back" size={ms(24)} color="#1E293B" />
+        </TouchableOpacity>
+        {!user?.role?.includes('Quản trị viên') && (
+          <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
+            <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={ms(22)} color={isFavorite ? "#EF4444" : "#1E293B"} />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.heroWrapper}>
+          <Image
+            source={{ uri: imageUrl }}
+            style={styles.heroImg}
+            contentFit="cover"
+          />
+          <View style={styles.heroOverlay} />
         </View>
 
         <View style={styles.contentArea}>
           <View style={styles.titleBox}>
-            <Text style={styles.mainTitle}>{name}</Text>
+            <Text style={styles.mainTitle} adjustsFontSizeToFit numberOfLines={2}>{name}</Text>
             <View style={styles.locationRow}>
-              <Text style={styles.locationLabel}>{location}</Text>
+              <Text style={styles.locationLabel} numberOfLines={1}>{location}</Text>
             </View>
           </View>
 
-          {description ? <Text style={styles.piecePara}>{description}</Text> : null}
-
-          {contentBlocks.map((block: any, index: number) => (
-            <View key={index} style={styles.contentPiece}>
-              {block.images && <Image source={{ uri: block.images }} style={styles.blockPic} />}
-              <Text style={block.type === 'title' ? styles.pieceTitle : styles.piecePara}>
-                {isKm ? (block.value_khmer || block.value) : block.value}
+          <View style={styles.tabHeader}>
+            <TouchableOpacity
+              onPress={() => setActiveTab('gallery')}
+              style={[styles.tabItem, activeTab === 'gallery' && styles.tabItemActive]}
+            >
+              <Text style={[styles.tabLabel, activeTab === 'gallery' && styles.tabLabelActive]}>
+                {isKm ? 'រូបភាព' : 'Bộ sưu tập'}
               </Text>
-            </View>
-          ))}
+            </TouchableOpacity>
 
-          <View style={styles.mapWrap}>
-            <View style={styles.sectionTabRow}>
-              <TouchableOpacity onPress={() => setActiveTab('map')} style={[styles.tabBtn, activeTab === 'map' && styles.tabActive]}><Text style={[styles.tabText, activeTab === 'map' && styles.tabTextActive]}>{t('map_location')}</Text></TouchableOpacity>
-              {!user?.role?.includes('Quản trị viên') && <TouchableOpacity onPress={() => setActiveTab('quiz')} style={[styles.tabBtn, activeTab === 'quiz' && styles.tabActiveQuiz]}><Text style={[styles.tabText, activeTab === 'quiz' && styles.tabTextActive]}>{isKm ? 'ការប្រកួត' : 'THỬ THÁCH'}</Text></TouchableOpacity>}
-            </View>
-
-            {activeTab === 'map' ? (
-              <View style={styles.mapBox} onTouchStart={() => setScrollEnabled(false)} onTouchEnd={() => setScrollEnabled(true)} onTouchCancel={() => setScrollEnabled(true)}>
-                <WebView style={styles.mapWebView} source={{ html: leafletHtml }} />
-              </View>
-            ) : (
-              <View style={styles.quizCard}>
-                <Text style={styles.quizTitle}>{isKm ? 'សាកល្បងចំណេះដឹង' : 'Kiểm tra kiến thức'}</Text>
-                <TouchableOpacity style={styles.quizStartBtn} onPress={() => router.push({ pathname: '/game-mcq', params: { pagodaId: id, imageUrl: imageUrl, pagodaLocation: location } })}><Text style={styles.quizStartBtnText}>{isKm ? 'ចាប់ផ្តើមការប្រកួត' : 'Bắt đầu thử thách'}</Text></TouchableOpacity>
-              </View>
+            {!user?.role?.includes('Quản trị viên') && (
+              <TouchableOpacity
+                onPress={() => setActiveTab('quiz')}
+                style={[styles.tabItem, activeTab === 'quiz' && styles.tabItemActive]}
+              >
+                <Text style={[styles.tabLabel, activeTab === 'quiz' && styles.tabLabelActive]}>
+                  {isKm ? 'ការប្រកួត' : 'Thử thách'}
+                </Text>
+              </TouchableOpacity>
             )}
           </View>
-          <View style={{ height: 20 }} />
+
+          {activeTab === 'gallery' ? (
+            <View style={styles.tabContent}>
+              {description ? <Text style={styles.piecePara}>{description}</Text> : null}
+
+              {contentBlocks.map((block: any, index: number) => (
+                <View key={index} style={styles.contentPiece}>
+                  {block.images && (
+                    <Image
+                      source={{ uri: block.images }}
+                      style={styles.blockPic}
+                      contentFit="cover"
+                      transition={300}
+                    />
+                  )}
+                  <Text style={block.type === 'title' ? styles.pieceTitle : styles.piecePara}>
+                    {isKm ? (block.value_khmer || block.value) : block.value}
+                  </Text>
+                </View>
+              ))}
+
+              <View style={styles.galleryGrid}>
+                {galleryImages.map((img, idx) => (
+                  <View key={idx} style={styles.galleryItem}>
+                    <Image source={{ uri: img }} style={styles.gridImg} contentFit="cover" transition={200} />
+                  </View>
+                ))}
+              </View>
+            </View>
+          ) : (
+            <View style={styles.tabContent}>
+              <View style={styles.quizCard}>
+                <View style={styles.quizIconBg}>
+                  <Ionicons name="trophy-outline" size={ms(32)} color="#FF6B2C" />
+                </View>
+                <Text style={styles.quizTitle}>{isKm ? 'សាកល្បងចំណេះដឹង' : 'Kiểm tra kiến thức'}</Text>
+                <Text style={styles.quizSub}>{isKm ? 'ចូលរួមការប្រកួតដើម្បីទទួលបានពិន្ទុ' : 'Tham gia thử thách để nhận điểm thưởng'}</Text>
+                <TouchableOpacity
+                  style={styles.quizStartBtn}
+                  onPress={() => router.push({ pathname: '/game-mcq', params: { pagodaId: id, imageUrl: imageUrl, pagodaLocation: location } })}
+                >
+                  <Text style={styles.quizStartBtnText}>{isKm ? 'ចាប់ផ្តើមការប្រកួត' : 'Bắt đầu ngay'}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          <View style={{ height: insets.bottom + vs(40) }} />
         </View>
       </ScrollView>
     </View>
@@ -205,32 +230,123 @@ export default function CultureDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  topNav: { position: 'absolute', top: 50, left: 20, right: 20, flexDirection: 'row', justifyContent: 'space-between', zIndex: 100 },
-  iconBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.9)', justifyContent: 'center', alignItems: 'center' },
-  imageBlock: { width: width, height: HERO_HEIGHT },
-  fullImg: { width: '100%', height: '100%' },
-  contentArea: { paddingHorizontal: 25, paddingTop: 30, backgroundColor: '#fff', borderTopLeftRadius: 36, borderTopRightRadius: 36, marginTop: -30, minHeight: height - HERO_HEIGHT + 30 },
-  titleBox: { marginBottom: 20 },
-  mainTitle: { fontSize: 28, fontWeight: '900', color: '#0F172A' },
-  locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8, gap: 6 },
-  locationLabel: { fontSize: 14, color: '#64748B' },
-  contentPiece: { marginTop: 15 },
-  blockPic: { width: '100%', height: 220, borderRadius: 24, marginBottom: 15 },
-  pieceTitle: { fontSize: 20, fontWeight: '900', color: '#0F172A', marginBottom: 8 },
-  piecePara: { fontSize: 16, lineHeight: 26, color: '#475569' },
-  mapWrap: { marginTop: 10 },
-  mapBox: { height: 350, borderRadius: 28, overflow: 'hidden', borderWidth: 1, borderColor: '#F1F5F9' },
-  mapWebView: { width: '100%', height: '100%' },
-  loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  sectionTabRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
-  tabBtn: { flex: 1, paddingVertical: 12, backgroundColor: '#F8FAFC', borderRadius: 16, alignItems: 'center', borderWidth: 1, borderColor: '#E2E8F0' },
-  tabActive: { backgroundColor: '#3B82F6', borderColor: '#3B82F6' },
-  tabActiveQuiz: { backgroundColor: '#FF6B2C', borderColor: '#FF6B2C' },
-  tabText: { fontSize: 13, fontWeight: '700', color: '#64748B' },
-  tabTextActive: { color: '#FFF' },
-  quizCard: { height: 350, backgroundColor: '#FFF7ED', borderRadius: 28, alignItems: 'center', justifyContent: 'center', padding: 30 },
-  quizTitle: { fontSize: 20, fontWeight: '900', color: '#1E293B', marginBottom: 15 },
-  quizStartBtn: { backgroundColor: '#FF6B2C', paddingHorizontal: 24, paddingVertical: 14, borderRadius: 16 },
-  quizStartBtnText: { color: '#FFF', fontSize: 16, fontWeight: '800' }
+  container: { flex: 1, backgroundColor: '#F8FAFC' },
+  loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFF' },
+  topNav: {
+    position: 'absolute',
+    left: s(20),
+    right: s(20),
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    zIndex: 100
+  },
+  iconBtn: {
+    width: s(40),
+    height: s(40),
+    borderRadius: s(20),
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  heroWrapper: { width: width, height: HERO_HEIGHT, backgroundColor: '#E2E8F0' },
+  heroImg: { width: '100%', height: '100%' },
+  heroOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.1)' },
+  contentArea: {
+    paddingHorizontal: s(20),
+    paddingTop: vs(30),
+    backgroundColor: '#FFF',
+    borderTopLeftRadius: s(36),
+    borderTopRightRadius: s(36),
+    marginTop: vs(-30),
+    minHeight: height - HERO_HEIGHT + vs(30),
+  },
+  titleBox: { marginBottom: vs(20), paddingHorizontal: s(5) },
+  mainTitle: { fontSize: ms(24), fontWeight: '900', color: '#1E293B', lineHeight: ms(32) },
+  locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: vs(6), gap: s(4) },
+  locationLabel: { fontSize: ms(13), color: '#64748B', fontWeight: '500' },
+
+  tabHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#F1F5F9',
+    borderRadius: s(16),
+    padding: s(4),
+    marginBottom: vs(20)
+  },
+  tabItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: vs(10),
+    gap: s(8),
+    borderRadius: s(12),
+  },
+  tabItemActive: { backgroundColor: '#FFF', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4 },
+  tabLabel: { fontSize: ms(14), fontWeight: '700', color: '#64748B' },
+  tabLabelActive: { color: '#1E293B' },
+
+  tabContent: { marginTop: vs(10) },
+  galleryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: s(2),
+    marginBottom: vs(25)
+  },
+  galleryItem: {
+    width: (width - s(40) - s(15)) / 2,
+    height: vs(130),
+    borderRadius: s(16),
+    overflow: 'hidden',
+    marginBottom: vs(12)
+  },
+  gridImg: { width: '100%', height: '100%' },
+
+  contentPiece: { marginBottom: vs(25) },
+  blockPic: { width: '100%', height: vs(220), borderRadius: s(24), marginBottom: vs(15) },
+  pieceTitle: { fontSize: ms(18), fontWeight: '900', color: '#1E293B', marginBottom: vs(8) },
+  piecePara: { fontSize: ms(15), lineHeight: ms(24), color: '#475569', textAlign: 'justify', marginBottom: vs(15) },
+
+  quizCard: {
+    backgroundColor: '#FFF7ED',
+    borderRadius: s(28),
+    padding: s(24),
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#FFEDD5',
+    marginTop: vs(20)
+  },
+  quizIconBg: {
+    width: s(64),
+    height: s(64),
+    borderRadius: s(32),
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: vs(16),
+    elevation: 2,
+    shadowColor: '#FF6B2C',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  quizTitle: { fontSize: ms(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(4) },
+  quizSub: { fontSize: ms(14), color: '#64748B', marginBottom: vs(20), textAlign: 'center' },
+  quizStartBtn: {
+    backgroundColor: '#FF6B2C',
+    paddingHorizontal: s(32),
+    paddingVertical: vs(14),
+    borderRadius: s(16),
+    elevation: 4,
+    shadowColor: '#FF6B2C',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  },
+  quizStartBtnText: { color: '#FFF', fontSize: ms(16), fontWeight: '800' }
 });
