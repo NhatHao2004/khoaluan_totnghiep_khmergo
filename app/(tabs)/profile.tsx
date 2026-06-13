@@ -6,18 +6,20 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
-  Dimensions,
-  Image,
+  ActivityIndicator,
   Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Image } from 'expo-image';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { s, vs, ms } from '../../utils/responsive';
 import Animated, { Easing, FadeInUp, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 
 type MenuItem = {
@@ -38,10 +40,49 @@ const menuItems: MenuItem[] = [
 ];
 
 
+// --- Memoized Sub-components ---
+
+const MenuItemComp = React.memo(({ item, index, isLast, isGuestOrLoggingOut, onPress, t }: any) => {
+  const iconColor = isGuestOrLoggingOut && item.id !== 'login' ? '#94A3B8' : (item.color || '#555');
+  const titleColor = isGuestOrLoggingOut && item.id !== 'login' ? '#94A3B8' : (item.color ? item.color : '#1A1A1A');
+  const chevronColor = isGuestOrLoggingOut && item.id !== 'login' ? '#E2E8F0' : (item.color || '#CCC');
+
+  return (
+    <TouchableOpacity
+      style={[
+        styles.menuItem,
+        !isLast && styles.menuItemBorder,
+        isGuestOrLoggingOut && item.id !== 'login' && { opacity: 0.5 }
+      ]}
+      onPress={() => onPress(item.id)}
+      activeOpacity={0.6}
+    >
+      <Ionicons
+        name={item.icon as any}
+        size={ms(22)}
+        color={iconColor}
+        style={[
+          styles.menuIcon,
+          item.id === 'login' && { marginLeft: s(3), marginRight: s(12) }
+        ]}
+      />
+      <Text style={[styles.menuTitle, { color: titleColor }]} numberOfLines={1}>
+        {t(item.titleKey)}
+      </Text>
+      <Ionicons
+        name="chevron-forward"
+        size={ms(18)}
+        color={chevronColor}
+      />
+    </TouchableOpacity>
+  );
+});
+
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
   const router = useRouter();
   const { t } = useLanguage();
+  const insets = useSafeAreaInsets();
   const [userRank, setUserRank] = useState<string | number>('---');
   const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
   const [isLoginRequiredVisible, setLoginRequiredVisible] = useState(false);
@@ -49,7 +90,7 @@ export default function ProfileScreen() {
   const lastFetchTime = useRef<number>(0);
 
   // Animation for Logout Modal
-  const logoutX = useSharedValue(SCREEN_WIDTH);
+  const logoutX = useSharedValue(Platform.OS === 'web' ? 0 : 400); // Using 400 as a safe off-screen value
 
   React.useEffect(() => {
     if (isLogoutModalVisible) {
@@ -58,15 +99,15 @@ export default function ProfileScreen() {
         easing: Easing.out(Easing.poly(4)),
       });
     } else {
-      logoutX.value = SCREEN_WIDTH;
+      logoutX.value = withTiming(400, { duration: 250 });
     }
   }, [isLogoutModalVisible]);
 
   const animatedLogoutStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: logoutX.value }]
+    transform: [{ translateY: logoutX.value }]
   }));
 
-  const fetchRank = async (force = false) => {
+  const fetchRank = React.useCallback(async (force = false) => {
     if (!user || user.isAnonymous) {
       if (userRank !== 0) setUserRank(0);
       return;
@@ -81,85 +122,99 @@ export default function ProfileScreen() {
       const users = await getLeaderboardUsers(100);
       const index = users.findIndex(u => u.uid === user.uid);
       const newRank = index !== -1 ? index + 1 : '>100';
-      if (newRank !== userRank) {
-        setUserRank(newRank);
-      }
+      setUserRank(newRank);
       lastFetchTime.current = Date.now();
     } catch (error) {
       console.log('Error fetching rank:', error);
       setUserRank('---');
     }
-  };
+  }, [user?.uid, userRank]);
 
   useFocusEffect(
     React.useCallback(() => {
       fetchRank();
-    }, [user?.uid])
+    }, [fetchRank])
   );
 
 
-  const handleLogout = () => {
+  const handleLogout = React.useCallback(() => {
     setLogoutModalVisible(true);
-  };
+  }, []);
 
-  const confirmLogout = async () => {
+  const confirmLogout = React.useCallback(async () => {
     setLogoutModalVisible(false);
     setIsLoggingOut(true);
     await logout();
     router.replace({ pathname: '/(tabs)', params: { toast: 'logout_success' } });
-  };
+  }, [logout, router]);
 
-  const handleMenuPress = (id: string) => {
+  const handleMenuPress = React.useCallback((id: string) => {
     const isGuest = !user || user.isAnonymous;
-    // Nếu chưa đăng nhập (hoặc là khách), chỉ cho phép nhấn vào 'login' và một số mục công khai
-    if (isGuest && id !== 'login') {
+    if (isGuest && id !== 'login' && id !== 'settings' && id !== 'support') {
       setLoginRequiredVisible(true);
       return;
     }
 
-    if (id === 'logout') handleLogout();
-    else if (id === 'login') router.push('/login');
-    else if (id === 'personal-info') router.push('/(tabs)/personal-info');
-    else if (id === 'favorites') router.push('/(tabs)/favorites');
-    else if (id === 'medal') router.push('/(tabs)/medal');
-    else if (id === 'support') router.push('/(tabs)/support');
-    else if (id === 'settings') router.push('/(tabs)/settings');
-  };
+    switch (id) {
+      case 'logout': handleLogout(); break;
+      case 'login': router.push('/login'); break;
+      case 'personal-info': router.push('/(tabs)/personal-info'); break;
+      case 'favorites': router.push('/(tabs)/favorites'); break;
+      case 'medal': router.push('/(tabs)/medal'); break;
+      case 'support': router.push('/(tabs)/support'); break;
+      case 'settings': router.push('/(tabs)/settings'); break;
+    }
+  }, [user, handleLogout, router]);
 
 
-  // Lọc các menu item dựa trên trạng thái đăng nhập
-  const filteredMenuItems = menuItems.filter(item => {
-    const isGuest = !user || user.isAnonymous;
-    if (item.id === 'logout') return !isGuest && !isLoggingOut;
-    if (item.id === 'login') return isGuest || isLoggingOut;
-    return true;
-  });
+  // Optimized Menu Items Filtering
+  const filteredMenuItems = React.useMemo(() => {
+    return menuItems.filter(item => {
+      const isGuest = !user || user.isAnonymous;
+      if (item.id === 'logout') return !isGuest && !isLoggingOut;
+      if (item.id === 'login') return isGuest || isLoggingOut;
+      return true;
+    });
+  }, [user, isLoggingOut]);
 
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle} numberOfLines={1}>{t('my_profile')}</Text>
+        <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>{t('my_profile')}</Text>
       </View>
 
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: insets.bottom + vs(20) }}
+      >
         <Animated.View entering={FadeInUp.springify().damping(20).duration(600)}>
           {/* Profile Card */}
           <View style={styles.profileCard}>
             {/* Avatar */}
             <View style={styles.avatarWrapper}>
-              {user?.avatar ?
+              {user?.avatar && (user && !user.isAnonymous && !isLoggingOut) ?
                 (
-                  <Image source={{ uri: user.avatar }} style={styles.avatar} />
+                  <Image 
+                    source={{ uri: user.avatar }} 
+                    style={styles.avatar} 
+                    contentFit="cover"
+                    transition={300}
+                  />
                 ) : (
-                  <Ionicons name="person-circle-outline" size={115} color="#000000ff" />
+                  <Ionicons name="person-circle-outline" size={ms(115)} color="#1e293b" />
                 )}
             </View>
 
             {/* Info */}
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>{(user && !user.isAnonymous && !isLoggingOut) ? user?.name : t('guest')}</Text>
+              <Text style={styles.profileName} numberOfLines={1} adjustsFontSizeToFit>
+                {(user && !user.isAnonymous && !isLoggingOut) ? user?.name : t('guest')}
+              </Text>
+              {(user && !user.isAnonymous && !isLoggingOut) && user?.email && (
+                <Text style={styles.profileEmail} numberOfLines={1} adjustsFontSizeToFit>{user.email}</Text>
+              )}
             </View>
           </View>
         </Animated.View>
@@ -167,41 +222,17 @@ export default function ProfileScreen() {
         {/* Menu List */}
         <View style={styles.menuList}>
           {filteredMenuItems.map((item, index) => (
-            <TouchableOpacity
+            <MenuItemComp
               key={item.id}
-              style={[
-                styles.menuItem,
-                index < filteredMenuItems.length - 1 && styles.menuItemBorder,
-                (!user || user.isAnonymous || isLoggingOut) && item.id !== 'login' && { opacity: 0.5 }
-              ]}
-              onPress={() => handleMenuPress(item.id)}
-              activeOpacity={0.6}
-            >
-              <Ionicons
-                name={item.icon as any}
-                size={22}
-                color={((!user || user.isAnonymous || isLoggingOut) && item.id !== 'login') ? '#94A3B8' : (item.color || '#555')}
-                style={[
-                  styles.menuIcon,
-                  item.id === 'login' && { marginLeft: 3, marginRight: 12 }
-                ]}
-              />
-              <Text style={[
-                styles.menuTitle,
-                ((!user || user.isAnonymous || isLoggingOut) && item.id !== 'login') ? { color: '#94A3B8' } : (item.color ? { color: item.color } : {})
-              ]}>
-                {t(item.titleKey)}
-              </Text>
-              <Ionicons
-                name="chevron-forward"
-                size={18}
-                color={((!user || user.isAnonymous || isLoggingOut) && item.id !== 'login') ? '#E2E8F0' : (item.color || '#CCC')}
-              />
-            </TouchableOpacity>
+              item={item}
+              index={index}
+              isLast={index === filteredMenuItems.length - 1}
+              isGuestOrLoggingOut={(!user || user.isAnonymous || isLoggingOut)}
+              onPress={handleMenuPress}
+              t={t}
+            />
           ))}
         </View>
-
-        <View style={{ height: 40 }} />
       </ScrollView>
 
       {/* Custom Login Modal */}
@@ -212,12 +243,12 @@ export default function ProfileScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setLoginRequiredVisible(false)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+        <View style={styles.loginModalOverlay}>
           <View style={styles.loginModalContent}>
             <View style={styles.loginModalIconCircle}>
-              <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
+              <Ionicons name="person-circle-outline" size={ms(40)} color="#3B82F6" />
             </View>
-            <Text style={styles.loginModalTitle}>{t('login_required')}</Text>
+            <Text style={styles.loginModalTitle} numberOfLines={1}>{t('login_required')}</Text>
             <Text style={styles.loginModalSub}>{t('login_to_use')}</Text>
 
             <View style={styles.loginModalActionRow}>
@@ -249,13 +280,22 @@ export default function ProfileScreen() {
         onRequestClose={() => setLogoutModalVisible(false)}
         statusBarTranslucent
       >
-        <View
-          style={styles.modalOverlay}
-        >
-          <Animated.View style={[styles.logoutContent, animatedLogoutStyle]}>
-
-
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity 
+            style={StyleSheet.absoluteFill} 
+            activeOpacity={1} 
+            onPress={() => setLogoutModalVisible(false)} 
+          />
+          <Animated.View style={[
+            styles.logoutContent, 
+            animatedLogoutStyle,
+            { paddingBottom: Math.max(insets.bottom, vs(30)) }
+          ]}>
+            <View style={styles.modalHandle} />
             <View style={styles.logoutHeader}>
+              <View style={styles.logoutIconCircle}>
+                <Ionicons name="log-out-outline" size={ms(34)} color="#FF4D4D" />
+              </View>
               <Text style={styles.logoutMsg}>{t('logout_confirm_msg')}</Text>
             </View>
 
@@ -285,130 +325,87 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    paddingTop: 40,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 0,
-    paddingBottom: 5,
-    minHeight: 60,
-  },
-
-  notifBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 15,
-    backgroundColor: '#ffffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loginTextBtn: {
-    paddingHorizontal: 15,
-    paddingVertical: 6,
-    borderRadius: 15,
-    backgroundColor: '#00CFA3',
-    marginTop: 10,
-    alignSelf: 'center',
-  },
-
-
-  loginTextBtnLabel: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#ffffffff',
-    lineHeight: 18,
+    paddingHorizontal: s(20),
+    minHeight: vs(60),
+    paddingBottom: vs(10),
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: ms(22),
     fontWeight: '800',
-    color: '#000000ff',
-    lineHeight: 32,
-    paddingVertical: 5,
-    paddingRight: 5,
+    color: '#1e293b',
     textAlign: 'center',
   },
-
 
   // Profile Card
   profileCard: {
-    flexDirection: 'column', // Changed from row to center vertically
+    flexDirection: 'column',
     alignItems: 'center',
-    paddingHorizontal: 33,
-    paddingTop: 0, // Increased top padding
-    paddingBottom: 0, // Increased bottom padding
-    gap: 15,
+    paddingHorizontal: s(33),
+    paddingVertical: vs(20),
+    gap: vs(15),
   },
   avatarWrapper: {
     position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
   },
   avatar: {
-    width: 115,
-    height: 115,
-    borderRadius: 60,
-  },
-  cameraBtn: {
-    position: 'absolute',
-    bottom: 2,
-    right: 2,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#555',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#FFF',
+    width: s(115),
+    height: s(115),
+    borderRadius: s(60),
+    backgroundColor: '#f1f5f9',
   },
   profileInfo: {
-    alignItems: 'center', // Center text horizontally
-    gap: 0,
+    alignItems: 'center',
+    gap: vs(4),
+    width: '100%',
   },
   profileName: {
-    fontSize: 24,
+    fontSize: ms(24),
     fontWeight: '800',
-    color: '#1A1A1A',
-    marginBottom: 5,
-    lineHeight: 32,
-    paddingRight: 5,
+    color: '#1e293b',
     textAlign: 'center',
+    lineHeight: ms(32),
   },
   profileEmail: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 0,
-    lineHeight: 20,
+    fontSize: ms(14),
+    color: '#64748b',
     textAlign: 'center',
+    lineHeight: ms(20),
   },
-
 
   // Menu
   menuList: {
-    paddingHorizontal: 24,
-    paddingTop: 5,
+    paddingHorizontal: s(24),
+    paddingTop: vs(10),
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: vs(20),
   },
   menuItemBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: '#F1F5F9',
   },
   menuIcon: {
-    marginRight: 15,
-    width: 24,
+    marginRight: s(15),
+    width: s(24),
+    textAlign: 'center',
   },
   menuTitle: {
     flex: 1,
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#1A1A1A',
-    lineHeight: 23,
-    paddingRight: 5,
+    fontSize: ms(16),
+    fontWeight: '600',
+    lineHeight: ms(23),
   },
 
   // Logout Bottom Sheet Styles
@@ -419,12 +416,10 @@ const styles = StyleSheet.create({
   },
   logoutContent: {
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingHorizontal: 25,
-    paddingBottom: 40,
-    paddingTop: 10,
-    // Add shadow for white sheet
+    borderTopLeftRadius: s(30),
+    borderTopRightRadius: s(30),
+    paddingHorizontal: s(25),
+    paddingTop: vs(20),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.1,
@@ -432,143 +427,133 @@ const styles = StyleSheet.create({
     elevation: 20,
   },
   modalHandle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
+    width: s(40),
+    height: vs(4),
+    borderRadius: vs(2),
     backgroundColor: '#E5E7EB',
     alignSelf: 'center',
-    marginBottom: 25,
+    marginBottom: vs(10),
   },
   logoutHeader: {
     alignItems: 'center',
-    marginBottom: 30,
-    paddingTop: 20,
+    marginBottom: vs(30),
+    paddingTop: vs(15),
   },
   logoutIconCircle: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: 'rgba(255, 77, 77, 0.1)',
+    width: s(70),
+    height: s(70),
+    borderRadius: s(35),
+    backgroundColor: '#fef2f2',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 15,
-  },
-  logoutTitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#FFF',
-    marginBottom: 8,
+    marginBottom: vs(15),
   },
   logoutMsg: {
-    fontSize: 16,
-    color: '#1A1A1A',
+    fontSize: ms(17),
+    color: '#1e293b',
     textAlign: 'center',
-    lineHeight: 24,
-    fontWeight: '500',
+    lineHeight: ms(26),
+    fontWeight: '600',
+    paddingHorizontal: s(10),
   },
   logoutActionRow: {
-    gap: 12,
+    gap: vs(12),
+    width: '100%',
   },
   confirmLogoutBtn: {
-    height: 56,
-    borderRadius: 16,
+    height: vs(56),
+    borderRadius: s(16),
     backgroundColor: '#FF4D4D',
     justifyContent: 'center',
     alignItems: 'center',
   },
   confirmLogoutText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: ms(16),
     fontWeight: '800',
-    lineHeight: 28,
   },
   cancelLogoutBtn: {
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: '#1877F2',
+    height: vs(56),
+    borderRadius: s(16),
+    backgroundColor: '#f1f5f9',
     justifyContent: 'center',
     alignItems: 'center',
   },
   cancelLogoutText: {
-    color: '#FFF',
-    fontSize: 16,
+    color: '#475569',
+    fontSize: ms(16),
     fontWeight: '800',
-    lineHeight: 28,
   },
 
-  // Login Required Modal (centered card)
+  // Login Required Modal
+  loginModalOverlay: { 
+    flex: 1, 
+    backgroundColor: 'rgba(0,0,0,0.7)', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    padding: s(24) 
+  },
   loginModalContent: {
     backgroundColor: '#FFF',
-    borderRadius: 32,
-    padding: 30,
+    borderRadius: s(32),
+    padding: s(30),
     width: '100%',
     maxWidth: 340,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-    elevation: 10,
   },
   loginModalIconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: s(80),
+    height: s(80),
+    borderRadius: s(40),
     backgroundColor: '#EFF6FF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: vs(20),
     borderWidth: 1,
     borderColor: '#DBEAFE',
   },
   loginModalTitle: {
-    fontSize: 20,
+    fontSize: ms(20),
     fontWeight: '900',
-    color: '#1E293B',
-    marginBottom: 8,
+    color: '#1e293b',
+    marginBottom: vs(8),
     textAlign: 'center',
   },
   loginModalSub: {
-    fontSize: 15,
-    color: '#64748B',
+    fontSize: ms(15),
+    color: '#64748b',
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 24,
+    lineHeight: ms(22),
+    marginBottom: vs(24),
   },
   loginModalActionRow: {
     width: '100%',
-    gap: 12,
+    gap: vs(12),
   },
   loginModalPrimaryBtn: {
     backgroundColor: '#3B82F6',
-    height: 56,
-    borderRadius: 18,
+    height: vs(56),
+    borderRadius: s(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
   },
   loginModalPrimaryBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: ms(16),
     fontWeight: '800',
   },
   loginModalSecondaryBtn: {
-    backgroundColor: '#EF4444',
-    height: 56,
-    borderRadius: 18,
+    backgroundColor: '#f1f5f9',
+    height: vs(56),
+    borderRadius: s(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
   loginModalSecondaryBtnText: {
-    color: '#FFF',
-    fontSize: 16,
+    color: '#475569',
+    fontSize: ms(16),
     fontWeight: '800',
-    lineHeight: 28,
   },
 });
