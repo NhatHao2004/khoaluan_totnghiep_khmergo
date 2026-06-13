@@ -2,11 +2,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -21,7 +21,6 @@ import Animated, { FadeInDown, FadeInUp, interpolate, useAnimatedStyle, useShare
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../../contexts/AuthContext';
 import { auth, db } from '../../utils/firebaseConfig';
-import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
 import { ms, s, vs } from '../../utils/responsive';
 
 const AdminProfile = () => {
@@ -287,24 +286,6 @@ const AdminProfile = () => {
 
           {/* Detail List */}
           <Animated.View entering={FadeInDown.delay(200).duration(600)} style={styles.detailsList}>
-            <View style={styles.detailItem}>
-              <View style={[styles.detailIcon, { backgroundColor: '#f1f5f9' }]}>
-                <Ionicons name="person-outline" size={ms(20)} color="#1e293b" />
-              </View>
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Họ và tên</Text>
-                {isEditing ? (
-                  <TextInput
-                    style={styles.valueInput}
-                    value={name}
-                    onChangeText={setName}
-                    placeholder="Nhập họ tên..."
-                  />
-                ) : (
-                  <Text style={styles.detailValue}>{name || 'Chưa đặt tên'}</Text>
-                )}
-              </View>
-            </View>
 
             <View style={styles.detailItem}>
               <View style={[styles.detailIcon, { backgroundColor: '#f1f5f9' }]}>
@@ -343,7 +324,7 @@ const AdminProfile = () => {
           </View>
 
           <View style={styles.actionList}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.actionItem}
               onPress={() => setChangePassModalVisible(true)}
             >
@@ -354,7 +335,7 @@ const AdminProfile = () => {
               <Ionicons name="chevron-forward" size={ms(18)} color="#cbd5e1" />
             </TouchableOpacity>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.actionItem}
               onPress={() => router.push('/(admin)/trash' as any)}
             >
@@ -373,8 +354,8 @@ const AdminProfile = () => {
               <Ionicons name="chevron-forward" size={ms(18)} color="#cbd5e1" />
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={[styles.actionItem, { marginTop: vs(20) }]} 
+            <TouchableOpacity
+              style={[styles.actionItem, { marginTop: vs(20) }]}
               onPress={() => setLogoutModalVisible(true)}
             >
               <View style={[styles.actionIcon, { backgroundColor: '#fef2f2' }]}>
@@ -433,7 +414,7 @@ const AdminProfile = () => {
           </View>
         </TouchableOpacity>
       </Modal>
- 
+
       {/* Change Password Modal */}
       <Modal
         visible={changePassModalVisible}
@@ -448,7 +429,7 @@ const AdminProfile = () => {
         >
           <View style={styles.passwordBox}>
             <Text style={styles.modalTitle}>Đổi mật khẩu</Text>
-            
+
             <Text style={styles.modalInputLabel}>Mật khẩu hiện tại</Text>
             <TextInput
               style={styles.modalInput}
@@ -457,7 +438,7 @@ const AdminProfile = () => {
               onChangeText={setCurrentPassword}
               placeholder="Nhập mật khẩu hiện tại..."
             />
-            
+
             <Text style={styles.modalInputLabel}>Mật khẩu mới</Text>
             <TextInput
               style={styles.modalInput}
@@ -466,7 +447,7 @@ const AdminProfile = () => {
               onChangeText={setNewPassword}
               placeholder="Nhập mật khẩu mới..."
             />
-            
+
             <Text style={styles.modalInputLabel}>Xác nhận mật khẩu mới</Text>
             <TextInput
               style={styles.modalInput}
@@ -475,7 +456,7 @@ const AdminProfile = () => {
               onChangeText={setConfirmPassword}
               placeholder="Xác nhận lại mật khẩu..."
             />
- 
+
             <View style={styles.modalButtonRow}>
               <TouchableOpacity
                 style={[styles.modalBtn, { backgroundColor: '#ef4444' }]}
@@ -483,7 +464,7 @@ const AdminProfile = () => {
               >
                 <Text style={[styles.modalBtnText, { color: '#fff' }]}>Hủy</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 style={[styles.modalBtn, { backgroundColor: '#3b82f6' }]}
                 onPress={handleChangePassword}
