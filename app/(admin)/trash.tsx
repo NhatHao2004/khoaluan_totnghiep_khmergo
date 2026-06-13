@@ -38,7 +38,7 @@ const TrashItem = memo(({ item, onRestore, onDelete, getImageSource }: any) => {
       </View>
 
       <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{item.name || item.title || 'Không có tên'}</Text>
+        <Text style={styles.cardTitle} numberOfLines={1} adjustsFontSizeToFit>{item.name || item.title || 'Không có tên'}</Text>
 
         <View style={styles.divider} />
 
@@ -48,7 +48,7 @@ const TrashItem = memo(({ item, onRestore, onDelete, getImageSource }: any) => {
             onPress={() => onRestore(item)}
           >
             <Ionicons name="refresh-outline" size={ms(20)} color="#3b82f6" />
-            <Text style={styles.restoreBtnText}>Khôi phục</Text>
+            <Text style={styles.restoreBtnText} numberOfLines={1} adjustsFontSizeToFit>Khôi phục</Text>
           </TouchableOpacity>
 
           <View style={styles.footerRight}>
@@ -201,7 +201,7 @@ const TrashManagement = () => {
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Ionicons name="trash-bin-outline" size={ms(80)} color="#e2e8f0" />
-              <Text style={styles.emptyText}>Thùng rác trống</Text>
+              <Text style={styles.emptyText} numberOfLines={1} adjustsFontSizeToFit>Thùng rác trống</Text>
             </View>
           }
         />
@@ -214,17 +214,17 @@ const TrashManagement = () => {
             <View style={styles.confirmIconBg}>
               <Ionicons name="trash" size={ms(34)} color="#ef4444" />
             </View>
-            <Text style={styles.modalTitle}>Xóa vĩnh viễn</Text>
-            <Text style={styles.confirmSubText}>
+            <Text style={styles.modalTitle} numberOfLines={1} adjustsFontSizeToFit>Xóa vĩnh viễn</Text>
+            <Text style={styles.confirmSubText} numberOfLines={2} adjustsFontSizeToFit>
               Bạn có chắc chắn muốn xóa vĩnh viễn{"\n"}
               Thao tác này <Text style={{ color: '#ef4444', fontWeight: '700' }}>không thể hoàn tác</Text>
             </Text>
             <View style={styles.modalActions}>
               <TouchableOpacity style={[styles.btnAction, { backgroundColor: '#3b82f6' }]} onPress={() => setDeleteConfirmVisible(false)}>
-                <Text style={styles.btnText}>Hủy bỏ</Text>
+                <Text style={styles.btnText} numberOfLines={1} adjustsFontSizeToFit>Hủy bỏ</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.btnAction, { backgroundColor: '#ef4444' }]} onPress={confirmPermanentDelete}>
-                <Text style={styles.btnText}>Xác nhận</Text>
+                <Text style={styles.btnText} numberOfLines={1} adjustsFontSizeToFit>Xác nhận</Text>
               </TouchableOpacity>
             </View>
           </View>
