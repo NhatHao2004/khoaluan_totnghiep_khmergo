@@ -59,6 +59,8 @@ const UsersActivity = () => {
         });
 
       setUsers(usersData);
+    }, (err) => {
+      console.error('Snapshot users activity error:', err);
     });
 
     return () => unsub();

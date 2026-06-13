@@ -145,22 +145,22 @@ const AdminDashboard = () => {
         return data.role !== 'Quản trị viên' && data['quyền'] !== 'Quản trị viên';
       });
       setStats(prev => ({ ...prev, users: regularUsers.length }));
-    });
+    }, (err) => console.error('Snapshot users error:', err));
 
     // Lấy số lượng địa điểm/nội dung
     onSnapshot(collection(db, 'destinations'), (snap) => {
       setStats(prev => ({ ...prev, content: snap.size }));
-    });
+    }, (err) => console.error('Snapshot destinations error:', err));
 
     // Lấy số lượng thử thách
     onSnapshot(collection(db, 'quizzes'), (snap) => {
       setStats(prev => ({ ...prev, challenges: snap.size }));
-    });
+    }, (err) => console.error('Snapshot quizzes error:', err));
 
     // Lấy số lượng bài viết
     onSnapshot(collection(db, 'posts'), (snap) => {
       setStats(prev => ({ ...prev, posts: snap.size }));
-    });
+    }, (err) => console.error('Snapshot posts error:', err));
 
     // Lấy bảng xếp hạng
     onSnapshot(collection(db, 'users'), (snap) => {
@@ -171,7 +171,7 @@ const AdminDashboard = () => {
 
       const sortedUsers = allUsers.sort((a: any, b: any) => (b.points || 0) - (a.points || 0));
       setAllSortedUsers(sortedUsers);
-    });
+    }, (err) => console.error('Snapshot leaderboard error:', err));
 
     // Lấy hoạt động gần đây
     const unsubRecent = onSnapshot(collection(db, 'users'), (snap) => {
@@ -199,7 +199,7 @@ const AdminDashboard = () => {
       }));
 
       setRecentActivities(activities);
-    });
+    }, (err) => console.error('Snapshot recent activities error:', err));
 
     let unsubAdmin: any;
     if (user?.uid) {
@@ -208,7 +208,7 @@ const AdminDashboard = () => {
           const data = docSnap.data();
           setAdminName(data.name || data['tên'] || '');
         }
-      });
+      }, (err) => console.error('Snapshot admin context error:', err));
     }
     return () => {
       unsubUsers();
@@ -261,15 +261,20 @@ const AdminDashboard = () => {
       });
       const unrepliedCount = unrepliedList.length;
 
-      setRecentFeedbacks(sorted.slice(0, 10));
+      const onlyUnreplied = sorted.filter((f: any) => {
+        const reply = f.adminReply;
+        return reply === null || reply === undefined || reply === '' || (typeof reply === 'string' && reply.trim() === '');
+      });
+
+      setRecentFeedbacks(onlyUnreplied.slice(0, 15));
 
       setPendingFeedback(prev => {
         if (unrepliedCount > prev && prev !== 0) {
-          triggerToast(`Bạn có phản hồi mới từ người dùng!`, 'info');
+          triggerToast(`Bạn có phản hồi mới từ người dùng`, 'info');
         }
         return unrepliedCount;
       });
-    });
+    }, (err) => console.error('Snapshot feedback error:', err));
 
     return () => unsubFeedback();
   }, [triggerToast]);

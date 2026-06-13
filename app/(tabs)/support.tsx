@@ -145,7 +145,7 @@ export default function SupportScreen() {
 
     try {
       await deleteDoc(doc(db, 'feedback', id));
-      showToast('Đã xóa phản hồi', 'success');
+      showToast('Đã xóa nội dung phản hồi', 'success');
       setDeletingId(null);
     } catch (error) {
       console.error('Error deleting feedback:', error);
@@ -502,17 +502,14 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   systemReplyBox: {
-    backgroundColor: '#E0F2FE',
+    backgroundColor: '#eff6ff',
     padding: 16,
     borderRadius: 16,
     marginTop: 14,
     borderLeftWidth: 4,
-    borderLeftColor: '#0284C7',
-    shadowColor: '#0284C7',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderLeftColor: '#3b82f6',
+    borderWidth: 1,
+    borderColor: '#dbeafe',
   },
   systemReplyHeader: {
     flexDirection: 'row',

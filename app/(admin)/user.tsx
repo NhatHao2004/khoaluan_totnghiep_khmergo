@@ -144,6 +144,9 @@ const UserManagement = () => {
       });
       setUsers(allUsers);
       setLoading(false);
+    }, (err) => {
+      console.error('Snapshot users error:', err);
+      setLoading(false);
     });
 
     return () => unsub();
@@ -405,7 +408,7 @@ const UserManagement = () => {
                 onPress={handleSendReply}
                 disabled={sendingReply || !replyMessage.trim()}
               >
-                {sendingReply ? <ActivityIndicator color="#fff" size="small" /> : <Text style={styles.confirmReplyText}>Gửi trả lời</Text>}
+                {sendingReply ? <ActivityIndicator color="#fff" size="small" /> : <Text style={styles.confirmReplyText}>Gửi phản hồi</Text>}
               </TouchableOpacity>
             </View>
           </View>
