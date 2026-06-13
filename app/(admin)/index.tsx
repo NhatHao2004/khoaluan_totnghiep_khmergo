@@ -522,37 +522,13 @@ const AdminDashboard = () => {
               ) : (
                 <View style={styles.emptyFeedback}>
                   <View style={styles.emptyIconCircle}>
-                    <Ionicons name="chatbubble-ellipses-outline" size={ms(60)} color="#e2e8f0" />
+                    <Ionicons name="chatbox-ellipses-outline" size={ms(50)} color="#94a3b8" />
                   </View>
-                  <Text style={styles.emptyFeedbackText}>Chưa có phản hồi nào</Text>
+                  <Text style={styles.emptyFeedbackText}>Chưa có phản hồi mới nào từ người dùng</Text>
                 </View>
               )}
             </ScrollView>
           </View>
-
-          {/* Toast System inside Feedback List Modal */}
-          {showToast && (
-            <Animated.View
-              style={[
-                styles.toastContainer,
-                animatedToastStyle,
-                {
-                  backgroundColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
-                  shadowColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
-                  top: insets.top,
-                }
-              ]}
-            >
-              <View style={styles.toastIcon}>
-                <Ionicons
-                  name={toastType === 'success' ? "checkmark" : toastType === 'info' ? "notifications" : "close"}
-                  size={ms(20)}
-                  color="#FFF"
-                />
-              </View>
-              <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
-            </Animated.View>
-          )}
         </TouchableOpacity>
       </Modal>
 

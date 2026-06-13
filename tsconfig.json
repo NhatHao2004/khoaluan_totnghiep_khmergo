@@ -6,7 +6,10 @@
       "@/*": [
         "./*"
       ]
-    }
+    },
+    "jsx": "react-native",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler"
   },
   "include": [
     "**/*.ts",
