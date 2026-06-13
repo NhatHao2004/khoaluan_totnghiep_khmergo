@@ -10,8 +10,8 @@ const { width } = Dimensions.get('window');
 
 import { HapticTab } from '@/components/haptic-tab';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
-import { s, vs, ms } from '@/utils/responsive';
 
 // Prevent native splash screen from auto-hiding
 
@@ -72,7 +72,7 @@ export default function TabsLayout() {
     const showTooltip = () => {
       tooltipOpacity.value = withTiming(1, { duration: 600 });
       tooltipSlideX.value = withTiming(0, { duration: 600 });
-      
+
       setTimeout(() => {
         tooltipOpacity.value = withTiming(0, { duration: 600 });
         tooltipSlideX.value = withTiming(20, { duration: 600 });
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
   },
   tooltipText: {
     color: '#FFFFFF',
-    fontSize: ms(13),
+    fontSize: ms(12),
     fontWeight: '700',
     textAlign: 'center',
   },
