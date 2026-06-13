@@ -212,7 +212,7 @@ const ContentManagement = () => {
         ) : (
           <View style={styles.imagePickerPlaceholder}>
             <Ionicons name="image-outline" size={ms(32)} color="#94a3b8" />
-            <Text style={styles.imagePickerText}>Nhấn để chọn ảnh</Text>
+            <Text style={styles.imagePickerText} numberOfLines={1} adjustsFontSizeToFit>Nhấn để chọn ảnh</Text>
           </View>
         )}
       </TouchableOpacity>
@@ -229,6 +229,8 @@ const ContentManagement = () => {
   const [dLocKm, setDLocKm] = useState('');
   const [dDesc, setDDesc] = useState('');
   const [dDescKm, setDDescKm] = useState('');
+  const [dSubDesc, setDSubDesc] = useState('');
+  const [dSubDescKm, setDSubDescKm] = useState('');
   const [dImg, setDImg] = useState('');
   const [dImg1, setDImg1] = useState('');
   const [dImg2, setDImg2] = useState('');
@@ -319,6 +321,8 @@ const ContentManagement = () => {
         location_khmer: dLocKm,
         description: dDesc,
         description_khmer: dDescKm,
+        subDescription: dSubDesc,
+        subDescription_khmer: dSubDescKm,
         imageUrl: dImg,
         imageUrl1: dImg1,
         imageUrl2: dImg2,
@@ -519,7 +523,8 @@ const ContentManagement = () => {
               setTopicModalVisible(true);
             } else {
               setEditingDest(null);
-              setDName(''); setDNameKm(''); setDLoc(''); setDLocKm(''); setDDesc(''); setDDescKm(''); setDImg('');
+              setDName(''); setDNameKm(''); setDLoc(''); setDLocKm(''); setDDesc(''); setDDescKm('');
+              setDSubDesc(''); setDSubDescKm(''); setDImg('');
               setDImg1(''); setDImg2(''); setDImg3(''); setDImg4(''); setDImg5(''); setDImg6('');
               setDLat(''); setDLng('');
               setDBlocks([]);
@@ -566,6 +571,8 @@ const ContentManagement = () => {
                 setDLocKm(dest.location_khmer || '');
                 setDDesc(dest.description || '');
                 setDDescKm(dest.description_khmer || '');
+                setDSubDesc(dest.subDescription || '');
+                setDSubDescKm(dest.subDescription_khmer || '');
                 setDImg(dest.imageUrl || '');
                 setDImg1(dest.imageUrl1 || '');
                 setDImg2(dest.imageUrl2 || '');
@@ -705,11 +712,25 @@ const ContentManagement = () => {
               <Text style={styles.inputLabel}>{dCat === 'pagoda' ? 'Tên ngôi chùa (Khmer)' : dCat === 'food' ? 'Tên món ăn (Khmer)' : 'Tên văn hóa (Khmer)'}</Text>
               <TextInput style={styles.input} value={dNameKm} onChangeText={setDNameKm} placeholder="Nhập tên tiếng Khmer..." />
 
-              <Text style={styles.inputLabel}>{dCat === 'pagoda' ? 'Địa chỉ chùa (Việt)' : 'Địa chỉ (Việt)'}</Text>
-              <TextInput style={styles.input} value={dLoc} onChangeText={setDLoc} placeholder="Nhập địa chỉ..." />
+              {dCat === 'pagoda' && (
+                <>
+                  <Text style={styles.inputLabel}>Địa chỉ chùa (Việt)</Text>
+                  <TextInput style={styles.input} value={dLoc} onChangeText={setDLoc} placeholder="Nhập địa chỉ..." />
 
-              <Text style={styles.inputLabel}>{dCat === 'pagoda' ? 'Địa chỉ chùa (Khmer)' : 'Địa chỉ (Khmer)'}</Text>
-              <TextInput style={styles.input} value={dLocKm} onChangeText={setDLocKm} placeholder="Nhập địa chỉ tiếng Khmer..." />
+                  <Text style={styles.inputLabel}>Địa chỉ chùa (Khmer)</Text>
+                  <TextInput style={styles.input} value={dLocKm} onChangeText={setDLocKm} placeholder="Nhập địa chỉ tiếng Khmer..." />
+                </>
+              )}
+
+              {dCat !== 'pagoda' && (
+                <>
+                  <Text style={styles.inputLabel}>Mô tả phụ ngắn (Việt)</Text>
+                  <TextInput style={styles.input} value={dSubDesc} onChangeText={setDSubDesc} placeholder="Nhập mô tả phụ ngắn..." />
+
+                  <Text style={styles.inputLabel}>Mô tả phụ ngắn (Khmer)</Text>
+                  <TextInput style={styles.input} value={dSubDescKm} onChangeText={setDSubDescKm} placeholder="Nhập mô tả phụ ngắn..." />
+                </>
+              )}
 
               <Text style={styles.inputLabel}>Mô tả chính (Việt)</Text>
               <TextInput style={[styles.input, { height: 110 }]} value={dDesc} onChangeText={setDDesc} multiline numberOfLines={4} placeholder="Mô tả tóm tắt..." />
