@@ -34,9 +34,9 @@ const UserItem = memo(({ item, onFeedback, onToggleLock }: any) => (
         </Text>
         <Text
           style={[styles.userEmail, item.isBlocked && styles.textWhiteLight]}
-          numberOfLines={2}
+          numberOfLines={1}
           adjustsFontSizeToFit
-          minimumFontScale={0.7}
+          minimumFontScale={0.6}
         >
           {item.email || 'No email'}
         </Text>
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
   avatarPlaceholder: { width: s(60), height: s(60), borderRadius: s(30), backgroundColor: '#f1f5f9', justifyContent: 'center', alignItems: 'center' },
   userDetails: { flex: 1, marginLeft: s(16), justifyContent: 'center' },
   userName: { fontSize: ms(17), fontWeight: '700', color: '#1e293b', marginBottom: vs(2) },
-  userEmail: { fontSize: ms(13.5), color: '#64748b', width: '100%'},
+  userEmail: { fontSize: ms(13), color: '#64748b', width: '100%', lineHeight: vs(18) },
   userStatsRow: { flexDirection: 'row', gap: s(8), marginTop: vs(8), flexWrap: 'wrap' },
   statChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f8fafc', paddingHorizontal: s(10), paddingVertical: vs(5), borderRadius: s(8), borderWidth: 1, borderColor: '#e2e8f0', minWidth: s(70), justifyContent: 'center' },
   statChipText: { fontSize: ms(11.5), fontWeight: '700', color: '#475569' },

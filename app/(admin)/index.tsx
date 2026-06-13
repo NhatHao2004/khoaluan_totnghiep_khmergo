@@ -1126,7 +1126,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   feedbackListAvatarInitial: {
-    fontSize: ms(10),
+    fontSize: ms(12),
     fontWeight: '800',
     color: '#94a3b8',
   },
@@ -1180,7 +1180,7 @@ const styles = StyleSheet.create({
     marginBottom: vs(4),
   },
   feedbackUserName: {
-    fontSize: ms(14),
+    fontSize: ms(15),
     fontWeight: '700',
     color: '#1e293b',
     flex: 1,
@@ -1197,7 +1197,7 @@ const styles = StyleSheet.create({
     lineHeight: vs(20),
   },
   feedbackSubText: {
-    fontSize: ms(12),
+    fontSize: ms(10),
     color: '#64748b',
     fontWeight: '500',
     fontStyle: 'italic',

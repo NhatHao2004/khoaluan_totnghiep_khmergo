@@ -810,7 +810,7 @@ const styles = StyleSheet.create({
   },
   modalActions: { flexDirection: 'row', gap: s(12), marginTop: vs(25) },
   btnAction: { flex: 1, height: vs(50), borderRadius: s(14), justifyContent: 'center', alignItems: 'center', elevation: 2 },
-  cancelBtn: { backgroundColor: '#f1f5f9' },
+  cancelBtn: { backgroundColor: '#ff0000ff' },
   saveBtn: { backgroundColor: '#3b82f6' },
   btnText: { fontSize: ms(15), fontWeight: '800', color: '#fff' },
 
