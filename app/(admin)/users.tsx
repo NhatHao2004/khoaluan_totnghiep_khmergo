@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { db } from '../../utils/firebaseConfig';
@@ -11,10 +12,23 @@ import { ms, s, vs } from '../../utils/responsive';
 
 const ActivityCard = memo(({ item, getTimeAgo }: any) => (
   <View style={styles.activityCard}>
-    <Text style={styles.activityItemTitle} numberOfLines={1} adjustsFontSizeToFit>{item.name || 'Người dùng mới'}</Text>
+    <View style={styles.activityHeaderRow}>
+      <View style={styles.activityAvatar}>
+        {item.avatar ? (
+          <Image
+            source={{ uri: item.avatar }}
+            style={styles.avatarImg}
+            contentFit="cover"
+            transition={200}
+          />
+        ) : (
+          <Ionicons name="person" size={ms(18)} color="#cbd5e1" />
+        )}
+      </View>
+      <Text style={styles.activityItemTitle} numberOfLines={1} adjustsFontSizeToFit>{item.name || 'Người dùng mới'}</Text>
+    </View>
     <View style={styles.activityFooter}>
-      <Text style={styles.activityDesc} numberOfLines={1} adjustsFontSizeToFit>Đã đăng ký tài khoản thành công</Text>
-      <Text style={styles.activityTime}>{getTimeAgo(item.createdAt)}</Text>
+      <Text style={styles.activityDesc} numberOfLines={1} adjustsFontSizeToFit>Thành thành viên chính thức từ hôm nay </Text>
     </View>
   </View>
 ));
@@ -95,14 +109,12 @@ const UsersActivity = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#ffffff' },
-  header: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    paddingHorizontal: s(16), 
-    paddingBottom: vs(15), 
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: s(16),
+    paddingBottom: vs(15),
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9'
   },
   backBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center' },
   headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
@@ -120,16 +132,35 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 8,
   },
-  activityFooter: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    marginTop: vs(6) 
+  activityHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: s(10),
+    marginBottom: vs(10),
+  },
+  activityAvatar: {
+    width: s(36),
+    height: s(36),
+    borderRadius: s(18),
+    backgroundColor: '#f1f5f9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  avatarImg: {
+    width: '100%',
+    height: '100%',
   },
   activityItemTitle: {
     fontSize: ms(16),
     fontWeight: '800',
     color: '#1e293b',
+    flex: 1,
+  },
+  activityFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   activityDesc: {
     fontSize: ms(14),
