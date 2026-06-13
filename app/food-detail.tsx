@@ -234,11 +234,11 @@ export default function FoodDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
-  loaderContainer: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    backgroundColor: '#FFF' 
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFF'
   },
   loaderText: {
     marginTop: vs(15),
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
     borderRadius: s(16),
     padding: s(4),
-    marginBottom: vs(20)
+    marginBottom: vs(0)
   },
   tabItem: {
     flex: 1,
@@ -305,18 +305,18 @@ const styles = StyleSheet.create({
   tabLabel: { fontSize: ms(14), fontWeight: '700', color: '#64748B' },
   tabLabelActive: { color: '#1E293B' },
 
-  tabContent: { marginTop: vs(10) },
-  galleryGrid: { 
-    flexDirection: 'row', 
-    flexWrap: 'wrap', 
+  tabContent: { marginTop: vs(18) },
+  galleryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     paddingHorizontal: s(2),
     marginBottom: 0
   },
-  galleryItem: { 
-    width: (width - s(40) - s(15)) / 2, 
-    height: vs(130), 
-    borderRadius: s(16), 
+  galleryItem: {
+    width: (width - s(40) - s(15)) / 2,
+    height: vs(130),
+    borderRadius: s(16),
     overflow: 'hidden',
     marginBottom: vs(12)
   },

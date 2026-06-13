@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
     borderRadius: s(16),
     padding: s(4),
-    marginBottom: vs(20)
+    marginBottom: vs(0)
   },
   tabItem: {
     flex: 1,
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   tabLabel: { fontSize: ms(14), fontWeight: '700', color: '#64748B' },
   tabLabelActive: { color: '#1E293B' },
 
-  tabContent: { marginTop: vs(10) },
+  tabContent: { marginTop: vs(18) },
   galleryGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
