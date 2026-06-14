@@ -3,22 +3,21 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { getLeaderboardUsers } from '@/services/firebase-service';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
-  ActivityIndicator,
   Modal,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
-import { Image } from 'expo-image';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { s, vs, ms } from '../../utils/responsive';
 import Animated, { Easing, FadeInUp, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ms, s, vs } from '../../utils/responsive';
 
 
 
@@ -150,7 +149,7 @@ export default function ProfileScreen() {
 
   const handleMenuPress = React.useCallback((id: string) => {
     const isGuest = !user || user.isAnonymous;
-    if (isGuest && id !== 'login' && id !== 'settings' && id !== 'support') {
+    if (isGuest && id !== 'login') {
       setLoginRequiredVisible(true);
       return;
     }
@@ -185,7 +184,7 @@ export default function ProfileScreen() {
       </View>
 
 
-      <ScrollView 
+      <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + vs(20) }}
       >
@@ -196,9 +195,9 @@ export default function ProfileScreen() {
             <View style={styles.avatarWrapper}>
               {user?.avatar && (user && !user.isAnonymous && !isLoggingOut) ?
                 (
-                  <Image 
-                    source={{ uri: user.avatar }} 
-                    style={styles.avatar} 
+                  <Image
+                    source={{ uri: user.avatar }}
+                    style={styles.avatar}
                     contentFit="cover"
                     transition={300}
                   />
@@ -248,8 +247,8 @@ export default function ProfileScreen() {
             <View style={styles.loginModalIconCircle}>
               <Ionicons name="person-circle-outline" size={ms(40)} color="#3B82F6" />
             </View>
-            <Text style={styles.loginModalTitle} numberOfLines={1}>{t('login_required')}</Text>
-            <Text style={styles.loginModalSub}>{t('login_to_use')}</Text>
+            <Text style={styles.loginModalTitle} numberOfLines={1} adjustsFontSizeToFit>{t('login_required')}</Text>
+            <Text style={styles.loginModalSub} numberOfLines={1} adjustsFontSizeToFit>{t('login_to_use')}</Text>
 
             <View style={styles.loginModalActionRow}>
               <TouchableOpacity
@@ -281,13 +280,13 @@ export default function ProfileScreen() {
         statusBarTranslucent
       >
         <View style={styles.modalOverlay}>
-          <TouchableOpacity 
-            style={StyleSheet.absoluteFill} 
-            activeOpacity={1} 
-            onPress={() => setLogoutModalVisible(false)} 
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={() => setLogoutModalVisible(false)}
           />
           <Animated.View style={[
-            styles.logoutContent, 
+            styles.logoutContent,
             animatedLogoutStyle,
             { paddingBottom: Math.max(insets.bottom, vs(30)) }
           ]}>
@@ -486,12 +485,12 @@ const styles = StyleSheet.create({
   },
 
   // Login Required Modal
-  loginModalOverlay: { 
-    flex: 1, 
-    backgroundColor: 'rgba(0,0,0,0.7)', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    padding: s(24) 
+  loginModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: s(24)
   },
   loginModalContent: {
     backgroundColor: '#FFF',
@@ -544,7 +543,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   loginModalSecondaryBtn: {
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#ff0000ff',
     height: vs(56),
     borderRadius: s(18),
     justifyContent: 'center',
@@ -552,7 +551,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   loginModalSecondaryBtnText: {
-    color: '#475569',
+    color: 'rgba(255, 255, 255, 1)ff',
     fontSize: ms(16),
     fontWeight: '800',
   },

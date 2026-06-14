@@ -225,8 +225,8 @@ export default function QuizScreen() {
             <View style={styles.modalIconCircle}>
               <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
             </View>
-            <Text style={styles.modalTitle}>{t('login_required')}</Text>
-            <Text style={styles.modalSub}>{t('login_to_use')}</Text>
+            <Text style={styles.modalTitle} numberOfLines={1} adjustsFontSizeToFit>{t('login_required')}</Text>
+            <Text style={styles.modalSub} numberOfLines={1} adjustsFontSizeToFit>{t('login_to_use')}</Text>
 
             <View style={styles.modalActionRow}>
               <TouchableOpacity
