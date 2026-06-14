@@ -23,6 +23,7 @@ import {
   View
 } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { analyzeImage, chatWithAI } from '../services/ai-service';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -41,6 +42,7 @@ export default function AIAssistantScreen() {
   const router = useRouter();
   const { t } = useLanguage();
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
 
   // Tabs State
   const [activeTab, setActiveTab] = useState<Mode>('chat');
@@ -134,7 +136,7 @@ export default function AIAssistantScreen() {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const scanPos = useSharedValue(0);
 
-  // Keyboard Handling (Mirroring Community style)
+  // Manual Keyboard Control
   useEffect(() => {
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
     const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
@@ -142,6 +144,7 @@ export default function AIAssistantScreen() {
     const showSub = Keyboard.addListener(showEvent, (e: any) => {
       setKeyboardHeight(e.endCoordinates.height);
     });
+
     const hideSub = Keyboard.addListener(hideEvent, () => {
       setKeyboardHeight(0);
     });
@@ -151,6 +154,14 @@ export default function AIAssistantScreen() {
       hideSub.remove();
     };
   }, []);
+
+  // Reset keyboard height when tab changes or if a modal exists
+  useEffect(() => {
+    if (activeTab === 'camera') {
+      Keyboard.dismiss();
+      setKeyboardHeight(0);
+    }
+  }, [activeTab]);
 
   // Camera Animations
   useEffect(() => {
@@ -390,8 +401,8 @@ export default function AIAssistantScreen() {
               styles.inputContainer,
               {
                 paddingBottom: keyboardHeight > 0
-                  ? (Platform.OS === 'ios' ? keyboardHeight - 15 : keyboardHeight + 10)
-                  : 12
+                  ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom + 10 : keyboardHeight)
+                  : (insets.bottom + 15)
               }
             ]}>
               <TextInput
