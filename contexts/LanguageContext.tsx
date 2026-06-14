@@ -147,6 +147,36 @@ export const translations: any = {
     faq_quiz_content: 'Mỗi bài thử thách sẽ có các câu hỏi về văn hóa và ngôn ngữ Khmer. Bạn cần chọn câu trả lời đúng trong thời gian quy định để nhận được điểm thưởng.',
     faq_learn_content: 'Bạn có thể đăng ký tài khoản mới bằng email tại màn hình Đăng ký. Sau khi có tài khoản, hãy sử dụng thông tin đó để Đăng nhập và trải nghiệm đầy đủ các tính năng của ứng dụng như tích lũy điểm và thăng hạng.',
 
+    // FAQ Detail Steps — Use
+    faq_use_step1_title: '1. Khám phá ngay',
+    faq_use_step1_desc: 'Bắt đầu hành trình tại Trang chủ. Bạn có thể tìm thấy các ngôi chùa cổ kính, danh lam thắng cảnh và lễ hội đặc sắc của người Khmer Nam Bộ.',
+    faq_use_step2_title: '2. Tìm hiểu thêm',
+    faq_use_step2_desc: 'Mỗi địa điểm đều có thông tin chi tiết về lịch sử, kiến trúc và các món ăn đặc sản. Hãy đọc kỹ để hiểu sâu hơn về nét đẹp truyền thống.',
+    faq_use_step3_title: '3. Vượt thử thách',
+    faq_use_step3_desc: 'Tham gia các bài trắc nghiệm vui tại mục Thử thách. Trả lời đúng để tích lũy điểm thưởng và thăng hạng trên bảng xếp hạng cộng đồng.',
+    faq_use_step4_title: '4. Trò chuyện AI',
+    faq_use_step4_desc: 'Nếu có bất kỳ thắc mắc nào, hãy nhấn vào biểu tượng Chat để trò chuyện với Trợ lý AI thông minh của KhmerGo.',
+
+    // FAQ Detail Steps — Quiz
+    faq_quiz_step1_title: '1. Chọn chủ đề',
+    faq_quiz_step1_desc: 'Bạn có thể chọn các chủ đề như: Chùa Khmer, Văn hóa, Ẩm thực hoặc Học tiếng Khmer để bắt đầu thử thách kiến thức.',
+    faq_quiz_step2_title: '2. Chơi thử thách',
+    faq_quiz_step2_desc: 'Mỗi câu hỏi sẽ có 4 lựa chọn. Hãy suy nghĩ kỹ và chọn đáp án chính xác nhất trong thời gian quy định.',
+    faq_quiz_step3_title: '3. Nhận quà tặng',
+    faq_quiz_step3_desc: 'Sau khi hoàn thành, bạn sẽ nhận được điểm thưởng dựa trên số câu trả lời đúng. Điểm này dùng để thăng hạng thành viên.',
+    faq_quiz_step4_title: '4. Xem xếp hạng',
+    faq_quiz_step4_desc: 'Xem thứ hạng của mình so với các người dùng khác tại bảng xếp hạng chung để nỗ lực đạt vị trí cao hơn mỗi ngày.',
+
+    // FAQ Detail Steps — Learn (Register/Login)
+    faq_learn_step1_title: '1. Vào hồ sơ',
+    faq_learn_step1_desc: 'Nhấn vào biểu tượng Hồ sơ ở thanh điều hướng phía dưới, sau đó chọn Đăng nhập hoặc Đăng ký tài khoản.',
+    faq_learn_step2_title: '2. Đăng ký ngay',
+    faq_learn_step2_desc: 'Nếu bạn chưa có tài khoản, hãy nhập Email và Mật khẩu để tạo mới. Sau đó bạn có thể chọn các chủ đề mình quan tâm.',
+    faq_learn_step3_title: '3. Cộng đồng Khmer',
+    faq_learn_step3_desc: 'Khi đã đăng nhập, bạn có thể tham gia bình luận, chia sẻ ảnh và lưu lại các địa điểm yêu thích của mình.',
+    faq_learn_step4_title: '4. Đổi mật khẩu',
+    faq_learn_step4_desc: 'Bạn có thể thay đổi mật khẩu, cập nhật thông tin cá nhân hoặc quản lý quyền riêng tư trong mục Cài đặt tài khoản.',
+
     // Home Screen
     promotions: 'Khám phá ngay',
     category: 'Danh mục',
@@ -462,6 +492,36 @@ export const translations: any = {
     faq_use_content: 'សូម chào មកកាន់ KhmerGo! ដើម្បីប្រើកម្មវិធី អ្នក có thể ចាប់ផ្តើមដោយការរុករកវត្តអារាមនានានៅក្នុងទំព័រដើម ចូលរួមឆ្លើយសំណួរក្នុងផ្នែកសាកល្បង ដើម្បីបង្កើនពិន្ទុ និងតម្លើងឋានៈ។',
     faq_quiz_content: 'រាល់ការសាកល្បងនីមួយៗនឹងមានសំណួរអំពីវប្បធម៌ និងភាសាខ្មែរbox។ អ្នកត្រូវជ្រើសរើសចម្លើយដែលត្រឹមត្រូវក្នុងរយៈពេលកំណត់ ដើម្បីទទួលបានពិន្ទុបន្ថែម។',
     faq_learn_content: 'អ្នកអាចចុះឈ្មោះគណនីថ្មីដោយប្រើអ៊ីមែលនៅក្នុងទំព័រចុះឈ្មោះ។ បន្ទាប់ពីមានគណនីហើយ សូមប្រើព័ត៌មាននោះដើម្បីចូលប្រើប្រាស់ និងទទួលបានបទពិសោធន៍ពេញលេញពីកម្មវិធី ដូចជាការធ្វើតេស្ត និងការសន្សំពិន្ទុ។',
+
+    // FAQ Detail Steps — Use
+    faq_use_step1_title: '1. រុករកឥឡូវនេះ',
+    faq_use_step1_desc: 'ចាប់ផ្តើមការធ្វើដំណើរនៅទំព័រដើម។ អ្នកអាចស្វែងរកវត្តអារាមបុរាណ ទីកន្លែងល្បីៗ និងពិធីបុណ្យពិសេសរបស់ជនជាតិខ្មែរណាមបូ។',
+    faq_use_step2_title: '2. ស្វែងយល់បន្ថែម',
+    faq_use_step2_desc: 'ទីកន្លែងនីមួយៗមានព័ត៌មានលម្អិតអំពីប្រវត្តិសាស្ត្រ ស្ថាបត្យកម្ម និងម្ហូបអាហារពិសេស។ សូមអានដោយយកចិត្តទុកដាក់ដើម្បីយល់ដឹងកាន់តែច្បាស់អំពីភាពស្រស់ស្អាតនៃប្រពៃណី។',
+    faq_use_step3_title: '3. ឆ្លងកាត់ការសាកល្បង',
+    faq_use_step3_desc: 'ចូលរួមឆ្លើយសំណួរកម្សាន្តនៅក្នុងផ្នែកការសាកល្បង។ ឆ្លើយត្រឹមត្រូវដើម្បីប្រមូលពិន្ទុ និងតម្លើងចំណាត់ថ្នាក់នៅក្នុងតារាងពិន្ទុសហគមន៍។',
+    faq_use_step4_title: '4. ជជែកជាមួយ AI',
+    faq_use_step4_desc: 'ប្រសិនបើអ្នកមានចម្ងល់ណាមួយ សូមចុចលើរូបសញ្ញា Chat ដើម្បីជជែកជាមួយជំនួយការ AI ឆ្លាតវៃរបស់ KhmerGo។',
+
+    // FAQ Detail Steps — Quiz
+    faq_quiz_step1_title: '1. ជ្រើសរើសប្រធានបទ',
+    faq_quiz_step1_desc: 'អ្នកអាចជ្រើសរើសប្រធានបទដូចជា៖ វត្តអារាមខ្មែរ វប្បធម៌ ម្ហូបអាហារ ឬរៀនភាសាខ្មែរ ដើម្បីចាប់ផ្តើមការសាកល្បងចំណេះដឹង។',
+    faq_quiz_step2_title: '2. លេងការសាកល្បង',
+    faq_quiz_step2_desc: 'សំណួរនីមួយៗនឹងមាន ៤ ជម្រើស។ សូមគិតឱ្យបានច្បាស់ ហើយជ្រើសរើសចម្លើយត្រឹមត្រូវបំផុតក្នុងរយៈពេលកំណត់។',
+    faq_quiz_step3_title: '3. ទទួលរង្វាន់',
+    faq_quiz_step3_desc: 'បន្ទាប់ពីបញ្ចប់ អ្នកនឹងទទួលបានពិន្ទុបន្ថែមដោយផ្អែកលើចំនួនចម្លើយត្រឹមត្រូវ។ ពិន្ទុនេះប្រើដើម្បីតម្លើងចំណាត់ថ្នាក់សមាជិក។',
+    faq_quiz_step4_title: '4. មើលចំណាត់ថ្នាក់',
+    faq_quiz_step4_desc: 'មើលចំណាត់ថ្នាក់របស់អ្នកធៀបនឹងអ្នកប្រើប្រាស់ផ្សេងទៀតនៅក្នុងតារាងពិន្ទុរួម ដើម្បីខិតខំឲ្យបានទីតាំងកាន់តែខ្ពស់រៀងរាល់ថ្ងៃ។',
+
+    // FAQ Detail Steps — Learn (Register/Login)
+    faq_learn_step1_title: '1. ចូលទៅកាន់ប្រវត្តិរូប',
+    faq_learn_step1_desc: 'ចុចលើរូបសញ្ញាប្រវត្តិរូបនៅរបារក្រោម បន្ទាប់មកជ្រើសរើសចូលគណនី ឬចុះឈ្មោះគណនី។',
+    faq_learn_step2_title: '2. ចុះឈ្មោះឥឡូវនេះ',
+    faq_learn_step2_desc: 'ប្រសិនបើអ្នកមិនទាន់មានគណនី សូមបញ្ចូលអ៊ីមែល និងពាក្យសម្ងាត់ដើម្បីបង្កើតថ្មី។ បន្ទាប់មកអ្នកអាចជ្រើសរើសប្រធានបទដែលអ្នកចាប់អារម្មណ៍។',
+    faq_learn_step3_title: '3. សហគមន៍ខ្មែរ',
+    faq_learn_step3_desc: 'នៅពេលចូលគណនីរួចហើយ អ្នកអាចចូលរួមផ្តល់មតិ ចែករំលែករូបភាព និងរក្សាទុកទីកន្លែងដែលអ្នកចូលចិត្ត។',
+    faq_learn_step4_title: '4. ប្តូរពាក្យសម្ងាត់',
+    faq_learn_step4_desc: 'អ្នកអាចប្តូរពាក្យសម្ងាត់ ធ្វើបច្ចុប្បន្នភាពព័ត៌មានផ្ទាល់ខ្លួន ឬគ្រប់គ្រងភាពឯកជននៅក្នុងផ្នែកការកំណត់គណនី។',
 
     // Home Screen
     promotions: 'ការផ្សព្វផ្សាយ',

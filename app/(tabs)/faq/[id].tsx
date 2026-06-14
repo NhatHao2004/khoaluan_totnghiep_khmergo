@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function FAQDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const getFAQContent = () => {
     switch (id) {
@@ -18,23 +18,23 @@ export default function FAQDetailScreen() {
           icon: 'apps-outline',
           steps: [
             {
-              title: '1. Khám phá ngay',
-              desc: 'Bắt đầu hành trình tại Trang chủ. Bạn có thể tìm thấy các ngôi chùa cổ kính, danh lam thắng cảnh và lễ hội đặc sắc của người Khmer Nam Bộ.',
+              title: t('faq_use_step1_title'),
+              desc: t('faq_use_step1_desc'),
               image: require('@/assets/images/guide/guide_1.png')
             },
             {
-              title: '2. Tìm hiểu thêm',
-              desc: 'Mỗi địa điểm đều có thông tin chi tiết về lịch sử, kiến trúc và các món ăn đặc sản. Hãy đọc kỹ để hiểu sâu hơn về nét đẹp truyền thống.',
+              title: t('faq_use_step2_title'),
+              desc: t('faq_use_step2_desc'),
               image: require('@/assets/images/guide/guide_2.png')
             },
             {
-              title: '3. Vượt thử thách',
-              desc: 'Tham gia các bài trắc nghiệm vui tại mục Thử thách. Trả lời đúng để tích lũy điểm thưởng và thăng hạng trên bảng xếp hạng cộng đồng.',
+              title: t('faq_use_step3_title'),
+              desc: t('faq_use_step3_desc'),
               image: require('@/assets/images/guide/guide_3.png')
             },
             {
-              title: '4. Trò chuyện AI',
-              desc: 'Nếu có bất kỳ thắc mắc nào, hãy nhấn vào biểu tượng Chat để trò chuyện với Trợ lý AI thông minh của KhmerGo.',
+              title: t('faq_use_step4_title'),
+              desc: t('faq_use_step4_desc'),
               image: require('@/assets/images/guide/guide_4.png')
             }
           ]
@@ -45,23 +45,23 @@ export default function FAQDetailScreen() {
           icon: 'trophy-outline',
           steps: [
             {
-              title: '1. Chọn chủ đề',
-              desc: 'Bạn có thể chọn các chủ đề như: Chùa Khmer, Văn hóa, Ẩm thực hoặc Học tiếng Khmer để bắt đầu thử thách kiến thức.',
+              title: t('faq_quiz_step1_title'),
+              desc: t('faq_quiz_step1_desc'),
               image: require('@/assets/images/guide/guide_3.png')
             },
             {
-              title: '2. Chơi thử thách',
-              desc: 'Mỗi câu hỏi sẽ có 4 lựa chọn. Hãy suy nghĩ kỹ và chọn đáp án chính xác nhất trong thời gian quy định.',
+              title: t('faq_quiz_step2_title'),
+              desc: t('faq_quiz_step2_desc'),
               image: require('@/assets/images/guide/guide_2.png')
             },
             {
-              title: '3. Nhận quà tặng',
-              desc: 'Sau khi hoàn thành, bạn sẽ nhận được điểm thưởng dựa trên số câu trả lời đúng. Điểm này dùng để thăng hạng thành viên.',
+              title: t('faq_quiz_step3_title'),
+              desc: t('faq_quiz_step3_desc'),
               image: require('@/assets/images/guide/guide_1.png')
             },
             {
-              title: '4. Xem xếp hạng',
-              desc: 'Xem thứ hạng của mình so với các người dùng khác tại bảng xếp hạng chung để nỗ lực đạt vị trí cao hơn mỗi ngày.',
+              title: t('faq_quiz_step4_title'),
+              desc: t('faq_quiz_step4_desc'),
               image: require('@/assets/images/guide/guide_4.png')
             }
           ]
@@ -72,23 +72,23 @@ export default function FAQDetailScreen() {
           icon: 'person-circle-outline',
           steps: [
             {
-              title: '1. Vào hồ sơ',
-              desc: 'Nhấn vào biểu tượng Hồ sơ ở thanh điều hướng phía dưới, sau đó chọn Đăng nhập hoặc Đăng ký tài khoản.',
+              title: t('faq_learn_step1_title'),
+              desc: t('faq_learn_step1_desc'),
               image: require('@/assets/images/guide/guide_4.png')
             },
             {
-              title: '2. Đăng ký ngay',
-              desc: 'Nếu bạn chưa có tài khoản, hãy nhập Email và Mật khẩu để tạo mới. Sau đó bạn có thể chọn các chủ đề mình quan tâm.',
+              title: t('faq_learn_step2_title'),
+              desc: t('faq_learn_step2_desc'),
               image: require('@/assets/images/guide/guide_1.png')
             },
             {
-              title: '3. Cộng đồng Khmer',
-              desc: 'Khi đã đăng nhập, bạn có thể tham gia bình luận, chia sẻ ảnh và lưu lại các địa điểm yêu thích của mình.',
+              title: t('faq_learn_step3_title'),
+              desc: t('faq_learn_step3_desc'),
               image: require('@/assets/images/guide/guide_2.png')
             },
             {
-              title: '4. Đổi mật khẩu',
-              desc: 'Bạn có thể thay đổi mật khẩu, cập nhật thông tin cá nhân hoặc quản lý quyền riêng tư trong mục Cài đặt tài khoản.',
+              title: t('faq_learn_step4_title'),
+              desc: t('faq_learn_step4_desc'),
               image: require('@/assets/images/guide/guide_3.png')
             }
           ]
@@ -131,7 +131,7 @@ export default function FAQDetailScreen() {
                   <Image source={step.image} style={styles.stepImage} />
                   <View style={styles.stepContent}>
                     <Text style={styles.stepTitle}>{step.title}</Text>
-                    <Text style={styles.stepDesc}>{step.desc}</Text>
+                    <Text style={[styles.stepDesc, language === 'km' && { textAlign: 'left' }]}>{step.desc}</Text>
                   </View>
                 </View>
               );
