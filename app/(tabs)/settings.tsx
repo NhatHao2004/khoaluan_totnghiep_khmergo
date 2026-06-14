@@ -191,7 +191,12 @@ export default function SettingsScreen() {
                 <Text style={styles.appVersionTag}>{t('intro_version_label')} 1.0.0</Text>
               </View>
 
-              <Text style={styles.appDesc} numberOfLines={1} adjustsFontSizeToFit>{t('intro_app_desc')}</Text>
+              <Text
+                style={styles.appDesc}
+                {...(language === 'km' ? { numberOfLines: 1, adjustsFontSizeToFit: true } : {})}
+              >
+                {t('intro_app_desc')}
+              </Text>
 
               {/* Learning Goals */}
               <View style={styles.introSection}>
