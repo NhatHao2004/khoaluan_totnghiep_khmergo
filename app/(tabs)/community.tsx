@@ -854,7 +854,7 @@ export default function CommunityScreen() {
             <View style={[styles.commentInputContainer, {
               paddingBottom: keyboardHeight > 0 ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom : keyboardHeight) : (insets.bottom + vs(10)),
               position: 'absolute',
-              bottom: 5,
+              bottom: 10,
               left: 0,
               right: 0
             }]}>
