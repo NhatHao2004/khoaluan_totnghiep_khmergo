@@ -738,9 +738,8 @@ export default function CommunityScreen() {
               </ScrollView>
 
               <View style={[styles.createPostActions, {
-                paddingBottom: keyboardHeight === 0 ? (insets.bottom + vs(15)) : vs(15),
-                borderTopWidth: 1,
-                borderTopColor: '#F0F0F0',
+                paddingBottom: keyboardHeight > 0 ? 15 : (insets.bottom + vs(10)),
+                backgroundColor: '#FFF',
               }]}>
                 <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
                   <Ionicons name="image-outline" size={24} color="#1877F2" />
@@ -763,6 +762,7 @@ export default function CommunityScreen() {
                 </TouchableOpacity>
               </View>
             </Animated.View>
+            <View style={{ position: 'absolute', bottom: -vs(100), left: 0, right: 0, height: vs(100), backgroundColor: '#FFF' }} />
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -847,7 +847,7 @@ export default function CommunityScreen() {
                     </View>
                   );
                 }}
-                ListEmptyComponent={<View style={{ paddingTop: 215, paddingHorizontal: 40, alignItems: 'center' }}><Text style={{ color: '#999' }}>{t('first_comment_msg')}</Text></View>}
+                ListEmptyComponent={<View style={{ paddingTop: vs(150), paddingHorizontal: s(40), alignItems: 'center' }}><Text style={{ color: '#999', fontSize: ms(16), fontWeight: '500', textAlign: 'center', width: '100%' }} adjustsFontSizeToFit numberOfLines={1}>{t('first_comment_msg')}</Text></View>}
               />
 
               {replyToName && (
@@ -860,9 +860,8 @@ export default function CommunityScreen() {
               )}
 
               <View style={[styles.commentInputContainer, {
-                paddingBottom: keyboardHeight === 0 ? (insets.bottom + vs(10)) : vs(5),
-                borderTopWidth: 1,
-                borderTopColor: '#F0F0F0',
+                paddingBottom: keyboardHeight > 0 ? 15 : (insets.bottom + vs(10)),
+                backgroundColor: '#FFF',
               }]}>
                 <TextInput
                   ref={commentInputRef}
@@ -877,6 +876,7 @@ export default function CommunityScreen() {
                 </TouchableOpacity>
               </View>
             </Animated.View>
+            <View style={{ position: 'absolute', bottom: -vs(100), left: 0, right: 0, height: vs(100), backgroundColor: '#FFF' }} />
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -952,8 +952,8 @@ export default function CommunityScreen() {
             <View style={[styles.pModalIconCircle, { backgroundColor: '#FEF2F2', borderColor: '#FEE2E2' }]}>
               <Ionicons name="trash-outline" size={40} color="#EF4444" />
             </View>
-            <Text style={styles.pModalTitle}>{t('delete_post_confirm')}</Text>
-            <Text style={styles.pModalSub}>{t('cannot_undo')}</Text>
+            <Text style={styles.pModalTitle} adjustsFontSizeToFit numberOfLines={1}>{t('delete_post_confirm')}</Text>
+            <Text style={styles.pModalSub} adjustsFontSizeToFit numberOfLines={1}>{t('cannot_undo')}</Text>
 
             <View style={styles.pModalActionRow}>
               <TouchableOpacity
@@ -1023,7 +1023,12 @@ const styles = StyleSheet.create({
   actionItem: { flexDirection: 'row', alignItems: 'center', gap: s(8) },
   actionCount: { fontSize: ms(16), fontWeight: '700', color: '#1A1A1A' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: ms(30), borderTopRightRadius: ms(30), overflow: 'hidden' },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: ms(30),
+    borderTopRightRadius: ms(30),
+    overflow: 'visible',
+  },
   modalHeader: { alignItems: 'center', paddingVertical: vs(12) },
   modalHandle: { width: s(40), height: vs(5), borderRadius: s(3), backgroundColor: '#E0E0E0', marginBottom: vs(10) },
   modalHeaderTitleBox: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: s(20), marginBottom: vs(10) },
