@@ -289,6 +289,7 @@ export default function ProfileScreen() {
             styles.logoutContent,
             animatedLogoutStyle,
             { paddingBottom: Math.max(insets.bottom, vs(30)) }
+          ]}>
             <View style={styles.logoutHeader}>
               <View style={styles.logoutIconCircle}>
                 <Ionicons name="log-out-outline" size={ms(34)} color="#FF4D4D" />
