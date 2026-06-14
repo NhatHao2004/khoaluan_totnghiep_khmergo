@@ -278,7 +278,7 @@ export default function TabsLayout() {
                 adjustsFontSizeToFit 
                 minimumFontScale={0.8}
               >
-                Khám phá ngay
+                {t('explore_now')}
               </Animated.Text>
             </View>
           </Animated.View>

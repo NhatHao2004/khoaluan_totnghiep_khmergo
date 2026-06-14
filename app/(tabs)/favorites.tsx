@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '800',
     color: '#1A1A1A',
-    marginBottom: -22,
+    marginBottom: -17,
   },
   cardRental: {
     fontSize: 14,

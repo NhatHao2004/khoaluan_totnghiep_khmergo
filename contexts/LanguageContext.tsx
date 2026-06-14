@@ -306,6 +306,22 @@ export const translations: any = {
     delete_post_menu: 'Xóa bỏ bài viết',
     delete_post_confirm: 'Xóa bài viết',
     cannot_undo: 'Hành động này không thể hoàn tác',
+
+    // Intro Modal
+    intro_title: 'Giới thiệu ứng dụng',
+    intro_version_label: 'Phiên bản',
+    intro_app_desc: 'Ứng dụng hỗ trợ nâng cao kiến thức về văn hóa người Khmer Nam Bộ.',
+    intro_learn_title: 'KhmerGo giúp người dùng tìm hiểu về:',
+    intro_learn_pagoda: '• Ngôi chùa Khmer',
+    intro_learn_culture: '• Văn hóa Khmer',
+    intro_learn_food: '• Ẩm thực Khmer',
+    intro_learn_language: '• Học tiếng Khmer',
+    intro_goal_title: 'Mục tiêu chung của ứng dụng:',
+    intro_goal_1: '- Góp phần bảo tồn giá trị văn hóa Khmer Nam Bộ.',
+    intro_goal_2: '- Hỗ trợ học tập và nghiên cứu.',
+    intro_goal_3: '- Quảng bá văn hóa truyền thống đến cộng đồng.',
+    intro_tech_label: 'Công nghệ sử dụng: ',
+    intro_dev_label: 'Người phát triển: ',
   },
   km: {
     // Common
@@ -355,7 +371,7 @@ export const translations: any = {
     guest: 'ភ្ញៀវ',
     login_to_view: 'ចូលដើម្បីមើលព័ត៌មាន',
     login_to_use: 'ចូលដើម្បីប្រើប្រាស់មុខងារនេះ',
-    logout_confirm_msg: 'តើអ្នកប្រាកដថាចង់ចាកចេញមែនទេ?',
+    logout_confirm_msg: 'តើអ្នកប្រាកដថាចង់ចាកចេញមែនទេ',
     login_required: 'តម្រូវឱ្យចូល',
 
     // Quiz Screen
@@ -606,6 +622,22 @@ export const translations: any = {
     delete_post_menu: 'លុបអត្ថបទ',
     delete_post_confirm: 'លុបអត្ថបទ',
     cannot_undo: 'សកម្មភាពនេះមិនអាចផ្លាស់ប្តូរបានទេ',
+
+    // Intro Modal
+    intro_title: 'ការណែនាំកម្មវិធី',
+    intro_version_label: 'ជំនាន់',
+    intro_app_desc: 'កម្មវិធីជួយលើកកម្ពស់ចំណេះដឹងអំពីវប្បធម៌ជនជាតិខ្មែរណាមបូ។',
+    intro_learn_title: 'KhmerGo ជួយអ្នកប្រើប្រាស់ស្វែងយល់អំពី:',
+    intro_learn_pagoda: '• វត្តអារាមខ្មែរ',
+    intro_learn_culture: '• វប្បធម៌ខ្មែរ',
+    intro_learn_food: '• ម្ហូបខ្មែរ',
+    intro_learn_language: '• រៀនភាសាខ្មែរ',
+    intro_goal_title: 'គោលបំណងទូទៅរបស់កម្មវិធី:',
+    intro_goal_1: '- រួមចំណែកអភិរក្សតម្លៃវប្បធម៌ខ្មែរណាមបូ។',
+    intro_goal_2: '- គាំទ្រការរៀនសូត្រ និងការស្រាវជ្រាវ។',
+    intro_goal_3: '- ផ្សព្វផ្សាយវប្បធម៌ប្រពៃណីទៅកាន់សហគមន៍។',
+    intro_tech_label: 'បច្ចេកវិទ្យាប្រើប្រាស់: ',
+    intro_dev_label: 'អ្នកអភិវឌ្ឍន៍: ',
   }
 };
 

@@ -175,7 +175,7 @@ export default function SettingsScreen() {
         <View style={styles.introOverlay}>
           <View style={styles.introContent}>
             <View style={styles.introHeader}>
-              <Text style={styles.introTitle}>Giới thiệu ứng dụng</Text>
+              <Text style={styles.introTitle}>{t('intro_title')}</Text>
               <TouchableOpacity onPress={() => setShowIntro(false)} style={styles.introCloseBtn}>
                 <Ionicons name="close" size={28} color="#1A1A1A" />
               </TouchableOpacity>
@@ -187,38 +187,36 @@ export default function SettingsScreen() {
               <View style={styles.appIdentity}>
                 <Image source={require('@/assets/images/icon.png')} style={styles.appLogo} />
                 <Text style={styles.appName}>KhmerGo</Text>
-                <Text style={styles.appVersionTag}>Phiên bản 1.0.0</Text>
+                <Text style={styles.appVersionTag}>{t('intro_version_label')} 1.0.0</Text>
               </View>
 
-              <Text style={styles.appDesc}>
-                Ứng dụng hỗ trợ nâng cao kiến thức về văn hóa người Khmer Nam Bộ.
-              </Text>
+              <Text style={styles.appDesc} numberOfLines={1} adjustsFontSizeToFit>{t('intro_app_desc')}</Text>
 
               {/* Learning Goals */}
               <View style={styles.introSection}>
-                <Text style={styles.introSectionTitle}>KhmerGo giúp người dùng tìm hiểu về:</Text>
-                <Text style={styles.introBullet}>• Ngôi chùa Khmer</Text>
-                <Text style={styles.introBullet}>• Văn hóa Khmer</Text>
-                <Text style={styles.introBullet}>• Ẩm thực Khmer</Text>
-                <Text style={styles.introBullet}>• Học tiếng Khmer</Text>
+                <Text style={styles.introSectionTitle}>{t('intro_learn_title')}</Text>
+                <Text style={styles.introBullet}>{t('intro_learn_pagoda')}</Text>
+                <Text style={styles.introBullet}>{t('intro_learn_culture')}</Text>
+                <Text style={styles.introBullet}>{t('intro_learn_food')}</Text>
+                <Text style={styles.introBullet}>{t('intro_learn_language')}</Text>
               </View>
 
               {/* Objectives */}
               <View style={styles.introSection}>
-                <Text style={styles.introSectionTitle}>Mục tiêu chung của ứng dụng:</Text>
-                <Text style={styles.introItemText}>- Góp phần bảo tồn giá trị văn hóa Khmer Nam Bộ.</Text>
-                <Text style={styles.introItemText}>- Hỗ trợ học tập và nghiên cứu.</Text>
-                <Text style={styles.introItemText}>- Quảng bá văn hóa truyền thống đến cộng đồng.</Text>
+                <Text style={styles.introSectionTitle}>{t('intro_goal_title')}</Text>
+                <Text style={styles.introItemText}>{t('intro_goal_1')}</Text>
+                <Text style={styles.introItemText}>{t('intro_goal_2')}</Text>
+                <Text style={styles.introItemText}>{t('intro_goal_3')}</Text>
               </View>
 
               {/* Team & Tech */}
               <View style={styles.introSection}>
                 <View style={[styles.introDetailRow, { marginTop: 0 }]}>
-                  <Text style={styles.introSectionTitle}>Công nghệ sử dụng: </Text>
+                  <Text style={styles.introSectionTitle}>{t('intro_tech_label')}</Text>
                   <Text style={styles.introItemText}>React Native, Expo, Firebase</Text>
                 </View>
                 <View style={styles.introDetailRow}>
-                  <Text style={styles.introSectionTitle}>Người phát triển: </Text>
+                  <Text style={styles.introSectionTitle}>{t('intro_dev_label')}</Text>
                   <Text style={styles.introItemText}>Lâm Nhật Hào</Text>
                 </View>
               </View>
