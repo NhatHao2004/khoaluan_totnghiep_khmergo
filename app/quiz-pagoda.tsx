@@ -2,6 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useQuizzes } from '@/hooks/use-quizzes';
 import { useTemples } from '@/hooks/use-temples';
+import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -15,7 +16,6 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { s, vs, ms } from '@/utils/responsive';
 
 export default function QuizPagodaSelectScreen() {
   const router = useRouter();
@@ -165,7 +165,7 @@ export default function QuizPagodaSelectScreen() {
               >
                 <Text style={styles.modalPrimaryBtnText} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'ចូល' : 'Đăng nhập'}</Text>
               </TouchableOpacity>
- 
+
               <TouchableOpacity
                 style={styles.modalSecondaryBtn}
                 onPress={() => setShowLoginModal(false)}
@@ -215,12 +215,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderTopWidth: 1,
+    borderTopWidth: 0,
     borderTopColor: 'rgba(0,0,0,0.06)',
     paddingTop: vs(10),
   },
   quizInfo: { flexDirection: 'row', alignItems: 'center', gap: s(5), flex: 1, marginRight: s(10) },
-  quizInfoText: { fontSize: ms(14), color: '#64748B', fontWeight: '600' },
+  quizInfoText: { fontSize: ms(15), color: '#000000ff', fontWeight: '600' },
   startBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 10,
   },
- 
+
   // --- Premium Modal Styles ---
   modalOverlay: {
     flex: 1,

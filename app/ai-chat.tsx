@@ -13,7 +13,7 @@ import {
   ActivityIndicator,
   Dimensions,
   Image,
-  Keyboard,
+  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
@@ -94,8 +94,8 @@ export default function AIAssistantScreen() {
             timestamp: new Date(),
           }]);
         }
-      } catch (e) { 
-        console.error("Load error", e); 
+      } catch (e) {
+        console.error("Load error", e);
       }
     };
     loadChat();
@@ -131,26 +131,9 @@ export default function AIAssistantScreen() {
   const [image, setImage] = useState<string | null>(null);
   const [status, setStatus] = useState<AnalysisStatus>('idle');
   const [result, setResult] = useState<{ title: string; content: string } | null>(null);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const scanPos = useSharedValue(0);
 
-  // Keyboard Handling (Mirroring Community style)
-  useEffect(() => {
-    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
-    const showSub = Keyboard.addListener(showEvent, (e: any) => {
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-    const hideSub = Keyboard.addListener(hideEvent, () => {
-      setKeyboardHeight(0);
-    });
-
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
 
   // Camera Animations
   useEffect(() => {
@@ -316,7 +299,11 @@ export default function AIAssistantScreen() {
       {/* Content Area */}
       <View style={styles.contentArea}>
         {activeTab === 'chat' ? (
-          <View style={{ flex: 1 }}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1 }}
+            keyboardVerticalOffset={vs(158)}
+          >
             <ScrollView ref={scrollViewRef} style={styles.messageList} contentContainerStyle={styles.messageListContent} showsVerticalScrollIndicator={false}>
               {messages.map((msg) => (
                 <View key={msg.id} style={[styles.messageWrapper, msg.sender === 'user' ? styles.userWrapper : styles.aiWrapper]}>
@@ -386,14 +373,7 @@ export default function AIAssistantScreen() {
                 </View>
               ))}
             </ScrollView>
-            <View style={[
-              styles.inputContainer,
-              {
-                paddingBottom: keyboardHeight > 0
-                  ? (Platform.OS === 'ios' ? keyboardHeight - 15 : keyboardHeight + 10)
-                  : 12
-              }
-            ]}>
+            <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
                 placeholder={t('ask_anything_placeholder')}
@@ -406,7 +386,7 @@ export default function AIAssistantScreen() {
                 <Ionicons name="send" size={28} color={inputText.trim() ? "#1877F2" : "#1877F2"} />
               </TouchableOpacity>
             </View>
-          </View>
+          </KeyboardAvoidingView>
         ) : (
           <View style={{ flex: 1 }}>
             <ScrollView
@@ -650,6 +630,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: s(15),
     paddingTop: vs(12),
+    paddingBottom: vs(15),
     borderTopWidth: 1,
     borderTopColor: '#F0F0F0',
     backgroundColor: '#FFFFFF'

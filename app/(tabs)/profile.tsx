@@ -330,8 +330,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: s(20),
-    minHeight: vs(60),
-    paddingBottom: vs(10),
+    minHeight: vs(50),
+    paddingBottom: vs(5),
   },
   headerTitle: {
     fontSize: ms(22),
@@ -345,8 +345,9 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     paddingHorizontal: s(33),
-    paddingVertical: vs(20),
-    gap: vs(15),
+    paddingBottom: vs(20),
+    paddingTop: vs(5),
+    gap: vs(5),
   },
   avatarWrapper: {
     position: 'relative',
@@ -364,7 +365,7 @@ const styles = StyleSheet.create({
   },
   profileInfo: {
     alignItems: 'center',
-    gap: vs(4),
+    gap: vs(2),
     width: '100%',
   },
   profileName: {
@@ -384,7 +385,7 @@ const styles = StyleSheet.create({
   // Menu
   menuList: {
     paddingHorizontal: s(24),
-    paddingTop: vs(10),
+    paddingTop: vs(0),
   },
   menuItem: {
     flexDirection: 'row',
