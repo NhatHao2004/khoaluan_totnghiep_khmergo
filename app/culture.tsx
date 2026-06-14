@@ -88,7 +88,7 @@ export default function CultureScreen() {
           </ThemedText>
         </View>
 
-        <View style={{ width: 40 }} />
+        <View style={{ width: s(40) }} />
       </View>
 
       {/* Content */}
@@ -147,7 +147,7 @@ export default function CultureScreen() {
       {loading && (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color="#FF0050" />
-          <ThemedText style={{ marginTop: 10, color: '#888' }}>{t('loading_content')}</ThemedText>
+          <ThemedText style={{ marginTop: vs(10), color: '#888' }}>{t('loading_content')}</ThemedText>
         </View>
       )}
     </View>

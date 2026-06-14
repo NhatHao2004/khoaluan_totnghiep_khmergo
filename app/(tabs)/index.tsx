@@ -58,14 +58,14 @@ export default function HomeScreen() {
     setToastType(type);
     setShowToast(true);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    toastY.value = withSpring(Platform.OS === 'ios' ? 50 : 40, {
+    toastY.value = withSpring(Platform.OS === 'ios' ? vs(50) : vs(40), {
       damping: 15,
       stiffness: 120,
       mass: 1,
     });
 
     setTimeout(() => {
-      toastY.value = withTiming(-120, { duration: 400 });
+      toastY.value = withTiming(-vs(120), { duration: 400 });
       setTimeout(() => setShowToast(false), 400);
     }, 4000);
   };
@@ -360,7 +360,7 @@ export default function HomeScreen() {
           <View style={styles.toastIcon}>
             <Ionicons
               name={toastType === 'success' ? "checkmark" : "close"}
-              size={20}
+              size={ms(20)}
               color="#FFF"
             />
           </View>

@@ -136,7 +136,7 @@ export default function FoodScreen() {
       {loading && (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color="#FF0050" />
-          <ThemedText style={{ marginTop: 10, color: '#888' }}>{t('loading_content')}</ThemedText>
+          <ThemedText style={{ marginTop: vs(10), color: '#888' }}>{t('loading_content')}</ThemedText>
         </View>
       )}
     </View>

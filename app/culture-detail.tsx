@@ -137,16 +137,16 @@ export default function CultureDetailScreen() {
           />
           <View style={styles.heroOverlay} />
 
-          <View style={[styles.topNav, { top: insets.top + vs(10) }]}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
-              <Ionicons name="arrow-back" size={ms(24)} color="#1E293B" />
-            </TouchableOpacity>
-            {!user?.role?.includes('Quản trị viên') && (
-              <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
-                <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={ms(ms(22))} color={isFavorite ? "#EF4444" : "#1E293B"} />
+            <View style={[styles.topNav, { top: insets.top + vs(10) }]}>
+              <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
+                <Ionicons name="arrow-back" size={ms(24)} color="#1E293B" />
               </TouchableOpacity>
-            )}
-          </View>
+              {!user?.role?.includes('Quản trị viên') && (
+                <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
+                  <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={ms(22)} color={isFavorite ? "#EF4444" : "#1E293B"} />
+                </TouchableOpacity>
+              )}
+            </View>
         </View>
 
         <View style={styles.contentArea}>
@@ -247,13 +247,13 @@ export default function CultureDetailScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setShowLoginModal(false)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: s(24) }}>
           <View style={styles.modalContent}>
             <View style={styles.modalIconCircle}>
-              <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
+              <Ionicons name="person-circle-outline" size={ms(40)} color="#3B82F6" />
             </View>
             <Text style={styles.modalTitle} adjustsFontSizeToFit numberOfLines={1}>{t('login_required') || 'Yêu cầu đăng nhập'}</Text>
-            <Text style={styles.modalSub} adjustsFontSizeToFit numberOfLines={1}>
+            <Text style={styles.modalSub} adjustsFontSizeToFit numberOfLines={2}>
               {t('login_to_use') || 'Bạn cần đăng nhập để sử dụng tính năng này'}
             </Text>
 
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     minHeight: SCREEN_HEIGHT - HERO_HEIGHT + vs(30),
   },
   titleBox: { marginBottom: vs(20), paddingHorizontal: s(5) },
-  mainTitle: { fontSize: s(28), fontWeight: '400', color: '#1E293B', lineHeight: s(36) },
+  mainTitle: { fontSize: ms(28), fontWeight: '400', color: '#1E293B', lineHeight: s(36) },
   locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: vs(6), gap: s(4) },
   locationLabel: { fontSize: ms(14), color: '#64748B', fontWeight: '400' },
 

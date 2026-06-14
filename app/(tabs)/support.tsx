@@ -288,11 +288,7 @@ export default function SupportScreen() {
                 </View>
               </TouchableOpacity>
             ))
-          ) : (
-            <View style={styles.emptyHistory}>
-              <Text style={styles.emptyText}>{t('no_feedback_yet')}</Text>
-            </View>
-          )}
+          ) : null}
         </View>
       </ScrollView>
 
@@ -533,15 +529,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#94A3B8',
     textAlign: 'right',
-  },
-  emptyHistory: {
-    alignItems: 'center',
-    paddingVertical: 10,
-    gap: 12,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#94A3B8',
   },
   // Toast Styles
   toastContainer: {

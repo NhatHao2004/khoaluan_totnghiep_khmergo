@@ -130,7 +130,7 @@ export default function PagodaScreen() {
         </View>
 
         {/* Empty view to balance the header (matching backBtn width) */}
-        <View style={{ width: 40 }} />
+        <View style={{ width: s(40) }} />
       </View>
 
       {/* Content */}
@@ -198,7 +198,7 @@ export default function PagodaScreen() {
       {loading && (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color="#FF0050" />
-          <ThemedText style={{ marginTop: 10, color: '#888' }}>{t('loading_content')}</ThemedText>
+          <ThemedText style={{ marginTop: vs(10), color: '#888' }}>{t('loading_content')}</ThemedText>
         </View>
       )}
     </View>

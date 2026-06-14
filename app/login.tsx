@@ -269,7 +269,7 @@ export default function LoginScreen() {
           <View style={styles.toastIcon}>
             <Ionicons
               name={toastType === 'success' ? "checkmark" : "close"}
-              size={20}
+              size={ms(20)}
               color="#FFF"
             />
           </View>

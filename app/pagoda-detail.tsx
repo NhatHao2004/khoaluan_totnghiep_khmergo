@@ -196,10 +196,10 @@ export default function PagodaDetailScreen() {
             <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
               <Ionicons name="arrow-back" size={24} color="#000" />
             </TouchableOpacity>
-            <View style={{ flexDirection: 'row', gap: 12 }}>
+            <View style={{ flexDirection: 'row', gap: s(12) }}>
               {user?.role !== 'Quản trị viên' && (
                 <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
-                  <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={22} color={isFavorite ? "#FF4B4B" : "#000"} />
+                  <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={ms(22)} color={isFavorite ? "#FF4B4B" : "#000"} />
                 </TouchableOpacity>
               )}
             </View>
@@ -210,7 +210,7 @@ export default function PagodaDetailScreen() {
           <View style={styles.titleBox}>
             <Text style={styles.mainTitle} adjustsFontSizeToFit numberOfLines={1}>{name}</Text>
             <View style={styles.locationRow}>
-              <Ionicons name="location" size={18} color="#FF6B6B" />
+              <Ionicons name="location" size={ms(18)} color="#FF6B6B" />
               <Text style={styles.locationLabel}>{location}</Text>
             </View>
           </View>
@@ -324,7 +324,7 @@ export default function PagodaDetailScreen() {
             )}
           </View>
 
-          <View style={{ height: 20 }} />
+          <View style={{ height: vs(20) }} />
         </View>
       </ScrollView>
 
@@ -338,7 +338,7 @@ export default function PagodaDetailScreen() {
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
           <View style={styles.modalContent}>
             <View style={styles.modalIconCircle}>
-              <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
+              <Ionicons name="person-circle-outline" size={ms(40)} color="#3B82F6" />
             </View>
             <Text style={styles.modalTitle} adjustsFontSizeToFit numberOfLines={1}>{t('login_required') || 'Yêu cầu đăng nhập'}</Text>
             <Text style={styles.modalSub} adjustsFontSizeToFit numberOfLines={1}>

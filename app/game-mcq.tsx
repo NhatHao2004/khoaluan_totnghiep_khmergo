@@ -236,7 +236,7 @@ export default function GameMCQScreen() {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator size="large" color="#FF6B2C" />
-        <Text style={{ marginTop: 12, color: '#64748B' }}>Đang tải câu hỏi...</Text>
+        <Text style={{ marginTop: vs(12), color: '#64748B' }}>Đang tải câu hỏi...</Text>
       </View>
     );
   }
@@ -244,10 +244,10 @@ export default function GameMCQScreen() {
   // ─────────────── GUEST VIEW ───────────────
   if (!user) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 24 }]}>
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: s(24) }]}>
         <StatusBar barStyle="dark-content" />
         <View style={styles.guestIconCircle}>
-          <Ionicons name="lock-closed" size={50} color="#3B82F6" />
+          <Ionicons name="lock-closed" size={ms(50)} color="#3B82F6" />
         </View>
         <Text style={styles.guestTitle}>Yêu cầu đăng nhập</Text>
         <Text style={styles.guestSub}>
@@ -288,13 +288,13 @@ export default function GameMCQScreen() {
 
         {/* Stars */}
         <View style={styles.resultStarsRow}>
-          {[1, 2, 3, 4, 5].map(s => (
+          {[1, 2, 3, 4, 5].map(s_idx => (
             <Ionicons
-              key={s}
-              name={s <= stars ? 'star' : 'star-outline'}
-              size={44}
-              color={s <= stars ? '#FBBF24' : '#E2E8F0'}
-              style={{ marginHorizontal: 4 }}
+              key={s_idx}
+              name={s_idx <= stars ? 'star' : 'star-outline'}
+              size={ms(44)}
+              color={s_idx <= stars ? '#FBBF24' : '#E2E8F0'}
+              style={{ marginHorizontal: s(4) }}
             />
           ))}
         </View>
@@ -460,7 +460,7 @@ export default function GameMCQScreen() {
             ))}
           </View>
         </Animated.View>
-        <View style={{ height: 40 }} />
+        <View style={{ height: vs(40) }} />
       </ScrollView>
 
       {/* New Bottom Feedback UI */}
@@ -602,25 +602,25 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
   bgCircle: {
     position: 'absolute',
-    top: -100,
-    right: -100,
-    width: 300,
-    height: 300,
-    borderRadius: 150,
+    top: -vs(100),
+    right: -s(100),
+    width: s(300),
+    height: s(300),
+    borderRadius: s(150),
     zIndex: 0,
   },
 
   // ── MODERN HEADER ──
   headerContainer: {
-    paddingTop: 52,
+    paddingTop: vs(52),
     paddingHorizontal: s(13),
-    paddingBottom: 20,
-    height: 120, // Fixed height
+    paddingBottom: vs(20),
+    height: vs(120), // Fixed height
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFF',
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: s(30),
+    borderBottomRightRadius: s(30),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.03,

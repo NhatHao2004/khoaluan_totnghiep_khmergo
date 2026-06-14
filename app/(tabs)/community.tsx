@@ -14,6 +14,7 @@ import {
   FlatList,
   Image,
   Keyboard,
+  KeyboardAvoidingView,
   Modal,
   Platform,
   ScrollView,
@@ -183,10 +184,10 @@ export default function CommunityScreen() {
     setToastMsg(msg);
     setToastType(type as any);
     setShowToast(true);
-    toastY.value = withTiming(Platform.OS === 'ios' ? 50 : 40, { duration: 400 });
+    toastY.value = withTiming(Platform.OS === 'ios' ? vs(50) : vs(40), { duration: 400 });
 
     setTimeout(() => {
-      toastY.value = withTiming(-100, { duration: 400 });
+      toastY.value = withTiming(-vs(100), { duration: 400 });
       setTimeout(() => setShowToast(false), 400);
     }, 4000);
   };
@@ -659,7 +660,7 @@ export default function CommunityScreen() {
             setCreateModalVisible(true);
           }}
         >
-          <Ionicons name="add" size={28} color="#000dffff" />
+          <Ionicons name="add" size={ms(28)} color="#1877F2" />
         </TouchableOpacity>
       </View>
 
@@ -678,51 +679,58 @@ export default function CommunityScreen() {
       />
 
       {/* Modal: Tạo/Sửa bài viết */}
-      <Modal animationType="fade" transparent={true} statusBarTranslucent={true} visible={isCreateModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
-        <View style={styles.modalOverlay}>
-          {renderToast()}
-          <Animated.View style={animatedGapStyle}>
-            <TouchableOpacity
+      <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isCreateModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <SafeAreaView style={{ flex: 1 }}>
+            <KeyboardAvoidingView
               style={{ flex: 1 }}
-              activeOpacity={1}
-              onPress={() => {
-                Keyboard.dismiss();
-                setCreateModalVisible(false);
-              }}
-            />
-          </Animated.View>
-          <Animated.View style={[styles.modalContent, animatedCreatePostStyle, { flex: 1 }]}>
-            <View style={styles.modalHeader}>
-
-              <View style={styles.modalHeaderTitleBox}>
-                <Text style={styles.modalTitle}>{isEditingPost ? t('edit_post_title') : t('create_post_title')}</Text>
-                <TouchableOpacity
-                  onPress={submitPost}
-                  disabled={!createPostText.trim() && !base64Image || isSubmittingPost}
-                  style={{ minWidth: 80, alignItems: 'flex-end', paddingVertical: 10 }}
-                >
-                  <View style={{ minWidth: 30, alignItems: 'center', justifyContent: 'center', paddingRight: 10 }}>
-                    {isSubmittingPost ? (
-                      <ActivityIndicator size="small" color="#1877F2" />
-                    ) : (
-                      <Text style={{
-                        color: (createPostText.trim() || base64Image) ? '#1877F2' : '#CCC',
-                        fontSize: 16,
-                        fontWeight: '400',
-                      }}>
-                        {isEditingPost ? t('update_post') : t('submit_post')}
-                      </Text>
-                    )}
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <ScrollView
-              style={[styles.createPostContent, { marginBottom: vs(80) }]}
-              contentContainerStyle={{ flexGrow: 1 }}
-              keyboardShouldPersistTaps="handled"
+              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             >
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                activeOpacity={1}
+                onPress={() => {
+                  Keyboard.dismiss();
+                  setCreateModalVisible(false);
+                }}
+              />
+              <Animated.View style={[
+                styles.modalContent,
+                animatedCreatePostStyle,
+                {
+                  maxHeight: SCREEN_HEIGHT * 0.92,
+                  minHeight: SCREEN_HEIGHT * 0.55,
+                }
+              ]}>
+                <View style={styles.modalHeader}>
+                  <View style={styles.modalHeaderTitleBox}>
+                    <Text style={styles.modalTitle}>{isEditingPost ? t('edit_post_title') : t('create_post_title')}</Text>
+                    <TouchableOpacity
+                      onPress={submitPost}
+                      disabled={!createPostText.trim() && !base64Image || isSubmittingPost}
+                      style={{ minWidth: s(80), alignItems: 'flex-end', paddingVertical: vs(10) }}
+                    >
+                      <View style={{ minWidth: s(30), alignItems: 'center', justifyContent: 'center', paddingRight: s(10) }}>
+                        {isSubmittingPost ? (
+                          <ActivityIndicator size="small" color="#1877F2" />
+                        ) : (
+                          <Text style={{
+                            color: (createPostText.trim() || base64Image) ? '#1877F2' : '#CCC',
+                            fontSize: ms(16),
+                            fontWeight: '400',
+                          }}>
+                            {isEditingPost ? t('update_post') : t('submit_post')}
+                          </Text>
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <ScrollView
+                  style={styles.createPostContent}
+                  contentContainerStyle={{ flexGrow: 1 }}
+                  keyboardShouldPersistTaps="handled"
+                >
               <View style={styles.userInfoRow}>
                 <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.commentAvatar} />
                 <Text style={styles.userNameInModal}>{user?.name || t('user_default')}</Text>
@@ -753,74 +761,82 @@ export default function CommunityScreen() {
               <View style={{ height: keyboardHeight > 0 ? vs(100) : vs(80) }} />
             </ScrollView>
 
-            <View style={[styles.createPostActions, {
-              paddingBottom: keyboardHeight > 0
-                ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom + 10 : keyboardHeight)
-                : (insets.bottom + vs(10)),
-              position: 'absolute',
-              bottom: 5,
-              left: 0,
-              right: 0
-            }]}>
-              <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
-                <Ionicons name="image-outline" size={24} color="#1877F2" />
-                <Text style={styles.attachActionText}>{t('image_label')}</Text>
-              </TouchableOpacity>
-              <View style={{ flex: 1 }} />
-              <TouchableOpacity
-                style={styles.closeModalBtn}
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setKeyboardHeight(0);
-                  setCreateModalVisible(false);
-                  setIsEditingPost(false);
-                  setEditingPostId(null);
-                  setCreatePostText('');
-                  setSelectedImage(null);
-                  setBase64Image(null);
-                }}
-              >
-                <Ionicons name="close" size={28} color="#FF3B30" />
-              </TouchableOpacity>
-            </View>
-          </Animated.View>
+                <View style={[styles.createPostActions, {
+                  paddingBottom: keyboardHeight > 0
+                    ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom + 10 : keyboardHeight)
+                    : (insets.bottom + vs(10)),
+                  position: 'absolute',
+                  bottom: vs(5),
+                  left: 0,
+                  right: 0
+                }]}>
+                  <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
+                    <Ionicons name="image-outline" size={24} color="#1877F2" />
+                    <Text style={styles.attachActionText}>{t('image_label')}</Text>
+                  </TouchableOpacity>
+                  <View style={{ flex: 1 }} />
+                  <TouchableOpacity
+                    style={styles.closeModalBtn}
+                    onPress={() => {
+                      Keyboard.dismiss();
+                      setKeyboardHeight(0);
+                      setCreateModalVisible(false);
+                      setIsEditingPost(false);
+                      setEditingPostId(null);
+                      setCreatePostText('');
+                      setSelectedImage(null);
+                      setBase64Image(null);
+                    }}
+                  >
+                    <Ionicons name="close" size={28} color="#FF3B30" />
+                  </TouchableOpacity>
+                </View>
+              </Animated.View>
+            </KeyboardAvoidingView>
+          </SafeAreaView>
         </View>
       </Modal>
 
       {/* Modal: Bình luận */}
-      <Modal animationType="fade" transparent={true} statusBarTranslucent={true} visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.modalOverlay}>
-          {renderToast()}
-          <Animated.View style={animatedGapStyle}>
-            <TouchableOpacity
+      <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <SafeAreaView style={{ flex: 1 }}>
+            <KeyboardAvoidingView
               style={{ flex: 1 }}
-              activeOpacity={1}
-              onPress={() => {
-                Keyboard.dismiss();
-                setModalVisible(false);
-              }}
-            />
-          </Animated.View>
-          <Animated.View style={[styles.modalContent, animatedCommentsStyle, { flex: 1 }]}>
-            <View style={styles.modalHeader}>
-
-              <View style={styles.modalHeaderTitleBox}>
-                <Text style={styles.modalTitle}>{t('comments_title')} ({posts.find(p => p.id === activePostId)?.comments || 0})</Text>
-                <TouchableOpacity onPress={() => {
+              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            >
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                activeOpacity={1}
+                onPress={() => {
                   Keyboard.dismiss();
-                  setKeyboardHeight(0);
                   setModalVisible(false);
-                }}><Ionicons name="close" size={28} color="#ff0000ff" /></TouchableOpacity>
-              </View>
-            </View>
-
-            <FlatList
-              ref={commentsListRef}
-              data={comments}
-              keyExtractor={(item) => item.id}
-              style={{ flex: 1, marginBottom: vs(80) }}
-              contentContainerStyle={styles.commentsList}
-              renderItem={({ item }) => {
+                }}
+              />
+              <Animated.View style={[
+                styles.modalContent,
+                animatedCommentsStyle,
+                {
+                  maxHeight: SCREEN_HEIGHT * 0.92,
+                  minHeight: SCREEN_HEIGHT * 0.55,
+                }
+              ]}>
+                <View style={styles.modalHeader}>
+                  <View style={styles.modalHeaderTitleBox}>
+                    <Text style={styles.modalTitle}>{t('comments_title')} ({posts.find(p => p.id === activePostId)?.comments || 0})</Text>
+                    <TouchableOpacity onPress={() => {
+                      Keyboard.dismiss();
+                      setKeyboardHeight(0);
+                      setModalVisible(false);
+                    }}><Ionicons name="close" size={28} color="#FF3B30" /></TouchableOpacity>
+                  </View>
+                </View>                <FlatList
+                  ref={commentsListRef}
+                  data={comments}
+                  keyExtractor={(item) => item.id}
+                  style={{ flex: 1 }}
+                  contentContainerStyle={[styles.commentsList, { paddingBottom: vs(100) }]}
+                  renderItem={({ item }) => {
                 const isMyComment = user?.uid === item.userId;
                 const displayCommentAvatar = (isMyComment && user?.avatar) ? user.avatar : item.avatar;
                 const displayCommentName = (isMyComment && user?.name) ? user.name : item.user;
@@ -876,28 +892,30 @@ export default function CommunityScreen() {
               </View>
             )}
 
-            <View style={[styles.commentInputContainer, {
-              paddingBottom: keyboardHeight > 0
-                ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom + 10 : keyboardHeight)
-                : (insets.bottom + vs(10)),
-              position: 'absolute',
-              bottom: 5,
-              left: 0,
-              right: 0
-            }]}>
-              <TextInput
-                ref={commentInputRef}
-                style={styles.commentInput}
-                placeholder={t('write_comment_placeholder')}
-                value={commentText}
-                onChangeText={setCommentText}
-                multiline
-              />
-              <TouchableOpacity style={styles.sendBtn} onPress={submitComment} disabled={!commentText.trim() || isAddingComment}>
-                {isAddingComment ? <ActivityIndicator size="small" color="#1877F2" /> : <Ionicons name="send" size={25} color={commentText.trim() ? "#1877F2" : "#1877F2"} />}
-              </TouchableOpacity>
-            </View>
-          </Animated.View>
+                <View style={[styles.commentInputContainer, {
+                  paddingBottom: keyboardHeight > 0
+                    ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom + 10 : keyboardHeight)
+                    : (insets.bottom + vs(10)),
+                  position: 'absolute',
+                  bottom: vs(5),
+                  left: 0,
+                  right: 0
+                }]}>
+                  <TextInput
+                    ref={commentInputRef}
+                    style={styles.commentInput}
+                    placeholder={t('write_comment_placeholder')}
+                    value={commentText}
+                    onChangeText={setCommentText}
+                    multiline
+                  />
+                  <TouchableOpacity style={styles.sendBtn} onPress={submitComment} disabled={!commentText.trim() || isAddingComment}>
+                    {isAddingComment ? <ActivityIndicator size="small" color="#1877F2" /> : <Ionicons name="send" size={25} color={commentText.trim() ? "#1877F2" : "#1877F2"} />}
+                  </TouchableOpacity>
+                </View>
+              </Animated.View>
+            </KeyboardAvoidingView>
+          </SafeAreaView>
         </View>
       </Modal>
 

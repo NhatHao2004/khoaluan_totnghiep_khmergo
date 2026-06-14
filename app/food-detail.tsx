@@ -247,13 +247,13 @@ export default function FoodDetailScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setShowLoginModal(false)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: s(24) }}>
           <View style={styles.modalContent}>
             <View style={styles.modalIconCircle}>
-              <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
+              <Ionicons name="person-circle-outline" size={ms(40)} color="#3B82F6" />
             </View>
             <Text style={styles.modalTitle} adjustsFontSizeToFit numberOfLines={1}>{t('login_required') || 'Yêu cầu đăng nhập'}</Text>
-            <Text style={styles.modalSub} adjustsFontSizeToFit numberOfLines={1}>
+            <Text style={styles.modalSub} adjustsFontSizeToFit numberOfLines={2}>
               {t('login_to_use') || 'Bạn cần đăng nhập để sử dụng tính năng này'}
             </Text>
 

@@ -67,10 +67,10 @@ export default function AIAssistantScreen() {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withTiming(Platform.OS === 'ios' ? 50 : 40, { duration: 400 });
+    toastY.value = withTiming(Platform.OS === 'ios' ? vs(50) : vs(40), { duration: 400 });
 
     setTimeout(() => {
-      toastY.value = withTiming(-120, { duration: 400 });
+      toastY.value = withTiming(-vs(120), { duration: 400 });
       setTimeout(() => setShowToast(false), 400);
     }, 4000);
   };
@@ -300,7 +300,7 @@ export default function AIAssistantScreen() {
           style={styles.menuBtn}
           onPress={() => activeTab === 'camera' ? resetCamera() : clearChat()}
         >
-          <Ionicons name="refresh-outline" size={26} color="rgba(255, 0, 0, 1)ff" />
+          <Ionicons name="refresh-outline" size={ms(26)} color="#EF4444" />
         </TouchableOpacity>
       </View>
 
@@ -311,14 +311,14 @@ export default function AIAssistantScreen() {
             style={[styles.tab, activeTab === 'chat' && styles.activeTab]}
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('chat'); }}
           >
-            <Ionicons name="chatbubbles" size={20} color={activeTab === 'chat' ? '#FFF' : '#6B7280'} />
+            <Ionicons name="chatbubbles" size={ms(20)} color={activeTab === 'chat' ? '#FFF' : '#6B7280'} />
             <Text style={[styles.tabText, activeTab === 'chat' && styles.activeTabText]} numberOfLines={1}>AI Chatbot</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tab, activeTab === 'camera' && styles.activeTab]}
             onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('camera'); }}
           >
-            <Ionicons name="camera" size={20} color={activeTab === 'camera' ? '#FFF' : '#6B7280'} />
+            <Ionicons name="camera" size={ms(20)} color={activeTab === 'camera' ? '#FFF' : '#6B7280'} />
             <Text style={[styles.tabText, activeTab === 'camera' && styles.activeTabText]} numberOfLines={1}>AI Camera</Text>
           </TouchableOpacity>
         </View>
@@ -523,8 +523,8 @@ export default function AIAssistantScreen() {
             shadowColor: toastType === 'error' ? '#EF4444' : (toastType === 'success' ? '#10B981' : '#007AFF'),
           }
         ]}>
-          <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}>
-            <Ionicons name={toastType === 'success' ? "checkmark" : (toastType === 'error' ? "close" : "information")} size={18} color="#FFF" />
+          <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', width: s(32), height: s(32), borderRadius: s(16), justifyContent: 'center', alignItems: 'center' }}>
+            <Ionicons name={toastType === 'success' ? "checkmark" : (toastType === 'error' ? "close" : "information")} size={ms(18)} color="#FFF" />
           </View>
           <Text style={styles.toastText}>{toastMsg}</Text>
         </Animated.View>
