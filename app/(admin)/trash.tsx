@@ -23,9 +23,9 @@ const TrashItem = memo(({ item, onRestore, onDelete, getImageSource }: any) => {
   return (
     <View style={styles.card}>
       <View style={styles.imageContainer}>
-        {item.imageUrl || fallback ? (
+        {(item.imageUrl || item.image || fallback) ? (
           <Image
-            source={item.imageUrl ? { uri: item.imageUrl } : fallback}
+            source={item.imageUrl ? { uri: item.imageUrl } : (item.image ? { uri: item.image } : fallback)}
             style={styles.cardImage}
             contentFit="cover"
             transition={300}
@@ -38,7 +38,7 @@ const TrashItem = memo(({ item, onRestore, onDelete, getImageSource }: any) => {
       </View>
 
       <View style={styles.cardContent}>
-        <Text style={styles.cardTitle} numberOfLines={1} adjustsFontSizeToFit>{item.name || item.title || 'Không có tên'}</Text>
+        <Text style={styles.cardTitle} numberOfLines={1} adjustsFontSizeToFit>{item.name || item.title || item.content || 'Không có tên'}</Text>
 
         <View style={styles.divider} />
 

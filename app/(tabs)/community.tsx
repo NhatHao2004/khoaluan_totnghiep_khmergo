@@ -560,9 +560,22 @@ export default function CommunityScreen() {
   const confirmDeletePost = async () => {
     if (!postToDelete) return;
     try {
-      await Firestore.deleteDoc(Firestore.doc(db, 'posts', postToDelete));
-      triggerToast(t('delete_post_success'));
+      const postRef = Firestore.doc(db, 'posts', postToDelete);
+      const postSnap = await Firestore.getDoc(postRef);
+      if (postSnap.exists()) {
+        // Move to trash
+        await Firestore.setDoc(Firestore.doc(db, 'system_trash', postToDelete), {
+          ...postSnap.data(),
+          originalId: postToDelete,
+          originalCollection: 'posts',
+          deletedAt: new Date()
+        });
+        // Delete from original
+        await Firestore.deleteDoc(postRef);
+        triggerToast(t('delete_post_success'));
+      }
     } catch (error) {
+      console.error("Error moving post to trash:", error);
       triggerToast(t('action_failed'), "error");
     } finally {
       setShowDeleteModal(false);
