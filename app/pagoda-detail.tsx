@@ -7,15 +7,16 @@ import { doc, onSnapshot, getDoc } from 'firebase/firestore';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Dimensions, Image, Linking, Modal, ScrollView,
+  Image, Linking, Modal, ScrollView,
   Share,
   StatusBar,
-  StyleSheet, Text, TouchableOpacity, View
+  StyleSheet as RNStyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
+import { s, vs, ms, SCREEN_WIDTH, SCREEN_HEIGHT } from '@/utils/responsive';
+const StyleSheet = RNStyleSheet;
 import { WebView } from 'react-native-webview';
 
-const { width, height } = Dimensions.get('window');
-const HERO_HEIGHT = height * 0.40;
+const HERO_HEIGHT = SCREEN_HEIGHT * 0.40;
 
 export default function PagodaDetailScreen() {
   const router = useRouter();
@@ -207,7 +208,7 @@ export default function PagodaDetailScreen() {
 
         <View style={styles.contentArea}>
           <View style={styles.titleBox}>
-            <Text style={styles.mainTitle}>{name}</Text>
+            <Text style={styles.mainTitle} adjustsFontSizeToFit numberOfLines={1}>{name}</Text>
             <View style={styles.locationRow}>
               <Ionicons name="location" size={18} color="#FF6B6B" />
               <Text style={styles.locationLabel}>{location}</Text>
@@ -216,7 +217,7 @@ export default function PagodaDetailScreen() {
 
           {description ? (
             <View style={{ marginBottom: 0 }}>
-              <Text style={[styles.piecePara, { textAlign: isKm ? 'left' : 'justify' }]}>{description}</Text>
+              <Text style={styles.piecePara}>{description}</Text>
             </View>
           ) : null}
 
@@ -229,7 +230,7 @@ export default function PagodaDetailScreen() {
                 {block.type === 'title' ? (
                   <Text style={styles.pieceTitle}>{isKm ? (block.value_khmer || block.value) : block.value}</Text>
                 ) : (
-                  <Text style={[styles.piecePara, { textAlign: isKm ? 'left' : 'justify' }]}>{isKm ? (block.value_khmer || block.value) : block.value}</Text>
+                  <Text style={styles.piecePara}>{isKm ? (block.value_khmer || block.value) : block.value}</Text>
                 )}
               </View>
             </View>
@@ -376,51 +377,51 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   topNav: {
     position: 'absolute',
-    top: 50,
-    left: 20,
-    right: 20,
+    top: vs(50),
+    left: s(20),
+    right: s(20),
     flexDirection: 'row',
     justifyContent: 'space-between',
     zIndex: 100,
   },
   iconBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: s(44),
+    height: s(44),
+    borderRadius: s(22),
     backgroundColor: 'rgba(255,255,255,0.9)',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: vs(2) },
     shadowOpacity: 0.1,
-    shadowRadius: 5,
+    shadowRadius: s(5),
     elevation: 4,
   },
-  imageBlock: { width: width, height: HERO_HEIGHT, backgroundColor: '#fff' },
+  imageBlock: { width: SCREEN_WIDTH, height: HERO_HEIGHT, backgroundColor: '#fff' },
   fullImg: { width: '100%', height: '100%' },
   noImg: { flex: 1, backgroundColor: '#F8FAFC', justifyContent: 'center', alignItems: 'center' },
   contentArea: {
-    paddingHorizontal: 25,
-    paddingTop: 30,
+    paddingHorizontal: s(25),
+    paddingTop: vs(30),
     backgroundColor: '#fff',
-    borderTopLeftRadius: 36,
-    borderTopRightRadius: 36,
-    marginTop: -30,
-    minHeight: height - HERO_HEIGHT + 30,
+    borderTopLeftRadius: s(36),
+    borderTopRightRadius: s(36),
+    marginTop: -vs(30),
+    minHeight: SCREEN_HEIGHT - HERO_HEIGHT + vs(30),
   },
-  titleBox: { marginBottom: 20 },
-  mainTitle: { fontSize: 28, fontWeight: '900', color: '#0F172A', lineHeight: 36 },
-  locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8, gap: 6 },
-  locationLabel: { fontSize: 14, color: '#64748B', fontWeight: '500' },
-  contentPiece: { marginTop: 15 },
-  blockPic: { width: '100%', height: 220, borderRadius: 24, marginBottom: 15 },
+  titleBox: { marginBottom: vs(20) },
+  mainTitle: { fontSize: s(28), fontWeight: '900', color: '#0F172A', lineHeight: s(36) },
+  locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: vs(8), gap: s(6) },
+  locationLabel: { fontSize: s(14), color: '#64748B', fontWeight: '500' },
+  contentPiece: { marginTop: vs(20) },
+  blockPic: { width: '100%', height: vs(220), borderRadius: s(24), marginBottom: vs(15) },
   blockTextWrap: {},
-  pieceTitle: { fontSize: 20, fontWeight: '900', color: '#0F172A', marginBottom: 8 },
-  piecePara: { fontSize: 16, lineHeight: 26, color: '#475569', textAlign: 'left' },
-  mapWrap: { marginTop: 10 },
+  pieceTitle: { fontSize: s(20), fontWeight: '900', color: '#0F172A', marginBottom: vs(8) },
+  piecePara: { fontSize: s(15.5), lineHeight: vs(26), color: '#475569', textAlign: 'left' },
+  mapWrap: { marginTop: vs(15) },
   mapBox: {
-    height: 350,
-    borderRadius: 28,
+    height: vs(350),
+    borderRadius: s(28),
     overflow: 'hidden',
     backgroundColor: '#F8FAFC',
     borderWidth: 1,
@@ -429,97 +430,97 @@ const styles = StyleSheet.create({
   mapWebView: { width: '100%', height: '100%', backgroundColor: 'transparent' },
   mapOpenBtn: {
     position: 'absolute',
-    bottom: 15,
-    right: 15,
+    bottom: vs(15),
+    right: s(15),
     backgroundColor: '#3B82F6',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 12,
+    paddingHorizontal: s(15),
+    paddingVertical: vs(10),
+    borderRadius: s(12),
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: s(8),
   },
-  mapOpenText: { color: '#fff', fontSize: 12, fontWeight: '800' },
-  mapControls: { position: 'absolute', top: 15, right: 15, gap: 10 },
+  mapOpenText: { color: '#fff', fontSize: s(12), fontWeight: '800' },
+  mapControls: { position: 'absolute', top: vs(15), right: s(15), gap: vs(10) },
   mapControlBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: s(40),
+    height: s(40),
+    borderRadius: s(20),
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: vs(2) },
     shadowOpacity: 0.15,
-    shadowRadius: 4,
+    shadowRadius: s(4),
     elevation: 3,
   },
   loaderContainer: { flex: 1, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' },
-  loaderContent: { alignItems: 'center', gap: 15 },
-  loaderText: { fontSize: 14, color: '#64748B', fontWeight: '600', letterSpacing: 0.5 },
-  sectionTabRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
+  loaderContent: { alignItems: 'center', gap: vs(15) },
+  loaderText: { fontSize: s(14), color: '#64748B', fontWeight: '600', letterSpacing: 0.5 },
+  sectionTabRow: { flexDirection: 'row', gap: s(12), marginBottom: vs(20) },
   tabBtn: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 12,
+    gap: s(8),
+    paddingVertical: vs(12),
     backgroundColor: '#F8FAFC',
-    borderRadius: 16,
+    borderRadius: s(16),
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
-  tabBtnText: { fontSize: 13, fontWeight: '700', color: '#64748b', textTransform: 'uppercase', lineHeight: 20 },
+  tabBtnText: { fontSize: s(13), fontWeight: '700', color: '#64748b', textTransform: 'uppercase', lineHeight: vs(20) },
   tabBtnTextActive: { color: '#FFF' },
   quizCard: {
-    height: 350,
+    height: vs(350),
     backgroundColor: '#FFF7ED',
-    borderRadius: 28,
+    borderRadius: s(28),
     borderWidth: 1,
     borderColor: '#FFEDD5',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 30,
+    padding: s(30),
   },
-  quizTitle: { fontSize: 20, fontWeight: '900', color: '#1E293B', marginBottom: 8 },
-  quizDesc: { fontSize: 14, color: '#64748B', textAlign: 'center', lineHeight: 22, marginBottom: 12 },
+  quizTitle: { fontSize: s(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(8) },
+  quizDesc: { fontSize: s(14), color: '#64748B', textAlign: 'center', lineHeight: vs(22), marginBottom: vs(12) },
   quizStartBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: s(10),
     backgroundColor: '#FF6B2C',
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 16,
-    shadowColor: '#FF6B2C', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8, elevation: 4,
+    paddingHorizontal: s(24),
+    paddingVertical: vs(14),
+    borderRadius: s(16),
+    shadowColor: '#FF6B2C', shadowOffset: { width: 0, height: vs(4) }, shadowOpacity: 0.2, shadowRadius: s(8), elevation: 4,
   },
-  quizStartBtnText: { color: '#FFF', fontSize: 16, fontWeight: '800' },
+  quizStartBtnText: { color: '#FFF', fontSize: s(16), fontWeight: '800' },
   modalContent: {
     backgroundColor: '#FFF',
-    borderRadius: 32,
-    padding: 30,
+    borderRadius: s(32),
+    padding: s(30),
     width: '100%',
-    maxWidth: 340,
+    maxWidth: s(340),
     alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.1, shadowRadius: 20, elevation: 10,
+    shadowColor: '#000', shadowOffset: { width: 0, height: vs(10) }, shadowOpacity: 0.1, shadowRadius: s(20), elevation: 10,
   },
   modalIconCircle: {
-    width: 80, height: 80, borderRadius: 40, backgroundColor: '#EFF6FF',
-    justifyContent: 'center', alignItems: 'center', marginBottom: 20,
+    width: s(80), height: s(80), borderRadius: s(40), backgroundColor: '#EFF6FF',
+    justifyContent: 'center', alignItems: 'center', marginBottom: vs(20),
     borderWidth: 1, borderColor: '#DBEAFE',
   },
-  modalTitle: { fontSize: 20, fontWeight: '900', color: '#1E293B', marginBottom: 8, textAlign: 'center' },
-  modalSub: { fontSize: 15, color: '#64748B', textAlign: 'center', lineHeight: 22, marginBottom: 24 },
-  modalActionRow: { width: '100%', gap: 12 },
+  modalTitle: { fontSize: s(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(8), textAlign: 'center' },
+  modalSub: { fontSize: s(15), color: '#64748B', textAlign: 'center', lineHeight: vs(22), marginBottom: vs(24) },
+  modalActionRow: { width: '100%', gap: vs(12) },
   modalPrimaryBtn: {
-    backgroundColor: '#3B82F6', height: 56, borderRadius: 18,
+    backgroundColor: '#3B82F6', height: vs(56), borderRadius: s(18),
     justifyContent: 'center', alignItems: 'center', width: '100%',
   },
-  modalPrimaryBtnText: { color: '#FFF', fontSize: 16, fontWeight: '800' },
+  modalPrimaryBtnText: { color: '#FFF', fontSize: s(16), fontWeight: '800' },
   modalSecondaryBtn: {
-    backgroundColor: '#EF4444', height: 56, borderRadius: 18,
+    backgroundColor: '#EF4444', height: vs(56), borderRadius: s(18),
     justifyContent: 'center', alignItems: 'center', width: '100%',
   },
-  modalSecondaryBtnText: { color: '#FFF', fontSize: 16, fontWeight: '800' },
+  modalSecondaryBtnText: { color: '#FFF', fontSize: s(16), fontWeight: '800' },
 });

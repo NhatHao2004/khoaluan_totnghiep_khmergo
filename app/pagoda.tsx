@@ -11,10 +11,12 @@ import {
   Alert,
   Image,
   ScrollView,
-  StyleSheet,
+  StyleSheet as RNStyleSheet,
   TouchableOpacity,
   View
 } from 'react-native';
+import { s, vs, ms } from '@/utils/responsive';
+const StyleSheet = RNStyleSheet;
 
 // Placeholder for images - User will add later
 const PAGODA_IMAGES: { [key: string]: any } = {
@@ -87,7 +89,7 @@ export default function PagodaScreen() {
       .replace(/đ/g, 'd');
   };
 
-  const handleToggleFavorite = async (id: string, currentStatus: boolean) => {
+  const handleToggleFavorite = async (pagoda: any, currentStatus: boolean) => {
     if (!user) {
       Alert.alert(
         t('login_required'),
@@ -101,7 +103,7 @@ export default function PagodaScreen() {
     }
 
     try {
-      await toggleFavorite(id, !currentStatus);
+      await toggleFavorite(user.uid, pagoda, !currentStatus);
       refresh();
     } catch (error) {
       console.error('Error toggling favorite:', error);
@@ -185,8 +187,8 @@ export default function PagodaScreen() {
                 </View>
 
                 <View style={styles.pagodaContent}>
-                  <ThemedText style={styles.pagodaName}>{isKm ? (pagoda.name_khmer || pagoda.name) : pagoda.name}</ThemedText>
-                  <ThemedText style={styles.pagodaLocation}>
+                  <ThemedText style={styles.pagodaName} numberOfLines={1}>{isKm ? (pagoda.name_khmer || pagoda.name) : pagoda.name}</ThemedText>
+                  <ThemedText style={styles.pagodaLocation} numberOfLines={1}>
                     {isKm ? (pagoda.location_khmer || pagoda.location) : pagoda.location}
                   </ThemedText>
                 </View>
@@ -208,19 +210,32 @@ export default function PagodaScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f9fa' },
-  header: { backgroundColor: '#ffffff', paddingTop: 45, paddingBottom: 15, paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', elevation: 5, zIndex: 100 },
-  backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
+  header: { 
+    backgroundColor: '#ffffff', 
+    paddingTop: vs(45), 
+    paddingBottom: vs(15), 
+    paddingHorizontal: s(15), 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    elevation: 5, 
+    zIndex: 100,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: vs(2) },
+    shadowOpacity: 0.1,
+    shadowRadius: s(10),
+  },
+  backBtn: { width: s(40), height: s(40), justifyContent: 'center', alignItems: 'center' },
   headerTitleContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { color: '#000000', fontSize: 20, fontWeight: '800', lineHeight: 28 },
+  headerTitle: { color: '#000000', fontSize: ms(20), fontWeight: '900', lineHeight: ms(28) },
   content: { flex: 1 },
-  scrollContent: { paddingBottom: 20, flexGrow: 1 },
-  pagodaList: { padding: 15, gap: 15 },
-  pagodaCard: { backgroundColor: '#ffffff', borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)', elevation: 2 },
+  scrollContent: { paddingBottom: vs(20), flexGrow: 1 },
+  pagodaList: { padding: s(15), gap: vs(15) },
+  pagodaCard: { backgroundColor: '#ffffff', borderRadius: s(20), overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)', elevation: 2 },
   pagodaImageContainer: { width: '100%', aspectRatio: 16 / 10 },
   pagodaImage: { width: '100%', height: '100%' },
-  pagodaContent: { padding: 15 },
-  pagodaName: { fontSize: 18, fontWeight: '800', color: '#1A1A1A', marginBottom: 5 },
-  pagodaLocation: { fontSize: 13, color: '#666' },
+  pagodaContent: { padding: s(18) },
+  pagodaName: { fontSize: s(18), fontWeight: '900', color: '#1A1A1A', marginBottom: vs(4) },
+  pagodaLocation: { fontSize: s(13), color: '#666', fontWeight: '600' },
   loader: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#fff',
@@ -228,6 +243,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 10
   },
-  errorText: { textAlign: 'center', marginTop: 50, color: 'red' },
-  emptyText: { textAlign: 'center', marginTop: 50, color: '#999' },
+  errorText: { textAlign: 'center', marginTop: vs(50), color: 'red' },
+  emptyText: { textAlign: 'center', marginTop: vs(50), color: '#999' },
 });

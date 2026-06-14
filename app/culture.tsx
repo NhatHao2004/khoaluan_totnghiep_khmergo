@@ -9,10 +9,12 @@ import {
   ActivityIndicator,
   Image,
   ScrollView,
-  StyleSheet,
+  StyleSheet as RNStyleSheet,
   TouchableOpacity,
   View
 } from 'react-native';
+import { s, vs, ms } from '@/utils/responsive';
+const StyleSheet = RNStyleSheet;
 
 // Placeholder for images
 const CULTURE_IMAGES: { [key: string]: any } = {
@@ -132,7 +134,7 @@ export default function CultureScreen() {
                 </View>
 
                 <View style={styles.cultureContent}>
-                  <ThemedText style={styles.cultureName}>
+                  <ThemedText style={styles.cultureName} numberOfLines={1}>
                     {isKm ? (item.name_khmer || item.name) : item.name}
                   </ThemedText>
                   <ThemedText style={styles.cultureLocation} numberOfLines={1}>
@@ -162,21 +164,21 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#ffffff',
-    paddingTop: 45,
-    paddingBottom: 15,
-    paddingHorizontal: 15,
+    paddingTop: vs(45),
+    paddingBottom: vs(15),
+    paddingHorizontal: s(15),
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: vs(2) },
     shadowOpacity: 0.1,
-    shadowRadius: 10,
+    shadowRadius: s(10),
     elevation: 5,
     zIndex: 100,
   },
   backBtn: {
-    width: 40,
-    height: 40,
+    width: s(40),
+    height: s(40),
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -185,21 +187,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-    headerTitle: { color: '#000000', fontSize: 20, fontWeight: '800', textAlign: 'center', lineHeight: 28 },
+  headerTitle: { color: '#000000', fontSize: ms(20), fontWeight: '900', textAlign: 'center', lineHeight: ms(28) },
   content: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: vs(20),
     flexGrow: 1,
   },
   cultureList: {
-    padding: 15,
-    gap: 15,
+    padding: s(15),
+    gap: vs(15),
   },
   cultureCard: {
     backgroundColor: '#ffffff',
-    borderRadius: 20,
+    borderRadius: s(20),
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.05)',
@@ -214,18 +216,18 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   cultureContent: {
-    padding: 15,
+    padding: s(18),
   },
   cultureName: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: s(18),
+    fontWeight: '900',
     color: '#1A1A1A',
-    marginBottom: 5,
+    marginBottom: vs(4),
   },
   cultureLocation: {
-    fontSize: 13,
+    fontSize: s(13),
     color: '#666',
-    fontWeight: '500',
+    fontWeight: '600',
   },
   loader: {
     ...StyleSheet.absoluteFillObject,
@@ -236,12 +238,12 @@ const styles = StyleSheet.create({
   },
   errorText: {
     textAlign: 'center',
-    marginTop: 50,
+    marginTop: vs(50),
     color: 'red',
   },
   emptyText: {
     textAlign: 'center',
-    marginTop: 50,
+    marginTop: vs(50),
     color: '#999',
   },
 });

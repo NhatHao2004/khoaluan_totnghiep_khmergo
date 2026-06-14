@@ -9,10 +9,12 @@ import {
   ActivityIndicator,
   Image,
   ScrollView,
-  StyleSheet,
+  StyleSheet as RNStyleSheet,
   TouchableOpacity,
   View
 } from 'react-native';
+import { s, vs, ms } from '@/utils/responsive';
+const StyleSheet = RNStyleSheet;
 
 const FOOD_IMAGES: { [key: string]: any } = {
   default: require('@/assets/images/amthuc.jpg'),
@@ -81,7 +83,7 @@ export default function FoodScreen() {
             {t('food')}
           </ThemedText>
         </View>
-        <View style={{ width: 40 }} />
+        <View style={{ width: s(40) }} />
       </View>
 
       <ScrollView
@@ -123,7 +125,7 @@ export default function FoodScreen() {
                   />
                 </View>
                 <View style={styles.foodContent}>
-                  <ThemedText style={styles.foodName}>{isKm ? (item.name_khmer || item.name) : item.name}</ThemedText>
+                  <ThemedText style={styles.foodName} numberOfLines={1}>{isKm ? (item.name_khmer || item.name) : item.name}</ThemedText>
                   <ThemedText style={styles.foodLocation} numberOfLines={1}>
                     {(isKm ? (item.location_khmer || item.location) : item.location) || (isKm ? 'ឯកទេសខ្មែរ' : 'Đặc sản Khmer')}
                   </ThemedText>
@@ -146,19 +148,32 @@ export default function FoodScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f9fa' },
-  header: { backgroundColor: '#ffffff', paddingTop: 45, paddingBottom: 15, paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', elevation: 5, zIndex: 100 },
-  backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
+  header: { 
+    backgroundColor: '#ffffff', 
+    paddingTop: vs(45), 
+    paddingBottom: vs(15), 
+    paddingHorizontal: s(15), 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    elevation: 5, 
+    zIndex: 100,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: vs(2) },
+    shadowOpacity: 0.1,
+    shadowRadius: s(10),
+  },
+  backBtn: { width: s(40), height: s(40), justifyContent: 'center', alignItems: 'center' },
   headerTitleContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { color: '#000000', fontSize: 20, fontWeight: '800', lineHeight: 32 },
+  headerTitle: { color: '#000000', fontSize: ms(20), fontWeight: '900', lineHeight: ms(32) },
   content: { flex: 1 },
-  scrollContent: { paddingBottom: 20, flexGrow: 1 },
-  foodList: { padding: 15, gap: 15 },
-  foodCard: { backgroundColor: '#ffffff', borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)', elevation: 2 },
+  scrollContent: { paddingBottom: vs(20), flexGrow: 1 },
+  foodList: { padding: s(15), gap: vs(15) },
+  foodCard: { backgroundColor: '#ffffff', borderRadius: s(20), overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(0,0,0,0.05)', elevation: 2 },
   imageContainer: { width: '100%', aspectRatio: 16 / 10 },
   foodImage: { width: '100%', height: '100%' },
-  foodContent: { padding: 15 },
-  foodName: { fontSize: 18, fontWeight: '800', color: '#1A1A1A', marginBottom: 5 },
-  foodLocation: { fontSize: 13, color: '#666' },
+  foodContent: { padding: s(18) },
+  foodName: { fontSize: s(18), fontWeight: '900', color: '#1A1A1A', marginBottom: vs(4) },
+  foodLocation: { fontSize: s(13), color: '#666', fontWeight: '600' },
   loader: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#fff',
@@ -166,6 +181,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 10
   },
-  errorText: { textAlign: 'center', marginTop: 50, color: 'red' },
-  emptyText: { textAlign: 'center', marginTop: 50, color: '#999' },
+  errorText: { textAlign: 'center', marginTop: vs(50), color: 'red' },
+  emptyText: { textAlign: 'center', marginTop: vs(50), color: '#999' },
 });

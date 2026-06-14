@@ -1,17 +1,17 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
-import { ms, s, vs } from '@/utils/responsive';
+import { s, vs, ms, SCREEN_WIDTH, SCREEN_HEIGHT } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Dimensions, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StatusBar, StyleSheet as RNStyleSheet, Text, TouchableOpacity, View } from 'react-native';
+const StyleSheet = RNStyleSheet;
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const { width, height } = Dimensions.get('window');
-const HERO_HEIGHT = height * 0.40;
+const HERO_HEIGHT = SCREEN_HEIGHT * 0.40;
 
 export default function FoodDetailScreen() {
   const router = useRouter();
@@ -151,7 +151,7 @@ export default function FoodDetailScreen() {
 
         <View style={styles.contentArea}>
           <View style={styles.titleBox}>
-            <Text style={styles.mainTitle} adjustsFontSizeToFit numberOfLines={2}>{name}</Text>
+            <Text style={styles.mainTitle} adjustsFontSizeToFit numberOfLines={1}>{name}</Text>
             <View style={styles.locationRow}>
               <Text style={styles.locationLabel} numberOfLines={1}>{location}</Text>
             </View>
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   },
   loaderText: {
     marginTop: vs(15),
-    fontSize: ms(14),
+    fontSize: s(14),
     color: '#64748B',
     fontWeight: '600',
     letterSpacing: 0.5
@@ -263,12 +263,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: vs(2) },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: s(4),
     elevation: 3,
   },
-  heroWrapper: { width: width, height: HERO_HEIGHT, backgroundColor: '#E2E8F0' },
+  heroWrapper: { width: SCREEN_WIDTH, height: HERO_HEIGHT, backgroundColor: '#E2E8F0' },
   heroImg: { width: '100%', height: '100%' },
   heroOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.1)' },
   contentArea: {
@@ -278,12 +278,12 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: s(36),
     borderTopRightRadius: s(36),
     marginTop: vs(-30),
-    minHeight: height - HERO_HEIGHT + vs(30),
+    minHeight: SCREEN_HEIGHT - HERO_HEIGHT + vs(30),
   },
   titleBox: { marginBottom: vs(20), paddingHorizontal: s(5) },
-  mainTitle: { fontSize: ms(28), fontWeight: '900', color: '#1E293B', lineHeight: ms(36) },
+  mainTitle: { fontSize: s(28), fontWeight: '900', color: '#1E293B', lineHeight: s(36) },
   locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: vs(6), gap: s(4) },
-  locationLabel: { fontSize: ms(14), color: '#64748B', fontWeight: '500' },
+  locationLabel: { fontSize: s(14), color: '#64748B', fontWeight: '500' },
 
   tabHeader: {
     flexDirection: 'row',
@@ -301,8 +301,8 @@ const styles = StyleSheet.create({
     gap: s(8),
     borderRadius: s(12),
   },
-  tabItemActive: { backgroundColor: '#FFF', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4 },
-  tabLabel: { fontSize: ms(14), fontWeight: '700', color: '#64748B' },
+  tabItemActive: { backgroundColor: '#FFF', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: vs(2) }, shadowOpacity: 0.05, shadowRadius: s(4) },
+  tabLabel: { fontSize: s(14), fontWeight: '700', color: '#64748B' },
   tabLabelActive: { color: '#1E293B' },
 
   tabContent: { marginTop: vs(18) },
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     marginBottom: 0
   },
   galleryItem: {
-    width: (width - s(40) - s(15)) / 2,
+    width: (SCREEN_WIDTH - s(40) - s(15)) / 2,
     height: vs(130),
     borderRadius: s(16),
     overflow: 'hidden',
@@ -324,8 +324,8 @@ const styles = StyleSheet.create({
 
   contentPiece: { marginBottom: vs(25) },
   blockPic: { width: '100%', height: vs(220), borderRadius: s(24), marginBottom: vs(15) },
-  pieceTitle: { fontSize: ms(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(8) },
-  piecePara: { fontSize: ms(16), lineHeight: ms(26), color: '#475569', textAlign: 'justify', marginBottom: vs(15) },
+  pieceTitle: { fontSize: s(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(8) },
+  piecePara: { fontSize: s(15.5), lineHeight: vs(26), color: '#475569', textAlign: 'left', marginBottom: vs(15) },
 
   quizCard: {
     backgroundColor: '#FFF7ED',
@@ -346,12 +346,12 @@ const styles = StyleSheet.create({
     marginBottom: vs(16),
     elevation: 2,
     shadowColor: '#FF6B2C',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: vs(4) },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowRadius: s(8),
   },
-  quizTitle: { fontSize: ms(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(4) },
-  quizSub: { fontSize: ms(14), color: '#64748B', marginBottom: vs(20), textAlign: 'center' },
+  quizTitle: { fontSize: s(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(4) },
+  quizSub: { fontSize: s(14), color: '#64748B', marginBottom: vs(20), textAlign: 'center' },
   quizStartBtn: {
     backgroundColor: '#FF6B2C',
     paddingHorizontal: s(32),
@@ -359,9 +359,9 @@ const styles = StyleSheet.create({
     borderRadius: s(16),
     elevation: 4,
     shadowColor: '#FF6B2C',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: vs(4) },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowRadius: s(8),
   },
-  quizStartBtnText: { color: '#FFF', fontSize: ms(16), fontWeight: '800' }
+  quizStartBtnText: { color: '#FFF', fontSize: s(16), fontWeight: '800' }
 });
