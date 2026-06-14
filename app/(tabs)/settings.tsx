@@ -246,7 +246,7 @@ export default function SettingsScreen() {
               color="#FFF"
             />
           </View>
-          <Text style={styles.toastText}>{toastMsg}</Text>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
         </Animated.View>
       )}
 

@@ -273,7 +273,7 @@ export default function LoginScreen() {
               color="#FFF"
             />
           </View>
-          <Text style={styles.toastText}>{toastMsg}</Text>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
         </Animated.View>
       )}
     </View>

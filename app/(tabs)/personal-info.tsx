@@ -365,7 +365,7 @@ export default function PersonalInfoScreen() {
           <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}>
             <Ionicons name={toastType === 'success' ? "checkmark" : (toastType === 'error' ? "close" : "information")} size={18} color="#FFF" />
           </View>
-          <Text style={styles.toastText}>{toastMsg}</Text>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
         </Animated.View>
       )}
     </SafeAreaView>

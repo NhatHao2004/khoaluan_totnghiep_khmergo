@@ -285,7 +285,7 @@ export const translations: any = {
     update_post: 'Cập nhật',
     empty_posts: 'Chưa có bài viết nào',
     image_label: 'Ảnh',
-    update_post_success: 'Đã cập nhật bài viết thành công',
+    update_post_success: 'Cập nhật bài viết thành công',
     post_success: 'Đã đăng bài viết thành công',
     action_failed: 'Thao tác thất bại',
     someone_liked: 'đã thích bài viết của bạn',

@@ -358,7 +358,7 @@ export default function HomeScreen() {
               color="#FFF"
             />
           </View>
-          <Text style={styles.toastText}>{toastMsg}</Text>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
         </Animated.View>
       )}
 

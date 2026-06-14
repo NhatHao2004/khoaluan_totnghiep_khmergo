@@ -85,7 +85,7 @@ export default function QuizScreen() {
               {user?.avatar ? (
                 <Image source={{ uri: user.avatar }} style={styles.cardAvatar} />
               ) : (
-                <Ionicons name="person-circle-outline" size={70} color="#000000ff" />
+                <Ionicons name="person" size={ms(40)} color="#000000ff" />
               )}
             </View>
 
@@ -302,10 +302,12 @@ const styles = StyleSheet.create({
     width: s(70),
     height: s(70),
     borderRadius: s(35),
-    backgroundColor: '#ffffffff',
+    backgroundColor: '#f8fafc',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
   },
   cardAvatar: {
     width: '100%',

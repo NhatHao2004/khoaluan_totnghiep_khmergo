@@ -212,7 +212,7 @@ export default function CommunityScreen() {
         <View style={styles.toastIcon}>
           <Ionicons name={toastType === 'success' ? "checkmark" : "close"} size={20} color="#FFF" />
         </View>
-        <Text style={styles.toastText}>{toastMsg}</Text>
+        <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
       </Animated.View>
     );
   };

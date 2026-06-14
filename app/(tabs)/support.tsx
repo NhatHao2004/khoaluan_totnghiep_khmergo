@@ -310,7 +310,7 @@ export default function SupportScreen() {
             size={24}
             color="#FFFFFF"
           />
-          <Text style={styles.toastText}>{toast.message}</Text>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toast.message}</Text>
         </Animated.View>
       )}
     </SafeAreaView>

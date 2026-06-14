@@ -361,9 +361,7 @@ const ChallengeManagement = () => {
               color="#FFF"
             />
           </View>
-          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
-            {toastMsg}
-          </Text>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
         </Animated.View>
       )}
 
