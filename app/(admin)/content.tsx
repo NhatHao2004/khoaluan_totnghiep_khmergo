@@ -708,9 +708,9 @@ const ContentManagement = () => {
             )}
 
             <Text style={styles.inputLabel}>Mô tả chính (Việt)</Text>
-            <TextInput style={[styles.input, { height: 110 }]} value={dDesc} onChangeText={setDDesc} multiline numberOfLines={4} placeholder="Mô tả tóm tắt..." />
+            <TextInput style={[styles.input, { height: vs(110) }]} value={dDesc} onChangeText={setDDesc} multiline numberOfLines={4} placeholder="Mô tả tóm tắt..." />
             <Text style={styles.inputLabel}>Mô tả chính (Khmer)</Text>
-            <TextInput style={[styles.input, { height: 110 }]} value={dDescKm} onChangeText={setDDescKm} multiline numberOfLines={4} placeholder="Mô tả tiếng Khmer..." />
+            <TextInput style={[styles.input, { height: vs(110) }]} value={dDescKm} onChangeText={setDDescKm} multiline numberOfLines={4} placeholder="Mô tả tiếng Khmer..." />
 
             <ImageSelector label="Ảnh đại diện chính" value={dImg} onChange={setDImg} />
 
@@ -719,7 +719,7 @@ const ContentManagement = () => {
             ) : (
               <View style={{ marginBottom: vs(15) }}>
                 <Text style={styles.inputLabel}>Bộ sưu tập ảnh (Thêm tối đa 6 ảnh phụ)</Text>
-                <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
+                <View style={{ flexDirection: 'row', gap: s(10), flexWrap: 'wrap' }}>
                   <ImageSelector label="Ảnh 1" value={dImg1} onChange={setDImg1} style={{ flex: 1, minWidth: '45%' }} />
                   <ImageSelector label="Ảnh 2" value={dImg2} onChange={setDImg2} style={{ flex: 1, minWidth: '45%' }} />
                   <ImageSelector label="Ảnh 3" value={dImg3} onChange={setDImg3} style={{ flex: 1, minWidth: '45%' }} />
@@ -731,7 +731,7 @@ const ContentManagement = () => {
             )}
 
             {dCat === 'pagoda' && (
-              <View style={{ flexDirection: 'row', gap: 15 }}>
+              <View style={{ flexDirection: 'row', gap: s(15) }}>
                 <View style={{ flex: 1 }}><Text style={styles.inputLabel}>Vĩ độ</Text><TextInput style={styles.input} value={dLat} onChangeText={setDLat} placeholder="Nhập vĩ độ..." keyboardType="numeric" /></View>
                 <View style={{ flex: 1 }}><Text style={styles.inputLabel}>Kinh độ</Text><TextInput style={styles.input} value={dLng} onChangeText={setDLng} placeholder="Nhập kinh độ..." keyboardType="numeric" /></View>
               </View>
@@ -761,7 +761,7 @@ const ContentManagement = () => {
 
                   <Text style={[styles.inputLabel, { marginTop: 0 }]}>Đoạn văn bản (Việt)</Text>
                   <TextInput
-                    style={[styles.input, { height: 80, backgroundColor: '#fff' }]}
+                    style={[styles.input, { height: vs(80), backgroundColor: '#fff' }]}
                     value={block.value}
                     onChangeText={(txt) => {
                       const newBlocks = [...dBlocks];
@@ -774,7 +774,7 @@ const ContentManagement = () => {
 
                   <Text style={styles.inputLabel}>Đoạn văn bản (Khmer)</Text>
                   <TextInput
-                    style={[styles.input, { height: 80, backgroundColor: '#fff' }]}
+                    style={[styles.input, { height: vs(80), backgroundColor: '#fff' }]}
                     value={block.value_khmer}
                     onChangeText={(txt) => {
                       const newBlocks = [...dBlocks];
@@ -922,8 +922,8 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 20,
   },
-  cancelBtn: { flex: 1, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#ff0000ff', alignItems: 'center' },
-  cancelBtnText: { fontSize: ms(15), fontWeight: '400', color: '#ffffffff' },
+  cancelBtn: { flex: 1, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#94a3b8', alignItems: 'center' },
+  cancelBtnText: { fontSize: ms(15), fontWeight: '400', color: '#fff' },
   saveBtn: { flex: 2, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#3b82f6', alignItems: 'center' },
   saveBtnText: { fontSize: ms(15), fontWeight: '400', color: '#fff' },
   catRow: { flexDirection: 'row', gap: s(8), marginBottom: vs(15) },

@@ -320,7 +320,7 @@ const ArticleManagement = () => {
             <Text style={styles.confirmTitle}>Xóa bình luận</Text>
             <Text style={styles.confirmSubText}>Bạn có chắc muốn xóa bình luận này</Text>
             <View style={styles.modalActions}>
-              <TouchableOpacity style={[styles.cancelBtn, { backgroundColor: '#3b82f6' }]} onPress={() => setCommentDeleteConfirmVisible(false)}>
+              <TouchableOpacity style={[styles.cancelBtn, { backgroundColor: '#94a3b8' }]} onPress={() => setCommentDeleteConfirmVisible(false)}>
                 <Text style={styles.btnText}>Hủy bỏ</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.saveBtnSmall, { backgroundColor: '#ef4444' }]} onPress={confirmDeleteComment}>
@@ -341,7 +341,7 @@ const ArticleManagement = () => {
             <Text style={styles.confirmTitle} numberOfLines={1} adjustsFontSizeToFit>Xác nhận xóa</Text>
             <Text style={styles.confirmSubText}>Bài đăng của {pendingDelete?.user} sẽ được chuyển vào thùng rác</Text>
             <View style={styles.modalActions}>
-              <TouchableOpacity style={[styles.cancelBtn, { backgroundColor: '#3b82f6' }]} onPress={() => setDeleteConfirmVisible(false)}>
+              <TouchableOpacity style={[styles.cancelBtn, { backgroundColor: '#94a3b8' }]} onPress={() => setDeleteConfirmVisible(false)}>
                 <Text style={styles.btnText}>Hủy bỏ</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.saveBtnSmall, { backgroundColor: '#ef4444' }]} onPress={confirmDelete}>

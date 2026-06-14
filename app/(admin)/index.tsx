@@ -367,7 +367,7 @@ const AdminDashboard = () => {
               onPress={() => setShowFeedbackModal(true)}
               style={styles.notificationBtn}
             >
-              <Ionicons name="chatbubbles-outline" size={ms(26)} color="#0022ffff" />
+              <Ionicons name="chatbubbles-outline" size={ms(26)} color="#3b82f6" />
               {pendingFeedback > 0 && (
                 <View style={styles.notificationBadge}>
                   <Text style={styles.badgeText}>{pendingFeedback > 99 ? '99+' : pendingFeedback}</Text>
@@ -680,7 +680,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: s(20),
     paddingBottom: vs(5),
-    minHeight: vs(70),
+    minHeight: vs(60),
   },
   headerTitle: {
     fontSize: ms(22),
@@ -1029,11 +1029,11 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingVertical: vs(14),
     borderRadius: s(18),
-    backgroundColor: '#0080ffff',
+    backgroundColor: '#3b82f6',
     alignItems: 'center',
   },
   logoutCancelText: {
-    color: '#ffffffff',
+    color: '#fff',
     fontSize: ms(15),
     fontWeight: '400',
   },
@@ -1376,13 +1376,13 @@ const styles = StyleSheet.create({
     height: vs(46),
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ff0000ff',
+    backgroundColor: '#94a3b8',
     borderRadius: s(14),
   },
   quickCancelText: {
     fontSize: ms(15),
     fontWeight: '400',
-    color: '#ffffffff',
+    color: '#fff',
   },
   quickSendBtn: {
     flex: 2,

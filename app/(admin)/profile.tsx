@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
   detailContent: { flex: 1 },
   detailLabel: { fontSize: ms(12), color: '#94a3b8', fontWeight: '400' },
   detailValue: { fontSize: ms(15), color: '#1e293b', fontWeight: '400', marginTop: vs(2) },
-  valueInput: { fontSize: ms(15), color: '#3b82f6', fontWeight: '400', marginTop: vs(2), padding: 0 },
+  valueInput: { fontSize: ms(15), color: '#3b82f6', fontWeight: '400', marginTop: vs(2), height: vs(22), padding: 0 },
   sectionTitleContainer: { marginTop: vs(30), paddingHorizontal: s(24), marginBottom: vs(12) },
   sectionTitle: { fontSize: ms(16), fontWeight: '400', color: '#1e293b' },
   actionList: { paddingHorizontal: s(20), gap: vs(10) },

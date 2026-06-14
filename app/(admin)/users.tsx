@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     marginLeft: s(10),
   },
-  emptyContainer: { alignItems: 'center', marginTop: vs(250), opacity: 0.5 },
+  emptyContainer: { alignItems: 'center', marginTop: vs(150), opacity: 0.5 },
   emptyText: {
     textAlign: 'center',
     color: '#94a3b8',

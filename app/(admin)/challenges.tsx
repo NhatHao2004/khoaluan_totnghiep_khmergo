@@ -656,8 +656,14 @@ const ChallengeManagement = () => {
               </ScrollView>
             </KeyboardAvoidingView>
 
-            <View style={[styles.modalFooter, { paddingBottom: Math.max(insets.bottom, vs(20)) }]}>
-              <TouchableOpacity style={styles.saveBtnLarge} onPress={handleSaveQuestion}>
+            <View style={[styles.modalFooter, { paddingBottom: Math.max(insets.bottom, vs(20)), paddingHorizontal: s(20), paddingTop: vs(15) }]}>
+              <TouchableOpacity
+                style={[styles.btnAction, styles.cancelBtn, { flex: 1, backgroundColor: '#f1f5f9' }]}
+                onPress={() => setQuestionModalVisible(false)}
+              >
+                <Text style={[styles.btnText, { color: '#64748b' }]}>Hủy bỏ</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.saveBtnLarge, { flex: 2 }]} onPress={handleSaveQuestion}>
                 <Text style={styles.saveBtnText}>Lưu câu hỏi</Text>
               </TouchableOpacity>
             </View>
