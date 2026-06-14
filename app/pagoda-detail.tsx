@@ -291,12 +291,12 @@ export default function PagodaDetailScreen() {
               </View>
             ) : (
               <View style={styles.quizCard}>
-                <Text style={styles.quizTitle}>{isKm ? 'សាកល្បងចំណេះដឹង' : 'Kiểm tra kiến thức'}</Text>
-                <Text style={styles.quizDesc}>
+                <Text style={styles.quizTitle} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'សាកល្បងចំណេះដឹង' : 'Kiểm tra kiến thức'}</Text>
+                <Text style={styles.quizDesc} adjustsFontSizeToFit numberOfLines={2}>
                   {isKm ? (
-                    <>តើអ្នកយល់ពី <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> យ៉ាងណា?{"\n"}ប្រកួតប្រជែងឥឡូវនេះ để nhận điểm thưởng</>
+                    <>តើអ្នកយល់ពី <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> យ៉ាងណា?{'\n'}ប្រកួតប្រជែងឥឡូវនេះដើម្បីទទួលបានពិន្ទុ</>
                   ) : (
-                    <>Hiểu <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> như thế nào{"\n"}Thử thách ngay để nhận điểm thưởng</>
+                    <>Hiểu <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> như thế nào?{'\n'}Thử thách ngay để nhận điểm thưởng</>
                   )}
                 </Text>
                 <TouchableOpacity
@@ -318,7 +318,7 @@ export default function PagodaDetailScreen() {
                     });
                   }}
                 >
-                  <Text style={styles.quizStartBtnText}>{isKm ? 'ចាប់ផ្តើមការប្រកួត' : 'Bắt đầu thử thách'}</Text>
+                  <Text style={styles.quizStartBtnText} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'ចាប់ផ្តើមការប្រកួត' : 'Bắt đầu thử thách'}</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -340,8 +340,8 @@ export default function PagodaDetailScreen() {
             <View style={styles.modalIconCircle}>
               <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
             </View>
-            <Text style={styles.modalTitle}>{t('login_required') || 'Yêu cầu đăng nhập'}</Text>
-            <Text style={styles.modalSub}>
+            <Text style={styles.modalTitle} adjustsFontSizeToFit numberOfLines={1}>{t('login_required') || 'Yêu cầu đăng nhập'}</Text>
+            <Text style={styles.modalSub} adjustsFontSizeToFit numberOfLines={1}>
               {t('login_to_use') || 'Bạn cần đăng nhập để sử dụng tính năng này'}
             </Text>
 
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
   tabBtnText: { fontSize: s(13), fontWeight: '700', color: '#64748b', textTransform: 'uppercase', lineHeight: vs(20) },
   tabBtnTextActive: { color: '#FFF' },
   quizCard: {
-    height: vs(350),
+    minHeight: vs(280),
     backgroundColor: '#FFF7ED',
     borderRadius: s(28),
     borderWidth: 1,
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
     padding: s(30),
   },
   quizTitle: { fontSize: s(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(8) },
-  quizDesc: { fontSize: s(14), color: '#64748B', textAlign: 'center', lineHeight: vs(22), marginBottom: vs(12) },
+  quizDesc: { fontSize: s(14), color: '#64748B', textAlign: 'center', lineHeight: vs(22), marginBottom: vs(16), alignSelf: 'stretch' },
   quizStartBtn: {
     flexDirection: 'row',
     alignItems: 'center',

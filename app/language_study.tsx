@@ -6,6 +6,7 @@ import { Audio } from 'expo-av';
 import { Image as ExpoImage } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { collection, onSnapshot, query } from 'firebase/firestore';
+import { ms } from '@/utils/responsive';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -186,7 +187,7 @@ export default function LanguageStudyScreen() {
             <Ionicons name="arrow-back" size={28} color="#000000" />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
-            <ThemedText style={styles.headerTitle} numberOfLines={1}>
+            <ThemedText style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
               {t('language_study')}
             </ThemedText>
           </View>
@@ -200,7 +201,7 @@ export default function LanguageStudyScreen() {
               style={[styles.tabItem, activeTab === 'topics' && styles.activeTabItem]}
               onPress={() => setActiveTab('topics')}
             >
-              <ThemedText style={[styles.tabText, activeTab === 'topics' && styles.activeTabText]}>
+              <ThemedText style={[styles.tabText, activeTab === 'topics' && styles.activeTabText]} adjustsFontSizeToFit numberOfLines={1} minimumFontScale={0.8}>
                 {t('learn_by_topic')}
               </ThemedText>
             </TouchableOpacity>
@@ -209,7 +210,7 @@ export default function LanguageStudyScreen() {
               style={[styles.tabItem, activeTab === 'translator' && styles.activeTabItem]}
               onPress={() => setActiveTab('translator')}
             >
-              <ThemedText style={[styles.tabText, activeTab === 'translator' && styles.activeTabText]}>
+              <ThemedText style={[styles.tabText, activeTab === 'translator' && styles.activeTabText]} adjustsFontSizeToFit numberOfLines={1} minimumFontScale={0.8}>
                 {t('vocab_translation')}
               </ThemedText>
             </TouchableOpacity>
@@ -254,12 +255,12 @@ export default function LanguageStudyScreen() {
                     <View style={styles.categoryCardBody}>
                       <View style={styles.cardInfoRow}>
                         <View style={styles.textContainer}>
-                          <ThemedText style={styles.categoryCardTitle}>
+                          <ThemedText style={styles.categoryCardTitle} adjustsFontSizeToFit numberOfLines={1} minimumFontScale={0.4}>
                             {isKm && category.titleKm ? category.titleKm : t(category.title)}
                           </ThemedText>
                         </View>
                         <View style={styles.startStudyBtn}>
-                          <ThemedText style={styles.startStudyBtnText}>{isKm ? 'ចាប់ផ្តើមរៀន' : 'Bắt đầu học'}</ThemedText>
+                          <ThemedText style={styles.startStudyBtnText} adjustsFontSizeToFit numberOfLines={1} minimumFontScale={0.8}>{isKm ? 'ចាប់ផ្តើមរៀន' : 'Bắt đầu học'}</ThemedText>
                         </View>
                       </View>
                     </View>
@@ -369,7 +370,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: ms(20),
     fontWeight: '800',
     color: '#000',
   },
@@ -393,9 +394,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(59, 130, 246, 0.05)',
   },
   tabText: {
-    fontSize: 15,
+    fontSize: ms(15),
     fontWeight: '700',
     color: '#94A3B8',
+    textAlign: 'center',
   },
   activeTabText: {
     color: '#3B82F6',
@@ -445,12 +447,13 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
+    paddingRight: 5,
   },
   categoryCardTitle: {
-    fontSize: 16,
+    fontSize: ms(16),
     fontWeight: '800',
     color: '#1A1A1A',
-    paddingLeft: 10,
+    marginLeft: 10,
   },
   categoryCardSub: {
     fontSize: 13,
@@ -459,9 +462,9 @@ const styles = StyleSheet.create({
   },
   startStudyBtn: {
     backgroundColor: '#0179e9',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 2,
@@ -469,11 +472,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
+    minWidth: 65,
   },
   startStudyBtnText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: ms(13),
     fontWeight: '700',
+    textAlign: 'center',
   },
   translatorWrapper: {
     padding: 15,
@@ -495,7 +500,7 @@ const styles = StyleSheet.create({
   },
   langButtonText: {
     color: '#1A73E8',
-    fontSize: 16,
+    fontSize: ms(16),
     fontWeight: '600',
   },
   swapButton: {
@@ -536,7 +541,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   outTextLabel: {
-    fontSize: 13,
+    fontSize: ms(13),
     color: '#848789ff',
     fontWeight: '600',
     marginBottom: 8,

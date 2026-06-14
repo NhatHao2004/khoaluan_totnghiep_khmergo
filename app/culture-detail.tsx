@@ -1,15 +1,15 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
+import { ms, s, SCREEN_HEIGHT, SCREEN_WIDTH, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StatusBar, StyleSheet as RNStyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { s, vs, ms, SCREEN_WIDTH, SCREEN_HEIGHT } from '@/utils/responsive';
-const StyleSheet = RNStyleSheet;
+import { ActivityIndicator, Modal, StyleSheet as RNStyleSheet, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+const StyleSheet = RNStyleSheet;
 
 const HERO_HEIGHT = SCREEN_HEIGHT * 0.40;
 
@@ -117,7 +117,7 @@ export default function CultureDetailScreen() {
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" color="#FF0050" />
-        <Text style={styles.loaderText}>
+        <Text style={styles.loaderText} adjustsFontSizeToFit numberOfLines={1}>
           {isKm ? 'កំពុងផ្ទុកមាតិកា...' : 'Đang tải nội dung...'}
         </Text>
       </View>
@@ -153,7 +153,7 @@ export default function CultureDetailScreen() {
           <View style={styles.titleBox}>
             <Text style={styles.mainTitle} adjustsFontSizeToFit numberOfLines={1}>{name}</Text>
             <View style={styles.locationRow}>
-              <Text style={styles.locationLabel} numberOfLines={1}>{location}</Text>
+              <Text style={styles.locationLabel} numberOfLines={1} adjustsFontSizeToFit>{location}</Text>
             </View>
           </View>
 
@@ -162,7 +162,7 @@ export default function CultureDetailScreen() {
               onPress={() => setActiveTab('gallery')}
               style={[styles.tabItem, activeTab === 'gallery' && styles.tabItemActive]}
             >
-              <Text style={[styles.tabLabel, activeTab === 'gallery' && styles.tabLabelActive]}>
+              <Text style={[styles.tabLabel, activeTab === 'gallery' && styles.tabLabelActive]} adjustsFontSizeToFit numberOfLines={1}>
                 {isKm ? 'រូបភាព' : 'Bộ sưu tập'}
               </Text>
             </TouchableOpacity>
@@ -172,7 +172,7 @@ export default function CultureDetailScreen() {
                 onPress={() => setActiveTab('quiz')}
                 style={[styles.tabItem, activeTab === 'quiz' && styles.tabItemActive]}
               >
-                <Text style={[styles.tabLabel, activeTab === 'quiz' && styles.tabLabelActive]}>
+                <Text style={[styles.tabLabel, activeTab === 'quiz' && styles.tabLabelActive]} adjustsFontSizeToFit numberOfLines={1}>
                   {isKm ? 'ការប្រកួត' : 'Thử thách'}
                 </Text>
               </TouchableOpacity>
@@ -213,13 +213,28 @@ export default function CultureDetailScreen() {
                 <View style={styles.quizIconBg}>
                   <Ionicons name="trophy-outline" size={ms(32)} color="#FF6B2C" />
                 </View>
-                <Text style={styles.quizTitle}>{isKm ? 'សាកល្បងចំណេះដឹង' : 'Kiểm tra kiến thức'}</Text>
-                <Text style={styles.quizSub}>{isKm ? 'ចូលរួមការប្រកួតដើម្បីទទួលបានពិន្ទុ' : 'Tham gia thử thách để nhận điểm thưởng'}</Text>
+                <Text style={styles.quizTitle} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'សាកល្បងចំណេះដឹង' : 'Kiểm tra kiến thức'}</Text>
+                <Text style={styles.quizSub} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'ចូលរួមការប្រកួតដើម្បីទទួលបានពិន្ទុ' : 'Tham gia thử thách để nhận điểm thưởng'}</Text>
                 <TouchableOpacity
                   style={styles.quizStartBtn}
-                  onPress={() => router.push({ pathname: '/game-mcq', params: { pagodaId: id, imageUrl: imageUrl, pagodaLocation: location } })}
+                  onPress={() => {
+                    const isAdmin = user?.role?.includes('Quản trị viên');
+                    if (!isAdmin && (!user || user.isAnonymous)) {
+                      setShowLoginModal(true);
+                      return;
+                    }
+
+                    router.push({
+                      pathname: '/game-mcq',
+                      params: {
+                        pagodaId: id,
+                        imageUrl: imageUrl,
+                        pagodaLocation: location
+                      }
+                    });
+                  }}
                 >
-                  <Text style={styles.quizStartBtnText}>{isKm ? 'ចាប់ផ្តើមការប្រកួត' : 'Bắt đầu ngay'}</Text>
+                  <Text style={styles.quizStartBtnText} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'ចាប់ផ្តើមការប្រកួត' : 'Bắt đầu ngay'}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -228,6 +243,47 @@ export default function CultureDetailScreen() {
           <View style={{ height: insets.bottom + vs(40) }} />
         </View>
       </ScrollView>
+      <Modal
+        visible={showLoginModal}
+        transparent={true}
+        animationType="fade"
+        statusBarTranslucent={true}
+        onRequestClose={() => setShowLoginModal(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalIconCircle}>
+              <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
+            </View>
+            <Text style={styles.modalTitle} adjustsFontSizeToFit numberOfLines={1}>{t('login_required') || 'Yêu cầu đăng nhập'}</Text>
+            <Text style={styles.modalSub} adjustsFontSizeToFit numberOfLines={1}>
+              {t('login_to_use') || 'Bạn cần đăng nhập để sử dụng tính năng này'}
+            </Text>
+
+            <View style={styles.modalActionRow}>
+              <TouchableOpacity
+                style={styles.modalPrimaryBtn}
+                onPress={() => {
+                  setShowLoginModal(false);
+                  router.push({
+                    pathname: '/login',
+                    params: { returnTo: '/culture-detail', returnId: id }
+                  });
+                }}
+              >
+                <Text style={styles.modalPrimaryBtnText}>{isKm ? 'ចូល' : 'Đăng nhập'}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalSecondaryBtn}
+                onPress={() => setShowLoginModal(false)}
+              >
+                <Text style={styles.modalSecondaryBtnText}>{isKm ? 'បោះបង់' : 'Quay lại'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -242,7 +298,7 @@ const styles = StyleSheet.create({
   },
   loaderText: {
     marginTop: vs(15),
-    fontSize: s(14),
+    fontSize: ms(14),
     color: '#64748B',
     fontWeight: '600',
     letterSpacing: 0.5
@@ -283,7 +339,7 @@ const styles = StyleSheet.create({
   titleBox: { marginBottom: vs(20), paddingHorizontal: s(5) },
   mainTitle: { fontSize: s(28), fontWeight: '900', color: '#1E293B', lineHeight: s(36) },
   locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: vs(6), gap: s(4) },
-  locationLabel: { fontSize: s(14), color: '#64748B', fontWeight: '500' },
+  locationLabel: { fontSize: ms(14), color: '#64748B', fontWeight: '500' },
 
   tabHeader: {
     flexDirection: 'row',
@@ -302,7 +358,7 @@ const styles = StyleSheet.create({
     borderRadius: s(12),
   },
   tabItemActive: { backgroundColor: '#FFF', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: vs(2) }, shadowOpacity: 0.05, shadowRadius: s(4) },
-  tabLabel: { fontSize: s(14), fontWeight: '700', color: '#64748B' },
+  tabLabel: { fontSize: ms(14), fontWeight: '700', color: '#64748B' },
   tabLabelActive: { color: '#1E293B' },
 
   tabContent: { marginTop: vs(18) },
@@ -324,8 +380,8 @@ const styles = StyleSheet.create({
 
   contentPiece: { marginBottom: vs(25) },
   blockPic: { width: '100%', height: vs(220), borderRadius: s(24), marginBottom: vs(15) },
-  pieceTitle: { fontSize: s(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(8) },
-  piecePara: { fontSize: s(15.5), lineHeight: vs(26), color: '#475569', textAlign: 'left', marginBottom: vs(15) },
+  pieceTitle: { fontSize: ms(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(8) },
+  piecePara: { fontSize: ms(15.5), lineHeight: vs(26), color: '#475569', textAlign: 'left', marginBottom: vs(15) },
 
   quizCard: {
     backgroundColor: '#FFF7ED',
@@ -350,8 +406,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: s(8),
   },
-  quizTitle: { fontSize: s(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(4) },
-  quizSub: { fontSize: s(14), color: '#64748B', marginBottom: vs(20), textAlign: 'center' },
+  quizTitle: { fontSize: ms(18), fontWeight: '900', color: '#1E293B', marginBottom: vs(4) },
+  quizSub: { fontSize: ms(13), color: '#64748B', marginBottom: vs(20), textAlign: 'center', alignSelf: 'stretch' },
   quizStartBtn: {
     backgroundColor: '#FF6B2C',
     paddingHorizontal: s(32),
@@ -363,5 +419,32 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: s(8),
   },
-  quizStartBtnText: { color: '#FFF', fontSize: s(16), fontWeight: '800' }
+  quizStartBtnText: { color: '#FFF', fontSize: ms(15), fontWeight: '800' },
+  modalContent: {
+    backgroundColor: '#FFF',
+    borderRadius: s(32),
+    padding: s(30),
+    width: '100%',
+    maxWidth: s(340),
+    alignItems: 'center',
+    shadowColor: '#000', shadowOffset: { width: 0, height: vs(10) }, shadowOpacity: 0.1, shadowRadius: s(20), elevation: 10,
+  },
+  modalIconCircle: {
+    width: s(80), height: s(80), borderRadius: s(40), backgroundColor: '#EFF6FF',
+    justifyContent: 'center', alignItems: 'center', marginBottom: vs(20),
+    borderWidth: 1, borderColor: '#DBEAFE',
+  },
+  modalTitle: { fontSize: ms(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(8), textAlign: 'center', alignSelf: 'stretch' },
+  modalSub: { fontSize: ms(15), color: '#64748B', textAlign: 'center', lineHeight: vs(22), marginBottom: vs(24), alignSelf: 'stretch' },
+  modalActionRow: { width: '100%', gap: vs(12) },
+  modalPrimaryBtn: {
+    backgroundColor: '#3B82F6', height: vs(56), borderRadius: s(18),
+    justifyContent: 'center', alignItems: 'center', width: '100%',
+  },
+  modalPrimaryBtnText: { color: '#FFF', fontSize: ms(16), fontWeight: '800' },
+  modalSecondaryBtn: {
+    backgroundColor: '#EF4444', height: vs(56), borderRadius: s(18),
+    justifyContent: 'center', alignItems: 'center', width: '100%',
+  },
+  modalSecondaryBtnText: { color: '#FFF', fontSize: ms(16), fontWeight: '800' },
 });

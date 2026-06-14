@@ -3,17 +3,17 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFoods } from '@/hooks/use-foods';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import {
   ActivityIndicator,
   Image,
-  ScrollView,
   StyleSheet as RNStyleSheet,
+  ScrollView,
   TouchableOpacity,
   View
 } from 'react-native';
-import { s, vs, ms } from '@/utils/responsive';
 const StyleSheet = RNStyleSheet;
 
 const FOOD_IMAGES: { [key: string]: any } = {
@@ -125,10 +125,7 @@ export default function FoodScreen() {
                   />
                 </View>
                 <View style={styles.foodContent}>
-                  <ThemedText style={styles.foodName} numberOfLines={1}>{isKm ? (item.name_khmer || item.name) : item.name}</ThemedText>
-                  <ThemedText style={styles.foodLocation} numberOfLines={1}>
-                    {(isKm ? (item.location_khmer || item.location) : item.location) || (isKm ? 'ឯកទេសខ្មែរ' : 'Đặc sản Khmer')}
-                  </ThemedText>
+                  <ThemedText style={styles.foodName} numberOfLines={1} adjustsFontSizeToFit>{isKm ? (item.name_khmer || item.name) : item.name}</ThemedText>
                 </View>
               </TouchableOpacity>
             ))}
@@ -148,14 +145,14 @@ export default function FoodScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f9fa' },
-  header: { 
-    backgroundColor: '#ffffff', 
-    paddingTop: vs(45), 
-    paddingBottom: vs(15), 
-    paddingHorizontal: s(15), 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    elevation: 5, 
+  header: {
+    backgroundColor: '#ffffff',
+    paddingTop: vs(45),
+    paddingBottom: vs(15),
+    paddingHorizontal: s(15),
+    flexDirection: 'row',
+    alignItems: 'center',
+    elevation: 5,
     zIndex: 100,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: vs(2) },

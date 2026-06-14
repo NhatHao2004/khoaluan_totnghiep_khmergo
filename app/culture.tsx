@@ -3,17 +3,17 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCultures } from '@/hooks/use-cultures';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import {
   ActivityIndicator,
   Image,
-  ScrollView,
   StyleSheet as RNStyleSheet,
+  ScrollView,
   TouchableOpacity,
   View
 } from 'react-native';
-import { s, vs, ms } from '@/utils/responsive';
 const StyleSheet = RNStyleSheet;
 
 // Placeholder for images
@@ -134,11 +134,8 @@ export default function CultureScreen() {
                 </View>
 
                 <View style={styles.cultureContent}>
-                  <ThemedText style={styles.cultureName} numberOfLines={1}>
+                  <ThemedText style={styles.cultureName} numberOfLines={1} adjustsFontSizeToFit>
                     {isKm ? (item.name_khmer || item.name) : item.name}
-                  </ThemedText>
-                  <ThemedText style={styles.cultureLocation} numberOfLines={1}>
-                    {(isKm ? (item.location_khmer || item.location) : item.location) || t('address_not_updated')}
                   </ThemedText>
                 </View>
               </TouchableOpacity>
@@ -219,13 +216,13 @@ const styles = StyleSheet.create({
     padding: s(18),
   },
   cultureName: {
-    fontSize: s(18),
+    fontSize: ms(17),
     fontWeight: '900',
     color: '#1A1A1A',
     marginBottom: vs(4),
   },
   cultureLocation: {
-    fontSize: s(13),
+    fontSize: ms(13),
     color: '#666',
     fontWeight: '600',
   },
