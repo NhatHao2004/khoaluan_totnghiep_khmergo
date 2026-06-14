@@ -23,6 +23,7 @@ import {
   View
 } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { analyzeImage, chatWithAI } from '../services/ai-service';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -41,6 +42,7 @@ export default function AIAssistantScreen() {
   const router = useRouter();
   const { t } = useLanguage();
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
 
   // Tabs State
   const [activeTab, setActiveTab] = useState<Mode>('chat');
@@ -59,6 +61,7 @@ export default function AIAssistantScreen() {
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+
   const toastY = useSharedValue(-120);
 
   const triggerToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
@@ -132,6 +135,8 @@ export default function AIAssistantScreen() {
   const [status, setStatus] = useState<AnalysisStatus>('idle');
   const [result, setResult] = useState<{ title: string; content: string } | null>(null);
   const scanPos = useSharedValue(0);
+
+
 
 
 
@@ -246,6 +251,156 @@ export default function AIAssistantScreen() {
     }
   };
 
+  const renderMainContent = () => (
+    <>
+      <View style={styles.tabContainer}>
+        <View style={styles.tabWrapper}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'chat' && styles.activeTab]}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('chat'); }}
+          >
+            <Ionicons name="chatbubbles" size={20} color={activeTab === 'chat' ? '#FFF' : '#6B7280'} />
+            <Text style={[styles.tabText, activeTab === 'chat' && styles.activeTabText]} numberOfLines={1}>AI Chatbot</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'camera' && styles.activeTab]}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('camera'); }}
+          >
+            <Ionicons name="camera" size={20} color={activeTab === 'camera' ? '#FFF' : '#6B7280'} />
+            <Text style={[styles.tabText, activeTab === 'camera' && styles.activeTabText]} numberOfLines={1}>AI Camera</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.contentArea}>
+        {activeTab === 'chat' ? (
+          <View style={{ flex: 1 }}>
+            <ScrollView ref={scrollViewRef} style={styles.messageList} contentContainerStyle={styles.messageListContent} showsVerticalScrollIndicator={false}>
+              {messages.map((msg) => (
+                <View key={msg.id} style={[styles.messageWrapper, msg.sender === 'user' ? styles.userWrapper : styles.aiWrapper]}>
+                  {msg.sender === 'ai' ? (
+                    <>
+                      <Image source={require('@/assets/images/AI.jpg')} style={[styles.chatAvatar, { transform: [{ scale: 1.1 }] }]} />
+                      <View style={styles.aiBubbleContainer}>
+                        <View style={styles.aiBubble}>
+                          <Text style={styles.aiMessageText} textBreakStrategy="highQuality">
+                            {msg.text.replace(/\[LINK:.*?\]/g, '').replace(/\n\s*\n/g, '\n').replace(/\s+([.,!?;])/g, '$1').replace(/\s\s+/g, ' ').trim()}
+                          </Text>
+                          {msg.text.includes('[LINK:') && (
+                            <TouchableOpacity
+                              style={styles.detailBtn}
+                              onPress={() => {
+                                const match = msg.text.match(/\[LINK:(.*?)\]/);
+                                if (match) {
+                                  const id = match[1];
+                                  if (id === 'food_all') router.push('/food');
+                                  else if (id === 'pagoda_all') router.push('/pagoda');
+                                  else if (id === 'culture_all') router.push('/culture');
+                                  else if (id.startsWith('pagoda_')) router.push({ pathname: '/pagoda-detail', params: { id } });
+                                  else if (id.startsWith('culture_')) router.push({ pathname: '/culture-detail', params: { id } });
+                                  else if (id.startsWith('food_')) router.push({ pathname: '/food-detail', params: { id } });
+                                }
+                              }}
+                            >
+                              <Text style={styles.detailBtnText}>{msg.text.includes('_all]') ? t('explore_now') : t('view_details')}</Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
+                        <Text style={styles.chatTime}>{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+                      </View>
+                    </>
+                  ) : (
+                    <>
+                      <View style={styles.userBubbleContainer}>
+                        <View style={styles.userBubble}>
+                          <Text style={styles.userMessageText} textBreakStrategy="highQuality">{msg.text}</Text>
+                        </View>
+                        <Text style={[styles.chatTime, { textAlign: 'right' }]}>{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+                      </View>
+                      <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.chatAvatar} />
+                    </>
+                  )}
+                </View>
+              ))}
+            </ScrollView>
+            <SafeAreaView edges={['bottom']} style={styles.inputContainer}>
+              <TextInput style={styles.input} placeholder={t('ask_anything_placeholder')} placeholderTextColor="#9CA3AF" value={inputText} onChangeText={setInputText} multiline />
+              <TouchableOpacity style={styles.sendfab} onPress={sendMessage}>
+                <Ionicons name="send" size={28} color={inputText.trim() ? "#1877F2" : "#1877F2"} />
+              </TouchableOpacity>
+            </SafeAreaView>
+          </View>
+        ) : (
+          <View style={{ flex: 1 }}>
+            <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: (status === 'idle' || status === 'selected') ? 150 : 10 }}>
+              <View style={styles.cameraSection}>
+                <View style={styles.imageFrame}>
+                  <View style={[styles.corner, styles.topL]} /><View style={[styles.corner, styles.topR]} />
+                  <View style={[styles.corner, styles.botL]} /><View style={[styles.corner, styles.botR]} />
+                  <View style={styles.innerFrame}>
+                    {image ? (
+                      <View style={styles.imageWrapper}>
+                        <Image source={{ uri: image }} style={styles.previewImage} />
+                        {status === 'analyzing' && (
+                          <Animated.View style={[styles.scanLine, animatedLineStyle]}>
+                            <LinearGradient colors={['transparent', '#FF3131', 'transparent']} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={{ flex: 1 }} />
+                          </Animated.View>
+                        )}
+                      </View>
+                    ) : (
+                      <View style={styles.placeholderContainer}>
+                        <View style={styles.focusBracketContainer}>
+                          <View style={[styles.focusBracket, styles.fb_tl]} /><View style={[styles.focusBracket, styles.fb_tr]} /><View style={[styles.focusBracket, styles.fb_bl]} /><View style={[styles.focusBracket, styles.fb_br]} />
+                        </View>
+                      </View>
+                    )}
+                  </View>
+                </View>
+                <View style={[styles.aiCard, { width: '100%', marginTop: 0 }]}>
+                  {(status === 'idle' || status === 'selected') && (
+                    <View style={{ marginBottom: 5 }}>
+                      <Text style={{ fontSize: 18, fontWeight: '800', color: '#1A1A1A' }}>
+                        {status === 'idle' ? t('ai_camera_idle_title') : t('ai_camera_ready')}
+                      </Text>
+                    </View>
+                  )}
+                  {status === 'idle' && <Text style={styles.aiBubbleTextSmall}>{t('ai_camera_idle_desc')}</Text>}
+                  {status === 'selected' && <Text style={styles.aiBubbleTextSmall}>{t('ai_camera_selected_desc')}</Text>}
+                  {status === 'analyzing' && <View style={[styles.analyzingBox, { marginTop: 120 }]}>
+                    <ActivityIndicator color="#0066ffff" size="large" />
+                    <Text style={styles.analyzingText}>{t('ai_analyzing')}</Text>
+                  </View>}
+                  {status === 'result' && result && (
+                    <View style={{ marginTop: -5 }}>
+                      <Text style={styles.resultTitleSmall}>{result.title}</Text>
+                      <Text style={styles.aiBubbleTextSmall}>{result.content}</Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            </ScrollView>
+            {activeTab === 'camera' && (status === 'idle' || status === 'selected') && (
+              <View style={styles.fixedCameraActions}>
+                {status === 'idle' ? (
+                  <View style={styles.camBtnRow}>
+                    <TouchableOpacity style={styles.rectBtn} onPress={() => pickImage(false)}><Ionicons name="images" size={32} color="#0066ffff" /></TouchableOpacity>
+                    <TouchableOpacity style={styles.rectBtn} onPress={() => pickImage(true)}><Ionicons name="camera" size={32} color="#0066ffff" /></TouchableOpacity>
+                  </View>
+                ) : (
+                  <TouchableOpacity style={styles.analyzeBtn} onPress={handleAnalyze}>
+                    <LinearGradient colors={['#0066ffff', '#0052cc']} style={styles.analyzeGradient}>
+                      <Text style={styles.analyzeBtnText}>{t('ai_start_analysis')}</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+          </View>
+        )}
+      </View>
+    </>
+  );
+
   const resetCamera = () => {
     // Chỉ hoạt động khi có ảnh hoặc kết quả
     if (!image && !result) return;
@@ -276,213 +431,20 @@ export default function AIAssistantScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Tab Switcher */}
-      <View style={styles.tabContainer}>
-        <View style={styles.tabWrapper}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'chat' && styles.activeTab]}
-            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('chat'); }}
-          >
-            <Ionicons name="chatbubbles" size={20} color={activeTab === 'chat' ? '#FFF' : '#6B7280'} />
-            <Text style={[styles.tabText, activeTab === 'chat' && styles.activeTabText]} numberOfLines={1}>AI Chatbot</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'camera' && styles.activeTab]}
-            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('camera'); }}
-          >
-            <Ionicons name="camera" size={20} color={activeTab === 'camera' ? '#FFF' : '#6B7280'} />
-            <Text style={[styles.tabText, activeTab === 'camera' && styles.activeTabText]} numberOfLines={1}>AI Camera</Text>
-          </TouchableOpacity>
+      {Platform.OS === 'ios' ? (
+        <KeyboardAvoidingView
+          behavior="padding"
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={vs(148)}
+        >
+          {renderMainContent()}
+        </KeyboardAvoidingView>
+      ) : (
+        <View style={{ flex: 1 }}>
+          {renderMainContent()}
         </View>
-      </View>
-
-      {/* Content Area */}
-      <View style={styles.contentArea}>
-        {activeTab === 'chat' ? (
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={{ flex: 1 }}
-            keyboardVerticalOffset={vs(158)}
-          >
-            <ScrollView ref={scrollViewRef} style={styles.messageList} contentContainerStyle={styles.messageListContent} showsVerticalScrollIndicator={false}>
-              {messages.map((msg) => (
-                <View key={msg.id} style={[styles.messageWrapper, msg.sender === 'user' ? styles.userWrapper : styles.aiWrapper]}>
-                  {msg.sender === 'ai' ? (
-                    <>
-                      <Image source={require('@/assets/images/AI.jpg')} style={[styles.chatAvatar, { transform: [{ scale: 1.1 }] }]} />
-                      <View style={styles.aiBubbleContainer}>
-                        <View style={styles.aiBubble}>
-                          <Text
-                            style={styles.aiMessageText}
-                            textBreakStrategy="highQuality"
-                          >
-                            {msg.text.replace(/\[LINK:.*?\]/g, '').replace(/\n\s*\n/g, '\n').replace(/\s+([.,!?;])/g, '$1').replace(/\s\s+/g, ' ').trim()}
-                          </Text>
-                          {msg.text.includes('[LINK:') && (
-                            <TouchableOpacity
-                              style={styles.detailBtn}
-                              onPress={() => {
-                                const match = msg.text.match(/\[LINK:(.*?)\]/);
-                                if (match) {
-                                  const id = match[1];
-                                  if (id === 'food_all') {
-                                    router.push('/food');
-                                  } else if (id === 'pagoda_all') {
-                                    router.push('/pagoda');
-                                  } else if (id === 'culture_all') {
-                                    router.push('/culture');
-                                  } else if (id.startsWith('pagoda_')) {
-                                    router.push({ pathname: '/pagoda-detail', params: { id } });
-                                  } else if (id.startsWith('culture_')) {
-                                    router.push({ pathname: '/culture-detail', params: { id } });
-                                  } else if (id.startsWith('food_')) {
-                                    router.push({ pathname: '/food-detail', params: { id } });
-                                  }
-                                }
-                              }}
-                            >
-                              <Text style={styles.detailBtnText}>
-                                {msg.text.includes('_all]') ? t('explore_now') : t('view_details')}
-                              </Text>
-                            </TouchableOpacity>
-                          )}
-                        </View>
-                        <Text style={styles.chatTime}>
-                          {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </Text>
-                      </View>
-                    </>
-                  ) : (
-                    <>
-                      <View style={styles.userBubbleContainer}>
-                        <View style={styles.userBubble}>
-                          <Text
-                            style={styles.userMessageText}
-                            textBreakStrategy="highQuality"
-                          >
-                            {msg.text}
-                          </Text>
-                        </View>
-                        <Text style={[styles.chatTime, { textAlign: 'right' }]}>
-                          {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </Text>
-                      </View>
-                      <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.chatAvatar} />
-                    </>
-                  )}
-                </View>
-              ))}
-            </ScrollView>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder={t('ask_anything_placeholder')}
-                placeholderTextColor="#9CA3AF"
-                value={inputText}
-                onChangeText={setInputText}
-                multiline
-              />
-              <TouchableOpacity style={styles.sendfab} onPress={sendMessage}>
-                <Ionicons name="send" size={28} color={inputText.trim() ? "#1877F2" : "#1877F2"} />
-              </TouchableOpacity>
-            </View>
-          </KeyboardAvoidingView>
-        ) : (
-          <View style={{ flex: 1 }}>
-            <ScrollView
-              style={{ flex: 1 }}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{
-                paddingBottom: (status === 'idle' || status === 'selected') ? 150 : 10
-              }}
-            >
-              <View style={styles.cameraSection}>
-                <View style={styles.imageFrame}>
-                  <View style={[styles.corner, styles.topL]} /><View style={[styles.corner, styles.topR]} />
-                  <View style={[styles.corner, styles.botL]} /><View style={[styles.corner, styles.botR]} />
-                  <View style={styles.innerFrame}>
-                    {image ? (
-                      <View style={styles.imageWrapper}>
-                        <Image source={{ uri: image }} style={styles.previewImage} />
-                        {status === 'analyzing' && (
-                          <Animated.View style={[styles.scanLine, animatedLineStyle]}>
-                            <LinearGradient
-                              colors={['transparent', '#FF3131', 'transparent']}
-                              start={{ x: 0, y: 0.5 }}
-                              end={{ x: 1, y: 0.5 }}
-                              style={{ flex: 1 }}
-                            />
-                          </Animated.View>
-                        )}
-                      </View>
-                    ) : (
-                      <View style={styles.placeholderContainer}>
-                        <View style={styles.focusBracketContainer}>
-                          <View style={[styles.focusBracket, styles.fb_tl]} />
-                          <View style={[styles.focusBracket, styles.fb_tr]} />
-                          <View style={[styles.focusBracket, styles.fb_bl]} />
-                          <View style={[styles.focusBracket, styles.fb_br]} />
-                        </View>
-                      </View>
-                    )}
-                  </View>
-                </View>
-
-                {/* AI Card - positioned directly below the camera frame */}
-                <View style={[styles.aiCard, { width: '100%', marginTop: 0 }]}>
-                  <View style={styles.aiHeader}>
-                  </View>
-
-                  {(status === 'idle' || status === 'selected') && (
-                    <View style={{ marginBottom: 5 }}>
-                      <Text style={{ fontSize: 18, fontWeight: '800', color: '#1A1A1A' }}>
-                        {status === 'idle' ? t('ai_camera_idle_title') : t('ai_camera_ready')}
-                      </Text>
-                    </View>
-                  )}
-                  {status === 'idle' && <Text style={styles.aiBubbleTextSmall}>{t('ai_camera_idle_desc')}</Text>}
-                  {status === 'selected' && <Text style={styles.aiBubbleTextSmall}>{t('ai_camera_selected_desc')}</Text>}
-                  {status === 'analyzing' && <View style={[styles.analyzingBox, { marginTop: 120 }]}>
-                    <ActivityIndicator color="#0066ffff" size="large" />
-                    <Text style={styles.analyzingText}>{t('ai_analyzing')}</Text>
-                  </View>}
-
-                  {status === 'result' && result && (
-                    <View style={{ marginTop: -5 }}>
-                      <Text style={styles.resultTitleSmall}>{result.title}</Text>
-                      <Text style={styles.aiBubbleTextSmall}>{result.content}</Text>
-                    </View>
-                  )}
-                </View>
-              </View>
-            </ScrollView>
-
-            {/* Fixed Bottom Action Buttons */}
-            {activeTab === 'camera' && (status === 'idle' || status === 'selected') && (
-              <View style={styles.fixedCameraActions}>
-                {status === 'idle' && (
-                  <View style={styles.camBtnRow}>
-                    <TouchableOpacity style={styles.rectBtn} onPress={() => pickImage(false)}>
-                      <Ionicons name="images" size={32} color="#0066ffff" />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.rectBtn} onPress={() => pickImage(true)}>
-                      <Ionicons name="camera" size={32} color="#0066ffff" />
-                    </TouchableOpacity>
-                  </View>
-                )}
-
-                {status === 'selected' && (
-                  <TouchableOpacity style={styles.analyzeBtn} onPress={handleAnalyze}>
-                    <LinearGradient colors={['#0066ffff', '#0052cc']} style={styles.analyzeGradient}>
-                      <Text style={styles.analyzeBtnText}>{t('ai_start_analysis')}</Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                )}
-              </View>
-            )}
-          </View>
-        )}
-      </View>
+      )}
+      {/* showToast logic remains below */}
       {showToast && (
         <Animated.View style={[
           styles.toastContainer,
@@ -522,13 +484,13 @@ const styles = StyleSheet.create({
     elevation: 10
   },
   toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '700', marginLeft: s(15), flex: 1, letterSpacing: 0.3 },
-  header: { paddingTop: vs(40), paddingBottom: vs(10), paddingHorizontal: s(20), backgroundColor: '#FFF', flexDirection: 'row', alignItems: 'center' },
+  header: { paddingTop: vs(40), paddingBottom: vs(5), paddingHorizontal: s(20), backgroundColor: '#FFF', flexDirection: 'row', alignItems: 'center' },
   backBtn: { marginRight: s(15) },
   headerInfo: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { fontSize: ms(20), fontWeight: '900', color: '#1A1A1A', textAlign: 'center' },
   menuBtn: { width: s(42), height: s(42), justifyContent: 'center', alignItems: 'center' },
 
-  tabContainer: { paddingHorizontal: s(20), paddingVertical: vs(10), backgroundColor: '#FFF' },
+  tabContainer: { paddingHorizontal: s(20), paddingVertical: vs(5), backgroundColor: '#FFF' },
   tabWrapper: { flexDirection: 'row', backgroundColor: '#F1F5F9', borderRadius: ms(25), padding: s(4) },
   tab: { flex: 1, flexDirection: 'row', height: vs(40), borderRadius: ms(20), alignItems: 'center', justifyContent: 'center', gap: s(6) },
   activeTab: {
