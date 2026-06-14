@@ -219,13 +219,13 @@ const styles = StyleSheet.create({
   },
   navActive: {
     fontSize: 26, 
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#000',
     lineHeight: 36, // Reduced 
   },
   navInactive: {
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: '400',
     color: '#B0B0B0',
     lineHeight: 28, // Reduced
   },
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
 
   loginButtonText: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#FFFFFF',
     letterSpacing: 1,
     textAlign: 'center',

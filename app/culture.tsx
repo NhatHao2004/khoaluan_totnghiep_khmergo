@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: '#000000',
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: '400',
     textAlign: 'center',
   },
   content: {
@@ -224,14 +224,14 @@ const styles = StyleSheet.create({
   },
   cultureName: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1A1A1A',
     marginBottom: 5,
   },
   cultureLocation: {
     fontSize: 13,
     color: '#666',
-    fontWeight: '500',
+    fontWeight: '400',
   },
   loader: {
     ...StyleSheet.absoluteFillObject,

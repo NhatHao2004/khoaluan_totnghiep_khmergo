@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1A1A1A',
   },
   content: {

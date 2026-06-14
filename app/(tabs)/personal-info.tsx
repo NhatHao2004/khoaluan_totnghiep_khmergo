@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1A1A1A',
     lineHeight: 30,
   },
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1A1A1A',
     marginBottom: 15,
     lineHeight: 26,
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
   },
   menuInput: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '400',
     color: '#000000ff',
     paddingVertical: 0,
     paddingLeft: 0,
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
   },
   menuStatic: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '400',
     color: '#000000ff',
     paddingVertical: 0,
     paddingLeft: 0,
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
   saveBtnText: {
     color: '#FFF',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '400',
     textAlign: 'center',
   },
 });

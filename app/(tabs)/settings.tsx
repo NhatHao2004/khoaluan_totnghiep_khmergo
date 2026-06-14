@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1A1A1A',
     lineHeight: 28,
   },
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#000000ff',
     paddingTop: 15,
     paddingBottom: 5,
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 15,
     color: '#444',
-    fontWeight: '500',
+    fontWeight: '400',
     lineHeight: 22,
   },
   activeOption: {
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   },
   activeOptionText: {
     color: '#1A1A1A',
-    fontWeight: '600',
+    fontWeight: '400',
     lineHeight: 22,
   },
   switchItem: {
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   switchLabel: {
     fontSize: 15,
     color: '#444',
-    fontWeight: '500',
+    fontWeight: '400',
     lineHeight: 22,
   },
   timeBadge: {
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 14,
     color: '#ffffffff',
-    fontWeight: '700',
+    fontWeight: '400',
     lineHeight: 20,
   },
   infoItem: {
@@ -308,13 +308,13 @@ const styles = StyleSheet.create({
   infoLabel: {
     fontSize: 15,
     color: '#444',
-    fontWeight: '500',
+    fontWeight: '400',
     lineHeight: 22,
   },
   infoValue: {
     fontSize: 14,
     color: '#000000ff',
-    fontWeight: '500',
+    fontWeight: '400',
     lineHeight: 20,
   },
   divider: {
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1A1A1A',
     textAlign: 'center',
     marginBottom: 20,
@@ -361,16 +361,16 @@ const styles = StyleSheet.create({
   timeItemText: {
     fontSize: 20,
     color: '#AAA',
-    fontWeight: '500',
+    fontWeight: '400',
   },
   activeTimeText: {
     color: '#1A1A1A',
-    fontWeight: '700',
+    fontWeight: '400',
     fontSize: 24,
   },
   timeSeparator: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: '400',
     marginHorizontal: 15,
   },
   closeModalBtn: {
@@ -383,6 +383,6 @@ const styles = StyleSheet.create({
   closeModalText: {
     color: '#FFF',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '400',
   },
 });

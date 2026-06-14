@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1A1A1A',
     textAlign: 'center',
   },
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1A1A1A',
     marginBottom: 10,
     textAlign: 'center',
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
   exploreText: {
     color: '#FFF',
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '400',
   },
   listContainer: {
     paddingHorizontal: 20,
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1A1A1A',
     marginBottom: 15,
   },
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1A1A1A',
     marginBottom: 6,
   },

@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1A1A1A', // Black text
     lineHeight: 32,
   },
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     color: '#000000ff',
-    fontWeight: '600',
+    fontWeight: '400',
     fontSize: 14,
     lineHeight: 20,
   },
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
   timerText: {
     color: '#FFF',
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: '400',
   },
   podiumContainer: {
     flexDirection: 'row',
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   podiumName: {
     color: '#1A1A1A',
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '400',
     marginBottom: 5,
     textAlign: 'center',
     lineHeight: 18,
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
   podiumPointsText: {
     color: '#000000',
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '400',
     lineHeight: 16,
     textAlign: 'center',
   },
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
   podiumRank: {
     color: '#FFF',
     fontSize: 36,
-    fontWeight: '800',
+    fontWeight: '400',
     opacity: 0.9,
   },
   listContainer: {
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
   },
   listItemRank: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1A1A1A',
     lineHeight: 18,
   },
@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
   },
   listItemName: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1A1A1A',
     marginBottom: 2,
   },
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
   meTagText: {
     color: '#FFF',
     fontSize: 10,
-    fontWeight: '900',
+    fontWeight: '400',
   },
   myRankIndicator: {
     position: 'absolute',
@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
   },
   myRankIndicatorText: {
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#FFF',
   },
 });

@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1A1A1A',
     lineHeight: 34,
     paddingVertical: 2,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1A1A1A',
     marginBottom: 8,
     lineHeight: 26,
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   faqText: {
     fontSize: 15,
     color: '#333',
-    fontWeight: '500',
+    fontWeight: '400',
     lineHeight: 22,
   },
   typeRow: {
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   },
   typeBtnText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '400',
     color: '#666',
   },
   typeBtnTextActive: {
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '400',
     color: '#444',
     marginBottom: 8,
   },
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     color: '#FFF',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '400',
     lineHeight: 24,
   },
 
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
     color: '#888',
-    fontWeight: '500',
+    fontWeight: '400',
   },
   contactCard: {
     flexDirection: 'row',
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
   },
   contactValue: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '400',
     color: '#1A1A1A',
   },
   contactBtn: {
@@ -358,6 +358,6 @@ const styles = StyleSheet.create({
   contactBtnText: {
     color: '#FFF',
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '400',
   },
 });

@@ -349,12 +349,12 @@ const styles = StyleSheet.create({
   helloText: {
     fontSize: 14,
     color: '#1E293B',
-    fontWeight: '700',
+    fontWeight: '400',
     letterSpacing: 0.3,
   },
   userName: {
     fontSize: 20,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
   },
   notificationBtnSimple: {
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
   badgeText: {
     color: '#FFF',
     fontSize: 10,
-    fontWeight: '900',
+    fontWeight: '400',
     textAlign: 'center',
     textAlignVertical: 'center',
     includeFontPadding: false,
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#1E293B',
-    fontWeight: '500',
+    fontWeight: '400',
   },
   filterBtn: {
     width: 58,
@@ -449,14 +449,14 @@ const styles = StyleSheet.create({
   promoOff: {
     fontSize: 13,
     color: '#3B82F6',
-    fontWeight: '800',
+    fontWeight: '400',
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   promoTitle: {
     fontSize: 18,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     marginBottom: 18,
     lineHeight: 24,
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
   bookBtnText: {
     color: '#FFF',
     fontSize: 13,
-    fontWeight: '800',
+    fontWeight: '400',
   },
   promoImage: {
     ...StyleSheet.absoluteFillObject,
@@ -498,7 +498,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     lineHeight: 30,
     paddingBottom: 0,
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
   viewAllText: {
     color: '#64748B',
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '400',
   },
   gridContainer: {
     flexDirection: 'row',
@@ -546,7 +546,7 @@ const styles = StyleSheet.create({
   },
   serviceLabelMini: {
     fontSize: 10,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1E293B',
     textAlign: 'center',
     marginTop: 2,
@@ -574,7 +574,7 @@ const styles = StyleSheet.create({
   },
   itemLabel: {
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#334155',
     textAlign: 'center',
     marginTop: 2,
@@ -626,7 +626,7 @@ const styles = StyleSheet.create({
   tagText: {
     color: '#FFF',
     fontSize: 9,
-    fontWeight: '800',
+    fontWeight: '400',
     textTransform: 'uppercase',
   },
   heartBtn: {
@@ -648,7 +648,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     flex: 1,
     marginRight: 10,
@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 13,
     color: '#64748B',
-    fontWeight: '600',
+    fontWeight: '400',
   },
   reviewInfo: {
     flexDirection: 'row',
@@ -674,11 +674,11 @@ const styles = StyleSheet.create({
   reviewText: {
     fontSize: 12,
     color: '#94A3B8',
-    fontWeight: '500',
+    fontWeight: '400',
   },
   primaryBtnText: {
     fontSize: 14,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#FFF',
   },
   featuredLoader: {

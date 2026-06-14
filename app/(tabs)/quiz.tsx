@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#000000ff',
     lineHeight: 32,
   },
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
   },
   cardName: {
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#000000ff',
     marginBottom: 4,
   },
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   },
   cardRankText: {
     fontSize: 15,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#000000ff',
   },
   cardStats: {
@@ -285,13 +285,13 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 18,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
   },
   statLabel: {
     fontSize: 10,
     color: '#64748B',
-    fontWeight: '700',
+    fontWeight: '400',
     marginTop: 0,
     textTransform: 'uppercase',
     textAlign: 'center',
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     textAlign: 'left',
   },
@@ -351,14 +351,14 @@ const styles = StyleSheet.create({
 
   bentoTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1E293B',
     lineHeight: 26, // Tăng lên để không cắt dấu
     textAlign: 'center',
   },
   bentoTitleSmall: {
     fontSize: 14,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1E293B',
     lineHeight: 20, // Thêm lineHeight
     textAlign: 'center',
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
   bentoSubtitle: {
     fontSize: 12,
     color: '#64748B',
-    fontWeight: '600',
+    fontWeight: '400',
     marginTop: 2,
     textAlign: 'center',
   },

@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   },
   comingSoonTitle: {
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1e293b',
     marginTop: 20,
     textAlign: 'center',

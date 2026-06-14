@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
   },
   mainTitle: {
     fontSize: 28,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#0F172A',
     lineHeight: 36,
   },
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   locationLabel: {
     fontSize: 14,
     color: '#64748B',
-    fontWeight: '500',
+    fontWeight: '400',
   },
   contentPiece: {
     marginTop: 15,
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
   },
   pieceTitle: {
     fontSize: 20,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#0F172A',
     marginBottom: 8,
   },
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
   },
   headerLabel: {
     fontSize: 13,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     letterSpacing: 1.5,
     marginBottom: 15,
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
   mapOpenText: {
     color: '#fff',
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: '400',
   },
   mapControls: {
     position: 'absolute',
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
   loaderText: {
     fontSize: 14,
     color: '#64748B',
-    fontWeight: '600',
+    fontWeight: '400',
     letterSpacing: 0.5,
   },
 });

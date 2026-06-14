@@ -223,13 +223,13 @@ const styles = StyleSheet.create({
 
   loginTextBtnLabel: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#ffffffff',
     lineHeight: 18,
   },
   headerTitle: {
     fontSize: 22,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#000000ff',
     lineHeight: 48,
     paddingVertical: 5,
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
   },
   profileName: {
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1A1A1A',
     marginBottom: 5,
     lineHeight: 32,
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   menuTitle: {
     flex: 1,
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '400',
     color: '#1A1A1A',
     lineHeight: 22,
   },

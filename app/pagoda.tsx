@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   header: { backgroundColor: '#ffffff', paddingTop: 45, paddingBottom: 15, paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', elevation: 5, zIndex: 100 },
   backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
   headerTitleContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { color: '#000000', fontSize: 20, fontWeight: '800' },
+  headerTitle: { color: '#000000', fontSize: 20, fontWeight: '400' },
   content: { flex: 1 },
   scrollContent: { paddingBottom: 20, flexGrow: 1 },
   pagodaList: { padding: 15, gap: 15 },
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   pagodaImageContainer: { width: '100%', aspectRatio: 16 / 10 },
   pagodaImage: { width: '100%', height: '100%' },
   pagodaContent: { padding: 15 },
-  pagodaName: { fontSize: 18, fontWeight: '800', color: '#1A1A1A', marginBottom: 5 },
+  pagodaName: { fontSize: 18, fontWeight: '400', color: '#1A1A1A', marginBottom: 5 },
   pagodaLocation: { fontSize: 13, color: '#666' },
   loader: {
     ...StyleSheet.absoluteFillObject,
