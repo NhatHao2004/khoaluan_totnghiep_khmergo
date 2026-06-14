@@ -9,6 +9,7 @@ import {
   Alert,
   Dimensions,
   FlatList,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -275,6 +276,18 @@ const ContentManagement = () => {
   const [wordPron, setWordPron] = useState('');
   const [wordImg, setWordImg] = useState('');
   const [vocabSearchQuery, setVocabSearchQuery] = useState('');
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showSub = Keyboard.addListener(showEvent, (e) => setKeyboardHeight(e.endCoordinates.height));
+    const hideSub = Keyboard.addListener(hideEvent, () => setKeyboardHeight(0));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const managingTopic = useMemo(() => categories.find(c => c.id === managingTopicId), [categories, managingTopicId]);
 
@@ -621,107 +634,162 @@ const ContentManagement = () => {
         </View>
       </Modal>
 
-      {/* --- Destination Modal --- */}
-      <Modal visible={destModalVisible} animationType="slide" transparent statusBarTranslucent={true}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalBg}>
-          <View style={[styles.modalContentFull, { paddingTop: insets.top + vs(10) }]}>
-            <View style={[styles.modalHeader, { marginBottom: vs(10) }]}>
-              <View style={{ width: s(40) }} />
-              <Text style={[styles.modalTitle, { flex: 1, textAlign: 'center' }]} numberOfLines={1} adjustsFontSizeToFit>
-                {editingDest ? 'Sửa nội dung' : 'Thêm nội dung'}
-              </Text>
-              <TouchableOpacity onPress={() => setDestModalVisible(false)}>
-                <Ionicons name="close" size={ms(30)} color="#ff0000ff" />
-              </TouchableOpacity>
+      <Modal visible={destModalVisible} animationType="slide" transparent={false} statusBarTranslucent={true}>
+        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+          {/* Header */}
+          <View style={[styles.modalHeader, { paddingTop: insets.top + vs(10), paddingBottom: vs(15), borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }]}>
+            <View style={{ width: s(40) }} />
+            <Text style={[styles.modalTitle, { flex: 1, textAlign: 'center' }]} numberOfLines={1} adjustsFontSizeToFit>
+              {editingDest ? 'Sửa nội dung' : 'Thêm nội dung'}
+            </Text>
+            <TouchableOpacity onPress={() => setDestModalVisible(false)} style={styles.headerCloseBtn}>
+              <Ionicons name="close" size={ms(30)} color="#ef4444" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Form Content */}
+          <ScrollView 
+            style={{ flex: 1 }} 
+            contentContainerStyle={{ padding: s(20) }}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {!editingDest && (
+              <View style={styles.catRow}>
+                {['pagoda', 'culture', 'food'].map(cat => (
+                  <TouchableOpacity key={cat} style={[styles.catBtn, dCat === cat && styles.activeCatBtn]} onPress={() => setDCat(cat as any)}>
+                    <Text style={[styles.catBtnText, dCat === cat && styles.activeCatBtnText]} numberOfLines={1} adjustsFontSizeToFit>
+                      {cat === 'pagoda' ? 'Chùa Khmer' : cat === 'culture' ? 'Văn hóa' : 'Ẩm thực'}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+            <Text style={[styles.inputLabel, { marginTop: editingDest ? 0 : 12 }]}>{dCat === 'pagoda' ? 'Tên ngôi chùa (Việt)' : dCat === 'food' ? 'Tên món ăn (Việt)' : 'Tên văn hóa (Việt)'}</Text>
+            <TextInput style={styles.input} value={dName} onChangeText={setDName} placeholder="Nhập tên tiếng Việt..." />
+
+            <Text style={styles.inputLabel}>{dCat === 'pagoda' ? 'Tên ngôi chùa (Khmer)' : dCat === 'food' ? 'Tên món ăn (Khmer)' : 'Tên văn hóa (Khmer)'}</Text>
+            <TextInput style={styles.input} value={dNameKm} onChangeText={setDNameKm} placeholder="Nhập tên tiếng Khmer..." />
+
+            {dCat === 'pagoda' && (
+              <>
+                <Text style={styles.inputLabel}>Địa chỉ chùa (Việt)</Text>
+                <TextInput style={styles.input} value={dLoc} onChangeText={setDLoc} placeholder="Nhập địa chỉ..." />
+                <Text style={styles.inputLabel}>Địa chỉ chùa (Khmer)</Text>
+                <TextInput style={styles.input} value={dLocKm} onChangeText={setDLocKm} placeholder="Nhập địa chỉ tiếng Khmer..." />
+              </>
+            )}
+
+            {(dCat === 'culture' || dCat === 'food') && (
+              <>
+                <Text style={styles.inputLabel}>Mô tả phụ ngắn (Việt)</Text>
+                <TextInput
+                  style={styles.input}
+                  value={dSubDesc}
+                  onChangeText={setDSubDesc}
+                  placeholder="Lấy từ trường 'location'..."
+                />
+
+                <Text style={styles.inputLabel}>Mô tả phụ ngắn (Khmer)</Text>
+                <TextInput
+                  style={styles.input}
+                  value={dSubDescKm}
+                  onChangeText={setDSubDescKm}
+                  placeholder="Lấy từ trường 'location_khmer'..."
+                />
+              </>
+            )}
+
+            <Text style={styles.inputLabel}>Mô tả chính (Việt)</Text>
+            <TextInput style={[styles.input, { height: 110 }]} value={dDesc} onChangeText={setDDesc} multiline numberOfLines={4} placeholder="Mô tả tóm tắt..." />
+            <Text style={styles.inputLabel}>Mô tả chính (Khmer)</Text>
+            <TextInput style={[styles.input, { height: 110 }]} value={dDescKm} onChangeText={setDDescKm} multiline numberOfLines={4} placeholder="Mô tả tiếng Khmer..." />
+
+            <ImageSelector label="Ảnh đại diện chính" value={dImg} onChange={setDImg} />
+
+            <Text style={styles.inputLabel}>Bộ sưu tập ảnh (Thêm tối đa 6 ảnh phụ)</Text>
+            <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap', marginBottom: 15 }}>
+              <ImageSelector label="Ảnh 1" value={dImg1} onChange={setDImg1} style={{ flex: 1, minWidth: '45%' }} />
+              <ImageSelector label="Ảnh 2" value={dImg2} onChange={setDImg2} style={{ flex: 1, minWidth: '45%' }} />
+              <ImageSelector label="Ảnh 3" value={dImg3} onChange={setDImg3} style={{ flex: 1, minWidth: '45%' }} />
+              <ImageSelector label="Ảnh 4" value={dImg4} onChange={setDImg4} style={{ flex: 1, minWidth: '45%' }} />
+              <ImageSelector label="Ảnh 5" value={dImg5} onChange={setDImg5} style={{ flex: 1, minWidth: '45%' }} />
+              <ImageSelector label="Ảnh 6" value={dImg6} onChange={setDImg6} style={{ flex: 1, minWidth: '45%' }} />
             </View>
 
-            <ScrollView style={styles.modalForm} showsVerticalScrollIndicator={false}>
-              {!editingDest && (
-                <View style={styles.catRow}>
-                  {['pagoda', 'culture', 'food'].map(cat => (
-                    <TouchableOpacity key={cat} style={[styles.catBtn, dCat === cat && styles.activeCatBtn]} onPress={() => setDCat(cat as any)}>
-                      <Text style={[styles.catBtnText, dCat === cat && styles.activeCatBtnText]} numberOfLines={1} adjustsFontSizeToFit>
-                        {cat === 'pagoda' ? 'Chùa Khmer' : cat === 'culture' ? 'Văn hóa' : 'Ẩm thực'}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-
-              <Text style={[styles.inputLabel, { marginTop: editingDest ? 0 : 12 }]}>{dCat === 'pagoda' ? 'Tên ngôi chùa (Việt)' : dCat === 'food' ? 'Tên món ăn (Việt)' : 'Tên văn hóa (Việt)'}</Text>
-              <TextInput style={styles.input} value={dName} onChangeText={setDName} placeholder="Nhập tên tiếng Việt..." />
-
-              <Text style={styles.inputLabel}>{dCat === 'pagoda' ? 'Tên ngôi chùa (Khmer)' : dCat === 'food' ? 'Tên món ăn (Khmer)' : 'Tên văn hóa (Khmer)'}</Text>
-              <TextInput style={styles.input} value={dNameKm} onChangeText={setDNameKm} placeholder="Nhập tên tiếng Khmer..." />
-
-              {dCat === 'pagoda' && (
-                <>
-                  <Text style={styles.inputLabel}>Địa chỉ chùa (Việt)</Text>
-                  <TextInput style={styles.input} value={dLoc} onChangeText={setDLoc} placeholder="Nhập địa chỉ..." />
-                  <Text style={styles.inputLabel}>Địa chỉ chùa (Khmer)</Text>
-                  <TextInput style={styles.input} value={dLocKm} onChangeText={setDLocKm} placeholder="Nhập địa chỉ tiếng Khmer..." />
-                </>
-              )}
-
-              {(dCat === 'culture' || dCat === 'food') && (
-                <>
-                  <Text style={styles.inputLabel}>Mô tả phụ ngắn (Việt)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={dSubDesc}
-                    onChangeText={setDSubDesc}
-                    placeholder="Lấy từ trường 'location'..."
-                  />
-
-                  <Text style={styles.inputLabel}>Mô tả phụ ngắn (Khmer)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={dSubDescKm}
-                    onChangeText={setDSubDescKm}
-                    placeholder="Lấy từ trường 'location_khmer'..."
-                  />
-                </>
-              )}
-
-              <Text style={styles.inputLabel}>Mô tả chính (Việt)</Text>
-              <TextInput style={[styles.input, { height: 110 }]} value={dDesc} onChangeText={setDDesc} multiline numberOfLines={4} placeholder="Mô tả tóm tắt..." />
-              <Text style={styles.inputLabel}>Mô tả chính (Khmer)</Text>
-              <TextInput style={[styles.input, { height: 110 }]} value={dDescKm} onChangeText={setDDescKm} multiline numberOfLines={4} placeholder="Mô tả tiếng Khmer..." />
-
-              <ImageSelector label="Ảnh đại diện chính" value={dImg} onChange={setDImg} />
-
-              <Text style={styles.inputLabel}>Bộ sưu tập ảnh (Thêm tối đa 6 ảnh phụ)</Text>
-              <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap', marginBottom: 15 }}>
-                <ImageSelector label="Ảnh 1" value={dImg1} onChange={setDImg1} style={{ flex: 1, minWidth: '45%' }} />
-                <ImageSelector label="Ảnh 2" value={dImg2} onChange={setDImg2} style={{ flex: 1, minWidth: '45%' }} />
-                <ImageSelector label="Ảnh 3" value={dImg3} onChange={setDImg3} style={{ flex: 1, minWidth: '45%' }} />
-                <ImageSelector label="Ảnh 4" value={dImg4} onChange={setDImg4} style={{ flex: 1, minWidth: '45%' }} />
-                <ImageSelector label="Ảnh 5" value={dImg5} onChange={setDImg5} style={{ flex: 1, minWidth: '45%' }} />
-                <ImageSelector label="Ảnh 6" value={dImg6} onChange={setDImg6} style={{ flex: 1, minWidth: '45%' }} />
+            {dCat === 'pagoda' && (
+              <View style={{ flexDirection: 'row', gap: 15 }}>
+                <View style={{ flex: 1 }}><Text style={styles.inputLabel}>Vĩ độ</Text><TextInput style={styles.input} value={dLat} onChangeText={setDLat} placeholder="Nhập vĩ độ..." keyboardType="numeric" /></View>
+                <View style={{ flex: 1 }}><Text style={styles.inputLabel}>Kinh độ</Text><TextInput style={styles.input} value={dLng} onChangeText={setDLng} placeholder="Nhập kinh độ..." keyboardType="numeric" /></View>
               </View>
+            )}
+          </ScrollView>
 
-              {dCat === 'pagoda' && (
-                <View style={{ flexDirection: 'row', gap: 15 }}>
-                  <View style={{ flex: 1 }}><Text style={styles.inputLabel}>Vĩ độ</Text><TextInput style={styles.input} value={dLat} onChangeText={setDLat} placeholder="Nhập vĩ độ..." keyboardType="numeric" /></View>
-                  <View style={{ flex: 1 }}><Text style={styles.inputLabel}>Kinh độ</Text><TextInput style={styles.input} value={dLng} onChangeText={setDLng} placeholder="Nhập kinh độ..." keyboardType="numeric" /></View>
-                </View>
-              )}
+          {/* Fixed Bottom Action Bar handling keyboard */}
+          <View style={[
+            styles.modalActions, 
+            { 
+              paddingBottom: keyboardHeight > 0 ? vs(12) : Math.max(insets.bottom, vs(12)),
+              marginBottom: keyboardHeight 
+            }
+          ]}>
+            <TouchableOpacity style={styles.cancelBtn} onPress={() => setDestModalVisible(false)}>
+              <Text style={styles.cancelBtnText}>Hủy</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.saveBtn} onPress={handleSaveDest}>
+              <Text style={styles.saveBtnText}>Lưu nội dung</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={topicModalVisible} animationType="fade" transparent statusBarTranslucent={true}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalBg}>
+          <View style={styles.modalContentSmall}>
+            <Text style={styles.modalTitle}>{editingTopic ? 'Sửa chủ đề' : 'Thêm chủ đề mới'}</Text>
+            <ScrollView style={{ maxHeight: vs(400) }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+              <Text style={styles.inputLabel}>Tên chủ đề (Việt)</Text>
+              <TextInput style={styles.input} value={topicTitle} onChangeText={setTopicTitle} placeholder="Nhập tên chủ đề..." />
+              <Text style={styles.inputLabel}>Tên chủ đề (Khmer)</Text>
+              <TextInput style={styles.input} value={topicTitleKm} onChangeText={setTopicTitleKm} placeholder="Nhập tên tiếng Khmer..." />
+              <ImageSelector label="Ảnh đại diện" value={topicImg} onChange={setTopicImg} />
             </ScrollView>
-
             <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setDestModalVisible(false)}>
+              <TouchableOpacity style={styles.cancelBtn} onPress={() => setTopicModalVisible(false)}>
                 <Text style={styles.cancelBtnText}>Hủy</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtn} onPress={handleSaveDest}>
-                <Text style={styles.saveBtnText}>Lưu nội dung</Text>
+              <TouchableOpacity style={styles.saveBtn} onPress={handleSaveTopic}>
+                <Text style={styles.saveBtnText}>Lưu chủ đề</Text>
               </TouchableOpacity>
             </View>
           </View>
         </KeyboardAvoidingView>
       </Modal>
-
-      <Modal visible={topicModalVisible} animationType="fade" transparent statusBarTranslucent={true}><KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalBg}><View style={styles.modalContentSmall}><Text style={styles.modalTitle}>{editingTopic ? 'Sửa chủ đề' : 'Thêm chủ đề mới'}</Text><Text style={styles.inputLabel}>Tên chủ đề (Việt)</Text><TextInput style={styles.input} value={topicTitle} onChangeText={setTopicTitle} placeholder="Nhập tên chủ đề..." /><Text style={styles.inputLabel}>Tên chủ đề (Khmer)</Text><TextInput style={styles.input} value={topicTitleKm} onChangeText={setTopicTitleKm} placeholder="Nhập tên tiếng Khmer..." /><ImageSelector label="Ảnh đại diện" value={topicImg} onChange={setTopicImg} /><View style={styles.modalActions}><TouchableOpacity style={styles.cancelBtn} onPress={() => setTopicModalVisible(false)}><Text style={styles.cancelBtnText}>Hủy</Text></TouchableOpacity><TouchableOpacity style={styles.saveBtn} onPress={handleSaveTopic}><Text style={styles.saveBtnText}>Lưu chủ đề</Text></TouchableOpacity></View></View></KeyboardAvoidingView></Modal>
-      <Modal visible={wordModalVisible} animationType="fade" transparent statusBarTranslucent={true}><KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalBg}><View style={styles.modalContentSmall}><Text style={styles.modalTitle}>{editingWord ? 'Sửa từ vựng' : 'Thêm từ vựng mới'}</Text><ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: vs(450) }}><Text style={styles.inputLabel}>Từ tiếng Khmer</Text><TextInput style={styles.input} value={wordKhm} onChangeText={setWordKhm} placeholder="Nhập từ Khmer..." /><Text style={styles.inputLabel}>Nghĩa tiếng Việt</Text><TextInput style={styles.input} value={wordVie} onChangeText={setWordVie} placeholder="Nhập nghĩa Việt..." /><Text style={styles.inputLabel}>Phiên âm</Text><TextInput style={styles.input} value={wordPron} onChangeText={setWordPron} placeholder="Nhập phiên âm..." /><ImageSelector label="Ảnh minh họa (không bắt buộc)" value={wordImg} onChange={setWordImg} /></ScrollView><View style={styles.modalActions}><TouchableOpacity style={styles.cancelBtn} onPress={() => setWordModalVisible(false)}><Text style={styles.cancelBtnText}>Hủy</Text></TouchableOpacity><TouchableOpacity style={styles.saveBtn} onPress={handleSaveWord}><Text style={styles.saveBtnText}>Lưu từ vựng</Text></TouchableOpacity></View></View></KeyboardAvoidingView></Modal>
+      <Modal visible={wordModalVisible} animationType="fade" transparent statusBarTranslucent={true}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalBg}>
+          <View style={styles.modalContentSmall}>
+            <Text style={styles.modalTitle}>{editingWord ? 'Sửa từ vựng' : 'Thêm từ vựng mới'}</Text>
+            <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: vs(400) }} keyboardShouldPersistTaps="handled">
+              <Text style={styles.inputLabel}>Từ tiếng Khmer</Text>
+              <TextInput style={styles.input} value={wordKhm} onChangeText={setWordKhm} placeholder="Nhập từ Khmer..." />
+              <Text style={styles.inputLabel}>Nghĩa tiếng Việt</Text>
+              <TextInput style={styles.input} value={wordVie} onChangeText={setWordVie} placeholder="Nhập nghĩa Việt..." />
+              <Text style={styles.inputLabel}>Phiên âm</Text>
+              <TextInput style={styles.input} value={wordPron} onChangeText={setWordPron} placeholder="Nhập phiên âm..." />
+              <ImageSelector label="Ảnh minh họa (không bắt buộc)" value={wordImg} onChange={setWordImg} />
+            </ScrollView>
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={styles.cancelBtn} onPress={() => setWordModalVisible(false)}>
+                <Text style={styles.cancelBtnText}>Hủy</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.saveBtn} onPress={handleSaveWord}>
+                <Text style={styles.saveBtnText}>Lưu từ vựng</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
       <Modal visible={deleteConfirmVisible} transparent animationType="fade" statusBarTranslucent><View style={styles.modalBg}><View style={styles.confirmBox}><View style={styles.confirmIconBg}><Ionicons name="trash" size={ms(32)} color="#ef4444" /></View><Text style={styles.confirmTitle}>Xác nhận xóa</Text><Text style={styles.confirmText}>{deleteType === 'destination' ? `"${pendingDelete?.name}" sẽ được chuyển vào thùng rác.` : deleteType === 'topic' ? `Chủ đề "${pendingDelete?.title}" sẽ được chuyển vào thùng rác.` : 'Từ vựng này sẽ bị xóa vĩnh viễn.'}</Text><View style={styles.modalActions}><TouchableOpacity style={styles.cancelBtn} onPress={() => setDeleteConfirmVisible(false)}><Text style={styles.cancelBtnText}>Quay lại</Text></TouchableOpacity><TouchableOpacity style={[styles.saveBtn, { backgroundColor: '#ef4444' }]} onPress={confirmDelete}><Text style={styles.saveBtnText}>Xác nhận xóa</Text></TouchableOpacity></View></View></View></Modal>
     </View>
   );
@@ -778,7 +846,25 @@ const styles = StyleSheet.create({
   imagePickerText: { fontSize: ms(13), color: '#94a3b8', fontWeight: '600' },
   pickedImagePreview: { width: '100%', height: '100%' },
   removeImageBtn: { position: 'absolute', top: 5, right: 5, backgroundColor: '#fff', borderRadius: 15 },
-  modalActions: { flexDirection: 'row', padding: s(20), gap: s(12), borderTopWidth: 1, borderTopColor: '#f1f5f9' },
+  headerCloseBtn: {
+    width: s(40),
+    height: s(40),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalActions: { 
+    flexDirection: 'row', 
+    padding: s(20), 
+    gap: s(12), 
+    borderTopWidth: 1, 
+    borderTopColor: '#f1f5f9',
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 20,
+  },
   cancelBtn: { flex: 1, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#ff0000ff', alignItems: 'center' },
   cancelBtnText: { fontSize: ms(15), fontWeight: '800', color: '#ffffffff' },
   saveBtn: { flex: 2, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#3b82f6', alignItems: 'center' },
