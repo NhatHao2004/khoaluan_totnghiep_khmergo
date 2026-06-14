@@ -221,9 +221,10 @@ export default function CommunityScreen() {
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
     const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
-    const showSub = Keyboard.addListener(showEvent, (e) => {
+    const showSub = Keyboard.addListener(showEvent, (e: any) => {
       setKeyboardHeight(e.endCoordinates.height);
     });
+
     const hideSub = Keyboard.addListener(hideEvent, () => {
       setKeyboardHeight(0);
     });
@@ -233,6 +234,13 @@ export default function CommunityScreen() {
       hideSub.remove();
     };
   }, []);
+
+  // Reset keyboard height when modals are hidden
+  useEffect(() => {
+    if (!isModalVisible && !isCreateModalVisible && !isOptionsModalVisible) {
+      setKeyboardHeight(0);
+    }
+  }, [isModalVisible, isCreateModalVisible, isOptionsModalVisible]);
 
   // Subscribe to real-time posts
   useEffect(() => {
@@ -746,9 +754,11 @@ export default function CommunityScreen() {
             </ScrollView>
 
             <View style={[styles.createPostActions, {
-              paddingBottom: keyboardHeight > 0 ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom : keyboardHeight) : (insets.bottom + vs(5)),
+              paddingBottom: keyboardHeight > 0
+                ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom + 10 : keyboardHeight)
+                : (insets.bottom + vs(15)),
               position: 'absolute',
-              bottom: 15,
+              bottom: 5,
               left: 0,
               right: 0
             }]}>
@@ -761,6 +771,7 @@ export default function CommunityScreen() {
                 style={styles.closeModalBtn}
                 onPress={() => {
                   Keyboard.dismiss();
+                  setKeyboardHeight(0);
                   setCreateModalVisible(false);
                   setIsEditingPost(false);
                   setEditingPostId(null);
@@ -797,6 +808,7 @@ export default function CommunityScreen() {
                 <Text style={styles.modalTitle}>{t('comments_title')} ({posts.find(p => p.id === activePostId)?.comments || 0})</Text>
                 <TouchableOpacity onPress={() => {
                   Keyboard.dismiss();
+                  setKeyboardHeight(0);
                   setModalVisible(false);
                 }}><Ionicons name="close" size={28} color="#ff0000ff" /></TouchableOpacity>
               </View>
@@ -865,9 +877,11 @@ export default function CommunityScreen() {
             )}
 
             <View style={[styles.commentInputContainer, {
-              paddingBottom: keyboardHeight > 0 ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom : keyboardHeight) : (insets.bottom + vs(10)),
+              paddingBottom: keyboardHeight > 0
+                ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom + 10 : keyboardHeight)
+                : (insets.bottom + vs(12)),
               position: 'absolute',
-              bottom: 10,
+              bottom: 0,
               left: 0,
               right: 0
             }]}>
