@@ -304,8 +304,14 @@ export default function HomeScreen() {
     try {
       await deleteDoc(doc(db, 'notifications', id));
       setDeletingId(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting notification:", error);
+      if (error.code === 'permission-denied') {
+        triggerToast(t('action_error'), 'error');
+      } else {
+        triggerToast(t('update_failed'), 'error');
+      }
+      setDeletingId(null);
     }
   };
 

@@ -61,6 +61,10 @@ export const translations: any = {
     login_to_use: 'Đăng nhập để sử dụng tính năng này',
     logout_confirm_msg: 'Bạn có chắc chắn muốn đăng xuất',
     login_required: 'Yêu cầu đăng nhập',
+    login_to_fav_msg: 'Vui lòng đăng nhập để lưu và xem danh sách yêu thích của bạn',
+    login_now: 'Đăng nhập ngay',
+    no_favorites_yet: 'Chưa có mục yêu thích nào',
+    explore_and_save_favs: 'Hãy khám phá và lưu lại những điều bạn yêu thích nhé',
 
     // Quiz Screen
     quiz_title: 'Thử thách',
@@ -138,6 +142,13 @@ export const translations: any = {
     content_required: 'Vui lòng nhập nội dung phản hồi',
     feedback_success: 'Đã gửi phản hồi thành công',
     feedback_failed: 'Gửi phản hồi thất bại',
+    delete_feedback_success: 'Đã xóa nội dung phản hồi',
+    delete_feedback_failed: 'Không thể xóa phản hồi',
+    feedback_history: 'Lịch sử phản hồi',
+    feedback_content_label: 'Nội dung',
+    no_content: 'Không có nội dung',
+    system_reply: 'Hệ thống phản hồi',
+    no_feedback_yet: 'Bạn chưa có phản hồi nào',
     tap_to_see_guide: 'Bấm để xem hướng dẫn chi tiết',
     // FAQ Extra
     faq_how_to_use: 'Cách sử dụng ứng dụng',
@@ -352,6 +363,26 @@ export const translations: any = {
     intro_goal_3: '- Quảng bá văn hóa truyền thống đến cộng đồng.',
     intro_tech_label: 'Công nghệ sử dụng: ',
     intro_dev_label: 'Người phát triển: ',
+
+    // Admin
+    system: 'Hệ thống',
+    feedback_replied_notif: 'đã phản hồi góp ý của bạn.',
+    user_management: 'Quản lý người dùng',
+    no_users: 'Chưa có người dùng nào',
+    feedback_from: 'Phản hồi từ',
+    loading_feedback: 'Đang tải phản hồi...',
+    no_subject: 'Không có tiêu đề',
+    edit_reply: 'Sửa phản hồi',
+    reply_feedback: 'Trả lời phản hồi',
+    user_no_feedback: 'Người dùng này chưa có phản hồi nào',
+    lock_user_account: 'Khóa tài khoản',
+    unlock_user_account: 'Mở khóa tài khoản',
+    confirm_lock_user: 'Bạn có chắc chắn muốn tạm đình chỉ cho người dùng',
+    confirm_unlock_user: 'Bạn có chắc chắn muốn mở lại quyền truy cập cho người dùng',
+    lock_now: 'Khóa ngay',
+    reply_placeholder: 'Nhập nội dung trả lời...',
+    send_reply_success: 'Đã gửi phản hồi tới người dùng',
+    action_error: 'Không thể thực hiện thao tác này.',
   },
   km: {
     // Common
@@ -403,6 +434,10 @@ export const translations: any = {
     login_to_use: 'ចូលដើម្បីប្រើប្រាស់មុខងារនេះ',
     logout_confirm_msg: 'តើអ្នកប្រាកដថាចង់ចាកចេញមែនទេ',
     login_required: 'តម្រូវឱ្យចូល',
+    login_to_fav_msg: 'សូមចូលដើម្បីរក្សាទុក និងមើលបញ្ជីដែលអ្នកចូលចិត្ត',
+    login_now: 'ចូលឥឡូវនេះ',
+    no_favorites_yet: 'មិនទាន់មានមាតិកាដែលចូលចិត្តនៅឡើយទេ',
+    explore_and_save_favs: 'សូមស្វែងយល់ និងរក្សាទុកអ្វីដែលអ្នកចូលចិត្ត',
 
     // Quiz Screen
     quiz_title: 'ការសាកល្បង',
@@ -484,6 +519,13 @@ export const translations: any = {
     content_required: 'សូមបញ្ចូលខ្លឹមសារមតិ',
     feedback_success: 'បានផ្ញើមតិដោយជោគជ័យ! អរគុណ។',
     feedback_failed: 'ផ្ញើមតិបរាជ័យ។ សូមព្យាយាមម្តងទៀត។',
+    delete_feedback_success: 'បានលុបខ្លឹមសារមតិកែលម្អ',
+    delete_feedback_failed: 'មិនអាចលុបមតិកែលម្អបានទេ',
+    feedback_history: 'ប្រវត្តិមតិកែលម្អ',
+    feedback_content_label: 'ខ្លឹមសារ',
+    no_content: 'គ្មានខ្លឹមសារ',
+    system_reply: 'ប្រព័ន្ធឆ្លើយតប',
+    no_feedback_yet: 'អ្នកមិនទាន់មានមតិកែលម្អនៅឡើយទេ',
     tap_to_see_guide: 'ចុចដើម្បីមើលការណែនាំលម្អិត',
     // FAQ Extra
     faq_how_to_use: 'របៀបប្រើកម្មវិធី',
@@ -698,6 +740,26 @@ export const translations: any = {
     intro_goal_3: '- ផ្សព្វផ្សាយវប្បធម៌ប្រពៃណីទៅកាន់សហគមន៍។',
     intro_tech_label: 'បច្ចេកវិទ្យាប្រើប្រាស់: ',
     intro_dev_label: 'អ្នកអភិវឌ្ឍន៍: ',
+
+    // Admin
+    system: 'ប្រព័ន្ធ',
+    feedback_replied_notif: 'បានឆ្លើយតបទៅនឹងមតិកែលម្អរបស់អ្នក។',
+    user_management: 'ការគ្រប់គ្រងអ្នកប្រើប្រាស់',
+    no_users: 'មិនទាន់មានអ្នកប្រើប្រាស់នៅឡើយទេ',
+    feedback_from: 'មតិកែលម្អពី',
+    loading_feedback: 'កំពុងទាញយកមតិកែលម្អ...',
+    no_subject: 'គ្មានប្រធានបទ',
+    edit_reply: 'កែសម្រួលការឆ្លើយតប',
+    reply_feedback: 'ឆ្លើយតបមតិកែលម្អ',
+    user_no_feedback: 'អ្នកប្រើប្រាស់នេះមិនទាន់មានមតិកែលម្អនៅឡើយទេ',
+    lock_user_account: 'ចាក់សោគណនី',
+    unlock_user_account: 'ដោះសោគណនី',
+    confirm_lock_user: 'តើអ្នកប្រាកដថាចង់ផ្អាកជាបណ្តោះអាសន្នសម្រាប់អ្នកប្រើប្រាស់',
+    confirm_unlock_user: 'តើអ្នកប្រាកដថាចង់បើកសិទ្ធិចូលប្រើឡើងវិញសម្រាប់អ្នកប្រើប្រាស់',
+    lock_now: 'ចាក់សោឥឡូវនេះ',
+    reply_placeholder: 'បញ្ចូលខ្លឹមសារឆ្លើយតប...',
+    send_reply_success: 'បានផ្ញើការឆ្លើយតបទៅអ្នកប្រើប្រាស់',
+    action_error: 'មិនអាចអនុវត្តសកម្មភាពនេះបានទេ។',
   }
 };
 

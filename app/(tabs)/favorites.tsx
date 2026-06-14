@@ -96,13 +96,13 @@ export default function FavoritesScreen() {
           <View style={styles.emptyIconCircle}>
             <Ionicons name="lock-closed-outline" size={50} color="#3B82F6" />
           </View>
-          <Text style={styles.emptyTitle}>Yêu cầu đăng nhập</Text>
-          <Text style={styles.emptySub}>Vui lòng đăng nhập để lưu và xem{'\n'}danh sách yêu thích của bạn</Text>
+          <Text style={styles.emptyTitle}>{t('login_required')}</Text>
+          <Text style={styles.emptySub}>{t('login_to_fav_msg')}</Text>
           <TouchableOpacity
             style={styles.exploreButton}
             onPress={() => router.push('/login')}
           >
-            <Text style={styles.exploreText}>Đăng nhập ngay</Text>
+            <Text style={styles.exploreText}>{t('login_now')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -130,8 +130,8 @@ export default function FavoritesScreen() {
             <View style={styles.emptyIconCircle}>
               <Ionicons name="heart-dislike-outline" size={50} color="#FF4D4D" />
             </View>
-            <Text style={styles.emptyTitle}>Chưa có mục yêu thích nào</Text>
-            <Text style={styles.emptySub}>Hãy khám phá và lưu lại những điều{'\n'}bạn yêu thích nhé</Text>
+            <Text style={styles.emptyTitle}>{t('no_favorites_yet')}</Text>
+            <Text style={styles.emptySub}>{t('explore_and_save_favs')}</Text>
           </View>
         ) : (
           <View style={styles.listContainer}>
@@ -145,7 +145,9 @@ export default function FavoritesScreen() {
                 <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
 
                 <View style={styles.cardContent}>
-                  <Text style={styles.cardTitle} numberOfLines={1}>{item.name}</Text>
+                  <Text style={styles.cardTitle} numberOfLines={1}>
+                    {language === 'km' ? (item.name_khmer || item.name) : item.name}
+                  </Text>
                   <Text style={styles.cardRental} numberOfLines={1}>{item.rental}</Text>
                 </View>
               </TouchableOpacity>
@@ -248,7 +250,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   cardImage: {
-    width: 80,
+    width: 130,
     height: 80,
     borderRadius: 10,
     resizeMode: 'cover',

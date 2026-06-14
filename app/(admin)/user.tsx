@@ -1,3 +1,4 @@
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
@@ -13,7 +14,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // --- Memoized Components ---
 
-const UserItem = memo(({ item, onFeedback, onToggleLock }: any) => (
+const UserItem = memo(({ item, onFeedback, onToggleLock, t }: any) => (
   <View style={[styles.userCard, item.isBlocked && styles.userCardLocked]}>
     <View style={styles.userInfoRow}>
       {item.avatar ? (
@@ -44,13 +45,13 @@ const UserItem = memo(({ item, onFeedback, onToggleLock }: any) => (
         <View style={styles.userStatsRow}>
           <View style={[styles.statChip, item.isBlocked && styles.statChipLocked]}>
             <Text style={[styles.statChipText, item.isBlocked && styles.textWhite]} adjustsFontSizeToFit>
-              {item.points || 0} Điểm
+              {item.points || 0} {t('points')}
             </Text>
           </View>
 
           <View style={[styles.statChip, item.isBlocked && styles.statChipLocked]}>
             <Text style={[styles.statChipText, item.isBlocked && styles.textWhite]} adjustsFontSizeToFit>
-              {item.completedQuizzes || 0} bài quiz
+              {item.completedQuizzes || 0} {t('questions_count')} quiz
             </Text>
           </View>
         </View>
@@ -69,13 +70,13 @@ const UserItem = memo(({ item, onFeedback, onToggleLock }: any) => (
           color="#3b82f6"
         />
         <Text style={[styles.actionBtnText, styles.feedbackBtnText]} numberOfLines={1} adjustsFontSizeToFit>
-          Phản hồi
+          {t('reply_action')}
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={[styles.actionBtn, item.isBlocked ? styles.unlockBtn : styles.lockBtn]}
-        onPress={() => onToggleLock(item.id, !!item.isBlocked, item.name || 'Người dùng')}
+        onPress={() => onToggleLock(item.id, !!item.isBlocked, item.name || t('user_default'))}
         activeOpacity={0.7}
       >
         <Ionicons
@@ -84,7 +85,7 @@ const UserItem = memo(({ item, onFeedback, onToggleLock }: any) => (
           color={item.isBlocked ? "#10b981" : "#ef4444"}
         />
         <Text style={[styles.actionBtnText, { color: item.isBlocked ? "#10b981" : "#ef4444" }]} numberOfLines={1} adjustsFontSizeToFit>
-          {item.isBlocked ? 'Mở khóa' : 'Khóa'}
+          {item.isBlocked ? t('unlock') : t('lock')}
         </Text>
       </TouchableOpacity>
     </View>
@@ -93,6 +94,7 @@ const UserItem = memo(({ item, onFeedback, onToggleLock }: any) => (
 UserItem.displayName = 'UserItem';
 
 const UserManagement = () => {
+  const { t, language } = useLanguage();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [feedbackVisible, setFeedbackVisible] = useState(false);
@@ -166,7 +168,7 @@ const UserManagement = () => {
       await updateDoc(userRef, { isBlocked: !pendingUser.isBlocked });
     } catch (error) {
       console.error('Error toggling lock:', error);
-      triggerToast('Không thể thực hiện thao tác này.', 'error');
+      triggerToast(t('action_error'), 'error');
     } finally {
       setPendingUser(null);
     }
@@ -213,8 +215,8 @@ const UserManagement = () => {
 
       await addDoc(collection(db, 'notifications'), {
         toUserId: replyingFeedback.userId,
-        fromUserName: 'Hệ thống',
-        message: 'đã phản hồi góp ý của bạn.',
+        fromUserName: t('system'),
+        message: t('feedback_replied_notif'),
         type: 'reply',
         isRead: false,
         createdAt: serverTimestamp()
@@ -229,18 +231,18 @@ const UserManagement = () => {
       setReplyModalVisible(false);
       setReplyingFeedback(null);
       setReplyMessage('');
-      triggerToast('Đã gửi phản hồi tới người dùng', 'success');
+      triggerToast(t('send_reply_success'), 'success');
     } catch (error) {
       console.error('Error replying:', error);
-      triggerToast('Không thể gửi phản hồi.', 'error');
+      triggerToast(t('action_error'), 'error');
     } finally {
       setSendingReply(false);
     }
   };
 
   const renderItem = useCallback(({ item }: any) => (
-    <UserItem item={item} onFeedback={openFeedback} onToggleLock={toggleUserLock} />
-  ), [openFeedback, toggleUserLock]);
+    <UserItem item={item} onFeedback={openFeedback} onToggleLock={toggleUserLock} t={t} />
+  ), [openFeedback, toggleUserLock, t]);
 
   return (
     <View style={[styles.container, { paddingTop: Math.max(insets.top, vs(10)) }]}>
@@ -271,7 +273,7 @@ const UserManagement = () => {
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>Quản lý người dùng</Text>
+        <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>{t('user_management')}</Text>
       </View>
 
       <FlatList
@@ -281,7 +283,7 @@ const UserManagement = () => {
         contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + vs(20) }]}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          !loading ? <Text style={styles.emptyText} numberOfLines={1} adjustsFontSizeToFit>Chưa có người dùng nào</Text> : null
+          !loading ? <Text style={styles.emptyText} numberOfLines={1} adjustsFontSizeToFit>{t('no_users')}</Text> : null
         }
       />
 
@@ -296,7 +298,7 @@ const UserManagement = () => {
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { paddingBottom: insets.bottom + vs(20) }]}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle} numberOfLines={1}>Phản hồi từ {selectedUser?.name}</Text>
+              <Text style={styles.modalTitle} numberOfLines={1}>{t('feedback_from')} {selectedUser?.name}</Text>
               <TouchableOpacity onPress={() => setFeedbackVisible(false)}>
                 <Ionicons name="close-circle" size={ms(32)} color="#ef4444" />
               </TouchableOpacity>
@@ -305,7 +307,7 @@ const UserManagement = () => {
             {fetchingFeedback ? (
               <View style={styles.centerContainer}>
                 <ActivityIndicator size="large" color="#3b82f6" />
-                <Text style={styles.loadingText}>Đang tải phản hồi...</Text>
+                <Text style={styles.loadingText}>{t('loading_feedback')}</Text>
               </View>
             ) : userFeedbacks.length > 0 ? (
               <FlatList
@@ -314,16 +316,18 @@ const UserManagement = () => {
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item }) => (
                   <View style={styles.feedbackItem}>
-                    <Text style={styles.feedbackSubject}>{item.subject || 'Không có tiêu đề'}</Text>
-                    <Text style={styles.feedbackMessage}>Nội dung: {(item.message || item.content) + ' '}</Text>
+                    <Text style={styles.feedbackSubject}>{item.subject || t('no_subject')}</Text>
+                    <Text style={[styles.feedbackMessage, language === 'km' && { textAlign: 'left' }]}>
+                      {t('feedback_content_label')}: {(item.message || item.content) + ' '}
+                    </Text>
 
                     {item.adminReply && (
                       <View style={styles.adminReplyContainer}>
                         <View style={styles.adminReplyHeader}>
                           <Ionicons name="chatbubble-ellipses" size={ms(14)} color="#3b82f6" />
-                          <Text style={styles.adminReplyTitle}>Hệ thống trả lời</Text>
+                          <Text style={styles.adminReplyTitle}>{t('system_reply')}</Text>
                         </View>
-                        <Text style={styles.adminReplyText}>{item.adminReply + ' '}</Text>
+                        <Text style={[styles.adminReplyText, language === 'km' && { textAlign: 'left' }]}>{item.adminReply + ' '}</Text>
                       </View>
                     )}
 
@@ -336,7 +340,7 @@ const UserManagement = () => {
                           setReplyModalVisible(true);
                         }}
                       >
-                        <Text style={styles.replyBtnText}>{item.adminReply ? 'Sửa phản hồi' : 'Trả lời phản hồi'}</Text>
+                        <Text style={styles.replyBtnText}>{item.adminReply ? t('edit_reply') : t('reply_feedback')}</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -345,7 +349,7 @@ const UserManagement = () => {
               />
             ) : (
               <View style={styles.centerContainer}>
-                <Text style={styles.noFeedbackText} numberOfLines={1} adjustsFontSizeToFit>Người dùng này chưa có phản hồi nào</Text>
+                <Text style={styles.noFeedbackText} numberOfLines={1} adjustsFontSizeToFit>{t('user_no_feedback')}</Text>
               </View>
             )}
           </View>
@@ -364,20 +368,20 @@ const UserManagement = () => {
               />
             </View>
             <Text style={styles.confirmTitle} numberOfLines={1} adjustsFontSizeToFit>
-              {pendingUser?.isBlocked ? 'Mở khóa tài khoản' : 'Khóa tài khoản'}
+              {pendingUser?.isBlocked ? t('unlock_user_account') : t('lock_user_account')}
             </Text>
             <Text style={styles.confirmSub}>
-              Bạn có chắc chắn muốn {pendingUser?.isBlocked ? 'mở lại quyền truy cập' : 'tạm đình chỉ'} cho người dùng <Text style={styles.boldText}>{pendingUser?.name}</Text>
+              {pendingUser?.isBlocked ? t('confirm_unlock_user') : t('confirm_lock_user')} <Text style={styles.boldText}>{pendingUser?.name}</Text>
             </Text>
             <View style={styles.confirmActions}>
               <TouchableOpacity style={styles.cancelActionBtn} onPress={() => setConfirmVisible(false)}>
-                <Text style={styles.cancelActionText}>Hủy</Text>
+                <Text style={styles.cancelActionText}>{t('cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.confirmActionBtn, { backgroundColor: pendingUser?.isBlocked ? '#10b981' : '#0011ffff' }]}
                 onPress={handleConfirmLock}
               >
-                <Text style={styles.confirmActionText}>{pendingUser?.isBlocked ? 'Mở khóa' : 'Khóa ngay'}</Text>
+                <Text style={styles.confirmActionText}>{pendingUser?.isBlocked ? t('unlock') : t('lock_now')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -388,13 +392,15 @@ const UserManagement = () => {
       <Modal visible={replyModalVisible} transparent animationType="fade" statusBarTranslucent>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.replyOverlay}>
           <View style={styles.replyContent}>
-            <Text style={styles.replyTitle} numberOfLines={1} adjustsFontSizeToFit>Trả lời phản hồi</Text>
+            <Text style={styles.replyTitle} numberOfLines={1} adjustsFontSizeToFit>{t('reply_feedback')}</Text>
             <View style={styles.originalFeedbackBox}>
-              <Text style={styles.replyOriginalMessage}>Nội dung: {(replyingFeedback?.message || replyingFeedback?.content) + ' '}</Text>
+              <Text style={[styles.replyOriginalMessage, language === 'km' && { textAlign: 'left' }]}>
+                {t('feedback_content_label')}: {(replyingFeedback?.message || replyingFeedback?.content) + ' '}
+              </Text>
             </View>
             <TextInput
               style={styles.replyInput}
-              placeholder="Nhập nội dung trả lời..."
+              placeholder={t('reply_placeholder')}
               value={replyMessage}
               onChangeText={setReplyMessage}
               multiline
@@ -402,14 +408,14 @@ const UserManagement = () => {
             />
             <View style={styles.replyActions}>
               <TouchableOpacity style={styles.cancelReplyBtn} onPress={() => setReplyModalVisible(false)}>
-                <Text style={styles.cancelReplyText}>Hủy</Text>
+                <Text style={styles.cancelReplyText}>{t('cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.confirmReplyBtn, !replyMessage.trim() && styles.disabledBtn]}
                 onPress={handleSendReply}
                 disabled={sendingReply || !replyMessage.trim()}
               >
-                {sendingReply ? <ActivityIndicator color="#fff" size="small" /> : <Text style={styles.confirmReplyText}>Gửi phản hồi</Text>}
+                {sendingReply ? <ActivityIndicator color="#fff" size="small" /> : <Text style={styles.confirmReplyText}>{t('send_reply') || t('reply_feedback')}</Text>}
               </TouchableOpacity>
             </View>
           </View>

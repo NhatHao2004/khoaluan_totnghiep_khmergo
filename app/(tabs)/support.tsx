@@ -21,7 +21,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SupportScreen() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { user } = useAuth();
   const [content, setContent] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -145,11 +145,11 @@ export default function SupportScreen() {
 
     try {
       await deleteDoc(doc(db, 'feedback', id));
-      showToast('Đã xóa nội dung phản hồi', 'success');
+      showToast(t('delete_feedback_success'), 'success');
       setDeletingId(null);
     } catch (error) {
       console.error('Error deleting feedback:', error);
-      showToast('Không thể xóa phản hồi', 'error');
+      showToast(t('delete_feedback_failed'), 'error');
       // Nếu lỗi thì nên load lại data từ snapshot (onSnapshot sẽ tự động làm việc này)
     }
   };
@@ -243,7 +243,7 @@ export default function SupportScreen() {
 
         {/* Feedback History Section */}
         <View style={styles.historySection}>
-          <Text style={styles.historySectionTitle}>Lịch sử phản hồi</Text>
+          <Text style={styles.historySectionTitle}>{t('feedback_history')}</Text>
 
           {loadingFeedbacks ? (
             <ActivityIndicator size="small" color="#3B82F6" style={{ marginTop: 20 }} />
@@ -258,8 +258,8 @@ export default function SupportScreen() {
               >
                 <View style={styles.historyItemGroup}>
                   <View style={styles.cardMainRow}>
-                    <Text style={[styles.userMsgText, { flex: 1 }]}>
-                      Nội dung: {item.content || item.message || (item.thrilled !== item.userName ? item.thrilled : '') || 'Không có nội dung'}
+                    <Text style={[styles.userMsgText, { flex: 1 }, language === 'km' && { textAlign: 'left' }]}>
+                      {t('feedback_content_label')}: {item.content || item.message || (item.thrilled !== item.userName ? item.thrilled : '') || t('no_content')}
                     </Text>
                   </View>
 
@@ -267,9 +267,9 @@ export default function SupportScreen() {
                     <View style={styles.systemReplyBox}>
                       <View style={styles.systemReplyHeader}>
                         <Ionicons name="chatbubble-ellipses" size={16} color="#0284C7" />
-                        <Text style={styles.systemReplyTitle}>Hệ thống phản hồi</Text>
+                        <Text style={styles.systemReplyTitle}>{t('system_reply')}</Text>
                       </View>
-                      <Text style={styles.systemReplyText}>
+                      <Text style={[styles.systemReplyText, language === 'km' && { textAlign: 'left' }]}>
                         {item.adminReply || item.reply || item.response}
                       </Text>
                     </View>
@@ -290,7 +290,7 @@ export default function SupportScreen() {
             ))
           ) : (
             <View style={styles.emptyHistory}>
-              <Text style={styles.emptyText}>Bạn chưa có phản hồi nào</Text>
+              <Text style={styles.emptyText}>{t('no_feedback_yet')}</Text>
             </View>
           )}
         </View>
