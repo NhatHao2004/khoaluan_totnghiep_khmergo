@@ -904,15 +904,18 @@ export default function CommunityScreen() {
             <View style={styles.pModalIconCircle}>
               <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
             </View>
-            <Text style={styles.pModalTitle}>{t('login_required')}</Text>
-            <Text style={styles.pModalSub}>{t('login_to_use')}</Text>
+            <Text style={styles.pModalTitle} adjustsFontSizeToFit numberOfLines={1}>{t('login_required')}</Text>
+            <Text style={styles.pModalSub} adjustsFontSizeToFit numberOfLines={1}>{t('login_to_use')}</Text>
 
             <View style={styles.pModalActionRow}>
               <TouchableOpacity
                 style={styles.pModalPrimaryBtn}
                 onPress={() => {
                   setShowLoginModal(false);
-                  router.push('/login');
+                  router.push({
+                    pathname: '/login',
+                    params: { returnTo: '(tabs)/community' }
+                  });
                 }}
               >
                 <Text style={styles.pModalPrimaryBtnText}>{t('login_user')}</Text>
@@ -1092,6 +1095,7 @@ const styles = StyleSheet.create({
     color: '#1E293B',
     marginBottom: vs(8),
     textAlign: 'center',
+    alignSelf: 'stretch',
   },
   pModalSub: {
     fontSize: ms(15),
@@ -1099,6 +1103,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: vs(22),
     marginBottom: vs(24),
+    alignSelf: 'stretch',
   },
   pModalActionRow: {
     width: '100%',
