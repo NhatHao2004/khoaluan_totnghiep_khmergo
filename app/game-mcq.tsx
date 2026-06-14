@@ -1,7 +1,8 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useLanguage } from '@/contexts/LanguageContext';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -367,7 +368,12 @@ export default function GameMCQScreen() {
       <View style={styles.headerContainer}>
         <View style={styles.headerInfo}>
           <View style={styles.headerTopRow}>
-            <Text style={styles.headerTitle}>Câu {questionIndex + 1} / {TOTAL_QUESTIONS}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: s(12) }}>
+              <TouchableOpacity onPress={() => setShowExitModal(true)} activeOpacity={0.7}>
+                <Ionicons name="arrow-back" size={28} color="#334155" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Câu {questionIndex + 1} / {TOTAL_QUESTIONS}</Text>
+            </View>
             <View style={styles.scorePill}>
               <Ionicons name="flash" size={16} color="#F59E0B" />
               <Text style={styles.scorePillText}>{score}</Text>
@@ -509,15 +515,6 @@ export default function GameMCQScreen() {
         </View>
       )}
 
-      {/* Floating Close Button at Bottom Right */}
-      <TouchableOpacity
-        onPress={() => setShowExitModal(true)}
-        style={styles.floatingCloseBtn}
-        activeOpacity={0.8}
-      >
-        <Ionicons name="close" size={26} color="#FFF" />
-      </TouchableOpacity>
-
       {/* Custom Exit Modal */}
       <Modal
         visible={showExitModal}
@@ -529,17 +526,16 @@ export default function GameMCQScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.exitModalContent}>
             <View style={styles.exitIconCircle}>
-              <Ionicons name="exit-outline" size={40} color="#EF4444" />
+              <Ionicons name="exit-outline" size={35} color="#EF4444" />
             </View>
             <Text style={styles.exitTitle}>Thoát khỏi trò chơi</Text>
-            <Text style={styles.exitSub}>Tiến trình hiện tại của bạn sẽ{'\n'}không được lưu lại</Text>
 
             <View style={styles.exitActionRow}>
               <TouchableOpacity
                 style={styles.stayBtn}
                 onPress={() => setShowExitModal(false)}
               >
-                <Text style={styles.stayBtnText}>Tiếp tục chơi</Text>
+                <Text style={styles.stayBtnText} adjustsFontSizeToFit numberOfLines={1}>Tiếp tục chơi</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -549,7 +545,7 @@ export default function GameMCQScreen() {
                   router.back();
                 }}
               >
-                <Text style={styles.confirmExitBtnText}>Thoát</Text>
+                <Text style={styles.confirmExitBtnText} adjustsFontSizeToFit numberOfLines={1}>Thoát</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -570,7 +566,12 @@ export default function GameMCQScreen() {
               <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
             </View>
             <Text style={styles.exitTitle}>Bạn chưa đăng nhập</Text>
-            <Text style={styles.exitSub}>Hãy đăng nhập để lưu lại thành tích{'\n'}và tích luỹ điểm thưởng nhé!</Text>
+            <Text
+              style={styles.exitSub}
+              numberOfLines={2}
+            >
+              Hãy đăng nhập để lưu lại thành tích{'\n'}và tích luỹ điểm thưởng nhé!
+            </Text>
 
             <View style={styles.exitActionRow}>
               <TouchableOpacity
@@ -580,14 +581,14 @@ export default function GameMCQScreen() {
                   router.push('/login');
                 }}
               >
-                <Text style={styles.stayBtnText}>Đăng nhập ngay</Text>
+                <Text style={styles.stayBtnText} adjustsFontSizeToFit numberOfLines={1}>Đăng nhập ngay</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.confirmExitBtn}
                 onPress={() => setShowLoginModal(false)}
               >
-                <Text style={styles.confirmExitBtnText}>Để sau</Text>
+                <Text style={styles.confirmExitBtnText} adjustsFontSizeToFit numberOfLines={1}>Để sau</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -612,7 +613,7 @@ const styles = StyleSheet.create({
   // ── MODERN HEADER ──
   headerContainer: {
     paddingTop: 52,
-    paddingHorizontal: 20,
+    paddingHorizontal: s(13),
     paddingBottom: 20,
     height: 120, // Fixed height
     flexDirection: 'row',
@@ -626,23 +627,6 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 5,
     zIndex: 10,
-  },
-  floatingCloseBtn: {
-    position: 'absolute',
-    bottom: 30,
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#1E293B',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
-    zIndex: 100,
   },
   headerInfo: {
     flex: 1,
@@ -677,15 +661,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFBEB',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    gap: 6,
+    paddingHorizontal: s(14),
+    paddingVertical: vs(5),
+    borderRadius: ms(20),
+    gap: s(6),
     borderWidth: 1,
     borderColor: '#FEF3C7',
+    minWidth: s(65),
+    justifyContent: 'center',
   },
   scorePillText: {
-    fontSize: 16,
+    fontSize: ms(16),
     fontWeight: '900',
     color: '#D97706',
   },
@@ -1001,75 +987,77 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: s(20),
   },
   exitModalContent: {
     backgroundColor: '#FFF',
-    borderRadius: 30,
-    padding: 30,
+    borderRadius: ms(30),
+    padding: s(30),
     width: '100%',
-    maxWidth: 340,
+    maxWidth: s(340),
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: vs(10) },
     shadowOpacity: 0.1,
-    shadowRadius: 20,
+    shadowRadius: s(20),
     elevation: 10,
   },
   exitIconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: s(80),
+    height: s(80),
+    borderRadius: s(40),
     backgroundColor: '#FEF2F2',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: vs(15),
     borderWidth: 1,
     borderColor: '#FEE2E2',
-    paddingLeft: 7,
   },
   exitTitle: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: ms(22),
+    fontWeight: '900',
     color: '#1E293B',
-    marginBottom: 10,
+    marginBottom: vs(25),
     textAlign: 'center',
+    alignSelf: 'stretch',
   },
   exitSub: {
-    fontSize: 15,
+    fontSize: ms(17),
     color: '#64748B',
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 25,
+    lineHeight: vs(24),
+    marginBottom: vs(28),
+    alignSelf: 'stretch',
+    fontWeight: '600',
   },
   exitActionRow: {
     width: '100%',
-    gap: 12,
+    gap: vs(12),
   },
   stayBtn: {
     backgroundColor: '#3B82F6',
-    height: 56,
-    borderRadius: 18,
+    height: vs(56),
+    borderRadius: ms(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
   stayBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: ms(16),
     fontWeight: '700',
   },
   confirmExitBtn: {
     backgroundColor: '#EF4444',
-    height: 56,
-    borderRadius: 18,
+    height: vs(56),
+    borderRadius: ms(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
   confirmExitBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: ms(16),
     fontWeight: '700',
   },
 

@@ -1,8 +1,8 @@
-import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { updateQuizScore } from '@/services/firebase-service';
 import { db } from '@/utils/firebaseConfig';
+import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -235,9 +235,9 @@ export default function VocabQuizScreen() {
                         </TouchableOpacity>
 
                         <View style={styles.headerTitleContainer}>
-                            <ThemedText style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
+                            <Text style={styles.headerTitle} adjustsFontSizeToFit numberOfLines={1}>
                                 {t('vocab_quiz')}
-                            </ThemedText>
+                            </Text>
                         </View>
 
                         <View style={{ width: 50 }} />
@@ -258,10 +258,10 @@ export default function VocabQuizScreen() {
                                                 category.imageUrl
                                                     ? { uri: category.imageUrl }
                                                     : (category.title === 'cat_family' || category.id === 'family') ? require('@/assets/images/giadinh.jpg') :
-                                                    (category.title === 'cat_food' || category.id === 'food') ? require('@/assets/images/monan.jpg') :
-                                                    (category.title === 'cat_greetings' || category.id === 'greetings') ? require('@/assets/images/chaohoi.jpg') :
-                                                    (category.title === 'cat_numbers' || category.id === 'numbers') ? require('@/assets/images/sodem.jpg') :
-                                                    require('@/assets/images/giadinh.jpg')
+                                                        (category.title === 'cat_food' || category.id === 'food') ? require('@/assets/images/monan.jpg') :
+                                                            (category.title === 'cat_greetings' || category.id === 'greetings') ? require('@/assets/images/chaohoi.jpg') :
+                                                                (category.title === 'cat_numbers' || category.id === 'numbers') ? require('@/assets/images/sodem.jpg') :
+                                                                    require('@/assets/images/giadinh.jpg')
                                             }
                                             style={styles.categoryCardImage}
                                             contentFit="contain"
@@ -270,17 +270,17 @@ export default function VocabQuizScreen() {
 
                                     {/* Content */}
                                     <View style={styles.categoryCardBody}>
-                                        <Text style={styles.categoryCardTitle}>
+                                        <Text style={styles.categoryCardTitle} adjustsFontSizeToFit numberOfLines={1}>
                                             {isKm && category.titleKm ? category.titleKm : t(category.title)}
                                         </Text>
-                                        <Text style={styles.categoryCardSub}>{Math.min(10, category.words?.length || 0)} {t('vocab_challenge_questions')}</Text>
+                                        <Text style={styles.categoryCardSub} adjustsFontSizeToFit numberOfLines={1}>{Math.min(10, category.words?.length || 0)} {t('vocab_challenge_questions')}</Text>
+
+                                        <View style={styles.quizInfoBox}>
+                                            <Text style={styles.quizInfoLabel}>{t('correct_answer_points_msg')}</Text>
+                                        </View>
 
                                         {/* Quiz footer */}
                                         <View style={styles.quizSelectionFooter}>
-                                            <View style={styles.quizInfoBox}>
-                                                <Text style={styles.quizInfoLabel}>{t('correct_answer_points_msg')}</Text>
-                                            </View>
-
                                             <TouchableOpacity
                                                 style={styles.startQuizBtn}
                                                 activeOpacity={0.8}
@@ -300,7 +300,7 @@ export default function VocabQuizScreen() {
                                                     prepareGame(category.id);
                                                 }}
                                             >
-                                                <Text style={styles.startQuizBtnText}>{t('start_quiz')}</Text>
+                                                <Text style={styles.startQuizBtnText} adjustsFontSizeToFit numberOfLines={1}>{t('start_quiz')}</Text>
                                             </TouchableOpacity>
                                         </View>
                                     </View>
@@ -331,7 +331,7 @@ export default function VocabQuizScreen() {
                             />
                         ))}
                     </View>
-                    <Text style={styles.resultTitle}>
+                    <Text style={styles.resultTitle} adjustsFontSizeToFit numberOfLines={1}>
                         {stars === 5 ? t('excellent') : stars >= 4 ? t('well_done') : t('keep_it_up')}
                     </Text>
                     <View style={styles.resultScoreCard}>
@@ -342,10 +342,10 @@ export default function VocabQuizScreen() {
                     </View>
                     <TouchableOpacity style={styles.resultPrimaryBtn} onPress={() => prepareGame(selectedCategory!)}>
                         <Ionicons name="refresh" size={20} color="#FFF" />
-                        <Text style={styles.resultPrimaryBtnText}>{t('replay')}</Text>
+                        <Text style={styles.resultPrimaryBtnText} adjustsFontSizeToFit numberOfLines={1}>{t('replay')}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.resultSecondaryBtn} onPress={resetGame}>
-                        <Text style={styles.resultSecondaryBtnText}>{t('choose_another_quiz')}</Text>
+                        <Text style={styles.resultSecondaryBtnText} adjustsFontSizeToFit numberOfLines={1}>{t('choose_another_quiz')}</Text>
                     </TouchableOpacity>
                 </SafeAreaView>
             </View>
@@ -439,15 +439,14 @@ export default function VocabQuizScreen() {
                         <View style={styles.exitIconCircle}>
                             <Ionicons name="exit-outline" size={40} color="#EF4444" />
                         </View>
-                        <Text style={styles.exitTitle}>{t('exit_game_title')}</Text>
-                        <Text style={styles.exitSub}>{t('exit_game_msg')}</Text>
+                        <Text style={styles.exitTitle} adjustsFontSizeToFit numberOfLines={1}>{t('exit_game_title')}</Text>
 
                         <View style={styles.exitActionRow}>
                             <TouchableOpacity
                                 style={styles.stayBtn}
                                 onPress={() => setShowExitModal(false)}
                             >
-                                <Text style={styles.stayBtnText}>{t('continue')}</Text>
+                                <Text style={styles.stayBtnText} adjustsFontSizeToFit numberOfLines={1}>{t('continue')}</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity
@@ -457,7 +456,7 @@ export default function VocabQuizScreen() {
                                     resetGame();
                                 }}
                             >
-                                <Text style={styles.confirmExitBtnText}>{t('exit')}</Text>
+                                <Text style={styles.confirmExitBtnText} adjustsFontSizeToFit numberOfLines={1}>{t('exit')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -468,60 +467,60 @@ export default function VocabQuizScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#F8FAFC' },
+    container: { flex: 1, backgroundColor: '#FFFFFF' },
     header: {
         backgroundColor: '#ffffff',
-        paddingTop: 45,
-        paddingBottom: 15,
-        paddingHorizontal: 15,
+        paddingTop: vs(45),
+        paddingBottom: vs(15),
+        paddingHorizontal: s(15),
         flexDirection: 'row',
         alignItems: 'center',
         elevation: 2,
         zIndex: 100,
     },
-    backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
+    backBtn: { width: s(40), height: s(40), justifyContent: 'center', alignItems: 'center' },
     headerTitleContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    headerTitle: { color: '#0F172A', fontSize: 20, fontWeight: '800' },
+    headerTitle: { color: '#0F172A', fontSize: ms(20), fontWeight: '800' },
     content: { flex: 1 },
-    introduction: { padding: 24, backgroundColor: '#FFF', marginBottom: 16 },
-    introTitle: { fontSize: 22, fontWeight: '900', color: '#1E293B', marginBottom: 8 },
-    introDesc: { fontSize: 15, color: '#64748B', lineHeight: 22 },
-    categoryList: { padding: 15, gap: 15 },
-    categoryMainCard: { backgroundColor: '#FFF', borderRadius: 24, padding: 0, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9', overflow: 'hidden' },
-    categoryImageContainer: { width: '100%', aspectRatio: 16 / 10, backgroundColor: '#FFFFFF', padding: 12 },
-    categoryCardImage: { width: '100%', height: '100%', borderRadius: 16 },
-    categoryCardBody: { padding: 20, gap: 4 },
-    categoryCardTitle: { fontSize: 18, fontWeight: '800', color: '#1E293B' },
-    categoryCardSub: { fontSize: 14, color: '#64748B', marginBottom: 8 },
-    quizSelectionFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: '#F1F5F9', paddingTop: 12 },
-    quizInfoBox: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-    quizInfoLabel: { fontSize: 12, color: '#64748B', fontWeight: '600' },
-    startQuizBtn: { backgroundColor: '#3B82F6', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12, alignItems: 'center' },
-    startQuizBtnText: { color: '#FFF', fontWeight: '800', fontSize: 13 },
+    introduction: { padding: s(24), backgroundColor: '#FFF', marginBottom: vs(16) },
+    introTitle: { fontSize: ms(22), fontWeight: '900', color: '#1E293B', marginBottom: vs(8) },
+    introDesc: { fontSize: ms(15), color: '#64748B', lineHeight: vs(22) },
+    categoryList: { padding: s(15), gap: vs(15) },
+    categoryMainCard: { backgroundColor: '#FFF', borderRadius: ms(24), padding: 0, elevation: 2, borderWidth: 1, borderColor: '#F1F5F9', overflow: 'hidden' },
+    categoryImageContainer: { width: '100%', aspectRatio: 16 / 10, backgroundColor: '#FFFFFF', padding: s(12) },
+    categoryCardImage: { width: '100%', height: '100%', borderRadius: ms(16) },
+    categoryCardBody: { padding: s(20), gap: vs(3) },
+    categoryCardTitle: { fontSize: ms(18), fontWeight: '800', color: '#1E293B', alignSelf: 'stretch', textAlign: 'center' },
+    categoryCardSub: { fontSize: ms(14), color: '#64748B', marginBottom: vs(8), alignSelf: 'stretch', textAlign: 'center' },
+    quizSelectionFooter: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopWidth: 1, borderTopColor: '#F1F5F9', paddingTop: vs(12), marginTop: vs(8) },
+    quizInfoBox: { flexDirection: 'row', alignItems: 'center', gap: s(4), alignSelf: 'center', marginBottom: vs(4) },
+    quizInfoLabel: { fontSize: ms(11), color: '#000000ff', fontWeight: '700', backgroundColor: '#ffffffff', paddingHorizontal: s(8), paddingVertical: vs(2), borderRadius: ms(6), textTransform: 'uppercase' },
+    startQuizBtn: { backgroundColor: '#3B82F6', paddingHorizontal: s(16), paddingVertical: vs(8), borderRadius: ms(12), alignItems: 'center' },
+    startQuizBtnText: { color: '#FFF', fontWeight: '800', fontSize: ms(13) },
     resultsContainer: { flex: 1 },
-    resultTitle: { fontSize: 32, fontWeight: '900', color: '#1E293B', marginBottom: 20 },
-    resultStarsRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: 24 },
-    resultScoreCard: { width: '100%', backgroundColor: '#FFF', borderRadius: 32, padding: 30, alignItems: 'center', marginBottom: 30, elevation: 4 },
-    resultScoreNum: { fontSize: 56, fontWeight: '900', color: '#7C3AED' },
-    resultScoreLabel: { fontSize: 16, color: '#64748B', fontWeight: '600' },
-    resultPrimaryBtn: { width: '100%', height: 60, backgroundColor: '#7C3AED', borderRadius: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12 },
-    resultPrimaryBtnText: { color: '#FFF', fontSize: 18, fontWeight: '800' },
-    resultSecondaryBtn: { width: '100%', height: 60, alignItems: 'center', justifyContent: 'center' },
-    resultSecondaryBtnText: { color: '#64748B', fontSize: 16, fontWeight: '700' },
-    savingText: { fontSize: 12, color: '#94A3B8', marginTop: 8 },
-    savedText: { fontSize: 12, color: '#22C55E', fontWeight: '700', marginTop: 8 },
-    headerContainer: { paddingTop: 50, paddingHorizontal: 20, paddingBottom: 20, backgroundColor: '#FFF', borderBottomLeftRadius: 32, borderBottomRightRadius: 32, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', elevation: 4 },
-    headerCloseBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
-    gameHeaderTitle: { fontSize: 16, fontWeight: '800', color: '#334155' },
-    timerContainer: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#F1F5F9', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
-    timerText: { fontSize: 16, fontWeight: '800', color: '#1E293B', fontVariant: ['tabular-nums'] },
-    scorePill: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFBEB', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, gap: 6, borderWidth: 1, borderColor: '#FEF3C7' },
-    scorePillText: { fontSize: 16, fontWeight: '900', color: '#D97706' },
-    matchCard: { backgroundColor: '#FFF', borderRadius: 20, padding: 12, height: 70, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#F1F5F9', elevation: 2 },
+    resultTitle: { fontSize: ms(32), fontWeight: '900', color: '#1E293B', marginBottom: vs(20), alignSelf: 'stretch', textAlign: 'center' },
+    resultStarsRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: vs(24) },
+    resultScoreCard: { width: '100%', backgroundColor: '#FFF', borderRadius: ms(32), padding: s(30), alignItems: 'center', marginBottom: vs(30), elevation: 4 },
+    resultScoreNum: { fontSize: ms(56), fontWeight: '900', color: '#7C3AED' },
+    resultScoreLabel: { fontSize: ms(16), color: '#64748B', fontWeight: '600' },
+    resultPrimaryBtn: { width: '100%', height: vs(60), backgroundColor: '#7C3AED', borderRadius: ms(20), flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: s(12) },
+    resultPrimaryBtnText: { color: '#FFF', fontSize: ms(18), fontWeight: '800' },
+    resultSecondaryBtn: { width: '100%', height: vs(60), alignItems: 'center', justifyContent: 'center' },
+    resultSecondaryBtnText: { color: '#64748B', fontSize: ms(16), fontWeight: '700' },
+    savingText: { fontSize: ms(12), color: '#94A3B8', marginTop: vs(8) },
+    savedText: { fontSize: ms(12), color: '#22C55E', fontWeight: '700', marginTop: vs(8) },
+    headerContainer: { paddingTop: vs(50), paddingHorizontal: s(20), paddingBottom: vs(20), backgroundColor: '#FFF', borderBottomLeftRadius: ms(32), borderBottomRightRadius: ms(32), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', elevation: 4 },
+    headerCloseBtn: { width: s(40), height: s(40), justifyContent: 'center', alignItems: 'center' },
+    gameHeaderTitle: { fontSize: ms(16), fontWeight: '800', color: '#334155' },
+    timerContainer: { flexDirection: 'row', alignItems: 'center', gap: s(6), backgroundColor: '#F1F5F9', paddingHorizontal: s(12), paddingVertical: vs(6), borderRadius: ms(20) },
+    timerText: { fontSize: ms(16), fontWeight: '800', color: '#1E293B', fontVariant: ['tabular-nums'] },
+    scorePill: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFBEB', paddingHorizontal: s(12), paddingVertical: vs(6), borderRadius: ms(20), gap: s(6), borderWidth: 1, borderColor: '#FEF3C7' },
+    scorePillText: { fontSize: ms(16), fontWeight: '900', color: '#D97706' },
+    matchCard: { backgroundColor: '#FFF', borderRadius: ms(20), padding: s(8), height: vs(85), justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#F1F5F9', elevation: 2 },
     matchCardSelected: { borderColor: '#3B82F6', backgroundColor: '#EFF6FF' },
     matchCardMatched: { borderColor: '#22C55E', backgroundColor: '#F0FDF4' },
     matchCardWrong: { borderColor: '#EF4444', backgroundColor: '#FEF2F2' },
-    matchText: { fontSize: 16, fontWeight: '800', color: '#1E293B', textAlign: 'center' },
+    matchText: { fontSize: ms(16), fontWeight: '800', color: '#1E293B', textAlign: 'center' },
     matchTextSelected: { color: '#3B82F6' },
     matchTextMatched: { color: '#22C55E' },
 
@@ -531,71 +530,73 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
+        padding: s(25),
     },
     exitModalContent: {
         width: '100%',
         backgroundColor: '#FFF',
-        borderRadius: 32,
-        padding: 30,
+        borderRadius: ms(32),
+        padding: s(30),
         alignItems: 'center',
         elevation: 10,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
+        shadowOffset: { width: 0, height: vs(4) },
         shadowOpacity: 0.25,
-        shadowRadius: 10,
+        shadowRadius: s(10),
     },
     exitIconCircle: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+        width: s(80),
+        height: s(80),
+        borderRadius: s(40),
         backgroundColor: '#FEF2F2',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20,
-        paddingLeft: 7,
+        marginBottom: vs(15),
+        paddingLeft: s(7),
     },
     exitTitle: {
-        fontSize: 22,
+        fontSize: ms(22),
         fontWeight: '800',
         color: '#1E293B',
-        marginBottom: 10,
+        marginBottom: vs(15),
         textAlign: 'center',
+        alignSelf: 'stretch',
     },
     exitSub: {
-        fontSize: 16,
+        fontSize: ms(16),
         color: '#64748B',
         textAlign: 'center',
-        marginBottom: 30,
-        lineHeight: 24,
+        marginBottom: vs(30),
+        lineHeight: vs(24),
+        alignSelf: 'stretch',
     },
     exitActionRow: {
         width: '100%',
-        gap: 12,
+        gap: vs(12),
     },
     stayBtn: {
         width: '100%',
-        height: 56,
+        height: vs(56),
         backgroundColor: '#3B82F6',
-        borderRadius: 16,
+        borderRadius: ms(16),
         justifyContent: 'center',
         alignItems: 'center',
     },
     stayBtnText: {
-        fontSize: 16,
+        fontSize: ms(16),
         fontWeight: '700',
         color: '#FFF',
     },
     confirmExitBtn: {
         width: '100%',
-        height: 56,
+        height: vs(56),
         backgroundColor: '#EF4444',
-        borderRadius: 16,
+        borderRadius: ms(16),
         justifyContent: 'center',
         alignItems: 'center',
     },
     confirmExitBtnText: {
-        fontSize: 16,
+        fontSize: ms(16),
         fontWeight: '700',
         color: '#FFF',
     },

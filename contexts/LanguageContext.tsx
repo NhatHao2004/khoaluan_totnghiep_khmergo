@@ -24,7 +24,7 @@ export const translations: any = {
     close: 'Đóng',
     save: 'Lưu',
     cancel: 'Huỷ',
-    continue: 'Tiếp tục',
+    continue: 'Tiếp tục chơi',
     exit: 'Thoát',
     login: 'Đăng nhập tài khoản',
     login_user: 'Đăng nhập',

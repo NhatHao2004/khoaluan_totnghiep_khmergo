@@ -2,6 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFoods } from '@/hooks/use-foods';
 import { useQuizzes } from '@/hooks/use-quizzes';
+import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -73,10 +74,10 @@ export default function QuizFoodSelectScreen() {
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
           <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
-            {isKm ? 'ម្ហូបខ្មែរ' : 'Ẩm thực Khmer'}
+            {isKm ? 'ម្ហូបខ្ mែរ' : 'Ẩm thực Khmer'}
           </Text>
         </View>
-        <View style={{ width: 40 }} />
+        <View style={{ width: s(40) }} />
       </View>
 
       {loading && (
@@ -108,11 +109,10 @@ export default function QuizFoodSelectScreen() {
 
                 <View style={styles.cardContent}>
                   <Text style={styles.name}>{item.name}</Text>
-                  <Text style={styles.location}>{item.location}</Text>
 
                   <View style={styles.footer}>
                     <View style={styles.info}>
-                      <Text style={styles.infoText}>
+                      <Text style={styles.infoText} adjustsFontSizeToFit numberOfLines={1}>
                         {(() => {
                           const count = item.questionCount;
                           const toKhmerNum = (n: number) => {
@@ -131,7 +131,7 @@ export default function QuizFoodSelectScreen() {
                       activeOpacity={0.8}
                       onPress={() => handleSelect(item.id, item.imageUrl, item.location)}
                     >
-                      <Text style={styles.startBtnText}>{isKm ? 'ចាប់ផ្តើម' : 'Bắt đầu'}</Text>
+                      <Text style={styles.startBtnText} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'ចាប់ផ្តើម' : 'Bắt đầu'}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -149,13 +149,13 @@ export default function QuizFoodSelectScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setShowLoginModal(false)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: s(24) }}>
           <View style={styles.modalContent}>
             <View style={styles.modalIconCircle}>
               <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
             </View>
-            <Text style={styles.modalTitle}>{isKm ? 'តម្រូវឱ្យចូល' : 'Yêu cầu đăng nhập'}</Text>
-            <Text style={styles.modalSub}>
+            <Text style={styles.modalTitle} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'តម្រូវឱ្យចូល' : 'Yêu cầu đăng nhập'}</Text>
+            <Text style={styles.modalSub} adjustsFontSizeToFit numberOfLines={1}>
               {isKm ? 'អ្នកត្រូវចូលដើម្បីចូលរួមក្នុងបញ្ហាប្រឈមនេះ' : 'Bạn cần đăng nhập để tham gia thử thách và tích luỵ điểm xếp hạng'}
             </Text>
 
@@ -167,14 +167,14 @@ export default function QuizFoodSelectScreen() {
                   router.push('/login');
                 }}
               >
-                <Text style={styles.modalPrimaryBtnText}>{isKm ? 'ចូល' : 'Đăng nhập'}</Text>
+                <Text style={styles.modalPrimaryBtnText} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'ចូល' : 'Đăng nhập'}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.modalSecondaryBtn}
                 onPress={() => setShowLoginModal(false)}
               >
-                <Text style={styles.modalSecondaryBtnText}>{isKm ? 'បោះបង់' : 'Huỷ'}</Text>
+                <Text style={styles.modalSecondaryBtnText} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'បោះបង់' : 'Huỷ'}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -188,23 +188,23 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f9fa' },
   header: {
     backgroundColor: '#ffffff',
-    paddingTop: 45,
-    paddingBottom: 15,
-    paddingHorizontal: 15,
+    paddingTop: vs(45),
+    paddingBottom: vs(15),
+    paddingHorizontal: s(15),
     flexDirection: 'row',
     alignItems: 'center',
     elevation: 5,
     zIndex: 100,
   },
-  backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
+  backBtn: { width: s(40), height: s(40), justifyContent: 'center', alignItems: 'center' },
   headerTitleContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { color: '#000000', fontSize: 20, fontWeight: '800', lineHeight: 32 },
+  headerTitle: { color: '#000000', fontSize: ms(20), fontWeight: '800' },
   content: { flex: 1 },
-  scrollContent: { paddingBottom: 20, flexGrow: 1 },
-  list: { padding: 15, gap: 15 },
+  scrollContent: { paddingBottom: vs(20), flexGrow: 1 },
+  list: { padding: s(15), gap: vs(15) },
   card: {
     backgroundColor: '#ffffff',
-    borderRadius: 20,
+    borderRadius: ms(20),
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.05)',
@@ -212,29 +212,29 @@ const styles = StyleSheet.create({
   },
   imageContainer: { width: '100%', aspectRatio: 16 / 10 },
   image: { width: '100%', height: '100%' },
-  cardContent: { padding: 15 },
-  name: { fontSize: 18, fontWeight: '800', color: '#1A1A1A', marginBottom: 4 },
-  location: { fontSize: 13, color: '#666', marginBottom: 12 },
+  cardContent: { padding: s(15) },
+  name: { fontSize: ms(18), fontWeight: '800', color: '#1A1A1A', marginBottom: vs(4) },
+  location: { fontSize: ms(13), color: '#666', marginBottom: vs(12) },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: 'rgba(0,0,0,0.06)',
-    paddingTop: 10,
+    paddingTop: vs(10),
   },
-  info: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  infoText: { fontSize: 12, color: '#64748B', fontWeight: '600' },
+  info: { flexDirection: 'row', alignItems: 'center', gap: s(5), flex: 1, marginRight: s(10) },
+  infoText: { fontSize: ms(15), color: '#64748B', fontWeight: '600' },
   startBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: s(5),
     backgroundColor: '#0179e9ff',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
+    paddingHorizontal: s(16),
+    paddingVertical: vs(8),
+    borderRadius: ms(10),
   },
-  startBtnText: { color: '#FFF', fontSize: 12, fontWeight: '800' },
+  startBtnText: { color: '#FFF', fontSize: ms(12), fontWeight: '800' },
   loader: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#f8f9fa',
@@ -249,79 +249,81 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: s(24),
   },
   modalContent: {
     backgroundColor: '#FFF',
-    borderRadius: 32,
-    padding: 30,
+    borderRadius: ms(32),
+    padding: s(30),
     width: '100%',
-    maxWidth: 340,
+    maxWidth: s(340),
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: vs(10) },
     shadowOpacity: 0.1,
-    shadowRadius: 20,
+    shadowRadius: s(20),
     elevation: 10,
   },
   modalIconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: s(80),
+    height: s(80),
+    borderRadius: s(40),
     backgroundColor: '#EFF6FF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: vs(20),
     borderWidth: 1,
     borderColor: '#DBEAFE',
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: ms(20),
     fontWeight: '900',
     color: '#1E293B',
-    marginBottom: 8,
+    marginBottom: vs(8),
     textAlign: 'center',
+    alignSelf: 'stretch',
   },
   modalSub: {
-    fontSize: 15,
+    fontSize: ms(15),
     color: '#64748B',
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 24,
+    lineHeight: vs(22),
+    marginBottom: vs(24),
+    alignSelf: 'stretch',
   },
   modalActionRow: {
     width: '100%',
-    gap: 12,
+    gap: vs(12),
   },
   modalPrimaryBtn: {
     backgroundColor: '#3B82F6',
-    height: 56,
-    borderRadius: 18,
+    height: vs(56),
+    borderRadius: ms(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
     shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: vs(4) },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowRadius: s(8),
     elevation: 4,
   },
   modalPrimaryBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: ms(16),
     fontWeight: '800',
   },
   modalSecondaryBtn: {
     backgroundColor: '#EF4444',
-    height: 56,
-    borderRadius: 18,
+    height: vs(56),
+    borderRadius: ms(18),
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
   modalSecondaryBtnText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: ms(16),
     fontWeight: '700',
   },
 });
