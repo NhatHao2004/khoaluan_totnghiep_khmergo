@@ -719,7 +719,7 @@ export default function CommunityScreen() {
             </View>
 
             <ScrollView
-              style={styles.createPostContent}
+              style={[styles.createPostContent, { marginBottom: vs(80) }]}
               contentContainerStyle={{ flexGrow: 1 }}
               keyboardShouldPersistTaps="handled"
             >
@@ -756,7 +756,7 @@ export default function CommunityScreen() {
             <View style={[styles.createPostActions, {
               paddingBottom: keyboardHeight > 0
                 ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom + 10 : keyboardHeight)
-                : (insets.bottom + vs(15)),
+                : (insets.bottom + vs(10)),
               position: 'absolute',
               bottom: 5,
               left: 0,
@@ -818,7 +818,7 @@ export default function CommunityScreen() {
               ref={commentsListRef}
               data={comments}
               keyExtractor={(item) => item.id}
-              style={{ flex: 1 }}
+              style={{ flex: 1, marginBottom: vs(80) }}
               contentContainerStyle={styles.commentsList}
               renderItem={({ item }) => {
                 const isMyComment = user?.uid === item.userId;
@@ -879,9 +879,9 @@ export default function CommunityScreen() {
             <View style={[styles.commentInputContainer, {
               paddingBottom: keyboardHeight > 0
                 ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom + 10 : keyboardHeight)
-                : (insets.bottom + vs(12)),
+                : (insets.bottom + vs(10)),
               position: 'absolute',
-              bottom: 0,
+              bottom: 5,
               left: 0,
               right: 0
             }]}>
