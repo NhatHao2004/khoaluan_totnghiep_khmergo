@@ -2,6 +2,7 @@ import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
+import { ms, s, SCREEN_WIDTH, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
@@ -9,7 +10,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import {
-  Dimensions,
   Modal,
   Platform,
   RefreshControl,
@@ -19,7 +19,6 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { s, vs, ms } from '@/utils/responsive';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -32,7 +31,6 @@ import Animated, {
 } from 'react-native-reanimated';
 const StyleSheet = RNStyleSheet;
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CATEGORY_CARD_WIDTH = (SCREEN_WIDTH - s(40) - (3 * s(8))) / 4;
 
 export default function HomeScreen() {
@@ -176,13 +174,13 @@ export default function HomeScreen() {
       if (userInterests.length > 0 && !forceRandom) {
         // Lấy tất cả các mục thuộc các danh mục mà người dùng quan tâm
         const itemsInInterests = sortedByNewest.filter(i => userInterests.includes(i.category));
-        
+
         if (itemsInInterests.length > 0) {
           // Trộn ngẫu nhiên các mục này để tạo sự đa dạng
           const shuffled = [...itemsInInterests].sort(() => Math.random() - 0.5);
           featured = shuffled.slice(0, 3);
         }
-        
+
         // Nếu vẫn chưa đủ 3 mục (do danh mục quan tâm ít dữ liệu), bù thêm từ các danh mục khác
         if (featured.length < 3) {
           const others = sortedByNewest.filter(i => !featured.find(f => f.id === i.id));
@@ -193,18 +191,18 @@ export default function HomeScreen() {
         const newestPagoda = pagodas[0];
         const newestCulture = cultures[0];
         const newestFood = foods[0];
-        
+
         if (newestPagoda) featured.push(newestPagoda);
         if (newestCulture) featured.push(newestCulture);
         if (newestFood) featured.push(newestFood);
-        
+
         // If still less than 3, just take newest from any
         if (featured.length < 3) {
           const remaining = sortedByNewest.filter(i => !featured.find(f => f.id === i.id));
           featured.push(...remaining.slice(0, 3 - featured.length));
         }
       }
-      
+
       // Final unique & limit
       featured = featured.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i).slice(0, 3);
 
@@ -375,7 +373,7 @@ export default function HomeScreen() {
                 <Image source={{ uri: user.avatar as string }} style={styles.avatar} />
               ) : (
                 <View style={styles.avatarPlaceholder}>
-                  <Ionicons name="person-circle-outline" size={53} color="#000000ff" />
+                  <Ionicons name="person-circle" size={ms(40)} color="#000000ff" />
                 </View>
               )}
             </TouchableOpacity>
@@ -595,7 +593,7 @@ export default function HomeScreen() {
                     </View>
                     <View style={styles.nContent}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <View style={{ flex: 1, marginRight: 10 }}>
+                        <View style={{ flex: 1, marginRight: s(10) }}>
                           <Text style={styles.nItemTitle} numberOfLines={2}>
                             <Text style={{ fontWeight: '800' }}>{item.fromUserName}</Text> {item.message}
                           </Text>
@@ -603,9 +601,9 @@ export default function HomeScreen() {
                         {deletingId === item.id ? (
                           <TouchableOpacity
                             onPress={() => deleteNotification(item.id)}
-                            style={{ padding: 5 }}
+                            style={{ padding: s(5) }}
                           >
-                            <Ionicons name="close-circle" size={24} color="#FF3B30" />
+                            <Ionicons name="close-circle" size={ms(24)} color="#FF3B30" />
                           </TouchableOpacity>
                         ) : (
                           <Text style={styles.nItemTime}>{item.time}</Text>
@@ -616,8 +614,8 @@ export default function HomeScreen() {
                 ))
               ) : (
                 <View style={{ alignItems: 'center' }}>
-                  <Ionicons name="notifications-off-outline" size={45} color="#E2E8F0" />
-                  <Text style={{ color: '#94A3B8', marginTop: 12, fontSize: 14 }}>{t('no_notifications')}</Text>
+                  <Ionicons name="notifications-off-outline" size={ms(45)} color="#E2E8F0" />
+                  <Text style={{ color: '#94A3B8', marginTop: vs(12), fontSize: ms(14) }}>{t('no_notifications')}</Text>
                 </View>
               )}
             </ScrollView>
@@ -633,20 +631,20 @@ const styles = RNStyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    paddingTop: vs(40),
+    paddingTop: Platform.OS === 'ios' ? vs(40) : vs(40),
   },
   featuredCard: {
     width: SCREEN_WIDTH - s(32),
     marginHorizontal: s(16),
     backgroundColor: '#FFF',
-    borderRadius: ms(20),
+    borderRadius: s(20),
     marginBottom: vs(16),
     borderWidth: 1,
     borderColor: '#F1F5F9',
     shadowColor: '#1E293B',
-    shadowOffset: { width: 0, height: 6 },
+    shadowOffset: { width: 0, height: vs(6) },
     shadowOpacity: 0.1,
-    shadowRadius: 12,
+    shadowRadius: s(12),
     elevation: 4,
   },
   header: {
@@ -654,12 +652,13 @@ const styles = RNStyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: s(24),
-    marginBottom: vs(10),
+    marginBottom: vs(12),
   },
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: s(12),
+    maxWidth: '80%',
   },
   avatar: {
     width: s(50),
@@ -677,11 +676,12 @@ const styles = RNStyleSheet.create({
   },
   welcomeText: {
     justifyContent: 'center',
+    gap: vs(1),
   },
   helloText: {
-    fontSize: ms(13),
+    fontSize: ms(13.5),
     color: '#1E293B',
-    fontWeight: '700',
+    fontWeight: '800',
     letterSpacing: 0.3,
   },
   userName: {
@@ -723,17 +723,17 @@ const styles = RNStyleSheet.create({
   },
   promoBanner: {
     marginHorizontal: s(24),
-    height: vs(170),
+    height: vs(160),
     backgroundColor: '#DBEAFE',
-    borderRadius: ms(28),
+    borderRadius: s(28),
     flexDirection: 'row',
     overflow: 'hidden',
-    marginBottom: vs(7),
+    marginBottom: vs(5),
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.5)',
   },
   promoImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...RNStyleSheet.absoluteFillObject,
     width: '100%',
     height: '100%',
   },
@@ -741,7 +741,7 @@ const styles = RNStyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: s(20),
+    paddingHorizontal: s(24),
     marginTop: 0,
     marginBottom: 0,
     paddingTop: vs(5),
@@ -761,23 +761,26 @@ const styles = RNStyleSheet.create({
   },
   categoryGrid: {
     flexDirection: 'row',
-    paddingHorizontal: s(20),
+    paddingHorizontal: s(24),
     justifyContent: 'space-between',
     marginBottom: 0,
-    marginTop: vs(10),
+    marginTop: vs(12),
   },
   categoryCol: {
     width: CATEGORY_CARD_WIDTH,
   },
   serviceCardMini: {
     backgroundColor: '#FFF',
-    borderRadius: ms(18),
-    paddingVertical: vs(12),
+    borderRadius: s(20),
+    paddingVertical: vs(10),
+    paddingHorizontal: s(4),
     alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: vs(95),
     shadowColor: '#1E293B',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: vs(4) },
     shadowOpacity: 0.08,
-    shadowRadius: 8,
+    shadowRadius: s(8),
     elevation: 3,
     borderWidth: 1,
     borderColor: '#F8FAFC',
@@ -788,12 +791,13 @@ const styles = RNStyleSheet.create({
     marginBottom: vs(8),
   },
   serviceLabelMini: {
-    fontSize: ms(10),
-    fontWeight: '800',
-    color: '#334155',
+    fontSize: ms(9.5),
+    fontWeight: '900',
+    color: '#1E293B',
     textAlign: 'center',
-    lineHeight: ms(16),
+    lineHeight: ms(13),
     paddingHorizontal: s(2),
+    marginTop: vs(2),
   },
   // Toast Styles
   toastContainer: {
@@ -802,14 +806,14 @@ const styles = RNStyleSheet.create({
     left: s(20),
     right: s(20),
     height: vs(56),
-    borderRadius: ms(20),
+    borderRadius: s(20),
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: s(16),
     zIndex: 9999,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: vs(10) },
     shadowOpacity: 0.3,
-    shadowRadius: 20,
+    shadowRadius: s(20),
     elevation: 10,
   },
   toastIcon: {
@@ -833,8 +837,8 @@ const styles = RNStyleSheet.create({
     aspectRatio: 16 / 10,
     position: 'relative',
     overflow: 'hidden',
-    borderTopLeftRadius: ms(20),
-    borderTopRightRadius: ms(20),
+    borderTopLeftRadius: s(20),
+    borderTopRightRadius: s(20),
   },
   cardImage: {
     width: '100%',
@@ -878,17 +882,17 @@ const styles = RNStyleSheet.create({
   },
   notificationContainer: {
     backgroundColor: '#FFF',
-    borderTopLeftRadius: ms(30),
-    borderBottomLeftRadius: ms(30),
+    borderTopLeftRadius: s(30),
+    borderBottomLeftRadius: s(30),
     width: '85%',
     height: '100%',
     padding: s(24),
     alignSelf: 'flex-end',
     elevation: 20,
     shadowColor: '#000',
-    shadowOffset: { width: -5, height: 0 },
+    shadowOffset: { width: -s(5), height: 0 },
     shadowOpacity: 0.1,
-    shadowRadius: 15,
+    shadowRadius: s(15),
   },
   nHeader: {
     flexDirection: 'row',
@@ -916,7 +920,7 @@ const styles = RNStyleSheet.create({
   nIcon: {
     width: s(45),
     height: s(43),
-    borderRadius: ms(10),
+    borderRadius: s(10),
     justifyContent: 'center',
     alignItems: 'center',
   },

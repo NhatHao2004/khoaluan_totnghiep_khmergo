@@ -57,10 +57,10 @@ export default function RegisterScreen() {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withTiming(Platform.OS === 'ios' ? 50 : 40, { duration: 400 });
+    toastY.value = withTiming(Platform.OS === 'ios' ? vs(50) : vs(40), { duration: 400 });
 
     setTimeout(() => {
-      toastY.value = withTiming(-120, { duration: 400 });
+      toastY.value = withTiming(-vs(120), { duration: 400 });
       setTimeout(() => setShowToast(false), 400);
     }, 3000);
   }, [toastY]);
