@@ -4,18 +4,18 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTemples } from '@/hooks/use-temples';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { toggleFavorite } from '@/services/firebase-service';
+import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import {
   ActivityIndicator,
   Alert,
   Image,
-  ScrollView,
   StyleSheet as RNStyleSheet,
+  ScrollView,
   TouchableOpacity,
   View
 } from 'react-native';
-import { s, vs, ms } from '@/utils/responsive';
 const StyleSheet = RNStyleSheet;
 
 // Placeholder for images - User will add later
@@ -188,9 +188,6 @@ export default function PagodaScreen() {
 
                 <View style={styles.pagodaContent}>
                   <ThemedText style={styles.pagodaName} numberOfLines={1}>{isKm ? (pagoda.name_khmer || pagoda.name) : pagoda.name}</ThemedText>
-                  <ThemedText style={styles.pagodaLocation} numberOfLines={1}>
-                    {isKm ? (pagoda.location_khmer || pagoda.location) : pagoda.location}
-                  </ThemedText>
                 </View>
               </TouchableOpacity>
             ))}
@@ -210,14 +207,14 @@ export default function PagodaScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f9fa' },
-  header: { 
-    backgroundColor: '#ffffff', 
-    paddingTop: vs(45), 
-    paddingBottom: vs(15), 
-    paddingHorizontal: s(15), 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    elevation: 5, 
+  header: {
+    backgroundColor: '#ffffff',
+    paddingTop: vs(45),
+    paddingBottom: vs(15),
+    paddingHorizontal: s(15),
+    flexDirection: 'row',
+    alignItems: 'center',
+    elevation: 5,
     zIndex: 100,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: vs(2) },

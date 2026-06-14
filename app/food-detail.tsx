@@ -1,13 +1,13 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
-import { s, vs, ms, SCREEN_WIDTH, SCREEN_HEIGHT } from '@/utils/responsive';
+import { ms, s, SCREEN_HEIGHT, SCREEN_WIDTH, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Modal, ScrollView, StatusBar, StyleSheet as RNStyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Modal, StyleSheet as RNStyleSheet, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const StyleSheet = RNStyleSheet;
 
@@ -152,9 +152,6 @@ export default function FoodDetailScreen() {
         <View style={styles.contentArea}>
           <View style={styles.titleBox}>
             <Text style={styles.mainTitle} adjustsFontSizeToFit numberOfLines={1}>{name}</Text>
-            <View style={styles.locationRow}>
-              <Text style={styles.locationLabel} numberOfLines={1} adjustsFontSizeToFit>{location}</Text>
-            </View>
           </View>
 
           <View style={styles.tabHeader}>

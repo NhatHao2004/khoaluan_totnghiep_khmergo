@@ -152,9 +152,6 @@ export default function CultureDetailScreen() {
         <View style={styles.contentArea}>
           <View style={styles.titleBox}>
             <Text style={styles.mainTitle} adjustsFontSizeToFit numberOfLines={1}>{name}</Text>
-            <View style={styles.locationRow}>
-              <Text style={styles.locationLabel} numberOfLines={1} adjustsFontSizeToFit>{location}</Text>
-            </View>
           </View>
 
           <View style={styles.tabHeader}>
