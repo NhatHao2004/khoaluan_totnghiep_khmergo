@@ -640,7 +640,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#334155',
   },
   progressContainer: {
@@ -672,7 +672,7 @@ const styles = StyleSheet.create({
   },
   scorePillText: {
     fontSize: ms(16),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#D97706',
   },
 
@@ -729,7 +729,7 @@ const styles = StyleSheet.create({
   },
   mainQuestionText: {
     fontSize: 22,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1E293B',
     lineHeight: 32,
     textAlign: 'center',
@@ -757,7 +757,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#475569',
     lineHeight: 20,
-    fontWeight: '600',
+    fontWeight: '400',
     textAlign: 'justify',
   },
 
@@ -803,13 +803,13 @@ const styles = StyleSheet.create({
   },
   optLetter: {
     fontSize: 16,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#64748B',
   },
   optText: {
     flex: 1,
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#334155',
   },
   correctMarker: {
@@ -862,7 +862,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 20,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#166534',
   },
   statusTextWrong: {
@@ -884,7 +884,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 24,
     color: '#334155',
-    fontWeight: '600',
+    fontWeight: '400',
     textAlign: 'center',
   },
   explTextNewWrong: {
@@ -911,7 +911,7 @@ const styles = StyleSheet.create({
   nextBtnTextNew: {
     color: '#FFF',
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '400',
   },
   correctAnswerBox: {
     marginTop: 10,
@@ -922,7 +922,7 @@ const styles = StyleSheet.create({
   },
   correctAnswerLabel: {
     fontSize: 11,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#64748B',
     textTransform: 'uppercase',
     letterSpacing: 1,
@@ -932,7 +932,7 @@ const styles = StyleSheet.create({
   },
   correctAnswerText: {
     fontSize: 16,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     textAlign: 'center',
   },
@@ -946,7 +946,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 16,
   },
-  resultTitle: { fontSize: 26, fontWeight: '900', color: '#1E293B', marginBottom: 20, textAlign: 'center' },
+  resultTitle: { fontSize: 26, fontWeight: '400', color: '#1E293B', marginBottom: 20, textAlign: 'center' },
   resultScoreCard: {
     width: '100%', alignItems: 'center', backgroundColor: '#FFF',
     borderRadius: 24, padding: 24, borderWidth: 2, marginBottom: 14,
@@ -958,10 +958,10 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
     gap: 8,
   },
-  resultScoreNum: { fontSize: 52, fontWeight: '900' },
-  resultScoreLabel: { fontSize: 16, color: '#64748B', fontWeight: '600' },
+  resultScoreNum: { fontSize: 52, fontWeight: '400' },
+  resultScoreLabel: { fontSize: 16, color: '#64748B', fontWeight: '400' },
   savingText: { fontSize: 12, color: '#94A3B8', marginTop: 6 },
-  savedText: { fontSize: 12, color: '#22C55E', fontWeight: '700', marginTop: 6 },
+  savedText: { fontSize: 12, color: '#22C55E', fontWeight: '400', marginTop: 6 },
   resultCorrectLabel: { fontSize: 14, color: '#64748B', marginBottom: 16 },
   resultDotRow: { flexDirection: 'row', gap: 8, marginBottom: 28 },
   resultDot: {
@@ -975,11 +975,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center', gap: 8,
     paddingVertical: 16, borderRadius: 18, marginBottom: 12,
   },
-  resultPrimaryBtnText: { color: '#FFF', fontSize: 16, fontWeight: '900' },
+  resultPrimaryBtnText: { color: '#FFF', fontSize: 16, fontWeight: '400' },
   resultSecondaryBtn: {
     paddingVertical: 12,
   },
-  resultSecondaryBtnText: { color: '#64748B', fontSize: 14, fontWeight: '600', textAlign: 'center' },
+  resultSecondaryBtnText: { color: '#64748B', fontSize: 14, fontWeight: '400', textAlign: 'center' },
 
   // --- Modal Styles ---
   modalOverlay: {
@@ -1015,7 +1015,7 @@ const styles = StyleSheet.create({
   },
   exitTitle: {
     fontSize: ms(22),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     marginBottom: vs(25),
     textAlign: 'center',
@@ -1028,7 +1028,7 @@ const styles = StyleSheet.create({
     lineHeight: vs(24),
     marginBottom: vs(28),
     alignSelf: 'stretch',
-    fontWeight: '600',
+    fontWeight: '400',
   },
   exitActionRow: {
     width: '100%',
@@ -1045,7 +1045,7 @@ const styles = StyleSheet.create({
   stayBtnText: {
     color: '#FFF',
     fontSize: ms(16),
-    fontWeight: '700',
+    fontWeight: '400',
   },
   confirmExitBtn: {
     backgroundColor: '#EF4444',
@@ -1058,7 +1058,7 @@ const styles = StyleSheet.create({
   confirmExitBtnText: {
     color: '#FFF',
     fontSize: ms(16),
-    fontWeight: '700',
+    fontWeight: '400',
   },
 
   // --- Guest View Styles ---
@@ -1075,7 +1075,7 @@ const styles = StyleSheet.create({
   },
   guestTitle: {
     fontSize: 24,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     marginBottom: 12,
     textAlign: 'center',
@@ -1104,7 +1104,7 @@ const styles = StyleSheet.create({
   guestPrimaryBtnText: {
     color: '#FFF',
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '400',
   },
   guestSecondaryBtn: {
     width: '100%',
@@ -1118,6 +1118,6 @@ const styles = StyleSheet.create({
   guestSecondaryBtnText: {
     color: '#64748B',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '400',
   },
 });

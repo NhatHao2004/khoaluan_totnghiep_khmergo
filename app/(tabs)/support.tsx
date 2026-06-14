@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1A1A1A',
     textAlign: 'center',
   },
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1A1A1A',
     marginBottom: 0,
     lineHeight: 26,
@@ -375,20 +375,20 @@ const styles = StyleSheet.create({
   faqText: {
     fontSize: 15,
     color: '#1E293B',
-    fontWeight: '700',
+    fontWeight: '400',
     marginBottom: 2,
   },
   faqSub: {
     fontSize: 13,
     color: '#94A3B8',
-    fontWeight: '500',
+    fontWeight: '400',
   },
   sectionSub: {
     fontSize: 14,
     color: '#64748B',
     marginTop: 6,
     lineHeight: 20,
-    fontWeight: '500',
+    fontWeight: '400',
     textAlign: 'justify',
   },
   formContainer: {
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#334155',
     marginBottom: 8,
     marginLeft: 4,
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
   sendBtnText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '400',
   },
   // Ultra Simple History Styles
   historySection: {
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
   },
   historySectionTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1E293B',
     marginBottom: 25,
   },
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#1E293B',
     lineHeight: 22,
-    fontWeight: '500',
+    fontWeight: '400',
     paddingLeft: 16,
   },
   cardMainRow: {
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
   },
   systemReplyTitle: {
     fontSize: 13,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#0369A1',
     textTransform: 'uppercase',
   },
@@ -527,7 +527,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#0C4A6E',
     lineHeight: 22,
-    fontWeight: '500',
+    fontWeight: '400',
   },
   historyDateText: {
     fontSize: 11,
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
   toastText: {
     color: '#FFFFFF',
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '400',
     flex: 1,
   },
 });

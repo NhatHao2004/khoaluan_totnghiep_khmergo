@@ -37,25 +37,27 @@ const styles = StyleSheet.create({
   default: {
     fontSize: 16,
     lineHeight: 26,
+    fontWeight: '400',
   },
   defaultSemiBold: {
     fontSize: 16,
     lineHeight: 26,
-    fontWeight: '600',
+    fontWeight: '400',
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontWeight: '400',
     lineHeight: 44, // Tăng lên để không bị cắt dấu Tiếng Việt
   },
   subtitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: '400',
     lineHeight: 28,
   },
   link: {
     lineHeight: 30,
     fontSize: 16,
     color: '#0a7ea4',
+    fontWeight: '400',
   },
 });

@@ -466,7 +466,7 @@ export default function AIAssistantScreen() {
 
                   {(status === 'idle' || status === 'selected') && (
                     <View style={{ marginBottom: 5 }}>
-                      <Text style={{ fontSize: 18, fontWeight: '800', color: '#1A1A1A' }}>
+                      <Text style={{ fontSize: 18, fontWeight: '400', color: '#1A1A1A' }}>
                         {status === 'idle' ? t('ai_camera_idle_title') : t('ai_camera_ready')}
                       </Text>
                     </View>
@@ -552,11 +552,11 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 10
   },
-  toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '700', marginLeft: s(15), flex: 1, letterSpacing: 0.3 },
+  toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '400', marginLeft: s(15), flex: 1, letterSpacing: 0.3 },
   header: { paddingTop: vs(40), paddingBottom: vs(10), paddingHorizontal: s(20), backgroundColor: '#FFF', flexDirection: 'row', alignItems: 'center' },
   backBtn: { marginRight: s(15) },
   headerInfo: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: ms(20), fontWeight: '900', color: '#1A1A1A', textAlign: 'center' },
+  headerTitle: { fontSize: ms(20), fontWeight: '400', color: '#1A1A1A', textAlign: 'center' },
   menuBtn: { width: s(42), height: s(42), justifyContent: 'center', alignItems: 'center' },
 
   tabContainer: { paddingHorizontal: s(20), paddingVertical: vs(10), backgroundColor: '#FFF' },
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
-  tabText: { fontSize: ms(13), fontWeight: '700', color: '#64748B' },
+  tabText: { fontSize: ms(13), fontWeight: '400', color: '#64748B' },
   activeTabText: { color: '#FFF' },
 
   contentArea: { flex: 1 },
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
   chatAvatar: { width: s(36), height: s(36), borderRadius: s(18), backgroundColor: '#F1F3F4', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' },
   aiBubbleContainer: { marginLeft: s(8), flex: 1, maxWidth: '82%' },
   userBubbleContainer: { marginRight: s(8), alignItems: 'flex-end', flex: 1, maxWidth: '82%' },
-  chatName: { fontSize: ms(13), fontWeight: '700', color: '#5F6368', marginBottom: vs(4), marginLeft: s(8) },
+  chatName: { fontSize: ms(13), fontWeight: '400', color: '#5F6368', marginBottom: vs(4), marginLeft: s(8) },
   chatTime: { fontSize: ms(11), color: '#70757A', marginTop: vs(4), marginLeft: s(8) },
   aiBubble: {
     backgroundColor: '#F1F3F4',
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
   detailBtnText: {
     color: '#FFF',
     fontSize: ms(14),
-    fontWeight: '700'
+    fontWeight: '400'
   },
 
   modalOverlay: {
@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     fontSize: ms(15),
-    fontWeight: '600',
+    fontWeight: '400',
     color: '#1A1A1A'
   },
   menuDivider: {
@@ -714,11 +714,11 @@ const styles = StyleSheet.create({
   },
   aiHeader: { alignItems: 'center', justifyContent: 'center', marginBottom: vs(12) },
   aiAvatarSmall: { width: s(36), height: s(36), borderRadius: s(20), backgroundColor: '#1877F2', justifyContent: 'center', alignItems: 'center' },
-  aiNameSmall: { fontSize: ms(18), fontWeight: '900', color: '#1A1A1A', textAlign: 'center' },
+  aiNameSmall: { fontSize: ms(18), fontWeight: '400', color: '#1A1A1A', textAlign: 'center' },
   aiBubbleTextSmall: { fontSize: ms(16), color: '#475569', lineHeight: ms(26), textAlign: 'justify' },
   analyzingBox: { alignItems: 'center', paddingVertical: vs(10) },
-  analyzingText: { marginTop: vs(5), color: '#1877F2', fontWeight: '600' },
-  resultTitleSmall: { fontSize: ms(22), fontWeight: '900', color: '#1A1A1A', marginBottom: vs(5) },
+  analyzingText: { marginTop: vs(5), color: '#1877F2', fontWeight: '400' },
+  resultTitleSmall: { fontSize: ms(22), fontWeight: '400', color: '#1A1A1A', marginBottom: vs(5) },
 
   camBtnRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: s(15) },
   rectBtn: {
@@ -733,7 +733,7 @@ const styles = StyleSheet.create({
   },
   analyzeBtn: { width: '100%', height: vs(60), borderRadius: ms(20), overflow: 'hidden' },
   analyzeGradient: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  analyzeBtnText: { color: '#FFF', fontWeight: '800', letterSpacing: 0.5, fontSize: ms(16) },
+  analyzeBtnText: { color: '#FFF', fontWeight: '400', letterSpacing: 0.5, fontSize: ms(16) },
 
   fixedCameraActions: {
     position: 'absolute',

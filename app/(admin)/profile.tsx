@@ -498,13 +498,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   backBtn: { width: s(40), height: s(40), justifyContent: 'center', alignItems: 'center' },
-  headerTitle: { fontSize: ms(22), fontWeight: '800', color: '#1e293b' },
+  headerTitle: { fontSize: ms(22), fontWeight: '400', color: '#1e293b' },
   editBtn: {
     paddingHorizontal: s(12),
     paddingVertical: vs(6),
     borderRadius: s(10),
   },
-  editBtnText: { color: '#3b82f6', fontWeight: '700', fontSize: ms(15) },
+  editBtnText: { color: '#3b82f6', fontWeight: '400', fontSize: ms(15) },
   profileCard: {
     backgroundColor: '#fff',
     alignItems: 'center',
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  avatarInitial: { fontSize: ms(40), fontWeight: '900', color: '#fff' },
+  avatarInitial: { fontSize: ms(40), fontWeight: '400', color: '#fff' },
   cameraIcon: {
     position: 'absolute',
     bottom: 0,
@@ -554,17 +554,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profileInfo: { marginTop: vs(15), alignItems: 'center', marginBottom: vs(13) },
-  profileName: { fontSize: ms(20), fontWeight: '900', color: '#1e293b' },
+  profileName: { fontSize: ms(20), fontWeight: '400', color: '#1e293b' },
   nameInput: {
     fontSize: ms(20),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1e293b',
     borderBottomWidth: 1,
     borderColor: '#3b82f6',
     paddingHorizontal: s(20),
     textAlign: 'center',
   },
-  profileRole: { fontSize: ms(13), color: '#64748b', fontWeight: '600', marginTop: vs(4) },
+  profileRole: { fontSize: ms(13), color: '#64748b', fontWeight: '400', marginTop: vs(4) },
   statsContainer: {
     flexDirection: 'row',
     marginTop: vs(-25),
@@ -580,8 +580,8 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   statBox: { flex: 1, alignItems: 'center' },
-  statValue: { fontSize: ms(16), fontWeight: '800', color: '#1e293b' },
-  statLabel: { fontSize: ms(11), color: '#94a3b8', fontWeight: '600', marginTop: vs(2) },
+  statValue: { fontSize: ms(16), fontWeight: '400', color: '#1e293b' },
+  statLabel: { fontSize: ms(11), color: '#94a3b8', fontWeight: '400', marginTop: vs(2) },
   statDivider: { width: 1, height: '60%', backgroundColor: '#f1f5f9', alignSelf: 'center' },
   detailsList: { marginTop: vs(40), paddingHorizontal: s(20), gap: vs(12) },
   detailItem: {
@@ -603,11 +603,11 @@ const styles = StyleSheet.create({
     marginRight: s(16),
   },
   detailContent: { flex: 1 },
-  detailLabel: { fontSize: ms(12), color: '#94a3b8', fontWeight: '600' },
-  detailValue: { fontSize: ms(15), color: '#1e293b', fontWeight: '700', marginTop: vs(2) },
-  valueInput: { fontSize: ms(15), color: '#3b82f6', fontWeight: '700', marginTop: vs(2), padding: 0 },
+  detailLabel: { fontSize: ms(12), color: '#94a3b8', fontWeight: '400' },
+  detailValue: { fontSize: ms(15), color: '#1e293b', fontWeight: '400', marginTop: vs(2) },
+  valueInput: { fontSize: ms(15), color: '#3b82f6', fontWeight: '400', marginTop: vs(2), padding: 0 },
   sectionTitleContainer: { marginTop: vs(30), paddingHorizontal: s(24), marginBottom: vs(12) },
-  sectionTitle: { fontSize: ms(16), fontWeight: '800', color: '#1e293b' },
+  sectionTitle: { fontSize: ms(16), fontWeight: '400', color: '#1e293b' },
   actionList: { paddingHorizontal: s(20), gap: vs(10) },
   actionItem: {
     flexDirection: 'row',
@@ -626,7 +626,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: s(14),
   },
-  actionText: { flex: 1, fontSize: ms(15), fontWeight: '700', color: '#475569' },
+  actionText: { flex: 1, fontSize: ms(15), fontWeight: '400', color: '#475569' },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.4)',
@@ -654,14 +654,14 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: ms(20),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1e293b',
     marginBottom: vs(20),
     textAlign: 'center',
   },
   modalInputLabel: {
     fontSize: ms(13),
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#64748b',
     marginBottom: vs(6),
   },
@@ -691,7 +691,7 @@ const styles = StyleSheet.create({
   },
   modalBtnText: {
     fontSize: ms(15),
-    fontWeight: '700',
+    fontWeight: '400',
   },
   // Toast
   toastContainer: {
@@ -722,7 +722,7 @@ const styles = StyleSheet.create({
   toastText: {
     color: '#FFF',
     fontSize: ms(15),
-    fontWeight: '700',
+    fontWeight: '400',
     flex: 1,
   },
   // Premium Logout Modal
@@ -763,12 +763,12 @@ const styles = StyleSheet.create({
   },
   logoutAvatarInitial: {
     fontSize: ms(28),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#fff',
   },
   logoutTitle: {
     fontSize: ms(12),
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#94a3b8',
     letterSpacing: 1,
     textTransform: 'uppercase',
@@ -777,7 +777,7 @@ const styles = StyleSheet.create({
   logoutEmail: {
     fontSize: ms(13),
     color: '#64748b',
-    fontWeight: '500',
+    fontWeight: '400',
     marginBottom: vs(24),
   },
   logoutDivider: {
@@ -805,7 +805,7 @@ const styles = StyleSheet.create({
   logoutConfirmText: {
     color: '#fff',
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
   },
   logoutCancelBtn: {
     width: '100%',
@@ -817,7 +817,7 @@ const styles = StyleSheet.create({
   logoutCancelText: {
     color: '#ffffffff',
     fontSize: ms(15),
-    fontWeight: '700',
+    fontWeight: '400',
   },
 });
 

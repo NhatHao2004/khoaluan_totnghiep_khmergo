@@ -435,7 +435,7 @@ export default function CommunityScreen() {
         const postSnap = await Firestore.getDoc(postRef);
         if (postSnap.exists()) {
           const postData = postSnap.data();
-          sendNotification(postData.userId, 'like', postId, t('someone_liked'));
+          sendNotification(postData.userId, 'like', postId, 'someone_liked');
         }
       }
     } catch (error) {
@@ -487,9 +487,9 @@ export default function CommunityScreen() {
       if (postSnap.exists()) {
         const postData = postSnap.data();
         if (replyToId && replyToUserId) {
-          sendNotification(replyToUserId, 'reply', activePostId, `${t('someone_replied')}: "${currentComment.substring(0, 30)}..."`);
+          sendNotification(replyToUserId, 'reply', activePostId, 'someone_replied');
         } else {
-          sendNotification(postData.userId, 'comment', activePostId, `${t('someone_commented')}: "${currentComment.substring(0, 30)}..."`);
+          sendNotification(postData.userId, 'comment', activePostId, 'someone_commented');
         }
       }
     } catch (error) {
@@ -708,7 +708,7 @@ export default function CommunityScreen() {
                       <Text style={{
                         color: (createPostText.trim() || base64Image) ? '#1877F2' : '#CCC',
                         fontSize: 16,
-                        fontWeight: '700',
+                        fontWeight: '400',
                       }}>
                         {isEditingPost ? t('update_post') : t('submit_post')}
                       </Text>
@@ -869,7 +869,7 @@ export default function CommunityScreen() {
 
             {replyToName && (
               <View style={styles.replyBar}>
-                <Text style={styles.replyBarText}>{t('replying_to')}: <Text style={{ fontWeight: '800' }}>{replyToName}</Text></Text>
+                <Text style={styles.replyBarText}>{t('replying_to')}: <Text style={{ fontWeight: '400' }}>{replyToName}</Text></Text>
                 <TouchableOpacity onPress={() => { setReplyToId(null); setReplyToName(null); setReplyToUserId(null); }}>
                   <Ionicons name="close-circle" size={24} color="#FF3B30" />
                 </TouchableOpacity>
@@ -1022,40 +1022,40 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '700', marginLeft: s(15), flex: 1, letterSpacing: 0.3 },
+  toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '400', marginLeft: s(15), flex: 1, letterSpacing: 0.3 },
   screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: s(20), paddingTop: vs(10), paddingBottom: vs(15), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
-  screenTitle: { fontSize: ms(22), fontWeight: '800', color: '#1A1A1A' },
+  screenTitle: { fontSize: ms(22), fontWeight: '400', color: '#1A1A1A' },
   plusBtn: { width: s(36), height: s(36), borderRadius: s(18), backgroundColor: '#F7F7F7', justifyContent: 'center', alignItems: 'center' },
   listContent: { paddingTop: vs(5), paddingBottom: vs(30) },
   postContainer: { paddingHorizontal: s(20), paddingVertical: vs(20), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(15) },
   avatar: { width: s(48), height: s(48), borderRadius: s(24), backgroundColor: '#F0F0F0' },
   headerInfo: { marginLeft: s(12), flex: 1, marginRight: s(10), minWidth: 0 },
-  userName: { fontSize: ms(17), fontWeight: '700', color: '#1A1A1A', paddingVertical: vs(2), paddingRight: s(15), flexShrink: 1 },
+  userName: { fontSize: ms(17), fontWeight: '400', color: '#1A1A1A', paddingVertical: vs(2), paddingRight: s(15), flexShrink: 1 },
   postTime: { fontSize: ms(14), color: '#666', marginTop: vs(2) },
   postContent: { fontSize: ms(16), color: '#1A1A1A', marginBottom: vs(15), paddingVertical: vs(2) },
   postImage: { width: '100%', borderRadius: ms(24), backgroundColor: '#F0F0F0', marginBottom: vs(15) },
   actionsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: vs(5) },
   leftActions: { flexDirection: 'row', alignItems: 'center', gap: s(20) },
   actionItem: { flexDirection: 'row', alignItems: 'center', gap: s(8) },
-  actionCount: { fontSize: ms(16), fontWeight: '700', color: '#1A1A1A' },
+  actionCount: { fontSize: ms(16), fontWeight: '400', color: '#1A1A1A' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: ms(30), borderTopRightRadius: ms(30), overflow: 'hidden' },
   modalHeader: { alignItems: 'center', paddingVertical: vs(12) },
   modalHandle: { width: s(40), height: vs(5), borderRadius: s(3), backgroundColor: '#E0E0E0', marginBottom: vs(10) },
   modalHeaderTitleBox: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: s(20), marginBottom: vs(10) },
-  modalTitle: { fontSize: ms(18), fontWeight: '800', color: '#1A1A1A' },
+  modalTitle: { fontSize: ms(18), fontWeight: '400', color: '#1A1A1A' },
   commentAvatar: { width: s(36), height: s(36), borderRadius: s(18), backgroundColor: '#F0F0F0' },
   commentsList: { paddingHorizontal: s(20), paddingBottom: vs(20) },
   commentItem: { flexDirection: 'row', marginBottom: vs(15) },
   commentBody: { marginLeft: s(10), flex: 1, minWidth: 0 },
   commentContentArea: { paddingVertical: vs(2) },
   commentUserRow: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(2), flexWrap: 'wrap' },
-  repliedToUser: { fontSize: ms(14), fontWeight: '700', color: '#1A1A1A', paddingVertical: vs(1) },
-  commentUser: { fontSize: ms(14), fontWeight: '700', color: '#1A1A1A', paddingVertical: vs(1), paddingRight: s(10), flexShrink: 1 },
+  repliedToUser: { fontSize: ms(14), fontWeight: '400', color: '#1A1A1A', paddingVertical: vs(1) },
+  commentUser: { fontSize: ms(14), fontWeight: '400', color: '#1A1A1A', paddingVertical: vs(1), paddingRight: s(10), flexShrink: 1 },
   commentText: { fontSize: ms(14), color: '#1A1A1A', paddingVertical: vs(2) },
   commentTime: { fontSize: ms(12), color: '#999' },
-  footerActionText: { fontSize: ms(12), fontWeight: '700', color: '#666', paddingVertical: vs(5), paddingRight: s(12), minWidth: s(55) },
+  footerActionText: { fontSize: ms(12), fontWeight: '400', color: '#666', paddingVertical: vs(5), paddingRight: s(12), minWidth: s(55) },
   commentFooter: { flexDirection: 'row', alignItems: 'center', marginTop: vs(4) },
   commentInputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(15), paddingTop: vs(12), borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFFFFF', zIndex: 10 },
   commentInput: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: ms(20), paddingHorizontal: s(15), paddingVertical: vs(8), fontSize: ms(16), maxHeight: vs(110) },
@@ -1063,24 +1063,24 @@ const styles = StyleSheet.create({
   replyBarText: { fontSize: ms(14), color: '#666', flex: 1, marginRight: s(10) },
   sendBtn: { marginLeft: s(10), width: s(45), height: s(45), justifyContent: 'center', alignItems: 'center' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: vs(50) },
-  emptyText: { marginTop: vs(35), fontSize: ms(16), color: '#999', fontWeight: '500' },
+  emptyText: { marginTop: vs(35), fontSize: ms(16), color: '#999', fontWeight: '400' },
   createPostContent: { flexGrow: 1 },
   userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(20), paddingHorizontal: s(20), paddingTop: vs(10) },
-  userNameInModal: { fontSize: ms(17), fontWeight: '700', color: '#1A1A1A', marginLeft: s(12), paddingRight: s(15), flex: 1 },
+  userNameInModal: { fontSize: ms(17), fontWeight: '400', color: '#1A1A1A', marginLeft: s(12), paddingRight: s(15), flex: 1 },
   createPostInput: { fontSize: ms(18), color: '#1A1A1A', textAlignVertical: 'top', minHeight: vs(65), paddingHorizontal: s(20), marginBottom: vs(10) },
   previewImageContainer: { position: 'relative', marginBottom: vs(12), paddingHorizontal: s(20) },
   previewImage: { width: '100%', borderRadius: ms(20), backgroundColor: '#F0F0F0' },
   removeImageBtn: { position: 'absolute', top: vs(10), right: s(30), backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: s(15) },
   createPostActions: { flexDirection: 'row', padding: s(15), borderTopWidth: 1, borderTopColor: '#F0F0F0', alignItems: 'center', backgroundColor: '#FFFFFF', zIndex: 10 },
   attachAction: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0F7FF', paddingHorizontal: s(20), paddingVertical: vs(10), borderRadius: ms(22), gap: s(8) },
-  attachActionText: { fontSize: ms(14), fontWeight: '700', color: '#1877F2', marginRight: s(2) },
+  attachActionText: { fontSize: ms(14), fontWeight: '400', color: '#1877F2', marginRight: s(2) },
   closeModalBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center', borderRadius: s(22), backgroundColor: '#FFF0F0' },
   optionsOverlay: { flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end' },
   optionsContent: { backgroundColor: '#FFFFFF', borderRadius: ms(30), marginHorizontal: s(15), marginBottom: vs(15), paddingHorizontal: s(10), paddingTop: vs(20), paddingBottom: vs(5), shadowColor: '#000', shadowOffset: { width: 0, height: vs(-10) }, shadowOpacity: 0.1, shadowRadius: s(20), elevation: 20 },
   optionsHandle: { width: s(40), height: vs(4), borderRadius: s(2), backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: vs(12) },
   optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: vs(10), paddingHorizontal: s(25), width: '100%' },
   optionIconContainer: { width: s(30), height: s(30), justifyContent: 'center', alignItems: 'center', marginRight: s(15) },
-  optionText: { fontSize: ms(16), fontWeight: '600', color: '#000000ff' },
+  optionText: { fontSize: ms(16), fontWeight: '400', color: '#000000ff' },
 
   pModalOverlay: {
     flex: 1,
@@ -1115,7 +1115,7 @@ const styles = StyleSheet.create({
   },
   pModalTitle: {
     fontSize: ms(20),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     marginBottom: vs(8),
     textAlign: 'center',
@@ -1147,7 +1147,7 @@ const styles = StyleSheet.create({
   pModalPrimaryBtnText: {
     color: '#FFF',
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
   },
   pModalSecondaryBtn: {
     backgroundColor: '#EF4444',
@@ -1160,6 +1160,6 @@ const styles = StyleSheet.create({
   pModalSecondaryBtnText: {
     color: '#FFF',
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
   },
 });

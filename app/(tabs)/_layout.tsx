@@ -172,7 +172,7 @@ export default function TabsLayout() {
           tabBarShowLabel: true,
           tabBarLabelStyle: {
             fontSize: ms(11),
-            fontWeight: '600',
+            fontWeight: '400',
             marginTop: vs(8),
           }
         }}>
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
   tooltipText: {
     color: '#FFFFFF',
     fontSize: ms(12),
-    fontWeight: '700',
+    fontWeight: '400',
     textAlign: 'center',
   },
 });

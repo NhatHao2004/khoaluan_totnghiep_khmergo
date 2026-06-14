@@ -193,7 +193,7 @@ export default function LoginScreen() {
                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: s(4), gap: s(10) }}>
                   <Text style={[styles.inputLabel, { flex: 1 }]} numberOfLines={1}>{t('password_label')}</Text>
                   <TouchableOpacity hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}>
-                    <Text style={{ fontSize: ms(13), color: '#94A3B8', fontWeight: '600' }}>{t('forgot_password')}</Text>
+                    <Text style={{ fontSize: ms(13), color: '#94A3B8', fontWeight: '400' }}>{t('forgot_password')}</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.inputWrapper}>
@@ -285,27 +285,27 @@ const styles = StyleSheet.create({
   fixedHeader: { paddingHorizontal: s(20), paddingTop: vs(20), paddingBottom: vs(10), backgroundColor: '#FFF' },
   scrollContent: { paddingHorizontal: s(20), paddingTop: vs(10), backgroundColor: '#FFF' },
   headerTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', minHeight: vs(50) },
-  titleText: { fontSize: ms(32), fontWeight: '900', color: '#1e293b', letterSpacing: -1 },
-  registerLinkText: { fontSize: ms(16), color: '#64748B', fontWeight: '700', marginBottom: vs(4) },
+  titleText: { fontSize: ms(32), fontWeight: '400', color: '#1e293b', letterSpacing: -1 },
+  registerLinkText: { fontSize: ms(16), color: '#64748B', fontWeight: '400', marginBottom: vs(4) },
 
   card: { backgroundColor: 'transparent', padding: s(10) },
 
   logoWrapper: { alignItems: 'center', marginBottom: vs(25) },
   logoImage: { width: s(130), height: s(130) },
   logoHintRow: { marginTop: vs(10), flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  logoHint: { fontSize: ms(17), color: '#64748B', fontWeight: '800' },
+  logoHint: { fontSize: ms(17), color: '#64748B', fontWeight: '400' },
   waveEmoji: { fontSize: ms(20) },
 
   form: { gap: vs(20), marginBottom: vs(30) },
   inputGroup: { gap: vs(8) },
-  inputLabel: { fontSize: ms(14), fontWeight: '800', color: '#475569', marginLeft: s(4) },
+  inputLabel: { fontSize: ms(14), fontWeight: '400', color: '#475569', marginLeft: s(4) },
   inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: s(16), paddingHorizontal: s(16), height: vs(56), borderWidth: 1, borderColor: '#F1F5F9' },
   inputIcon: { marginRight: s(12) },
-  input: { flex: 1, fontSize: ms(16), color: '#1e293b', fontWeight: '700', paddingVertical: vs(10) },
+  input: { flex: 1, fontSize: ms(16), color: '#1e293b', fontWeight: '400', paddingVertical: vs(10) },
 
   mainBtn: { borderRadius: s(18), overflow: 'hidden', elevation: 4, shadowColor: '#10B981', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8 },
   btnGradient: { height: vs(60), justifyContent: 'center', alignItems: 'center' },
-  btnText: { fontSize: ms(16), fontWeight: '800', color: '#FFF', letterSpacing: 1 },
+  btnText: { fontSize: ms(16), fontWeight: '400', color: '#FFF', letterSpacing: 1 },
 
   socialFooter: {
     marginTop: vs(40),
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   dividerText: {
     fontSize: ms(13),
     color: '#94A3B8',
-    fontWeight: '600',
+    fontWeight: '400',
   },
   socialIconsRow: {
     flexDirection: 'row',
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
   toastText: {
     color: '#FFF',
     fontSize: ms(15),
-    fontWeight: '700',
+    fontWeight: '400',
     marginLeft: s(12),
     flex: 1,
   },

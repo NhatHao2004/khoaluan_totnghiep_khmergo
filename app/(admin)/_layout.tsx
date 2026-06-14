@@ -52,7 +52,7 @@ export default function AdminLayout() {
           },
           headerShadowVisible: false,
           headerTitleStyle: {
-            fontWeight: '800',
+            fontWeight: '400',
             color: '#1e293b',
           },
           animation: 'slide_from_right',

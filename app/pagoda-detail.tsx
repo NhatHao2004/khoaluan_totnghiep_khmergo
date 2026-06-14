@@ -294,9 +294,9 @@ export default function PagodaDetailScreen() {
                 <Text style={styles.quizTitle} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'សាកល្បងចំណេះដឹង' : 'Kiểm tra kiến thức'}</Text>
                 <Text style={styles.quizDesc} adjustsFontSizeToFit numberOfLines={2}>
                   {isKm ? (
-                    <>តើអ្នកយល់ពី <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> យ៉ាងណា?{'\n'}ប្រកួតប្រជែងឥឡូវនេះដើម្បីទទួលបានពិន្ទុ</>
+                    <>តើអ្នកយល់ពី <Text style={{ fontWeight: '400', color: '#1E293B' }}>{name}</Text> យ៉ាងណា?{'\n'}ប្រកួតប្រជែងឥឡូវនេះដើម្បីទទួលបានពិន្ទុ</>
                   ) : (
-                    <>Hiểu <Text style={{ fontWeight: 'bold', color: '#1E293B' }}>{name}</Text> như thế nào?{'\n'}Thử thách ngay để nhận điểm thưởng</>
+                    <>Hiểu <Text style={{ fontWeight: '400', color: '#1E293B' }}>{name}</Text> như thế nào?{'\n'}Thử thách ngay để nhận điểm thưởng</>
                   )}
                 </Text>
                 <TouchableOpacity
@@ -410,13 +410,13 @@ const styles = StyleSheet.create({
     minHeight: SCREEN_HEIGHT - HERO_HEIGHT + vs(30),
   },
   titleBox: { marginBottom: vs(20) },
-  mainTitle: { fontSize: s(28), fontWeight: '900', color: '#0F172A', lineHeight: s(36) },
+  mainTitle: { fontSize: s(28), fontWeight: '400', color: '#0F172A', lineHeight: s(36) },
   locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: vs(8), gap: s(6) },
-  locationLabel: { fontSize: s(14), color: '#64748B', fontWeight: '500' },
+  locationLabel: { fontSize: s(14), color: '#64748B', fontWeight: '400' },
   contentPiece: { marginTop: vs(20) },
   blockPic: { width: '100%', height: vs(220), borderRadius: s(24), marginBottom: vs(15) },
   blockTextWrap: {},
-  pieceTitle: { fontSize: s(20), fontWeight: '900', color: '#0F172A', marginBottom: vs(8) },
+  pieceTitle: { fontSize: s(20), fontWeight: '400', color: '#0F172A', marginBottom: vs(8) },
   piecePara: { fontSize: s(15.5), lineHeight: vs(26), color: '#475569', textAlign: 'left' },
   mapWrap: { marginTop: vs(15) },
   mapBox: {
@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: s(8),
   },
-  mapOpenText: { color: '#fff', fontSize: s(12), fontWeight: '800' },
+  mapOpenText: { color: '#fff', fontSize: s(12), fontWeight: '400' },
   mapControls: { position: 'absolute', top: vs(15), right: s(15), gap: vs(10) },
   mapControlBtn: {
     width: s(40),
@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
   },
   loaderContainer: { flex: 1, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' },
   loaderContent: { alignItems: 'center', gap: vs(15) },
-  loaderText: { fontSize: s(14), color: '#64748B', fontWeight: '600', letterSpacing: 0.5 },
+  loaderText: { fontSize: s(14), color: '#64748B', fontWeight: '400', letterSpacing: 0.5 },
   sectionTabRow: { flexDirection: 'row', gap: s(12), marginBottom: vs(20) },
   tabBtn: {
     flex: 1,
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
-  tabBtnText: { fontSize: s(13), fontWeight: '700', color: '#64748b', textTransform: 'uppercase', lineHeight: vs(20) },
+  tabBtnText: { fontSize: s(13), fontWeight: '400', color: '#64748b', textTransform: 'uppercase', lineHeight: vs(20) },
   tabBtnTextActive: { color: '#FFF' },
   quizCard: {
     minHeight: vs(280),
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: s(30),
   },
-  quizTitle: { fontSize: s(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(8) },
+  quizTitle: { fontSize: s(20), fontWeight: '400', color: '#1E293B', marginBottom: vs(8) },
   quizDesc: { fontSize: s(14), color: '#64748B', textAlign: 'center', lineHeight: vs(22), marginBottom: vs(16), alignSelf: 'stretch' },
   quizStartBtn: {
     flexDirection: 'row',
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     borderRadius: s(16),
     shadowColor: '#FF6B2C', shadowOffset: { width: 0, height: vs(4) }, shadowOpacity: 0.2, shadowRadius: s(8), elevation: 4,
   },
-  quizStartBtnText: { color: '#FFF', fontSize: s(16), fontWeight: '800' },
+  quizStartBtnText: { color: '#FFF', fontSize: s(16), fontWeight: '400' },
   modalContent: {
     backgroundColor: '#FFF',
     borderRadius: s(32),
@@ -510,17 +510,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center', marginBottom: vs(20),
     borderWidth: 1, borderColor: '#DBEAFE',
   },
-  modalTitle: { fontSize: s(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(8), textAlign: 'center' },
+  modalTitle: { fontSize: s(20), fontWeight: '400', color: '#1E293B', marginBottom: vs(8), textAlign: 'center' },
   modalSub: { fontSize: s(15), color: '#64748B', textAlign: 'center', lineHeight: vs(22), marginBottom: vs(24) },
   modalActionRow: { width: '100%', gap: vs(12) },
   modalPrimaryBtn: {
     backgroundColor: '#3B82F6', height: vs(56), borderRadius: s(18),
     justifyContent: 'center', alignItems: 'center', width: '100%',
   },
-  modalPrimaryBtnText: { color: '#FFF', fontSize: s(16), fontWeight: '800' },
+  modalPrimaryBtnText: { color: '#FFF', fontSize: s(16), fontWeight: '400' },
   modalSecondaryBtn: {
     backgroundColor: '#EF4444', height: vs(56), borderRadius: s(18),
     justifyContent: 'center', alignItems: 'center', width: '100%',
   },
-  modalSecondaryBtnText: { color: '#FFF', fontSize: s(16), fontWeight: '800' },
+  modalSecondaryBtnText: { color: '#FFF', fontSize: s(16), fontWeight: '400' },
 });

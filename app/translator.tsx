@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: '#3C4043',
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: '400',
     textAlign: 'center',
     lineHeight: 32,
     paddingTop: 5,
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
   langButtonText: {
     color: '#1A73E8', // Màu xanh dương đặc trưng Google
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '400',
   },
   caret: {
     marginLeft: 6,

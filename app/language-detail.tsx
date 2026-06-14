@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: '#000000',
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: '400',
     textAlign: 'center',
     lineHeight: 32, // Padding lines
     paddingTop: 5,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   },
   indexText: {
     fontSize: 14,
-    fontWeight: '900',
+    fontWeight: '400',
   },
   wordContent: {
     alignItems: 'center',
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     fontSize: 36,
     lineHeight: 56, // Tăng lineHeight để tránh cắt nét dưới của chữ Khmer
     paddingBottom: 10, // Có thêm khoảng trống cho các nét đuôi (subscripts)
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1E293B',
     marginBottom: 2,
     textAlign: 'center',
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#3B82F6',
-    fontWeight: '500',
+    fontWeight: '400',
     fontStyle: 'italic',
     marginBottom: 20,
     textAlign: 'center',
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
   },
   vieText: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#475569',
     textAlign: 'center',
   },

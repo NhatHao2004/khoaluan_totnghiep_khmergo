@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: ms(22),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#000000ff',
     lineHeight: vs(32),
   },
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   },
   cardName: {
     fontSize: ms(24),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#000000ff',
     marginBottom: vs(4),
     lineHeight: vs(32),
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
   },
   cardRankText: {
     fontSize: ms(18),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#000000ff',
     lineHeight: vs(26),
   },
@@ -361,14 +361,14 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: ms(22),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     lineHeight: vs(28),
   },
   statLabel: {
     fontSize: ms(13),
     color: '#64748B',
-    fontWeight: '800',
+    fontWeight: '400',
     marginTop: vs(4),
     textAlign: 'center',
   },
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: ms(22),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     textAlign: 'left',
     lineHeight: vs(30),
@@ -438,14 +438,14 @@ const styles = StyleSheet.create({
 
   bentoTitle: {
     fontSize: ms(20),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#0F172A',
     lineHeight: vs(28),
     textAlign: 'center',
   },
   bentoTitleSmall: {
     fontSize: ms(14),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#0F172A',
     lineHeight: vs(24),
     textAlign: 'center',
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
   bentoSubtitle: {
     fontSize: ms(12),
     color: '#64748B',
-    fontWeight: '600',
+    fontWeight: '400',
     marginTop: vs(2),
     textAlign: 'center',
     lineHeight: vs(18),
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
   activeBadgeText: {
     color: '#FFF',
     fontSize: ms(10),
-    fontWeight: '800',
+    fontWeight: '400',
   },
   comingSoonTag: {
     position: 'absolute',
@@ -525,12 +525,12 @@ const styles = StyleSheet.create({
   comingSoonTagText: {
     color: '#94A3B8',
     fontSize: ms(9),
-    fontWeight: '700',
+    fontWeight: '400',
   },
   comingSoonText: {
     color: '#94A3B8',
     fontSize: ms(9),
-    fontWeight: '700',
+    fontWeight: '400',
   },
   bentoDesc: {
     fontSize: ms(12),
@@ -561,20 +561,20 @@ const styles = StyleSheet.create({
   pLabel: {
     color: '#3B82F6',
     fontSize: ms(10),
-    fontWeight: '900',
+    fontWeight: '400',
     letterSpacing: 2,
     marginBottom: vs(4),
   },
   pTitle: {
     color: '#FFF',
     fontSize: ms(24),
-    fontWeight: '900',
+    fontWeight: '400',
     marginBottom: vs(4),
   },
   pDesc: {
     color: '#94A3B8',
     fontSize: ms(13),
-    fontWeight: '500',
+    fontWeight: '400',
     marginBottom: vs(15),
   },
   pBadge: {
@@ -590,7 +590,7 @@ const styles = StyleSheet.create({
   pBadgeText: {
     color: '#000',
     fontSize: ms(11),
-    fontWeight: '800',
+    fontWeight: '400',
   },
   pIconBox: {
     marginLeft: s(15),
@@ -630,7 +630,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: ms(20),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     marginBottom: vs(8),
     textAlign: 'center',
@@ -662,7 +662,7 @@ const styles = StyleSheet.create({
   modalPrimaryBtnText: {
     color: '#FFF',
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
   },
   modalSecondaryBtn: {
     backgroundColor: '#EF4444',
@@ -675,6 +675,6 @@ const styles = StyleSheet.create({
   modalSecondaryBtnText: {
     color: '#FFF',
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
   },
 });

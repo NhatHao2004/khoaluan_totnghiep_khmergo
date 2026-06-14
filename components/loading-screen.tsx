@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: ms(42),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#000',
     marginBottom: vs(8),
     includeFontPadding: false,
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: ms(16),
     color: '#666',
-    fontWeight: '500',
+    fontWeight: '400',
     includeFontPadding: false,
     textAlign: 'center',
   },
@@ -130,6 +130,6 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: ms(14),
     color: '#999',
-    fontWeight: '500',
+    fontWeight: '400',
   },
 });

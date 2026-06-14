@@ -713,7 +713,7 @@ const styles = StyleSheet.create({
   },
   backBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center' },
   addBtnHeader: { width: s(42), height: s(42), backgroundColor: '#eff6ff', borderRadius: s(12), justifyContent: 'center', alignItems: 'center' },
-  headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+  headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '400', color: '#1e293b', textAlign: 'center' },
 
   searchSection: { paddingHorizontal: s(16), marginTop: vs(15) },
   searchBar: {
@@ -731,12 +731,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 10,
   },
-  searchInput: { flex: 1, marginLeft: s(10), fontSize: ms(15), color: '#1e293b', fontWeight: '500' },
+  searchInput: { flex: 1, marginLeft: s(10), fontSize: ms(15), color: '#1e293b', fontWeight: '400' },
 
   tabBar: { flexDirection: 'row', marginHorizontal: s(16), marginTop: vs(15), backgroundColor: '#f1f5f9', borderRadius: s(14), padding: s(4) },
   tab: { flex: 1, paddingVertical: vs(10), alignItems: 'center', borderRadius: s(12) },
   activeTab: { backgroundColor: '#fff', elevation: 2, shadowOpacity: 0.1, shadowRadius: 5 },
-  tabText: { fontSize: ms(13), fontWeight: '700', color: '#64748b' },
+  tabText: { fontSize: ms(13), fontWeight: '400', color: '#64748b' },
   activeTabText: { color: '#3b82f6' },
 
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -761,7 +761,7 @@ const styles = StyleSheet.create({
     borderColor: '#f1f5f9'
   },
   quizInfo: { flex: 1 },
-  quizTitle: { fontSize: fs(15), fontWeight: '800', color: '#1e293b', marginBottom: vs(6) },
+  quizTitle: { fontSize: fs(15), fontWeight: '400', color: '#1e293b', marginBottom: vs(6) },
   quizMeta: { flexDirection: 'row', alignItems: 'center' },
   questionBadge: {
     flexDirection: 'row',
@@ -772,7 +772,7 @@ const styles = StyleSheet.create({
     borderRadius: s(10),
     gap: s(4)
   },
-  metaText: { fontSize: clamp(ms(12), 12, 14), color: '#3b82f6', fontWeight: '700' },
+  metaText: { fontSize: clamp(ms(12), 12, 14), color: '#3b82f6', fontWeight: '400' },
   quizActions: { flexDirection: 'row', gap: s(8) },
   actionIcon: {
     width: s(40),
@@ -785,17 +785,17 @@ const styles = StyleSheet.create({
   },
 
   emptyContainer: { alignItems: 'center', marginTop: vs(150), opacity: 0.5 },
-  emptyText: { fontSize: ms(16), color: '#94a3b8', marginTop: vs(16), fontWeight: '600', textAlign: 'center', paddingHorizontal: s(40) },
+  emptyText: { fontSize: ms(16), color: '#94a3b8', marginTop: vs(16), fontWeight: '400', textAlign: 'center', paddingHorizontal: s(40) },
 
   // Modal Styles
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modalFullBg: { flex: 1, backgroundColor: '#fff' },
   modalContentFull: { flex: 1, backgroundColor: '#fff', paddingHorizontal: s(20) },
   modalContentSmall: { width: '88%', backgroundColor: '#fff', borderRadius: ms(28), padding: s(24) },
-  modalTitle: { fontSize: ms(22), fontWeight: '900', color: '#1e293b', marginBottom: vs(20), textAlign: 'center' },
-  modalTitleFull: { flex: 1, fontSize: ms(17), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+  modalTitle: { fontSize: ms(22), fontWeight: '400', color: '#1e293b', marginBottom: vs(20), textAlign: 'center' },
+  modalTitleFull: { flex: 1, fontSize: ms(17), fontWeight: '400', color: '#1e293b', textAlign: 'center' },
 
-  inputLabel: { fontSize: clamp(ms(13), 12, 14), fontWeight: '800', color: '#64748b', marginBottom: vs(10), marginTop: vs(15) },
+  inputLabel: { fontSize: clamp(ms(13), 12, 14), fontWeight: '400', color: '#64748b', marginBottom: vs(10), marginTop: vs(15) },
   input: {
     backgroundColor: '#f8fafc',
     borderRadius: ms(14),
@@ -810,54 +810,54 @@ const styles = StyleSheet.create({
   btnAction: { flex: 1, height: vs(50), borderRadius: s(14), justifyContent: 'center', alignItems: 'center', elevation: 2 },
   cancelBtn: { backgroundColor: '#ff0000ff' },
   saveBtn: { backgroundColor: '#3b82f6' },
-  btnText: { fontSize: ms(15), fontWeight: '800', color: '#fff' },
+  btnText: { fontSize: ms(15), fontWeight: '400', color: '#fff' },
 
   destListContainer: { marginBottom: vs(5) },
   destChip: { paddingHorizontal: s(12), paddingVertical: vs(8), borderRadius: s(10), backgroundColor: '#f1f5f9', marginRight: s(8), borderWidth: 1, borderColor: '#e2e8f0' },
   activeDestChip: { backgroundColor: '#3b82f6', borderColor: '#3b82f6' },
-  destChipText: { fontSize: ms(13), color: '#64748b', fontWeight: '700' },
+  destChipText: { fontSize: ms(13), color: '#64748b', fontWeight: '400' },
   activeDestChipText: { color: '#fff' },
 
   questionCard: { backgroundColor: '#fff', borderRadius: ms(20), padding: s(16), marginBottom: vs(15), borderWidth: 1, borderColor: '#f1f5f9', elevation: 2 },
   questionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(12) },
   questionIndexBadge: { backgroundColor: '#eff6ff', paddingHorizontal: s(10), paddingVertical: vs(4), borderRadius: s(10) },
-  questionIndexText: { fontSize: ms(12), fontWeight: '800', color: '#3b82f6' },
+  questionIndexText: { fontSize: ms(12), fontWeight: '400', color: '#3b82f6' },
   questionActions: { flexDirection: 'row', gap: s(10) },
   miniActionBtn: { width: s(36), height: s(36), borderRadius: s(10), justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#eff6ff' },
-  questionText: { fontSize: ms(16), fontWeight: '700', color: '#1e293b', marginBottom: vs(15) },
+  questionText: { fontSize: ms(16), fontWeight: '400', color: '#1e293b', marginBottom: vs(15) },
   optionsList: { gap: vs(10) },
   optionItem: { flexDirection: 'row', alignItems: 'center', padding: s(12), borderRadius: s(12), backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#f1f5f9' },
   correctOption: { backgroundColor: '#f0fdf4', borderColor: '#bcf0da' },
   optionLetter: { width: s(28), height: s(28), borderRadius: s(14), backgroundColor: '#fff', borderWidth: 1, borderColor: '#e2e8f0', justifyContent: 'center', alignItems: 'center', marginRight: s(12) },
   correctLetter: { backgroundColor: '#22c55e' },
-  optionLetterText: { fontSize: ms(13), fontWeight: '800', color: '#64748b' },
+  optionLetterText: { fontSize: ms(13), fontWeight: '400', color: '#64748b' },
   correctLetterText: { color: '#fff' },
-  optionText: { fontSize: ms(14), color: '#475569', fontWeight: '500', flex: 1 },
-  correctOptionText: { color: '#166534', fontWeight: '700' },
+  optionText: { fontSize: ms(14), color: '#475569', fontWeight: '400', flex: 1 },
+  correctOptionText: { color: '#166534', fontWeight: '400' },
 
   formScroll: { flex: 1 },
   optionInputRow: { flexDirection: 'row', alignItems: 'center', gap: s(12), marginBottom: vs(12) },
   correctIndicator: { width: s(40), height: s(40), borderRadius: s(20), backgroundColor: '#f1f5f9', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#e2e8f0' },
   correctIndicatorActive: { backgroundColor: '#22c55e', borderColor: '#22c55e' },
-  indicatorText: { fontSize: ms(14), fontWeight: '800', color: '#64748b' },
+  indicatorText: { fontSize: ms(14), fontWeight: '400', color: '#64748b' },
   indicatorTextActive: { color: '#fff' },
 
   modalFooter: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#fff', padding: s(20), borderTopWidth: 1, borderTopColor: '#f1f5f9' },
   saveBtnLarge: { backgroundColor: '#3b82f6', height: vs(54), borderRadius: s(16), justifyContent: 'center', alignItems: 'center', elevation: 4 },
-  saveBtnText: { fontSize: ms(16), fontWeight: '800', color: '#fff' },
+  saveBtnText: { fontSize: ms(16), fontWeight: '400', color: '#fff' },
 
   confirmOverlay: { flex: 1, backgroundColor: 'rgba(15, 23, 42, 0.65)', justifyContent: 'center', alignItems: 'center' },
   confirmBox: { width: '85%', backgroundColor: '#fff', borderRadius: ms(28), padding: s(24), alignItems: 'center' },
   confirmIconCircle: { width: s(70), height: s(70), borderRadius: s(35), justifyContent: 'center', alignItems: 'center', marginBottom: vs(20) },
-  confirmTitleText: { fontSize: ms(20), fontWeight: '800', color: '#1e293b', marginBottom: vs(10) },
+  confirmTitleText: { fontSize: ms(20), fontWeight: '400', color: '#1e293b', marginBottom: vs(10) },
   confirmMessage: { fontSize: ms(14), color: '#64748b', textAlign: 'center', lineHeight: ms(22), marginBottom: vs(25) },
   confirmActions: { flexDirection: 'row', gap: s(12) },
   confirmBtn: { flex: 1, height: vs(50), borderRadius: s(14), justifyContent: 'center', alignItems: 'center' },
-  confirmBtnText: { fontSize: ms(15), fontWeight: '800', color: '#fff' },
+  confirmBtnText: { fontSize: ms(15), fontWeight: '400', color: '#fff' },
 
   toastContainer: { position: 'absolute', top: 0, left: s(16), right: s(16), height: vs(56), borderRadius: ms(18), flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(14), zIndex: 9999, elevation: 10 },
   toastIcon: { width: s(32), height: s(32), borderRadius: s(16), backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
-  toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '700', marginLeft: s(12), flex: 1 },
+  toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '400', marginLeft: s(12), flex: 1 },
 });
 
 export default ChallengeManagement;

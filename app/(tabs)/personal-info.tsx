@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1A1A1A',
     textAlign: 'center',
   },
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1A1A1A',
     marginBottom: 15,
   },
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
   },
   menuInput: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '400',
     color: '#000000ff',
     paddingVertical: 0,
     paddingLeft: 0,
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
   },
   menuStatic: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '400',
     color: '#000000ff',
     paddingVertical: 0,
     paddingLeft: 0,
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
   saveBtnText: {
     color: '#FFF',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '400',
     textAlign: 'center',
     lineHeight: 26, // Optimized for VN
   },
@@ -516,5 +516,5 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 10,
   },
-  toastText: { color: '#FFF', fontSize: 15, fontWeight: '700', marginLeft: 15, flex: 1, letterSpacing: 0.3 },
+  toastText: { color: '#FFF', fontSize: 15, fontWeight: '400', marginLeft: 15, flex: 1, letterSpacing: 0.3 },
 });

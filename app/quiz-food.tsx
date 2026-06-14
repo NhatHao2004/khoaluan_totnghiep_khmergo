@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   },
   backBtn: { width: s(40), height: s(40), justifyContent: 'center', alignItems: 'center' },
   headerTitleContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { color: '#000000', fontSize: ms(20), fontWeight: '800' },
+  headerTitle: { color: '#000000', fontSize: ms(20), fontWeight: '400' },
   content: { flex: 1 },
   scrollContent: { paddingBottom: vs(20), flexGrow: 1 },
   list: { padding: s(15), gap: vs(15) },
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   imageContainer: { width: '100%', aspectRatio: 16 / 10 },
   image: { width: '100%', height: '100%' },
   cardContent: { padding: s(15) },
-  name: { fontSize: ms(18), fontWeight: '800', color: '#1A1A1A', marginBottom: vs(4) },
+  name: { fontSize: ms(18), fontWeight: '400', color: '#1A1A1A', marginBottom: vs(4) },
   location: { fontSize: ms(13), color: '#666', marginBottom: vs(12) },
   footer: {
     flexDirection: 'row',
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     paddingTop: vs(10),
   },
   info: { flexDirection: 'row', alignItems: 'center', gap: s(5), flex: 1, marginRight: s(10) },
-  infoText: { fontSize: ms(15), color: '#000000ff', fontWeight: '600' },
+  infoText: { fontSize: ms(15), color: '#000000ff', fontWeight: '400' },
   startBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     paddingVertical: vs(8),
     borderRadius: ms(10),
   },
-  startBtnText: { color: '#FFF', fontSize: ms(12), fontWeight: '800' },
+  startBtnText: { color: '#FFF', fontSize: ms(12), fontWeight: '400' },
   loader: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#f8f9fa',
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: ms(20),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     marginBottom: vs(8),
     textAlign: 'center',
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
   modalPrimaryBtnText: {
     color: '#FFF',
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
   },
   modalSecondaryBtn: {
     backgroundColor: '#EF4444',
@@ -324,6 +324,6 @@ const styles = StyleSheet.create({
   modalSecondaryBtnText: {
     color: '#FFF',
     fontSize: ms(16),
-    fontWeight: '700',
+    fontWeight: '400',
   },
 });

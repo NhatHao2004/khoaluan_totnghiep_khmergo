@@ -647,7 +647,7 @@ const ContentManagement = () => {
             </Text>
 
             <TouchableOpacity onPress={handleSaveDest} style={{ paddingRight: s(16), width: s(70), height: s(44), justifyContent: 'center', alignItems: 'flex-end' }}>
-              <Text style={{ fontSize: ms(16), fontWeight: '700', color: '#3b82f6' }}>Lưu</Text>
+              <Text style={{ fontSize: ms(16), fontWeight: '400', color: '#3b82f6' }}>Lưu</Text>
             </TouchableOpacity>
           </View>
 
@@ -746,14 +746,14 @@ const ContentManagement = () => {
                   style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#eff6ff', paddingHorizontal: s(12), paddingVertical: vs(6), borderRadius: s(8), gap: s(4) }}
                 >
                   <Ionicons name="add-circle-outline" size={ms(18)} color="#3b82f6" />
-                  <Text style={{ fontSize: ms(13), fontWeight: '700', color: '#3b82f6' }}>Thêm khối</Text>
+                  <Text style={{ fontSize: ms(13), fontWeight: '400', color: '#3b82f6' }}>Thêm khối</Text>
                 </TouchableOpacity>
               </View>
 
               {dBlocks.map((block, index) => (
                 <View key={index} style={{ backgroundColor: '#f8fafc', padding: s(15), borderRadius: ms(16), marginBottom: vs(15), borderWidth: 1, borderColor: '#e2e8f0' }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(10) }}>
-                    <Text style={{ fontSize: ms(14), fontWeight: '800', color: '#64748b' }}>Khối {index + 1}</Text>
+                    <Text style={{ fontSize: ms(14), fontWeight: '400', color: '#64748b' }}>Khối {index + 1}</Text>
                     <TouchableOpacity onPress={() => setDBlocks(dBlocks.filter((_, i) => i !== index))}>
                       <Ionicons name="trash-outline" size={ms(18)} color="#ef4444" />
                     </TouchableOpacity>
@@ -856,22 +856,22 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#ffffff' },
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(16), paddingBottom: vs(15) },
   backBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center' },
-  headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+  headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '400', color: '#1e293b', textAlign: 'center' },
   addBtnHeader: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center' },
   tabBar: { flexDirection: 'row', marginHorizontal: s(16), backgroundColor: '#f1f5f9', borderRadius: s(12), padding: s(4), marginBottom: vs(15) },
   tab: { flex: 1, paddingVertical: vs(10), alignItems: 'center', borderRadius: s(10) },
   activeTab: { backgroundColor: '#fff', elevation: 2, shadowOpacity: 0.1, shadowRadius: 5 },
-  tabText: { fontSize: ms(14), fontWeight: '700', color: '#64748b' },
+  tabText: { fontSize: ms(14), fontWeight: '400', color: '#64748b' },
   activeTabText: { color: '#3b82f6' },
   listContent: { padding: s(16), paddingBottom: vs(50) },
   card: { backgroundColor: '#fff', borderRadius: ms(20), marginBottom: vs(16), elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#f1f5f9' },
   cardImage: { width: '100%', height: vs(180) },
   cardContent: { padding: s(16) },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(12) },
-  cardTitle: { fontSize: ms(18), fontWeight: '800', color: '#1e293b' },
+  cardTitle: { fontSize: ms(18), fontWeight: '400', color: '#1e293b' },
   cardActions: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   viewBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#eff6ff', paddingHorizontal: s(12), paddingVertical: vs(6), borderRadius: s(8), gap: s(6) },
-  viewBtnText: { fontSize: ms(13), fontWeight: '700', color: '#3b82f6' },
+  viewBtnText: { fontSize: ms(13), fontWeight: '400', color: '#3b82f6' },
   rightActions: { flexDirection: 'row', gap: s(8) },
   editBtn: { width: s(36), height: s(36), borderRadius: s(10), backgroundColor: '#eff6ff', justifyContent: 'center', alignItems: 'center' },
   deleteBtn: { width: s(36), height: s(36), borderRadius: s(10), backgroundColor: '#fef2f2', justifyContent: 'center', alignItems: 'center' },
@@ -880,27 +880,27 @@ const styles = StyleSheet.create({
   vocabLargeImageContainer: { height: vs(160), backgroundColor: '#f8fafc', borderRadius: ms(18), justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
   vocabLargeImage: { width: '80%', height: '80%' },
   vocabCardFooter: { flexDirection: 'row', alignItems: 'center', marginTop: vs(12), paddingHorizontal: s(4) },
-  vocabLargeTitle: { fontSize: ms(17), fontWeight: '800', color: '#1e293b' },
+  vocabLargeTitle: { fontSize: ms(17), fontWeight: '400', color: '#1e293b' },
   footerActionGroup: { flexDirection: 'row', gap: s(8) },
   footerActionBtn: { width: s(36), height: s(36), borderRadius: s(10), borderWidth: 1, borderColor: '#e2e8f0', justifyContent: 'center', alignItems: 'center' },
   premiumWordItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: ms(16), padding: s(16), marginBottom: vs(12), borderWidth: 1, borderColor: '#f1f5f9', elevation: 2 },
   wordMainContent: { flex: 1 },
-  wordKhmText: { fontSize: ms(18), fontWeight: '800', color: '#1e293b' },
-  pronText: { fontSize: ms(14), color: '#64748b', fontWeight: '500' },
-  wordVieText: { fontSize: ms(15), fontWeight: '700' },
+  wordKhmText: { fontSize: ms(18), fontWeight: '400', color: '#1e293b' },
+  pronText: { fontSize: ms(14), color: '#64748b', fontWeight: '400' },
+  wordVieText: { fontSize: ms(15), fontWeight: '400' },
   wordActionGroup: { flexDirection: 'row', gap: s(8) },
   miniActionBtn: { width: s(32), height: s(32), borderRadius: s(8), borderWidth: 1, borderColor: '#e2e8f0', justifyContent: 'center', alignItems: 'center' },
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modalContentFull: { flex: 1, backgroundColor: '#fff', width: '100%' },
   modalContentSmall: { backgroundColor: '#fff', width: '90%', borderRadius: ms(24), padding: s(24) },
   modalHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(20) },
-  modalTitle: { fontSize: ms(20), fontWeight: '800', color: '#1e293b' },
+  modalTitle: { fontSize: ms(20), fontWeight: '400', color: '#1e293b' },
   modalForm: { padding: s(20) },
-  inputLabel: { fontSize: ms(14), fontWeight: '700', color: '#64748b', marginBottom: vs(8), marginTop: vs(12) },
+  inputLabel: { fontSize: ms(14), fontWeight: '400', color: '#64748b', marginBottom: vs(8), marginTop: vs(12) },
   input: { backgroundColor: '#f8fafc', borderRadius: ms(12), padding: s(14), fontSize: ms(15), color: '#1e293b', borderWidth: 1, borderColor: '#e2e8f0', marginBottom: vs(4) },
   imagePickerBtn: { height: vs(120), backgroundColor: '#f8fafc', borderRadius: ms(16), borderStyle: 'dashed', borderWidth: 1.5, borderColor: '#cbd5e1', overflow: 'hidden' },
   imagePickerPlaceholder: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: vs(8) },
-  imagePickerText: { fontSize: ms(13), color: '#94a3b8', fontWeight: '600' },
+  imagePickerText: { fontSize: ms(13), color: '#94a3b8', fontWeight: '400' },
   pickedImagePreview: { width: '100%', height: '100%' },
   removeImageBtn: { position: 'absolute', top: 5, right: 5, backgroundColor: '#fff', borderRadius: 15 },
   headerCloseBtn: {
@@ -923,23 +923,23 @@ const styles = StyleSheet.create({
     elevation: 20,
   },
   cancelBtn: { flex: 1, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#ff0000ff', alignItems: 'center' },
-  cancelBtnText: { fontSize: ms(15), fontWeight: '800', color: '#ffffffff' },
+  cancelBtnText: { fontSize: ms(15), fontWeight: '400', color: '#ffffffff' },
   saveBtn: { flex: 2, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#3b82f6', alignItems: 'center' },
-  saveBtnText: { fontSize: ms(15), fontWeight: '800', color: '#fff' },
+  saveBtnText: { fontSize: ms(15), fontWeight: '400', color: '#fff' },
   catRow: { flexDirection: 'row', gap: s(8), marginBottom: vs(15) },
   catBtn: { flex: 1, paddingVertical: vs(10), borderRadius: s(10), backgroundColor: '#f1f5f9', alignItems: 'center', borderWidth: 1, borderColor: '#e2e8f0' },
   activeCatBtn: { backgroundColor: '#3b82f6', borderColor: '#3b82f6' },
-  catBtnText: { fontSize: ms(13), fontWeight: '700', color: '#64748b' },
+  catBtnText: { fontSize: ms(13), fontWeight: '400', color: '#64748b' },
   activeCatBtnText: { color: '#fff' },
   emptyStateContainer: { alignItems: 'center', marginTop: vs(100), opacity: 0.5 },
-  emptyWords: { fontSize: ms(16), color: '#94a3b8', textAlign: 'center', marginTop: vs(15), fontWeight: '600' },
+  emptyWords: { fontSize: ms(16), color: '#94a3b8', textAlign: 'center', marginTop: vs(15), fontWeight: '400' },
   confirmBox: { backgroundColor: '#fff', width: '85%', borderRadius: ms(24), padding: s(24), alignItems: 'center' },
   confirmIconBg: { width: s(64), height: s(64), borderRadius: s(32), backgroundColor: '#fef2f2', justifyContent: 'center', alignItems: 'center', marginBottom: vs(16) },
-  confirmTitle: { fontSize: ms(20), fontWeight: '800', color: '#1e293b', marginBottom: vs(8) },
+  confirmTitle: { fontSize: ms(20), fontWeight: '400', color: '#1e293b', marginBottom: vs(8) },
   confirmText: { fontSize: ms(14), color: '#64748b', textAlign: 'center', lineHeight: vs(22), marginBottom: vs(24) },
   toastContainer: { position: 'absolute', top: 0, left: s(16), right: s(16), height: vs(56), borderRadius: ms(18), flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(14), zIndex: 9999, elevation: 10 },
   toastIcon: { width: s(32), height: s(32), borderRadius: s(16), backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
-  toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '700', marginLeft: s(12), flex: 1 },
+  toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '400', marginLeft: s(12), flex: 1 },
 });
 
 export default ContentManagement;

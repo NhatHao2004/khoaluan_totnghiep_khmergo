@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1E293B',
     flex: 1,
     textAlign: 'center',
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
   },
   contentTitle: {
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     textAlign: 'center',
     marginBottom: 15,
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   },
   backActionText: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#64748B',
   },
   stepCard: {
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
   },
   stepTitle: {
     fontSize: 15,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1E293B',
     marginBottom: 5,
   },

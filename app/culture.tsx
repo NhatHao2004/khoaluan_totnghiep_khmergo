@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerTitle: { color: '#000000', fontSize: ms(20), fontWeight: '900', textAlign: 'center', lineHeight: ms(28) },
+  headerTitle: { color: '#000000', fontSize: ms(20), fontWeight: '400', textAlign: 'center', lineHeight: ms(28) },
   content: {
     flex: 1,
   },
@@ -217,14 +217,14 @@ const styles = StyleSheet.create({
   },
   cultureName: {
     fontSize: ms(17),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1A1A1A',
     marginBottom: vs(4),
   },
   cultureLocation: {
     fontSize: ms(13),
     color: '#666',
-    fontWeight: '600',
+    fontWeight: '400',
   },
   loader: {
     ...StyleSheet.absoluteFillObject,

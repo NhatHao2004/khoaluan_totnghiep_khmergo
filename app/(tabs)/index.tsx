@@ -601,7 +601,7 @@ export default function HomeScreen() {
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <View style={{ flex: 1, marginRight: s(10) }}>
                           <Text style={styles.nItemTitle} numberOfLines={2}>
-                            <Text style={{ fontWeight: '800' }}>{item.fromUserName}</Text> {item.message}
+                            <Text style={{ fontWeight: '400' }}>{item.fromUserName}</Text> {t(item.message)}
                           </Text>
                         </View>
                         {deletingId === item.id ? (
@@ -687,12 +687,12 @@ const styles = RNStyleSheet.create({
   helloText: {
     fontSize: ms(13.5),
     color: '#1E293B',
-    fontWeight: '800',
+    fontWeight: '400',
     letterSpacing: 0.3,
   },
   userName: {
     fontSize: ms(20),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
   },
   notificationBtnSimple: {
@@ -719,7 +719,7 @@ const styles = RNStyleSheet.create({
   badgeText: {
     color: '#FFF',
     fontSize: ms(10),
-    fontWeight: '900',
+    fontWeight: '400',
     textAlign: 'center',
     includeFontPadding: false,
     lineHeight: ms(14),
@@ -756,11 +756,11 @@ const styles = RNStyleSheet.create({
   viewAllText: {
     color: '#64748B',
     fontSize: ms(13),
-    fontWeight: '600',
+    fontWeight: '400',
   },
   sectionTitle: {
     fontSize: ms(20),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     lineHeight: ms(30),
     paddingBottom: 0,
@@ -798,7 +798,7 @@ const styles = RNStyleSheet.create({
   },
   serviceLabelMini: {
     fontSize: ms(9.5),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     textAlign: 'center',
     lineHeight: ms(13),
@@ -833,7 +833,7 @@ const styles = RNStyleSheet.create({
   toastText: {
     color: '#FFF',
     fontSize: ms(15),
-    fontWeight: '700',
+    fontWeight: '400',
     marginLeft: s(12),
     flex: 1,
     letterSpacing: 0.2,
@@ -861,7 +861,7 @@ const styles = RNStyleSheet.create({
   },
   cardTitle: {
     fontSize: ms(18),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     flex: 1,
     marginRight: s(10),
@@ -878,7 +878,7 @@ const styles = RNStyleSheet.create({
   reviewText: {
     fontSize: ms(12),
     color: '#94A3B8',
-    fontWeight: '500',
+    fontWeight: '400',
   },
   // Notification Styles
   modalOverlay: {
@@ -908,7 +908,7 @@ const styles = RNStyleSheet.create({
   },
   nTitle: {
     fontSize: ms(21),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     marginTop: vs(20),
   },
@@ -935,13 +935,13 @@ const styles = RNStyleSheet.create({
   },
   nItemTitle: {
     fontSize: ms(15),
-    fontWeight: '500',
+    fontWeight: '400',
     color: '#1E293B',
     marginBottom: vs(4),
   },
   nItemTime: {
     fontSize: ms(11),
     color: '#94A3B8',
-    fontWeight: '500',
+    fontWeight: '400',
   },
 });

@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     marginTop: vs(15),
     fontSize: ms(14),
     color: '#64748B',
-    fontWeight: '600',
+    fontWeight: '400',
     letterSpacing: 0.5
   },
   topNav: {
@@ -334,9 +334,9 @@ const styles = StyleSheet.create({
     minHeight: SCREEN_HEIGHT - HERO_HEIGHT + vs(30),
   },
   titleBox: { marginBottom: vs(20), paddingHorizontal: s(5) },
-  mainTitle: { fontSize: s(28), fontWeight: '900', color: '#1E293B', lineHeight: s(36) },
+  mainTitle: { fontSize: s(28), fontWeight: '400', color: '#1E293B', lineHeight: s(36) },
   locationRow: { flexDirection: 'row', alignItems: 'center', marginTop: vs(6), gap: s(4) },
-  locationLabel: { fontSize: ms(14), color: '#64748B', fontWeight: '500' },
+  locationLabel: { fontSize: ms(14), color: '#64748B', fontWeight: '400' },
 
   tabHeader: {
     flexDirection: 'row',
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     borderRadius: s(12),
   },
   tabItemActive: { backgroundColor: '#FFF', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: vs(2) }, shadowOpacity: 0.05, shadowRadius: s(4) },
-  tabLabel: { fontSize: ms(14), fontWeight: '700', color: '#64748B' },
+  tabLabel: { fontSize: ms(14), fontWeight: '400', color: '#64748B' },
   tabLabelActive: { color: '#1E293B' },
 
   tabContent: { marginTop: vs(18) },
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
 
   contentPiece: { marginBottom: vs(25) },
   blockPic: { width: '100%', height: vs(220), borderRadius: s(24), marginBottom: vs(15) },
-  pieceTitle: { fontSize: ms(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(8) },
+  pieceTitle: { fontSize: ms(20), fontWeight: '400', color: '#1E293B', marginBottom: vs(8) },
   piecePara: { fontSize: ms(15.5), lineHeight: vs(26), color: '#475569', textAlign: 'left', marginBottom: vs(15) },
 
   quizCard: {
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: s(8),
   },
-  quizTitle: { fontSize: ms(18), fontWeight: '900', color: '#1E293B', marginBottom: vs(4) },
+  quizTitle: { fontSize: ms(18), fontWeight: '400', color: '#1E293B', marginBottom: vs(4) },
   quizSub: { fontSize: ms(13), color: '#64748B', marginBottom: vs(20), textAlign: 'center', alignSelf: 'stretch' },
   quizStartBtn: {
     backgroundColor: '#FF6B2C',
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: s(8),
   },
-  quizStartBtnText: { color: '#FFF', fontSize: ms(15), fontWeight: '800' },
+  quizStartBtnText: { color: '#FFF', fontSize: ms(15), fontWeight: '400' },
   modalContent: {
     backgroundColor: '#FFF',
     borderRadius: s(32),
@@ -431,17 +431,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center', marginBottom: vs(20),
     borderWidth: 1, borderColor: '#DBEAFE',
   },
-  modalTitle: { fontSize: ms(20), fontWeight: '900', color: '#1E293B', marginBottom: vs(8), textAlign: 'center', alignSelf: 'stretch' },
+  modalTitle: { fontSize: ms(20), fontWeight: '400', color: '#1E293B', marginBottom: vs(8), textAlign: 'center', alignSelf: 'stretch' },
   modalSub: { fontSize: ms(15), color: '#64748B', textAlign: 'center', lineHeight: vs(22), marginBottom: vs(24), alignSelf: 'stretch' },
   modalActionRow: { width: '100%', gap: vs(12) },
   modalPrimaryBtn: {
     backgroundColor: '#3B82F6', height: vs(56), borderRadius: s(18),
     justifyContent: 'center', alignItems: 'center', width: '100%',
   },
-  modalPrimaryBtnText: { color: '#FFF', fontSize: ms(16), fontWeight: '800' },
+  modalPrimaryBtnText: { color: '#FFF', fontSize: ms(16), fontWeight: '400' },
   modalSecondaryBtn: {
     backgroundColor: '#EF4444', height: vs(56), borderRadius: s(18),
     justifyContent: 'center', alignItems: 'center', width: '100%',
   },
-  modalSecondaryBtnText: { color: '#FFF', fontSize: ms(16), fontWeight: '800' },
+  modalSecondaryBtnText: { color: '#FFF', fontSize: ms(16), fontWeight: '400' },
 });

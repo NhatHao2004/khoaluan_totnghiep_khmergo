@@ -68,7 +68,7 @@ const PostItem = memo(({ item, onDelete, onShowComments }: any) => {
           onPress={() => onShowComments(item)}
         >
           <Ionicons name="chatbubble" size={ms(16)} color="#3b82f6" />
-          <Text style={[styles.statText, { color: '#3b82f6', fontWeight: '700' }]}>
+          <Text style={[styles.statText, { color: '#3b82f6', fontWeight: '400' }]}>
             {item.comments || 0} bình luận
           </Text>
         </TouchableOpacity>
@@ -284,7 +284,7 @@ const ArticleManagement = () => {
               <View style={{ flex: 1 }}>
                 <Text style={styles.modalTitle} numberOfLines={1} adjustsFontSizeToFit>Bình luận</Text>
                 <Text style={styles.modalSubTitle}>
-                  Bài đăng của <Text style={{ fontWeight: '800', color: '#3b82f6' }}>{selectedPost?.user}</Text>
+                  Bài đăng của <Text style={{ fontWeight: '400', color: '#3b82f6' }}>{selectedPost?.user}</Text>
                 </Text>
               </View>
             </View>
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f1f5f9'
   },
   backBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center' },
-  headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+  headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '400', color: '#1e293b', textAlign: 'center' },
 
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   listContent: { padding: s(16) },
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(12) },
   postAvatar: { width: s(44), height: s(44), borderRadius: s(22), backgroundColor: '#f1f5f9' },
   postInfo: { flex: 1, marginLeft: s(12) },
-  postUserName: { fontSize: ms(16), fontWeight: '700', color: '#1e293b' },
+  postUserName: { fontSize: ms(16), fontWeight: '400', color: '#1e293b' },
   postDate: { fontSize: ms(12), color: '#94a3b8', marginTop: vs(2) },
   deletePostBtn: { padding: s(8), borderRadius: s(10), backgroundColor: '#fff1f2' },
   postText: { fontSize: ms(15), color: '#334155', lineHeight: ms(22), marginBottom: vs(12) },
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
   postImage: { width: '100%', height: '100%' },
   postStats: { flexDirection: 'row', gap: s(16), borderTopWidth: 1, borderTopColor: '#f8fafc', paddingTop: vs(12) },
   statItem: { flexDirection: 'row', alignItems: 'center', gap: s(6) },
-  statText: { fontSize: ms(13), fontWeight: '600', color: '#64748b' },
+  statText: { fontSize: ms(13), fontWeight: '400', color: '#64748b' },
 
   commentItem: {
     flexDirection: 'row',
@@ -408,25 +408,25 @@ const styles = StyleSheet.create({
   commentAvatar: { width: s(36), height: s(36), borderRadius: s(18), backgroundColor: '#f1f5f9' },
   commentContent: { flex: 1, marginLeft: s(12) },
   commentHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: vs(4) },
-  commentUserName: { fontSize: ms(14), fontWeight: '800', color: '#1e293b' },
+  commentUserName: { fontSize: ms(14), fontWeight: '400', color: '#1e293b' },
   commentText: { fontSize: ms(14), color: '#475569', lineHeight: ms(20) },
   deleteCommentBtn: { padding: s(8) },
 
   emptyContainer: { alignItems: 'center', marginTop: vs(300), opacity: 0.5 },
-  emptyText: { marginTop: vs(16), fontSize: ms(16), color: '#94a3b8', fontWeight: '600' },
+  emptyText: { marginTop: vs(16), fontSize: ms(16), color: '#94a3b8', fontWeight: '400' },
 
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modalContentFull: { width: '100%', height: '100%', backgroundColor: '#fff', paddingHorizontal: s(20) },
   modalContentSmall: { width: '85%', backgroundColor: '#fff', borderRadius: ms(24), padding: s(24), alignItems: 'center' },
   modalHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(25) },
   modalBackBtn: { marginRight: s(15) },
-  modalTitle: { fontSize: ms(22), fontWeight: '800', color: '#1e293b' },
-  modalSubTitle: { fontSize: ms(13), color: '#64748b', fontWeight: '600', marginTop: vs(2) },
-  confirmTitle: { fontSize: ms(20), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+  modalTitle: { fontSize: ms(22), fontWeight: '400', color: '#1e293b' },
+  modalSubTitle: { fontSize: ms(13), color: '#64748b', fontWeight: '400', marginTop: vs(2) },
+  confirmTitle: { fontSize: ms(20), fontWeight: '400', color: '#1e293b', textAlign: 'center' },
 
   modalActions: { flexDirection: 'row', gap: s(12), marginTop: vs(25) },
   cancelBtn: { flex: 1, paddingVertical: vs(14), borderRadius: s(14), alignItems: 'center' },
-  btnText: { color: '#fff', fontWeight: '800', fontSize: ms(15) },
+  btnText: { color: '#fff', fontWeight: '400', fontSize: ms(15) },
   saveBtnSmall: { flex: 1, paddingVertical: vs(14), borderRadius: s(14), alignItems: 'center' },
 
   confirmIconBg: {
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
   toastText: {
     color: '#FFF',
     fontSize: ms(15),
-    fontWeight: '700',
+    fontWeight: '400',
     marginLeft: s(12),
     flex: 1,
     letterSpacing: 0.2,

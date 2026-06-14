@@ -595,7 +595,7 @@ const AdminDashboard = () => {
 
               <View style={styles.msgBubble}>
                 <Text style={styles.msgContentText}>
-                  <Text style={{ fontWeight: '800', color: '#1e293b' }}>Nội dung: </Text>
+                  <Text style={{ fontWeight: '400', color: '#1e293b' }}>Nội dung: </Text>
                   {selectedFeedback?.message || selectedFeedback?.content}
                 </Text>
               </View>
@@ -684,7 +684,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: ms(22),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1e293b',
     letterSpacing: -0.5,
   },
@@ -747,7 +747,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: ms(12),
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#64748b',
     flex: 1,
   },
@@ -758,7 +758,7 @@ const styles = StyleSheet.create({
   },
   statNumber: {
     fontSize: ms(15),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1e293b',
   },
   chartHeader: {
@@ -770,7 +770,7 @@ const styles = StyleSheet.create({
   },
   chartTitle: {
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1e293b',
   },
   podiumContainer: {
@@ -833,7 +833,7 @@ const styles = StyleSheet.create({
   },
   podiumName: {
     fontSize: ms(10),
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1e293b',
     textAlign: 'center',
     marginTop: vs(10),
@@ -841,7 +841,7 @@ const styles = StyleSheet.create({
   podiumPoints: {
     fontSize: ms(9),
     color: '#94a3b8',
-    fontWeight: '600',
+    fontWeight: '400',
     marginTop: vs(1),
   },
   bar: {
@@ -861,7 +861,7 @@ const styles = StyleSheet.create({
   },
   rankNum: {
     fontSize: ms(22),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#fff',
   },
   activityHeader: {
@@ -873,7 +873,7 @@ const styles = StyleSheet.create({
   },
   activityTitle: {
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1e293b',
   },
   seeAllBtn: {
@@ -887,7 +887,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: ms(12),
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#fff',
     textAlign: 'center',
   },
@@ -905,7 +905,7 @@ const styles = StyleSheet.create({
   },
   activityItemTitle: {
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1e293b',
   },
   activityBottomRow: {
@@ -917,13 +917,13 @@ const styles = StyleSheet.create({
   activityDesc: {
     fontSize: ms(14),
     color: '#64748b',
-    fontWeight: '500',
+    fontWeight: '400',
     flex: 1,
   },
   activityTime: {
     fontSize: ms(12),
     color: '#94a3b8',
-    fontWeight: '600',
+    fontWeight: '400',
     marginLeft: s(10),
   },
   emptyContainer: {
@@ -975,12 +975,12 @@ const styles = StyleSheet.create({
   },
   logoutAvatarInitial: {
     fontSize: ms(28),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#fff',
   },
   logoutTitle: {
     fontSize: ms(12),
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#94a3b8',
     letterSpacing: 1,
     textTransform: 'uppercase',
@@ -988,14 +988,14 @@ const styles = StyleSheet.create({
   },
   logoutName: {
     fontSize: ms(20),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1e293b',
     marginBottom: vs(2),
   },
   logoutEmail: {
     fontSize: ms(13),
     color: '#64748b',
-    fontWeight: '500',
+    fontWeight: '400',
     marginBottom: vs(24),
   },
   logoutDivider: {
@@ -1023,7 +1023,7 @@ const styles = StyleSheet.create({
   logoutConfirmText: {
     color: '#fff',
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
   },
   logoutCancelBtn: {
     width: '100%',
@@ -1035,7 +1035,7 @@ const styles = StyleSheet.create({
   logoutCancelText: {
     color: '#ffffffff',
     fontSize: ms(15),
-    fontWeight: '700',
+    fontWeight: '400',
   },
   profileDetailBtn: {
     width: '100%',
@@ -1048,7 +1048,7 @@ const styles = StyleSheet.create({
   profileDetailText: {
     color: '#475569',
     fontSize: ms(15),
-    fontWeight: '700',
+    fontWeight: '400',
   },
   // Toast System
   toastContainer: {
@@ -1079,7 +1079,7 @@ const styles = StyleSheet.create({
   toastText: {
     color: '#FFF',
     fontSize: ms(15),
-    fontWeight: '800',
+    fontWeight: '400',
     flex: 1,
   },
   notificationBtn: {
@@ -1106,7 +1106,7 @@ const styles = StyleSheet.create({
   badgeText: {
     color: '#fff',
     fontSize: ms(9),
-    fontWeight: '900',
+    fontWeight: '400',
     textAlign: 'center',
     textAlignVertical: 'center',
     includeFontPadding: false,
@@ -1127,7 +1127,7 @@ const styles = StyleSheet.create({
   },
   feedbackListAvatarInitial: {
     fontSize: ms(12),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#94a3b8',
   },
   // Feedback Modal Styles
@@ -1149,7 +1149,7 @@ const styles = StyleSheet.create({
   },
   feedbackModalTitle: {
     fontSize: ms(22),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1e293b',
     letterSpacing: -0.5,
   },
@@ -1181,7 +1181,7 @@ const styles = StyleSheet.create({
   },
   feedbackUserName: {
     fontSize: ms(15),
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1e293b',
     flex: 1,
   },
@@ -1199,13 +1199,13 @@ const styles = StyleSheet.create({
   feedbackSubText: {
     fontSize: ms(10),
     color: '#64748b',
-    fontWeight: '500',
+    fontWeight: '400',
     fontStyle: 'italic',
   },
   feedbackTime: {
     fontSize: ms(11),
     color: '#94a3b8',
-    fontWeight: '600',
+    fontWeight: '400',
     marginLeft: s(8),
   },
   emptyFeedback: {
@@ -1226,7 +1226,7 @@ const styles = StyleSheet.create({
   emptyFeedbackText: {
     fontSize: ms(15),
     color: '#94a3b8',
-    fontWeight: '700',
+    fontWeight: '400',
     opacity: 0.8,
     textAlign: 'center',
     paddingHorizontal: s(20),
@@ -1243,7 +1243,7 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     fontSize: ms(14),
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#3b82f6',
   },
   // Quick Detail Modal Styles
@@ -1266,7 +1266,7 @@ const styles = StyleSheet.create({
   },
   detailModalTitle: {
     fontSize: ms(22),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1e293b',
     letterSpacing: -0.5,
   },
@@ -1301,7 +1301,7 @@ const styles = StyleSheet.create({
   },
   detailAvatarInitial: {
     fontSize: ms(18),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#3b82f6',
   },
   detailAvatarImage: {
@@ -1311,7 +1311,7 @@ const styles = StyleSheet.create({
   },
   detailNameText: {
     fontSize: ms(16),
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1e293b',
   },
   detailEmailText: {
@@ -1328,7 +1328,7 @@ const styles = StyleSheet.create({
   },
   msgLabel: {
     fontSize: ms(12),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#94a3b8',
     textTransform: 'uppercase',
     marginBottom: vs(4),
@@ -1352,7 +1352,7 @@ const styles = StyleSheet.create({
   },
   replyLabel: {
     fontSize: ms(13),
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#1e293b',
     marginBottom: vs(8),
   },
@@ -1381,7 +1381,7 @@ const styles = StyleSheet.create({
   },
   quickCancelText: {
     fontSize: ms(15),
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#ffffffff',
   },
   quickSendBtn: {
@@ -1396,7 +1396,7 @@ const styles = StyleSheet.create({
   },
   quickSendText: {
     fontSize: ms(15),
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#fff',
   },
   disabledBtn: {

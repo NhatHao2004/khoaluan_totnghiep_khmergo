@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1A1A1A',
     textAlign: 'center',
     lineHeight: 28,
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#000000ff',
     paddingTop: 15,
     paddingBottom: 5,
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 15,
     color: '#444',
-    fontWeight: '500',
+    fontWeight: '400',
     lineHeight: 24,
     paddingLeft: 10,
   },
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
   },
   activeOptionText: {
     color: '#1A1A1A',
-    fontWeight: '600',
+    fontWeight: '400',
     lineHeight: 24,
   },
   switchItem: {
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   switchLabel: {
     fontSize: 15,
     color: '#1E293B',
-    fontWeight: '700',
+    fontWeight: '400',
     lineHeight: 24,
   },
   switchSubLabel: {
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 14,
     color: '#ffffffff',
-    fontWeight: '700',
+    fontWeight: '400',
     lineHeight: 20,
   },
   infoItem: {
@@ -393,14 +393,14 @@ const styles = StyleSheet.create({
   infoLabel: {
     fontSize: 15,
     color: '#444',
-    fontWeight: '500',
+    fontWeight: '400',
     lineHeight: 22,
     paddingLeft: 12,
   },
   infoValue: {
     fontSize: 14,
     color: '#000000ff',
-    fontWeight: '500',
+    fontWeight: '400',
     lineHeight: 20,
   },
   divider: {
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
   },
   introTitle: {
     fontSize: ms(18),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1A1A1A',
   },
   introCloseBtn: {
@@ -454,14 +454,14 @@ const styles = StyleSheet.create({
   },
   appName: {
     fontSize: ms(25),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#000000ff',
     marginBottom: vs(4),
   },
   appVersionTag: {
     fontSize: ms(13),
     color: '#64748B',
-    fontWeight: '600',
+    fontWeight: '400',
     backgroundColor: '#F1F5F9',
     paddingHorizontal: s(12),
     paddingVertical: vs(4),
@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
   },
   introSectionTitle: {
     fontSize: ms(15),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1E293B',
     marginBottom: vs(4),
   },
@@ -527,7 +527,7 @@ const styles = StyleSheet.create({
   },
   actionLabel: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#64748B',
   },
   copyright: {
@@ -565,7 +565,7 @@ const styles = StyleSheet.create({
   toastText: {
     color: '#FFF',
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '400',
     marginLeft: 12,
     flex: 1,
     letterSpacing: 0.2,

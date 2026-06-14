@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   backBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center' },
-  headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+  headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '400', color: '#1e293b', textAlign: 'center' },
   listContent: { padding: s(16) },
   activityCard: {
     backgroundColor: '#fff',
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   },
   activityItemTitle: {
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1e293b',
     flex: 1,
   },
@@ -168,13 +168,13 @@ const styles = StyleSheet.create({
   activityDesc: {
     fontSize: ms(14),
     color: '#64748b',
-    fontWeight: '500',
+    fontWeight: '400',
     flex: 1,
   },
   activityTime: {
     fontSize: ms(12),
     color: '#94a3b8',
-    fontWeight: '600',
+    fontWeight: '400',
     marginLeft: s(10),
   },
   emptyContainer: { alignItems: 'center', marginTop: vs(250), opacity: 0.5 },
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
     marginTop: vs(16),
     fontSize: ms(16),
-    fontWeight: '600'
+    fontWeight: '400'
   },
 });
 

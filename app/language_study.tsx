@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: ms(20),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#000',
   },
   tabsWrapper: {
@@ -395,13 +395,13 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: ms(15),
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#94A3B8',
     textAlign: 'center',
   },
   activeTabText: {
     color: '#3B82F6',
-    fontWeight: '800',
+    fontWeight: '400',
   },
   content: {
     flex: 1,
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
   },
   categoryCardTitle: {
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1A1A1A',
     marginLeft: 10,
   },
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
   startStudyBtnText: {
     color: '#FFFFFF',
     fontSize: ms(13),
-    fontWeight: '700',
+    fontWeight: '400',
     textAlign: 'center',
   },
   translatorWrapper: {
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
   langButtonText: {
     color: '#1A73E8',
     fontSize: ms(16),
-    fontWeight: '600',
+    fontWeight: '400',
   },
   swapButton: {
     padding: 10,
@@ -543,7 +543,7 @@ const styles = StyleSheet.create({
   outTextLabel: {
     fontSize: ms(13),
     color: '#848789ff',
-    fontWeight: '600',
+    fontWeight: '400',
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
   resultText: {
     fontSize: 25,
     color: '#1A73E8',
-    fontWeight: '600',
+    fontWeight: '400',
     lineHeight: 36,
     paddingVertical: 5,
   },

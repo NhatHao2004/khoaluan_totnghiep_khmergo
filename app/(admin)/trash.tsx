@@ -217,7 +217,7 @@ const TrashManagement = () => {
             <Text style={styles.modalTitle} numberOfLines={1} adjustsFontSizeToFit>Xóa vĩnh viễn</Text>
             <Text style={styles.confirmSubText} numberOfLines={2} adjustsFontSizeToFit>
               Bạn có chắc chắn muốn xóa vĩnh viễn{"\n"}
-              Thao tác này <Text style={{ color: '#ef4444', fontWeight: '700' }}>không thể hoàn tác</Text>
+              Thao tác này <Text style={{ color: '#ef4444', fontWeight: '400' }}>không thể hoàn tác</Text>
             </Text>
             <View style={styles.modalActions}>
               <TouchableOpacity style={[styles.btnAction, { backgroundColor: '#3b82f6' }]} onPress={() => setDeleteConfirmVisible(false)}>
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f1f5f9'
   },
   backBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center' },
-  headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '800', color: '#1e293b', textAlign: 'center' },
+  headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '400', color: '#1e293b', textAlign: 'center' },
   centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   listContent: { padding: s(16) },
   card: {
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: ms(22),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1e293b',
     marginBottom: vs(16),
   },
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
   },
   restoreBtnText: {
     fontSize: ms(15),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#3b82f6',
   },
   footerRight: {
@@ -322,15 +322,15 @@ const styles = StyleSheet.create({
     borderColor: '#ffe4e6',
   },
   emptyContainer: { alignItems: 'center', marginTop: vs(300), opacity: 0.5 },
-  emptyText: { marginTop: vs(14), fontSize: ms(16), color: '#94a3b8', fontWeight: '600' },
+  emptyText: { marginTop: vs(14), fontSize: ms(16), color: '#94a3b8', fontWeight: '400' },
 
   // Modal Styles
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modalContentSmall: { width: '85%', backgroundColor: '#fff', borderRadius: ms(24), padding: s(24) },
-  modalTitle: { fontSize: ms(22), fontWeight: '800', color: '#1e293b', textAlign: 'center', marginBottom: vs(10) },
+  modalTitle: { fontSize: ms(22), fontWeight: '400', color: '#1e293b', textAlign: 'center', marginBottom: vs(10) },
   modalActions: { flexDirection: 'row', justifyContent: 'center', gap: s(12), marginTop: vs(25) },
   btnAction: { flex: 1, paddingVertical: vs(14), borderRadius: s(14), alignItems: 'center' },
-  btnText: { color: '#fff', fontWeight: '800', fontSize: ms(15) },
+  btnText: { color: '#fff', fontWeight: '400', fontSize: ms(15) },
   confirmIconBg: {
     width: s(70),
     height: s(70),
@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
   toastText: {
     color: '#FFF',
     fontSize: ms(15),
-    fontWeight: '700',
+    fontWeight: '400',
     marginLeft: s(12),
     flex: 1,
     letterSpacing: 0.2,

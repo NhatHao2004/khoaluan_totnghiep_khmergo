@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: ms(22),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1e293b',
     textAlign: 'center',
   },
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   },
   profileName: {
     fontSize: ms(24),
-    fontWeight: '800',
+    fontWeight: '400',
     color: '#1e293b',
     textAlign: 'center',
     lineHeight: ms(32),
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
   menuTitle: {
     flex: 1,
     fontSize: ms(16),
-    fontWeight: '600',
+    fontWeight: '400',
     lineHeight: ms(23),
   },
 
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
     color: '#1e293b',
     textAlign: 'center',
     lineHeight: ms(26),
-    fontWeight: '600',
+    fontWeight: '400',
     paddingHorizontal: s(10),
   },
   logoutActionRow: {
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
   confirmLogoutText: {
     color: '#FFF',
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
   },
   cancelLogoutBtn: {
     height: vs(56),
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
   cancelLogoutText: {
     color: '#ffffffff',
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
   },
 
   // Login Required Modal
@@ -513,7 +513,7 @@ const styles = StyleSheet.create({
   },
   loginModalTitle: {
     fontSize: ms(20),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1e293b',
     marginBottom: vs(8),
     textAlign: 'center',
@@ -540,7 +540,7 @@ const styles = StyleSheet.create({
   loginModalPrimaryBtnText: {
     color: '#FFF',
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
   },
   loginModalSecondaryBtn: {
     backgroundColor: '#ff0000ff',
@@ -553,6 +553,6 @@ const styles = StyleSheet.create({
   loginModalSecondaryBtnText: {
     color: 'rgba(255, 255, 255, 1)ff',
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
   },
 });
