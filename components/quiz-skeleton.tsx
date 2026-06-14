@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Dimensions, ScrollView, SafeAreaView } from 'react-native';
+import { View, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { 
   useAnimatedStyle, 
   useSharedValue, 
@@ -109,7 +110,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    paddingTop: 40,
   },
   innerContainer: {
     flex: 1,

@@ -544,7 +544,7 @@ const ContentManagement = () => {
             if (activeTab === 'vocabulary') {
               setEditingTopic(null); setTopicTitle(''); setTopicTitleKm(''); setTopicImg(''); setTopicModalVisible(true);
             } else {
-              setEditingDest(null); setDName(''); setDNameKm(''); setDLoc(''); setDLocKm(''); setDDesc(''); setDDescKm(''); setDSubDesc(''); setDSubDescKm(''); setDImg(''); setDImg1(''); setDImg2(''); setDImg3(''); setDImg4(''); setDImg5(''); setDImg6(''); setDLat(''); setDLng(''); setDBlocks([]); setDCat('pagoda'); setDestModalVisible(true);
+              setEditingDest(null); setDName(''); setDNameKm(''); setDLoc(''); setDLocKm(''); setDDesc(''); setDDescKm(''); setDSubDesc(''); setDSubDescKm(''); setDImg(''); setDImg1(''); setDImg2(''); setDImg3(''); setDImg4(''); setDImg5(''); setDImg6(''); setDLat(''); setDLng(''); setDBlocks([{ value: '', value_khmer: '', images: '' }]); setDCat('pagoda'); setDestModalVisible(true);
             }
           }}
           style={styles.addBtnHeader}
@@ -637,20 +637,26 @@ const ContentManagement = () => {
       <Modal visible={destModalVisible} animationType="slide" transparent={false} statusBarTranslucent={true}>
         <View style={{ flex: 1, backgroundColor: '#fff' }}>
           {/* Header */}
-          <View style={[styles.modalHeader, { paddingTop: insets.top + vs(10), paddingBottom: vs(15), borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }]}>
-            <View style={{ width: s(40) }} />
+          <View style={[styles.modalHeader, { paddingTop: insets.top + vs(10), paddingBottom: vs(15), borderBottomWidth: 1, borderBottomColor: '#f1f5f9', paddingHorizontal: 0 }]}>
+            <TouchableOpacity onPress={() => setDestModalVisible(false)} style={{ paddingLeft: s(15), width: s(70), height: s(44), justifyContent: 'center' }}>
+              <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
+            </TouchableOpacity>
+
             <Text style={[styles.modalTitle, { flex: 1, textAlign: 'center' }]} numberOfLines={1} adjustsFontSizeToFit>
               {editingDest ? 'Sửa nội dung' : 'Thêm nội dung'}
             </Text>
-            <TouchableOpacity onPress={() => setDestModalVisible(false)} style={styles.headerCloseBtn}>
-              <Ionicons name="close" size={ms(30)} color="#ef4444" />
+
+            <TouchableOpacity onPress={handleSaveDest} style={{ paddingRight: s(16), width: s(70), height: s(44), justifyContent: 'center', alignItems: 'flex-end' }}>
+              <Text style={{ fontSize: ms(16), fontWeight: '700', color: '#3b82f6' }}>Lưu</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Form Content */}
-          <ScrollView 
-            style={{ flex: 1 }} 
-            contentContainerStyle={{ padding: s(20) }}
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={{
+              padding: s(20),
+              paddingBottom: keyboardHeight > 0 ? keyboardHeight + vs(20) : Math.max(insets.bottom, vs(20))
+            }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
@@ -674,9 +680,9 @@ const ContentManagement = () => {
 
             {dCat === 'pagoda' && (
               <>
-                <Text style={styles.inputLabel}>Địa chỉ chùa (Việt)</Text>
+                <Text style={styles.inputLabel}>Địa chỉ ngôi chùa (Việt)</Text>
                 <TextInput style={styles.input} value={dLoc} onChangeText={setDLoc} placeholder="Nhập địa chỉ..." />
-                <Text style={styles.inputLabel}>Địa chỉ chùa (Khmer)</Text>
+                <Text style={styles.inputLabel}>Địa chỉ ngôi chùa (Khmer)</Text>
                 <TextInput style={styles.input} value={dLocKm} onChangeText={setDLocKm} placeholder="Nhập địa chỉ tiếng Khmer..." />
               </>
             )}
@@ -708,15 +714,21 @@ const ContentManagement = () => {
 
             <ImageSelector label="Ảnh đại diện chính" value={dImg} onChange={setDImg} />
 
-            <Text style={styles.inputLabel}>Bộ sưu tập ảnh (Thêm tối đa 6 ảnh phụ)</Text>
-            <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap', marginBottom: 15 }}>
-              <ImageSelector label="Ảnh 1" value={dImg1} onChange={setDImg1} style={{ flex: 1, minWidth: '45%' }} />
-              <ImageSelector label="Ảnh 2" value={dImg2} onChange={setDImg2} style={{ flex: 1, minWidth: '45%' }} />
-              <ImageSelector label="Ảnh 3" value={dImg3} onChange={setDImg3} style={{ flex: 1, minWidth: '45%' }} />
-              <ImageSelector label="Ảnh 4" value={dImg4} onChange={setDImg4} style={{ flex: 1, minWidth: '45%' }} />
-              <ImageSelector label="Ảnh 5" value={dImg5} onChange={setDImg5} style={{ flex: 1, minWidth: '45%' }} />
-              <ImageSelector label="Ảnh 6" value={dImg6} onChange={setDImg6} style={{ flex: 1, minWidth: '45%' }} />
-            </View>
+            {dCat === 'pagoda' ? (
+              <ImageSelector label="Ảnh bìa phụ" value={dImg1} onChange={setDImg1} />
+            ) : (
+              <View style={{ marginBottom: vs(15) }}>
+                <Text style={styles.inputLabel}>Bộ sưu tập ảnh (Thêm tối đa 6 ảnh phụ)</Text>
+                <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
+                  <ImageSelector label="Ảnh 1" value={dImg1} onChange={setDImg1} style={{ flex: 1, minWidth: '45%' }} />
+                  <ImageSelector label="Ảnh 2" value={dImg2} onChange={setDImg2} style={{ flex: 1, minWidth: '45%' }} />
+                  <ImageSelector label="Ảnh 3" value={dImg3} onChange={setDImg3} style={{ flex: 1, minWidth: '45%' }} />
+                  <ImageSelector label="Ảnh 4" value={dImg4} onChange={setDImg4} style={{ flex: 1, minWidth: '45%' }} />
+                  <ImageSelector label="Ảnh 5" value={dImg5} onChange={setDImg5} style={{ flex: 1, minWidth: '45%' }} />
+                  <ImageSelector label="Ảnh 6" value={dImg6} onChange={setDImg6} style={{ flex: 1, minWidth: '45%' }} />
+                </View>
+              </View>
+            )}
 
             {dCat === 'pagoda' && (
               <View style={{ flexDirection: 'row', gap: 15 }}>
@@ -724,23 +736,68 @@ const ContentManagement = () => {
                 <View style={{ flex: 1 }}><Text style={styles.inputLabel}>Kinh độ</Text><TextInput style={styles.input} value={dLng} onChangeText={setDLng} placeholder="Nhập kinh độ..." keyboardType="numeric" /></View>
               </View>
             )}
-          </ScrollView>
 
-          {/* Fixed Bottom Action Bar handling keyboard */}
-          <View style={[
-            styles.modalActions, 
-            { 
-              paddingBottom: keyboardHeight > 0 ? vs(12) : Math.max(insets.bottom, vs(12)),
-              marginBottom: keyboardHeight 
-            }
-          ]}>
-            <TouchableOpacity style={styles.cancelBtn} onPress={() => setDestModalVisible(false)}>
-              <Text style={styles.cancelBtnText}>Hủy</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.saveBtn} onPress={handleSaveDest}>
-              <Text style={styles.saveBtnText}>Lưu nội dung</Text>
-            </TouchableOpacity>
-          </View>
+            {/* --- Content Blocks Section --- */}
+            <View style={{ marginTop: vs(20), borderTopWidth: 1, borderTopColor: '#f1f5f9', paddingTop: vs(20) }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(15) }}>
+                <Text style={[styles.inputLabel, { marginTop: 0 }]}>Nội dung chi tiết</Text>
+                <TouchableOpacity
+                  onPress={() => setDBlocks([...dBlocks, { value: '', value_khmer: '', images: '' }])}
+                  style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#eff6ff', paddingHorizontal: s(12), paddingVertical: vs(6), borderRadius: s(8), gap: s(4) }}
+                >
+                  <Ionicons name="add-circle-outline" size={ms(18)} color="#3b82f6" />
+                  <Text style={{ fontSize: ms(13), fontWeight: '700', color: '#3b82f6' }}>Thêm khối</Text>
+                </TouchableOpacity>
+              </View>
+
+              {dBlocks.map((block, index) => (
+                <View key={index} style={{ backgroundColor: '#f8fafc', padding: s(15), borderRadius: ms(16), marginBottom: vs(15), borderWidth: 1, borderColor: '#e2e8f0' }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(10) }}>
+                    <Text style={{ fontSize: ms(14), fontWeight: '800', color: '#64748b' }}>Khối {index + 1}</Text>
+                    <TouchableOpacity onPress={() => setDBlocks(dBlocks.filter((_, i) => i !== index))}>
+                      <Ionicons name="trash-outline" size={ms(18)} color="#ef4444" />
+                    </TouchableOpacity>
+                  </View>
+
+                  <Text style={[styles.inputLabel, { marginTop: 0 }]}>Đoạn văn bản (Việt)</Text>
+                  <TextInput
+                    style={[styles.input, { height: 80, backgroundColor: '#fff' }]}
+                    value={block.value}
+                    onChangeText={(txt) => {
+                      const newBlocks = [...dBlocks];
+                      newBlocks[index].value = txt;
+                      setDBlocks(newBlocks);
+                    }}
+                    multiline
+                    placeholder="Nhập nội dung (Việt)..."
+                  />
+
+                  <Text style={styles.inputLabel}>Đoạn văn bản (Khmer)</Text>
+                  <TextInput
+                    style={[styles.input, { height: 80, backgroundColor: '#fff' }]}
+                    value={block.value_khmer}
+                    onChangeText={(txt) => {
+                      const newBlocks = [...dBlocks];
+                      newBlocks[index].value_khmer = txt;
+                      setDBlocks(newBlocks);
+                    }}
+                    multiline
+                    placeholder="Nhập nội dung (Khmer)..."
+                  />
+
+                  <ImageSelector
+                    label="Ảnh minh họa khối"
+                    value={block.images}
+                    onChange={(uri) => {
+                      const newBlocks = [...dBlocks];
+                      newBlocks[index].images = uri;
+                      setDBlocks(newBlocks);
+                    }}
+                  />
+                </View>
+              ))}
+            </View>
+          </ScrollView>
         </View>
       </Modal>
 
@@ -852,11 +909,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modalActions: { 
-    flexDirection: 'row', 
-    padding: s(20), 
-    gap: s(12), 
-    borderTopWidth: 1, 
+  modalActions: {
+    flexDirection: 'row',
+    padding: s(20),
+    gap: s(12),
+    borderTopWidth: 1,
     borderTopColor: '#f1f5f9',
     backgroundColor: '#ffffff',
     shadowColor: '#000',

@@ -268,6 +268,10 @@ export const translations: any = {
     cat_numbers: 'Số đếm cơ bản',
     cat_family: 'Gia đình thân yêu',
     cat_food: 'Ẩm thực đặc sắc',
+    'Gia đình thân yêu': 'Gia đình thân yêu',
+    'Ẩm thực đặc sắc': 'Ẩm thực đặc sắc',
+    'Chào hỏi thông dụng': 'Chào hỏi thông dụng',
+    'Số đếm cơ bản': 'Số đếm cơ bản',
     // Toast Messages
     login_success: 'Đăng nhập thành công',
     logout_success: 'Tài khoản đã được đăng xuất',
@@ -383,6 +387,9 @@ export const translations: any = {
     reply_placeholder: 'Nhập nội dung trả lời...',
     send_reply_success: 'Đã gửi phản hồi tới người dùng',
     action_error: 'Không thể thực hiện thao tác này.',
+    send_reply: 'Trả lời',
+    lock: 'Khóa',
+    unlock: 'Mở khóa',
   },
   km: {
     // Common
@@ -645,6 +652,10 @@ export const translations: any = {
     cat_numbers: 'លេខ និងការរាប់',
     cat_family: 'គ្រួសារ និងការហៅទូរសព្ទ',
     cat_food: 'អាហារនិងភេសជ្ជៈ',
+    'Gia đình thân yêu': 'គ្រួសារ និងការហៅទូរសព្ទ',
+    'Ẩm thực đặc sắc': 'អាហារនិងភេសជ្ជៈ',
+    'Chào hỏi thông dụng': 'ការសួរសុខទុក្ខបឋម',
+    'Số đếm cơ bản': 'លេខ និងការរាប់',
     // Toast Messages
     login_success: 'បានចូលដោយជោគជ័យ',
     logout_success: 'បានចាកចេញពីគណនី',
@@ -760,6 +771,9 @@ export const translations: any = {
     reply_placeholder: 'បញ្ចូលខ្លឹមសារឆ្លើយតប...',
     send_reply_success: 'បានផ្ញើការឆ្លើយតបទៅអ្នកប្រើប្រាស់',
     action_error: 'មិនអាចអនុវត្តសកម្មភាពនេះបានទេ។',
+    send_reply: 'ឆ្លើយតប',
+    lock: 'ចាក់សោ',
+    unlock: 'ដោះសោ',
   }
 };
 

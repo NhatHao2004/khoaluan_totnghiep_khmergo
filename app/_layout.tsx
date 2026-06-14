@@ -10,6 +10,7 @@ import { LoadingScreen } from '@/components/loading-screen';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -35,26 +36,28 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-        <LanguageProvider>
-          {!isAppReady ? (
-            <LoadingScreen onFinish={() => setIsAppReady(true)} />
-          ) : (
-            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-              <Stack screenOptions={{ 
-                headerShown: false,
-                contentStyle: { backgroundColor: '#FFFFFF' }
-              }}>
-                <Stack.Screen name="(tabs)" />
-                <Stack.Screen name="login" options={{ presentation: 'modal' }} />
-                <Stack.Screen name="register" options={{ presentation: 'modal' }} />
-              </Stack>
-              <StatusBar style="auto" />
-            </ThemeProvider>
-          )}
-        </LanguageProvider>
-      </AuthProvider>
-    </GestureHandlerRootView>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AuthProvider>
+          <LanguageProvider>
+            {!isAppReady ? (
+              <LoadingScreen onFinish={() => setIsAppReady(true)} />
+            ) : (
+              <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                <Stack screenOptions={{ 
+                  headerShown: false,
+                  contentStyle: { backgroundColor: '#FFFFFF' }
+                }}>
+                  <Stack.Screen name="(tabs)" />
+                  <Stack.Screen name="login" options={{ presentation: 'modal' }} />
+                  <Stack.Screen name="register" options={{ presentation: 'modal' }} />
+                </Stack>
+                <StatusBar style="auto" />
+              </ThemeProvider>
+            )}
+          </LanguageProvider>
+        </AuthProvider>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }

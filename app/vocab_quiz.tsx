@@ -14,7 +14,6 @@ import {
     Animated,
     Dimensions,
     Modal,
-    SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
@@ -22,6 +21,7 @@ import {
     Vibration,
     View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { height } = Dimensions.get('window');
 const POINTS_PER_WORD = 5;
@@ -354,19 +354,21 @@ export default function VocabQuizScreen() {
 
     return (
         <View style={styles.container}>
-            <View style={styles.headerContainer}>
-                <TouchableOpacity onPress={() => setShowExitModal(true)} style={styles.headerCloseBtn}>
-                    <Ionicons name="arrow-back" size={28} color="#1E293B" />
-                </TouchableOpacity>
-                <View style={styles.timerContainer}>
-                    <Ionicons name="time-outline" size={20} color={timeLeft < 30 ? '#EF4444' : '#1E293B'} />
-                    <Text style={[styles.timerText, timeLeft < 30 && { color: '#EF4444' }]}>{formatTime(timeLeft)}</Text>
+            <SafeAreaView edges={['top']} style={{ backgroundColor: '#FFF' }}>
+                <View style={styles.headerContainer}>
+                    <TouchableOpacity onPress={() => setShowExitModal(true)} style={styles.headerCloseBtn}>
+                        <Ionicons name="arrow-back" size={28} color="#1E293B" />
+                    </TouchableOpacity>
+                    <View style={styles.timerContainer}>
+                        <Ionicons name="time-outline" size={20} color={timeLeft < 30 ? '#EF4444' : '#1E293B'} />
+                        <Text style={[styles.timerText, timeLeft < 30 && { color: '#EF4444' }]}>{formatTime(timeLeft)}</Text>
+                    </View>
+                    <View style={styles.scorePill}>
+                        <Ionicons name="flash" size={16} color="#F59E0B" />
+                        <Text style={styles.scorePillText}>{score}</Text>
+                    </View>
                 </View>
-                <View style={styles.scorePill}>
-                    <Ionicons name="flash" size={16} color="#F59E0B" />
-                    <Text style={styles.scorePillText}>{score}</Text>
-                </View>
-            </View>
+            </SafeAreaView>
 
             <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
                 <Animated.View style={{ flex: 1, flexDirection: 'row', padding: 20, gap: 20, transform: [{ translateX: cardShake }] }}>
@@ -470,13 +472,14 @@ const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#FFFFFF' },
     header: {
         backgroundColor: '#ffffff',
-        paddingTop: vs(45),
+        paddingTop: vs(13),
         paddingBottom: vs(15),
         paddingHorizontal: s(15),
         flexDirection: 'row',
         alignItems: 'center',
-        elevation: 2,
         zIndex: 100,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F1F5F9',
     },
     backBtn: { width: s(40), height: s(40), justifyContent: 'center', alignItems: 'center' },
     headerTitleContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
@@ -509,7 +512,7 @@ const styles = StyleSheet.create({
     resultSecondaryBtnText: { color: '#64748B', fontSize: ms(16), fontWeight: '700' },
     savingText: { fontSize: ms(12), color: '#94A3B8', marginTop: vs(8) },
     savedText: { fontSize: ms(12), color: '#22C55E', fontWeight: '700', marginTop: vs(8) },
-    headerContainer: { paddingTop: vs(50), paddingHorizontal: s(20), paddingBottom: vs(20), backgroundColor: '#FFF', borderBottomLeftRadius: ms(32), borderBottomRightRadius: ms(32), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', elevation: 4 },
+    headerContainer: { paddingHorizontal: s(20), paddingBottom: vs(20), backgroundColor: '#FFF', borderBottomLeftRadius: ms(32), borderBottomRightRadius: ms(32), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     headerCloseBtn: { width: s(40), height: s(40), justifyContent: 'center', alignItems: 'center' },
     gameHeaderTitle: { fontSize: ms(16), fontWeight: '800', color: '#334155' },
     timerContainer: { flexDirection: 'row', alignItems: 'center', gap: s(6), backgroundColor: '#F1F5F9', paddingHorizontal: s(12), paddingVertical: vs(6), borderRadius: ms(20) },
