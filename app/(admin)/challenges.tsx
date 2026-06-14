@@ -582,7 +582,7 @@ const ChallengeManagement = () => {
                 <Text style={styles.btnText}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.btnAction, styles.saveBtn]} onPress={handleSaveQuiz}>
-                <Text style={styles.btnText}>Lưu</Text>
+                <Text style={styles.btnText}>Lưu thử thách</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -812,7 +812,7 @@ const styles = StyleSheet.create({
   saveBtn: { backgroundColor: '#3b82f6' },
   btnText: { fontSize: ms(15), fontWeight: '800', color: '#fff' },
 
-  destListContainer: { marginBottom: vs(15) },
+  destListContainer: { marginBottom: vs(5) },
   destChip: { paddingHorizontal: s(12), paddingVertical: vs(8), borderRadius: s(10), backgroundColor: '#f1f5f9', marginRight: s(8), borderWidth: 1, borderColor: '#e2e8f0' },
   activeDestChip: { backgroundColor: '#3b82f6', borderColor: '#3b82f6' },
   destChipText: { fontSize: ms(13), color: '#64748b', fontWeight: '700' },

@@ -666,19 +666,19 @@ const ContentManagement = () => {
               {(dCat === 'culture' || dCat === 'food') && (
                 <>
                   <Text style={styles.inputLabel}>Mô tả phụ ngắn (Việt)</Text>
-                  <TextInput 
-                    style={styles.input} 
-                    value={dSubDesc} 
-                    onChangeText={setDSubDesc} 
-                    placeholder="Lấy từ trường 'location'..." 
+                  <TextInput
+                    style={styles.input}
+                    value={dSubDesc}
+                    onChangeText={setDSubDesc}
+                    placeholder="Lấy từ trường 'location'..."
                   />
 
                   <Text style={styles.inputLabel}>Mô tả phụ ngắn (Khmer)</Text>
-                  <TextInput 
-                    style={styles.input} 
-                    value={dSubDescKm} 
-                    onChangeText={setDSubDescKm} 
-                    placeholder="Lấy từ trường 'location_khmer'..." 
+                  <TextInput
+                    style={styles.input}
+                    value={dSubDescKm}
+                    onChangeText={setDSubDescKm}
+                    placeholder="Lấy từ trường 'location_khmer'..."
                   />
                 </>
               )}
@@ -779,8 +779,8 @@ const styles = StyleSheet.create({
   pickedImagePreview: { width: '100%', height: '100%' },
   removeImageBtn: { position: 'absolute', top: 5, right: 5, backgroundColor: '#fff', borderRadius: 15 },
   modalActions: { flexDirection: 'row', padding: s(20), gap: s(12), borderTopWidth: 1, borderTopColor: '#f1f5f9' },
-  cancelBtn: { flex: 1, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#f1f5f9', alignItems: 'center' },
-  cancelBtnText: { fontSize: ms(15), fontWeight: '700', color: '#64748b' },
+  cancelBtn: { flex: 1, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#ff0000ff', alignItems: 'center' },
+  cancelBtnText: { fontSize: ms(15), fontWeight: '800', color: '#ffffffff' },
   saveBtn: { flex: 2, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#3b82f6', alignItems: 'center' },
   saveBtnText: { fontSize: ms(15), fontWeight: '800', color: '#fff' },
   catRow: { flexDirection: 'row', gap: s(8), marginBottom: vs(15) },

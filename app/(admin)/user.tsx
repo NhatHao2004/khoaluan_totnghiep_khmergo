@@ -371,10 +371,10 @@ const UserManagement = () => {
             </Text>
             <View style={styles.confirmActions}>
               <TouchableOpacity style={styles.cancelActionBtn} onPress={() => setConfirmVisible(false)}>
-                <Text style={styles.cancelActionText}>Hủy bỏ</Text>
+                <Text style={styles.cancelActionText}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.confirmActionBtn, { backgroundColor: pendingUser?.isBlocked ? '#10b981' : '#ef4444' }]}
+                style={[styles.confirmActionBtn, { backgroundColor: pendingUser?.isBlocked ? '#10b981' : '#0011ffff' }]}
                 onPress={handleConfirmLock}
               >
                 <Text style={styles.confirmActionText}>{pendingUser?.isBlocked ? 'Mở khóa' : 'Khóa ngay'}</Text>
@@ -473,10 +473,10 @@ const styles = StyleSheet.create({
   confirmSub: { fontSize: ms(15), color: '#64748b', textAlign: 'center', lineHeight: vs(22), marginBottom: vs(24) },
   boldText: { fontWeight: '800', color: '#1e293b' },
   confirmActions: { flexDirection: 'row', gap: s(12), width: '100%' },
-  cancelActionBtn: { flex: 1, paddingVertical: vs(12), borderRadius: s(12), backgroundColor: '#f1f5f9', alignItems: 'center' },
-  cancelActionText: { fontSize: ms(15), fontWeight: '700', color: '#475569' },
+  cancelActionBtn: { flex: 1, paddingVertical: vs(12), borderRadius: s(12), backgroundColor: '#ff0000ff', alignItems: 'center' },
+  cancelActionText: { fontSize: ms(15), fontWeight: '800', color: '#ffffffff' },
   confirmActionBtn: { flex: 1, paddingVertical: vs(12), borderRadius: s(12), alignItems: 'center' },
-  confirmActionText: { fontSize: ms(15), fontWeight: '700', color: '#fff' },
+  confirmActionText: { fontSize: ms(15), fontWeight: '800', color: '#fff' },
   replyOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: s(20) },
   replyContent: { backgroundColor: '#fff', borderRadius: s(24), padding: s(20) },
   replyTitle: { fontSize: ms(20), fontWeight: '800', color: '#1e293b', marginBottom: vs(10) },
@@ -484,8 +484,8 @@ const styles = StyleSheet.create({
   replyOriginalMessage: { fontSize: ms(14), color: '#475569', lineHeight: vs(24), textAlign: 'justify', paddingLeft: s(6), paddingRight: s(12), paddingBottom: vs(2), includeFontPadding: false },
   replyInput: { backgroundColor: '#f8fafc', borderRadius: s(12), padding: s(12), fontSize: ms(15), color: '#1e293b', borderWidth: 1, borderColor: '#e2e8f0', height: vs(150), marginBottom: vs(20) },
   replyActions: { flexDirection: 'row', gap: s(12) },
-  cancelReplyBtn: { flex: 1, paddingVertical: vs(12), borderRadius: s(12), backgroundColor: '#f1f5f9', alignItems: 'center' },
-  cancelReplyText: { fontSize: ms(15), fontWeight: '700', color: '#475569' },
+  cancelReplyBtn: { flex: 1, paddingVertical: vs(12), borderRadius: s(12), backgroundColor: '#ff0000ff', alignItems: 'center' },
+  cancelReplyText: { fontSize: ms(15), fontWeight: '800', color: '#ffffffff' },
   confirmReplyBtn: { flex: 1, paddingVertical: vs(12), borderRadius: s(12), backgroundColor: '#3b82f6', alignItems: 'center' },
   confirmReplyText: { fontSize: ms(15), fontWeight: '800', color: '#fff' },
   disabledBtn: { backgroundColor: '#94a3b8' },
