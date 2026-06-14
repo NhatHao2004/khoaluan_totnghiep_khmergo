@@ -289,8 +289,6 @@ export default function ProfileScreen() {
             styles.logoutContent,
             animatedLogoutStyle,
             { paddingBottom: Math.max(insets.bottom, vs(30)) }
-          ]}>
-            <View style={styles.modalHandle} />
             <View style={styles.logoutHeader}>
               <View style={styles.logoutIconCircle}>
                 <Ionicons name="log-out-outline" size={ms(34)} color="#FF4D4D" />
@@ -475,12 +473,12 @@ const styles = StyleSheet.create({
   cancelLogoutBtn: {
     height: vs(56),
     borderRadius: s(16),
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#0080ffff',
     justifyContent: 'center',
     alignItems: 'center',
   },
   cancelLogoutText: {
-    color: '#475569',
+    color: '#ffffffff',
     fontSize: ms(16),
     fontWeight: '800',
   },
