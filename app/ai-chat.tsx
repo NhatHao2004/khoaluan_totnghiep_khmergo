@@ -161,9 +161,11 @@ export default function AIAssistantScreen() {
 
   const resetCamera = () => { if (image || result) { setImage(null); setStatus('idle'); setResult(null); triggerToast(t('clear_analysis_success')); } };
 
-  const keyboardPadding = Math.max(0, keyboardHeight - (initialLayoutHeight - layoutHeight));
+  // UNIFIED CALCULATION
+  const keyboardSpacer = Math.max(0, keyboardHeight - (initialLayoutHeight - layoutHeight));
+  const dynamicPadding = keyboardHeight > 0 ? vs(15) : vs(10);
 
-  const renderContent = () => (
+  const renderContentArea = () => (
     <View style={styles.contentArea}>
       {activeTab === 'chat' ? (
         <View style={{ flex: 1 }}>
@@ -211,50 +213,25 @@ export default function AIAssistantScreen() {
               </View>
             ))}
           </ScrollView>
-          <View style={[styles.inputContainer, { paddingBottom: keyboardPadding + vs(10) }]}>
+          <View style={[styles.inputContainer, { paddingBottom: dynamicPadding }]}>
             <TextInput style={styles.input} placeholder={t('ask_anything_placeholder')} placeholderTextColor="#9CA3AF" value={inputText} onChangeText={setInputText} multiline />
             <TouchableOpacity style={styles.sendfab} onPress={sendMessage}><Ionicons name="send" size={28} color="#1877F2" /></TouchableOpacity>
           </View>
+          {Platform.OS === 'android' && <View style={{ height: keyboardSpacer }} />}
         </View>
       ) : (
         <View style={{ flex: 1 }}>
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 150 }}>
             <View style={styles.cameraSection}>
-              <View style={styles.imageFrame}>
-                <View style={[styles.corner, styles.topL]} /><View style={[styles.corner, styles.topR]} />
-                <View style={[styles.corner, styles.botL]} /><View style={[styles.corner, styles.botR]} />
-                <View style={styles.innerFrame}>
-                  {image ? <Image source={{ uri: image }} style={styles.previewImage} /> : <View style={styles.placeholderContainer} />}
-                </View>
-              </View>
-              <View style={styles.aiCard}>
-                 {status === 'analyzing' ? (
-                   <View style={styles.analyzingBox}>
-                     <ActivityIndicator size="large" color="#1877F2" />
-                     <Text style={styles.analyzingText}>{t('ai_analyzing')}</Text>
-                   </View>
-                 ) : (
-                   <>
-                     <Text style={styles.resultTitleSmall}>{result?.title || (status === 'idle' ? t('ai_camera_idle_title') : t('ai_camera_ready'))}</Text>
-                     <Text style={styles.aiBubbleTextSmall}>{result?.content || (status === 'idle' ? t('ai_camera_idle_desc') : t('ai_camera_selected_desc'))}</Text>
-                   </>
-                 )}
-              </View>
+              <View style={styles.imageFrame}><View style={styles.innerFrame}>{image ? <Image source={{ uri: image }} style={styles.previewImage} /> : <View style={styles.placeholderContainer} />}</View></View>
+              <View style={styles.aiCard}><Text style={styles.resultTitleSmall}>{result?.title || t('ai_camera_ready')}</Text><Text style={styles.aiBubbleTextSmall}>{result?.content || t('ai_camera_selected_desc')}</Text></View>
             </View>
           </ScrollView>
-          <View style={[styles.fixedCameraActions, { bottom: keyboardPadding + vs(25) }]}>
-            {status === 'idle' ? (
-              <View style={styles.camBtnRow}>
+          <View style={[styles.fixedCameraActions, { bottom: keyboardSpacer > 0 ? (keyboardSpacer + vs(20)) : vs(20) }]}>
+             <View style={styles.camBtnRow}>
                 <TouchableOpacity style={styles.rectBtn} onPress={() => pickImage(false)}><Ionicons name="images" size={32} color="#1877F2" /></TouchableOpacity>
                 <TouchableOpacity style={styles.rectBtn} onPress={() => pickImage(true)}><Ionicons name="camera" size={32} color="#1877F2" /></TouchableOpacity>
               </View>
-            ) : status === 'selected' ? (
-              <TouchableOpacity style={styles.analyzeBtn} onPress={handleAnalyze}>
-                <LinearGradient colors={['#1877F2', '#0C58C1']} style={styles.analyzeGradient}>
-                  <Text style={styles.analyzeBtnText}>{t('ai_start_analysis')}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            ) : null}
           </View>
         </View>
       )}
@@ -281,15 +258,13 @@ export default function AIAssistantScreen() {
       </View>
 
       {Platform.OS === 'ios' ? (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">{renderContent()}</KeyboardAvoidingView>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" keyboardVerticalOffset={0}>
+          {renderContentArea()}
+        </KeyboardAvoidingView>
       ) : (
-        <View style={{ flex: 1 }}>{renderContent()}</View>
-      )}
-
-      {showToast && (
-        <Animated.View style={[styles.toastContainer, { transform: [{ translateY: toastY.value }] }]}>
-          <Text style={styles.toastText}>{toastMsg}</Text>
-        </Animated.View>
+        <View style={{ flex: 1 }}>
+          {renderContentArea()}
+        </View>
       )}
     </View>
   );
@@ -325,8 +300,6 @@ const styles = StyleSheet.create({
   inputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(15), paddingTop: vs(12), borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFF' },
   input: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: ms(20), paddingHorizontal: s(15), paddingVertical: vs(10), maxHeight: vs(110), fontSize: ms(16) },
   sendfab: { marginLeft: s(10) },
-  toastContainer: { position: 'absolute', top: 0, left: 15, right: 15, backgroundColor: '#10B981', padding: 15, borderRadius: 20, zIndex: 10000 },
-  toastText: { color: '#FFF', textAlign: 'center', fontSize: ms(15) },
   cameraSection: { padding: 20, alignItems: 'center' },
   imageFrame: { width: SCREEN_WIDTH - s(80), aspectRatio: 1, position: 'relative', marginBottom: 20 },
   innerFrame: { width: '100%', height: '100%', backgroundColor: '#F1F5F9', borderRadius: 25, overflow: 'hidden', borderWidth: 1, borderColor: '#E2E8F0' },
@@ -339,10 +312,8 @@ const styles = StyleSheet.create({
   botR: { bottom: 0, right: 0, borderBottomWidth: 3.5, borderRightWidth: 3.5, borderBottomRightRadius: 15 },
   aiCard: { width: '100%', backgroundColor: '#FFF', borderRadius: 20, padding: 20 },
   aiBubbleTextSmall: { fontSize: ms(16), color: '#475569', lineHeight: ms(24) },
-  analyzingBox: { alignItems: 'center', justifyContent: 'center', padding: 20 },
-  analyzingText: { marginTop: 10, color: '#1877F2', fontSize: ms(16) },
   resultTitleSmall: { fontSize: ms(20), fontWeight: '400', color: '#1A1A1A', marginBottom: 8 },
-  fixedCameraActions: { position: 'absolute', left: 0, right: 0, paddingHorizontal: 20, paddingBottom: 25 },
+  fixedCameraActions: { position: 'absolute', left: 0, right: 0, paddingHorizontal: 20 },
   camBtnRow: { flexDirection: 'row', gap: 15, justifyContent: 'center' },
   rectBtn: { flex: 1, height: vs(60), backgroundColor: '#FFF', borderWidth: 1.5, borderColor: '#1877F2', borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
   analyzeBtn: { width: '100%', height: vs(60), borderRadius: 20, overflow: 'hidden' },
