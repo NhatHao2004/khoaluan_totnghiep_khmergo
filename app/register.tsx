@@ -1,7 +1,9 @@
 import { ThemedText } from '@/components/themed-text';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { auth, db } from '@/utils/firebaseConfig';
+import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -10,6 +12,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Modal,
   Platform,
   ScrollView,
@@ -17,18 +20,15 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
-  KeyboardAvoidingView
+  View
 } from 'react-native';
-import { Image } from 'expo-image';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { s, vs, ms } from '@/utils/responsive';
 import Animated, {
   interpolate,
   useAnimatedStyle,
   useSharedValue,
   withTiming
 } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 export default function RegisterScreen() {
@@ -393,13 +393,17 @@ export default function RegisterScreen() {
                 Chúng tôi có quyền tạm ngừng hoặc khóa tài khoản nếu phát hiện hành vi vi phạm điều khoản hoặc gây ảnh hưởng đến hệ thống và cộng đồng người dùng.{"\n\n"}
 
                 <Text style={styles.termsBold}>7. Liên hệ hỗ trợ:</Text>{"\n"}
-                {"    "}• Email:{" "}
-                <Text style={{ color: '#1A73E8' }}>
-                  support@khmergoapp.vn
+                <Text numberOfLines={1} adjustsFontSizeToFit style={styles.termsText}>
+                  {"    "}• Email:{" "}
+                  <Text style={{ color: '#1A73E8' }}>
+                    khmergo.support@gmail.com
+                  </Text>
                 </Text>{"\n"}
-                {"    "}• Số điện thoại:{" "}
-                <Text style={{ color: '#1A73E8' }}>
-                  0123 456 789
+                <Text numberOfLines={1} adjustsFontSizeToFit style={styles.termsText}>
+                  {"    "}• Số điện thoại:{" "}
+                  <Text style={{ color: '#1A73E8' }}>
+                    0337048780
+                  </Text>
                 </Text>
               </ThemedText>
             </ScrollView>
