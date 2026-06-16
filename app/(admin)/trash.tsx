@@ -221,7 +221,7 @@ const TrashManagement = () => {
             </Text>
             <View style={styles.modalActions}>
               <TouchableOpacity style={[styles.btnAction, { backgroundColor: '#3b82f6' }]} onPress={() => setDeleteConfirmVisible(false)}>
-                <Text style={styles.btnText} numberOfLines={1} adjustsFontSizeToFit>Hủy bỏ</Text>
+                <Text style={styles.btnText} numberOfLines={1} adjustsFontSizeToFit>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.btnAction, { backgroundColor: '#ef4444' }]} onPress={confirmPermanentDelete}>
                 <Text style={styles.btnText} numberOfLines={1} adjustsFontSizeToFit>Xác nhận</Text>

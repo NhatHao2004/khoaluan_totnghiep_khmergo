@@ -656,12 +656,19 @@ const ChallengeManagement = () => {
               </ScrollView>
             </KeyboardAvoidingView>
 
-            <View style={[styles.modalFooter, { paddingBottom: Math.max(insets.bottom, vs(20)), paddingHorizontal: s(20), paddingTop: vs(15) }]}>
+            <View style={[styles.modalFooter, {
+              flexDirection: 'row',
+              gap: s(12),
+              alignItems: 'center',
+              paddingBottom: Math.max(insets.bottom, vs(20)),
+              paddingHorizontal: s(20),
+              paddingTop: vs(15)
+            }]}>
               <TouchableOpacity
-                style={[styles.btnAction, styles.cancelBtn, { flex: 1, backgroundColor: '#f1f5f9' }]}
+                style={[styles.btnAction, styles.cancelBtn, { flex: 1, backgroundColor: '#ff0000ff' }]}
                 onPress={() => setQuestionModalVisible(false)}
               >
-                <Text style={[styles.btnText, { color: '#64748b' }]}>Hủy bỏ</Text>
+                <Text style={[styles.btnText, { color: '#ffffffff' }]}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.saveBtnLarge, { flex: 2 }]} onPress={handleSaveQuestion}>
                 <Text style={styles.saveBtnText}>Lưu câu hỏi</Text>
@@ -682,7 +689,7 @@ const ChallengeManagement = () => {
             <Text style={styles.confirmMessage}>{confirmDialog.message}</Text>
             <View style={styles.confirmActions}>
               <TouchableOpacity style={[styles.confirmBtn, { backgroundColor: '#f1f5f9' }]} onPress={hideConfirm}>
-                <Text style={[styles.confirmBtnText, { color: '#64748b' }]}>Hủy bỏ</Text>
+                <Text style={[styles.confirmBtnText, { color: '#64748b' }]}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.confirmBtn, { backgroundColor: confirmDialog.iconColor }]}
@@ -816,7 +823,7 @@ const styles = StyleSheet.create({
   btnAction: { flex: 1, height: vs(50), borderRadius: s(14), justifyContent: 'center', alignItems: 'center', elevation: 2 },
   cancelBtn: { backgroundColor: '#ff0000ff' },
   saveBtn: { backgroundColor: '#3b82f6' },
-  btnText: { fontSize: ms(15), fontWeight: '400', color: '#fff' },
+  btnText: { fontSize: ms(15), fontWeight: '400', color: '#ffffffff' },
 
   destListContainer: { marginBottom: vs(5) },
   destChip: { paddingHorizontal: s(12), paddingVertical: vs(8), borderRadius: s(10), backgroundColor: '#f1f5f9', marginRight: s(8), borderWidth: 1, borderColor: '#e2e8f0' },

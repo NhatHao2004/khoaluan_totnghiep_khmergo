@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { collection, deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDocs, increment, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -78,22 +78,30 @@ const PostItem = memo(({ item, onDelete, onShowComments }: any) => {
 });
 PostItem.displayName = 'PostItem';
 
-const CommentItem = memo(({ item, onDelete }: any) => (
-  <View style={styles.commentItem}>
+const CommentItem = memo(({ item, onDelete, isReply, parentUserName }: any) => (
+  <View style={[styles.commentItem, isReply && { marginLeft: s(45), borderLeftWidth: 2, borderLeftColor: '#e2e8f0', paddingLeft: s(12) }]}>
     <Image
       source={{ uri: item.userAvatar || item.avatar || 'https://api.dicebear.com/7.x/avataaars/png?seed=' + item.id }}
-      style={styles.commentAvatar}
+      style={[styles.commentAvatar, isReply && { width: s(28), height: s(28), borderRadius: s(14) }]}
       contentFit="cover"
       transition={200}
     />
     <View style={styles.commentContent}>
       <View style={styles.commentHeader}>
-        <Text style={styles.commentUserName} numberOfLines={1} adjustsFontSizeToFit>{item.userName || item.user || 'Người dùng'}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
+          <Text style={[styles.commentUserName, isReply && { fontSize: ms(13) }]} numberOfLines={1}>{item.userName || item.user || 'Người dùng'}</Text>
+          {isReply && parentUserName && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: s(6) }}>
+              <Ionicons name="caret-forward" size={ms(10)} color="#94a3b8" />
+              <Text style={{ fontSize: ms(13), fontWeight: '400', color: '#3b82f6', marginLeft: s(4) }}>{parentUserName}</Text>
+            </View>
+          )}
+        </View>
       </View>
-      <Text style={styles.commentText}>{item.text || item.content || ''}</Text>
+      <Text style={[styles.commentText, isReply && { fontSize: ms(13) }]}>{item.text || item.content || ''}</Text>
     </View>
     <TouchableOpacity onPress={() => onDelete(item.id)} style={styles.deleteCommentBtn}>
-      <Ionicons name="trash-outline" size={ms(20)} color="#ef4444" />
+      <Ionicons name="trash-outline" size={ms(18)} color="#ef4444" />
     </TouchableOpacity>
   </View>
 ));
@@ -185,11 +193,32 @@ const ArticleManagement = () => {
   const confirmDeleteComment = async () => {
     if (!selectedPost || !pendingCommentDelete) return;
     try {
-      await deleteDoc(doc(db, `posts/${selectedPost.id}/comments`, pendingCommentDelete));
+      // 1. Tìm các reply của comment này (nếu có)
+      const childDocsQuery = query(
+        collection(db, `posts/${selectedPost.id}/comments`),
+        where('parentId', '==', pendingCommentDelete)
+      );
+      const childDocs = await getDocs(childDocsQuery);
+      const totalToDelete = childDocs.size + 1;
+
+      // 2. Thực hiện xóa hàng loạt (batch)
+      const batch = writeBatch(db);
+      batch.delete(doc(db, `posts/${selectedPost.id}/comments`, pendingCommentDelete));
+      childDocs.forEach((d) => {
+        batch.delete(d.ref);
+      });
+      await batch.commit();
+
+      // 3. Cập nhật số lượng bình luận trên bài viết
+      await updateDoc(doc(db, 'posts', selectedPost.id), {
+        comments: increment(-totalToDelete)
+      });
+
       setCommentDeleteConfirmVisible(false);
       setPendingCommentDelete(null);
       triggerToast('Đã xóa bình luận thành công', 'success');
     } catch (e) {
+      console.error("Error deleting comment: ", e);
       triggerToast('Lỗi khi xóa bình luận', 'error');
     }
   };
@@ -245,7 +274,7 @@ const ArticleManagement = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Ionicons name="chevron-back" size={ms(28)} color="#1e293b" />
+          <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>Quản lý bài viết</Text>
         <View style={{ width: s(44) }} />
@@ -293,9 +322,37 @@ const ArticleManagement = () => {
               <ActivityIndicator size="large" color="#3b82f6" style={{ marginTop: vs(50) }} />
             ) : (
               <FlatList
-                data={comments}
+                data={(() => {
+                  // Build threaded list: parent comments followed by their children
+                  const parentComments = comments.filter(c => !c.parentId);
+                  const childComments = comments.filter(c => !!c.parentId);
+                  const threaded: any[] = [];
+                  parentComments.forEach(parent => {
+                    threaded.push(parent);
+                    const children = childComments.filter(c => c.parentId === parent.id);
+                    children.forEach(child => threaded.push(child));
+                  });
+                  // Add orphaned replies (parent was deleted) at the end
+                  const threadedIds = new Set(threaded.map(c => c.id));
+                  childComments.forEach(c => {
+                    if (!threadedIds.has(c.id)) threaded.push(c);
+                  });
+                  return threaded;
+                })()}
                 keyExtractor={item => item.id}
-                renderItem={({ item }) => <CommentItem item={item} onDelete={handleDeleteComment} />}
+                renderItem={({ item }) => {
+                  const isReply = !!item.parentId;
+                  const parentComment = isReply ? comments.find(c => c.id === item.parentId) : null;
+                  const parentUserName = parentComment ? (parentComment.userName || parentComment.user || 'Người dùng') : null;
+                  return (
+                    <CommentItem
+                      item={item}
+                      onDelete={handleDeleteComment}
+                      isReply={isReply}
+                      parentUserName={parentUserName}
+                    />
+                  );
+                }}
                 ListEmptyComponent={
                   <View style={styles.emptyContainer}>
                     <Ionicons name="chatbubble-outline" size={ms(48)} color="#e2e8f0" />
@@ -318,10 +375,10 @@ const ArticleManagement = () => {
               <Ionicons name="chatbubble-ellipses" size={ms(32)} color="#ef4444" />
             </View>
             <Text style={styles.confirmTitle}>Xóa bình luận</Text>
-            <Text style={styles.confirmSubText}>Bạn có chắc muốn xóa bình luận này</Text>
+            <Text style={styles.confirmSubText}>Bạn chắc muốn xóa bình luận này</Text>
             <View style={styles.modalActions}>
               <TouchableOpacity style={[styles.cancelBtn, { backgroundColor: '#94a3b8' }]} onPress={() => setCommentDeleteConfirmVisible(false)}>
-                <Text style={styles.btnText}>Hủy bỏ</Text>
+                <Text style={styles.btnText}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.saveBtnSmall, { backgroundColor: '#ef4444' }]} onPress={confirmDeleteComment}>
                 <Text style={styles.btnText}>Xác nhận</Text>
@@ -342,7 +399,7 @@ const ArticleManagement = () => {
             <Text style={styles.confirmSubText}>Bài đăng của {pendingDelete?.user} sẽ được chuyển vào thùng rác</Text>
             <View style={styles.modalActions}>
               <TouchableOpacity style={[styles.cancelBtn, { backgroundColor: '#94a3b8' }]} onPress={() => setDeleteConfirmVisible(false)}>
-                <Text style={styles.btnText}>Hủy bỏ</Text>
+                <Text style={styles.btnText}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.saveBtnSmall, { backgroundColor: '#ef4444' }]} onPress={confirmDelete}>
                 <Text style={styles.btnText}>Xác nhận</Text>

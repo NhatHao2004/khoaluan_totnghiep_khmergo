@@ -410,7 +410,7 @@ const AdminProfile = () => {
               onPress={() => setLogoutModalVisible(false)}
               activeOpacity={0.8}
             >
-              <Text style={styles.logoutCancelText}>Hủy bỏ</Text>
+              <Text style={styles.logoutCancelText}>Hủy</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
