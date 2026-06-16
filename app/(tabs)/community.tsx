@@ -679,116 +679,101 @@ export default function CommunityScreen() {
       />
 
       {/* Modal: Tạo/Sửa bài viết */}
-      <Modal animationType="slide" transparent={true} statusBarTranslucent={true} visible={isCreateModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <View style={{ flex: 1 }}>
-            <KeyboardAvoidingView
-              style={{ flex: 1 }}
-              behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
-            >
-              <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+      <Modal animationType="slide" transparent={false} statusBarTranslucent={true} visible={isCreateModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
+        <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+          <View style={[
+            styles.modalContent,
+            {
+              flex: 1,
+              backgroundColor: '#FFF',
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 0,
+              paddingTop: Platform.OS === 'ios' ? (insets.top + vs(3)) : (insets.top > 0 ? insets.top + vs(3) : vs(20)),
+            }
+          ]}>
+            <View style={styles.modalHeader}>
+              <View style={styles.modalHeaderTitleBox}>
                 <TouchableOpacity
-                  style={{ flex: 1 }}
-                  activeOpacity={1}
                   onPress={() => {
                     Keyboard.dismiss();
                     setCreateModalVisible(false);
                   }}
-                />
-                <Animated.View style={[
-                  styles.modalContent,
-                  animatedCreatePostStyle,
-                  {
-                    maxHeight: SCREEN_HEIGHT * 0.92,
-                    minHeight: SCREEN_HEIGHT * 0.55,
-                    backgroundColor: '#FFF'
-                  }
-                ]}>
-                  <View style={styles.modalHeader}>
-                    <View style={styles.modalHeaderTitleBox}>
-                      <Text style={styles.modalTitle}>{isEditingPost ? t('edit_post_title') : t('create_post_title')}</Text>
-                      <TouchableOpacity
-                        onPress={submitPost}
-                        disabled={!createPostText.trim() && !base64Image || isSubmittingPost}
-                        style={{ minWidth: s(80), alignItems: 'flex-end', paddingVertical: vs(10) }}
-                      >
-                        <View style={{ minWidth: s(30), alignItems: 'center', justifyContent: 'center', paddingRight: s(10) }}>
-                          {isSubmittingPost ? (
-                            <ActivityIndicator size="small" color="#1877F2" />
-                          ) : (
-                            <Text style={{
-                              color: (createPostText.trim() || base64Image) ? '#1877F2' : '#CCC',
-                              fontSize: ms(16),
-                              fontWeight: '400',
-                            }}>
-                              {isEditingPost ? t('update_post') : t('submit_post')}
-                            </Text>
-                          )}
-                        </View>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <ScrollView
-                    style={styles.createPostContent}
-                    contentContainerStyle={{ flexGrow: 1 }}
-                    keyboardShouldPersistTaps="handled"
-                  >
-                    <View style={styles.userInfoRow}>
-                      <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.commentAvatar} />
-                      <View style={{ flex: 1, marginLeft: s(12) }}>
-                        <Text style={styles.userNameInModal} numberOfLines={1}>{user?.name || t('user_default')}</Text>
-                      </View>
-                      
-                      <TouchableOpacity style={styles.tinyAttachBtn} onPress={pickImage}>
-                        <Ionicons name="image-outline" size={ms(26)} color="#1877F2" />
-                      </TouchableOpacity>
-                    </View>
-                    <TextInput
-                      style={styles.createPostInput}
-                      placeholder={t('post_placeholder')}
-                      placeholderTextColor="#999"
-                      multiline
-                      value={createPostText}
-                      onChangeText={setCreatePostText}
-                      scrollEnabled={false}
-                    />
+                  style={{ minWidth: s(80), alignItems: 'flex-start' }}
+                >
+                  <Ionicons name="arrow-back" size={ms(26)} color="#1A1A1A" />
+                </TouchableOpacity>
 
-                    {selectedImage && (
-                      <View style={[styles.previewImageContainer, keyboardHeight > 0 && { maxHeight: vs(250) }]}>
-                        <Image
-                          source={{ uri: selectedImage }}
-                          style={[styles.previewImage, { aspectRatio: imageRatio || 1 }]}
-                        />
-                        <TouchableOpacity 
-                          style={styles.removeImageBtn} 
-                          onPress={() => { 
-                            setSelectedImage(null); 
-                            setBase64Image(null); 
-                            setImageRatio(null); 
-                          }}
-                        >
-                          <Ionicons name="close-circle" size={ms(28)} color="rgba(0,0,0,0.6)" />
-                        </TouchableOpacity>
-                      </View>
+                <Text style={styles.modalTitle}>{isEditingPost ? t('edit_post_title') : t('create_post_title')}</Text>
+
+                <TouchableOpacity
+                  onPress={submitPost}
+                  disabled={!createPostText.trim() && !base64Image || isSubmittingPost}
+                  style={{ minWidth: s(80), alignItems: 'flex-end', paddingVertical: vs(5) }}
+                >
+                  <View style={{ minWidth: s(30), alignItems: 'center', justifyContent: 'center' }}>
+                    {isSubmittingPost ? (
+                      <ActivityIndicator size="small" color="#1877F2" />
+                    ) : (
+                      <Text style={{
+                        color: (createPostText.trim() || base64Image) ? '#1877F2' : '#CCC',
+                        fontSize: ms(16),
+                        fontWeight: '400',
+                      }}>
+                        {isEditingPost ? t('update_post') : t('submit_post')}
+                      </Text>
                     )}
-
-                    <View style={{ height: keyboardHeight > 0 ? vs(60) : vs(70) }} />
-                  </ScrollView>
-
-                  <View style={[styles.createPostActions, {
-                    paddingBottom: keyboardHeight > 0 ? vs(15) : (insets.bottom + vs(15)),
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0
-                  }]}>
-                    <View style={{ flex: 1 }} />
                   </View>
-                </Animated.View>
-                {/* Nền lót trắng để che đáy kể cả khi có khe hở */}
-                <View style={{ height: 100, backgroundColor: '#FFF', position: 'absolute', bottom: -100, left: 0, right: 0 }} />
+                </TouchableOpacity>
               </View>
-            </KeyboardAvoidingView>
+            </View>
+            <ScrollView
+              style={styles.createPostContent}
+              contentContainerStyle={{ flexGrow: 1 }}
+              keyboardShouldPersistTaps="handled"
+            >
+              <View style={styles.userInfoRow}>
+                <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.commentAvatar} />
+                <View style={{ flex: 1, marginLeft: s(12) }}>
+                  <Text style={styles.userNameInModal} numberOfLines={1}>{user?.name || t('user_default')}</Text>
+                </View>
+
+                <TouchableOpacity style={styles.tinyAttachBtn} onPress={pickImage}>
+                  <Ionicons name="image-outline" size={ms(26)} color="#1877F2" />
+                </TouchableOpacity>
+              </View>
+              <TextInput
+                style={styles.createPostInput}
+                placeholder={t('post_placeholder')}
+                placeholderTextColor="#999"
+                multiline
+                value={createPostText}
+                onChangeText={setCreatePostText}
+                scrollEnabled={false}
+              />
+
+              <View style={{ height: vs(30) }} />
+            </ScrollView>
+
+            {selectedImage && (
+              <View style={[styles.previewImageContainer, { marginBottom: keyboardHeight > 0 ? vs(15) : (insets.bottom > 0 ? insets.bottom + vs(10) : vs(20)) }, keyboardHeight > 0 && { maxHeight: vs(200) }]}>
+                <Image
+                  source={{ uri: selectedImage }}
+                  style={[styles.previewImage, { aspectRatio: imageRatio || 1, maxHeight: keyboardHeight > 0 ? vs(180) : vs(350) }]}
+                  resizeMode="cover"
+                />
+                <TouchableOpacity
+                  style={styles.removeImageBtn}
+                  onPress={() => {
+                    setSelectedImage(null);
+                    setBase64Image(null);
+                    setImageRatio(null);
+                  }}
+                >
+                  <Ionicons name="close-circle" size={ms(28)} color="rgba(0,0,0,0.6)" />
+                </TouchableOpacity>
+              </View>
+            )}
+
           </View>
         </View>
       </Modal>
@@ -831,85 +816,85 @@ export default function CommunityScreen() {
                     style={{ flex: 1 }}
                     contentContainerStyle={[styles.commentsList, { paddingBottom: vs(100) }]}
                     renderItem={({ item }) => {
-                  const isMyComment = user?.uid === item.userId;
-                  const displayCommentAvatar = (isMyComment && user?.avatar) ? user.avatar : item.avatar;
-                  const displayCommentName = (isMyComment && user?.name) ? user.name : item.user;
-                  const isReply = !!item.parentId;
+                      const isMyComment = user?.uid === item.userId;
+                      const displayCommentAvatar = (isMyComment && user?.avatar) ? user.avatar : item.avatar;
+                      const displayCommentName = (isMyComment && user?.name) ? user.name : item.user;
+                      const isReply = !!item.parentId;
 
-                  return (
-                    <View style={[styles.commentItem, isReply && { marginLeft: 45 }]}>
-                      <Image source={{ uri: displayCommentAvatar }} style={[styles.commentAvatar, isReply && { width: 32, height: 32 }]} />
-                      <View style={styles.commentBody}>
-                        <View style={styles.commentContentArea}>
-                        <View style={styles.commentUserRow}>
-                          <Text style={styles.commentUser} numberOfLines={0}>
-                            {displayCommentName}
-                            {isReply && item.parentId && (
-                              <Text style={{ fontWeight: 'normal' }}>
-                                {"  "}
-                                <Ionicons name="caret-forward-sharp" size={12} color="#666" />
-                                {"  "}
-                                <Text style={styles.repliedToUser}>
-                                  {comments.find(c => c.id === item.parentId)?.user || t('user_default')}
+                      return (
+                        <View style={[styles.commentItem, isReply && { marginLeft: 45 }]}>
+                          <Image source={{ uri: displayCommentAvatar }} style={[styles.commentAvatar, isReply && { width: 32, height: 32 }]} />
+                          <View style={styles.commentBody}>
+                            <View style={styles.commentContentArea}>
+                              <View style={styles.commentUserRow}>
+                                <Text style={styles.commentUser} numberOfLines={0}>
+                                  {displayCommentName}
+                                  {isReply && item.parentId && (
+                                    <Text style={{ fontWeight: 'normal' }}>
+                                      {"  "}
+                                      <Ionicons name="caret-forward-sharp" size={12} color="#666" />
+                                      {"  "}
+                                      <Text style={styles.repliedToUser}>
+                                        {comments.find(c => c.id === item.parentId)?.user || t('user_default')}
+                                      </Text>
+                                    </Text>
+                                  )}
                                 </Text>
-                              </Text>
-                            )}
-                          </Text>
+                              </View>
+                              <Text style={styles.commentText}>{item.text}</Text>
+                            </View>
+
+                            <View style={styles.commentFooter}>
+                              <Text style={styles.commentTime}>{item.time}</Text>
+                              <TouchableOpacity onPress={() => handleReply(item)} style={{ marginLeft: 12 }}>
+                                <Text style={styles.footerActionText}>{t('reply_action')}</Text>
+                              </TouchableOpacity>
+                              {isMyComment && (
+                                <TouchableOpacity onPress={() => handleDeleteComment(item.id)} style={{ marginLeft: 1 }}>
+                                  <Text style={styles.footerActionText}>{t('delete_action')}</Text>
+                                </TouchableOpacity>
+                              )}
+                            </View>
+                          </View>
                         </View>
-                        <Text style={styles.commentText}>{item.text}</Text>
-                      </View>
-
-                      <View style={styles.commentFooter}>
-                        <Text style={styles.commentTime}>{item.time}</Text>
-                        <TouchableOpacity onPress={() => handleReply(item)} style={{ marginLeft: 12 }}>
-                          <Text style={styles.footerActionText}>{t('reply_action')}</Text>
-                        </TouchableOpacity>
-                        {isMyComment && (
-                          <TouchableOpacity onPress={() => handleDeleteComment(item.id)} style={{ marginLeft: 1 }}>
-                            <Text style={styles.footerActionText}>{t('delete_action')}</Text>
-                          </TouchableOpacity>
-                        )}
-                      </View>
-                    </View>
-                  </View>
-                );
-              }}
-              ListEmptyComponent={<View style={{ paddingTop: 270, paddingHorizontal: 40, alignItems: 'center' }}><Text style={{ color: '#999' }}>{t('first_comment_msg')}</Text></View>}
-            />
-
-            {replyToName && (
-              <View style={styles.replyBar}>
-                <Text style={styles.replyBarText}>{t('replying_to')}: <Text style={{ fontWeight: '400' }}>{replyToName}</Text></Text>
-                <TouchableOpacity onPress={() => { setReplyToId(null); setReplyToName(null); setReplyToUserId(null); }}>
-                  <Ionicons name="close-circle" size={24} color="#FF3B30" />
-                </TouchableOpacity>
-              </View>
-            )}
-
-                <View style={[styles.commentInputContainer, {
-                  paddingBottom: keyboardHeight > 0 ? vs(15) : (insets.bottom + vs(15)),
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0
-                }]}>
-                  <TextInput
-                    ref={commentInputRef}
-                    style={styles.commentInput}
-                    placeholder={t('write_comment_placeholder')}
-                    value={commentText}
-                    onChangeText={setCommentText}
-                    multiline
+                      );
+                    }}
+                    ListEmptyComponent={<View style={{ paddingTop: 270, paddingHorizontal: 40, alignItems: 'center' }}><Text style={{ color: '#999' }}>{t('first_comment_msg')}</Text></View>}
                   />
-                  <TouchableOpacity style={styles.sendBtn} onPress={submitComment} disabled={!commentText.trim() || isAddingComment}>
-                    {isAddingComment ? <ActivityIndicator size="small" color="#1877F2" /> : <Ionicons name="send" size={25} color={commentText.trim() ? "#1877F2" : "#1877F2"} />}
-                  </TouchableOpacity>
-                </View>
-              </Animated.View>
-              {/* Nền lót trắng để che đáy kể cả khi có khe hở */}
-              <View style={{ height: 100, backgroundColor: '#FFF', position: 'absolute', bottom: -100, left: 0, right: 0 }} />
-            </View>
-          </KeyboardAvoidingView>
+
+                  {replyToName && (
+                    <View style={styles.replyBar}>
+                      <Text style={styles.replyBarText}>{t('replying_to')}: <Text style={{ fontWeight: '400' }}>{replyToName}</Text></Text>
+                      <TouchableOpacity onPress={() => { setReplyToId(null); setReplyToName(null); setReplyToUserId(null); }}>
+                        <Ionicons name="close-circle" size={24} color="#FF3B30" />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+
+                  <View style={[styles.commentInputContainer, {
+                    paddingBottom: keyboardHeight > 0 ? vs(15) : (insets.bottom + vs(15)),
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0
+                  }]}>
+                    <TextInput
+                      ref={commentInputRef}
+                      style={styles.commentInput}
+                      placeholder={t('write_comment_placeholder')}
+                      value={commentText}
+                      onChangeText={setCommentText}
+                      multiline
+                    />
+                    <TouchableOpacity style={styles.sendBtn} onPress={submitComment} disabled={!commentText.trim() || isAddingComment}>
+                      {isAddingComment ? <ActivityIndicator size="small" color="#1877F2" /> : <Ionicons name="send" size={25} color={commentText.trim() ? "#1877F2" : "#1877F2"} />}
+                    </TouchableOpacity>
+                  </View>
+                </Animated.View>
+                {/* Nền lót trắng để che đáy kể cả khi có khe hở */}
+                <View style={{ height: 100, backgroundColor: '#FFF', position: 'absolute', bottom: -100, left: 0, right: 0 }} />
+              </View>
+            </KeyboardAvoidingView>
           </View>
         </View>
       </Modal>
@@ -1056,7 +1041,7 @@ const styles = StyleSheet.create({
   modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: ms(30), borderTopRightRadius: ms(30), overflow: 'hidden' },
   modalHeader: { alignItems: 'center', paddingVertical: vs(12) },
   modalHandle: { width: s(40), height: vs(5), borderRadius: s(3), backgroundColor: '#E0E0E0', marginBottom: vs(10) },
-  modalHeaderTitleBox: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: s(20), marginBottom: vs(10) },
+  modalHeaderTitleBox: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: s(20), marginBottom: vs(0) },
   modalTitle: { fontSize: ms(18), fontWeight: '400', color: '#1A1A1A' },
   commentAvatar: { width: s(36), height: s(36), borderRadius: s(18), backgroundColor: '#F0F0F0' },
   commentsList: { paddingHorizontal: s(20), paddingBottom: vs(20) },
@@ -1075,10 +1060,10 @@ const styles = StyleSheet.create({
   replyBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8F9FA', paddingHorizontal: s(20), paddingVertical: vs(8), borderTopWidth: 1, borderTopColor: '#EEE' },
   replyBarText: { fontSize: ms(14), color: '#666', flex: 1, marginRight: s(10) },
   sendBtn: { marginLeft: s(10), width: s(45), height: s(45), justifyContent: 'center', alignItems: 'center' },
-  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: vs(50) },
+  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: vs(270) },
   emptyText: { marginTop: vs(35), fontSize: ms(16), color: '#999', fontWeight: '400' },
   createPostContent: { flexGrow: 1 },
-  userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(20), paddingHorizontal: s(20), paddingTop: vs(10) },
+  userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(15), paddingHorizontal: s(20), paddingTop: vs(5) },
   userNameInModal: { fontSize: ms(17), fontWeight: '400', color: '#1A1A1A' },
   thumbnailWrapper: { position: 'relative', width: s(45), height: s(45) },
   thumbnailPreview: { width: s(45), height: s(45), borderRadius: ms(8), backgroundColor: '#F0F0F0' },
