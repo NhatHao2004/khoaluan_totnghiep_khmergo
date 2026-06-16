@@ -681,100 +681,123 @@ export default function CommunityScreen() {
       {/* Modal: Tạo/Sửa bài viết */}
       <Modal animationType="slide" transparent={false} statusBarTranslucent={true} visible={isCreateModalVisible} onRequestClose={() => setCreateModalVisible(false)}>
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
-          <View style={[
-            styles.modalContent,
-            {
-              flex: 1,
-              backgroundColor: '#FFF',
-              borderTopLeftRadius: 0,
-              borderTopRightRadius: 0,
-              paddingTop: Platform.OS === 'ios' ? (insets.top + vs(3)) : (insets.top > 0 ? insets.top + vs(3) : vs(20)),
-            }
-          ]}>
-            <View style={styles.modalHeader}>
-              <View style={styles.modalHeaderTitleBox}>
-                <TouchableOpacity
-                  onPress={() => {
-                    Keyboard.dismiss();
-                    setCreateModalVisible(false);
-                  }}
-                  style={{ minWidth: s(80), alignItems: 'flex-start' }}
-                >
-                  <Ionicons name="arrow-back" size={ms(26)} color="#1A1A1A" />
-                </TouchableOpacity>
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? vs(0) : 0}
+          >
+            <View style={[
+              styles.modalContent,
+              {
+                flex: 1,
+                backgroundColor: '#FFF',
+                borderTopLeftRadius: 0,
+                borderTopRightRadius: 0,
+                paddingTop: Platform.OS === 'ios' ? (insets.top + vs(3)) : (insets.top > 0 ? insets.top + vs(3) : vs(20)),
+              }
+            ]}>
+              <View style={styles.modalHeader}>
+                <View style={styles.modalHeaderTitleBox}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      Keyboard.dismiss();
+                      setCreateModalVisible(false);
+                    }}
+                    style={{ minWidth: s(80), alignItems: 'flex-start' }}
+                  >
+                    <Ionicons name="arrow-back" size={ms(26)} color="#1A1A1A" />
+                  </TouchableOpacity>
 
-                <Text style={styles.modalTitle}>{isEditingPost ? t('edit_post_title') : t('create_post_title')}</Text>
+                  <Text style={styles.modalTitle}>{isEditingPost ? t('edit_post_title') : t('create_post_title')}</Text>
 
-                <TouchableOpacity
-                  onPress={submitPost}
-                  disabled={!createPostText.trim() && !base64Image || isSubmittingPost}
-                  style={{ minWidth: s(80), alignItems: 'flex-end', paddingVertical: vs(5) }}
+                  <TouchableOpacity
+                    onPress={submitPost}
+                    disabled={!createPostText.trim() && !base64Image || isSubmittingPost}
+                    style={{ minWidth: s(80), alignItems: 'flex-end', paddingVertical: vs(5) }}
+                  >
+                    <View style={{ minWidth: s(30), alignItems: 'center', justifyContent: 'center' }}>
+                      {isSubmittingPost ? (
+                        <ActivityIndicator size="small" color="#1877F2" />
+                      ) : (
+                        <Text style={{
+                          color: (createPostText.trim() || base64Image) ? '#1877F2' : '#CCC',
+                          fontSize: ms(16),
+                          fontWeight: '400',
+                        }}>
+                          {isEditingPost ? t('update_post') : t('submit_post')}
+                        </Text>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <ScrollView
+                  style={[styles.createPostContent, { flex: 1 }]}
+                  contentContainerStyle={{ flexGrow: 1 }}
+                  keyboardShouldPersistTaps="handled"
+                  showsVerticalScrollIndicator={false}
                 >
-                  <View style={{ minWidth: s(30), alignItems: 'center', justifyContent: 'center' }}>
-                    {isSubmittingPost ? (
-                      <ActivityIndicator size="small" color="#1877F2" />
-                    ) : (
-                      <Text style={{
-                        color: (createPostText.trim() || base64Image) ? '#1877F2' : '#CCC',
-                        fontSize: ms(16),
-                        fontWeight: '400',
-                      }}>
-                        {isEditingPost ? t('update_post') : t('submit_post')}
-                      </Text>
-                    )}
+                  <View style={styles.userInfoRow}>
+                    <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.commentAvatar} />
+                    <View style={{ flex: 1, marginLeft: s(12) }}>
+                      <Text style={styles.userNameInModal} numberOfLines={1}>{user?.name || t('user_default')}</Text>
+                    </View>
+
+                    <TouchableOpacity style={styles.tinyAttachBtn} onPress={pickImage}>
+                      <Ionicons name="image-outline" size={ms(26)} color="#1877F2" />
+                    </TouchableOpacity>
                   </View>
-                </TouchableOpacity>
+                  <TextInput
+                    style={styles.createPostInput}
+                    placeholder={t('post_placeholder')}
+                    placeholderTextColor="#999"
+                    multiline
+                    value={createPostText}
+                    onChangeText={setCreatePostText}
+                    scrollEnabled={false}
+                  />
+
+                  <View style={{ height: vs(30) }} />
+                </ScrollView>
+
+                {selectedImage && (
+                  <View style={[
+                    styles.previewImageContainer,
+                    {
+                      marginBottom: keyboardHeight > 0
+                        ? vs(20)
+                        : (insets.bottom > 0 ? insets.bottom + vs(10) : vs(20)),
+                      maxHeight: keyboardHeight > 0 ? vs(220) : vs(400)
+                    }
+                  ]}>
+                    <Image
+                      source={{ uri: selectedImage }}
+                      style={[
+                        styles.previewImage,
+                        {
+                          aspectRatio: imageRatio || 1,
+                          maxHeight: keyboardHeight > 0 ? vs(200) : vs(380)
+                        }
+                      ]}
+                      resizeMode="cover"
+                    />
+                    <TouchableOpacity
+                      style={styles.removeImageBtn}
+                      onPress={() => {
+                        setSelectedImage(null);
+                        setBase64Image(null);
+                        setImageRatio(null);
+                      }}
+                    >
+                      <Ionicons name="close-circle" size={ms(28)} color="rgba(0,0,0,0.6)" />
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             </View>
-            <ScrollView
-              style={styles.createPostContent}
-              contentContainerStyle={{ flexGrow: 1 }}
-              keyboardShouldPersistTaps="handled"
-            >
-              <View style={styles.userInfoRow}>
-                <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.commentAvatar} />
-                <View style={{ flex: 1, marginLeft: s(12) }}>
-                  <Text style={styles.userNameInModal} numberOfLines={1}>{user?.name || t('user_default')}</Text>
-                </View>
-
-                <TouchableOpacity style={styles.tinyAttachBtn} onPress={pickImage}>
-                  <Ionicons name="image-outline" size={ms(26)} color="#1877F2" />
-                </TouchableOpacity>
-              </View>
-              <TextInput
-                style={styles.createPostInput}
-                placeholder={t('post_placeholder')}
-                placeholderTextColor="#999"
-                multiline
-                value={createPostText}
-                onChangeText={setCreatePostText}
-                scrollEnabled={false}
-              />
-
-              <View style={{ height: vs(30) }} />
-            </ScrollView>
-
-            {selectedImage && (
-              <View style={[styles.previewImageContainer, { marginBottom: keyboardHeight > 0 ? vs(15) : (insets.bottom > 0 ? insets.bottom + vs(10) : vs(20)) }, keyboardHeight > 0 && { maxHeight: vs(200) }]}>
-                <Image
-                  source={{ uri: selectedImage }}
-                  style={[styles.previewImage, { aspectRatio: imageRatio || 1, maxHeight: keyboardHeight > 0 ? vs(180) : vs(350) }]}
-                  resizeMode="cover"
-                />
-                <TouchableOpacity
-                  style={styles.removeImageBtn}
-                  onPress={() => {
-                    setSelectedImage(null);
-                    setBase64Image(null);
-                    setImageRatio(null);
-                  }}
-                >
-                  <Ionicons name="close-circle" size={ms(28)} color="rgba(0,0,0,0.6)" />
-                </TouchableOpacity>
-              </View>
-            )}
-
-          </View>
+          </KeyboardAvoidingView>
         </View>
       </Modal>
 
@@ -1060,7 +1083,7 @@ const styles = StyleSheet.create({
   replyBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8F9FA', paddingHorizontal: s(20), paddingVertical: vs(8), borderTopWidth: 1, borderTopColor: '#EEE' },
   replyBarText: { fontSize: ms(14), color: '#666', flex: 1, marginRight: s(10) },
   sendBtn: { marginLeft: s(10), width: s(45), height: s(45), justifyContent: 'center', alignItems: 'center' },
-  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: vs(270) },
+  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: vs(80) },
   emptyText: { marginTop: vs(35), fontSize: ms(16), color: '#999', fontWeight: '400' },
   createPostContent: { flexGrow: 1 },
   userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(15), paddingHorizontal: s(20), paddingTop: vs(5) },
