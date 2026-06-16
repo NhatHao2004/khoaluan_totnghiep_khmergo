@@ -1083,7 +1083,7 @@ const styles = StyleSheet.create({
   replyBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8F9FA', paddingHorizontal: s(20), paddingVertical: vs(8), borderTopWidth: 1, borderTopColor: '#EEE' },
   replyBarText: { fontSize: ms(14), color: '#666', flex: 1, marginRight: s(10) },
   sendBtn: { marginLeft: s(10), width: s(45), height: s(45), justifyContent: 'center', alignItems: 'center' },
-  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: vs(80) },
+  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: vs(65) },
   emptyText: { marginTop: vs(35), fontSize: ms(16), color: '#999', fontWeight: '400' },
   createPostContent: { flexGrow: 1 },
   userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(15), paddingHorizontal: s(20), paddingTop: vs(5) },

@@ -173,7 +173,7 @@ export default function TabsLayout() {
           tabBarLabelStyle: {
             fontSize: ms(11),
             fontWeight: '400',
-            marginTop: vs(8),
+            marginTop: vs(2),
           }
         }}>
         <Tabs.Screen
