@@ -14,6 +14,7 @@ import {
   Dimensions,
   Image,
   Keyboard,
+  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
@@ -287,6 +288,11 @@ export default function AIAssistantScreen() {
 
   return (
     <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+        keyboardVerticalOffset={0}
+      >
 
       {/* Header */}
       <View style={styles.header}>
@@ -397,12 +403,13 @@ export default function AIAssistantScreen() {
                 </View>
               ))}
             </ScrollView>
+
             <View style={[
               styles.inputContainer,
               {
                 paddingBottom: keyboardHeight > 0
-                  ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom + 10 : keyboardHeight)
-                  : (insets.bottom + 15)
+                  ? vs(12)
+                  : (insets.bottom + vs(15))
               }
             ]}>
               <TextInput
@@ -513,7 +520,8 @@ export default function AIAssistantScreen() {
             )}
           </View>
         )}
-      </View>
+        </View>
+      </KeyboardAvoidingView>
       {showToast && (
         <Animated.View style={[
           styles.toastContainer,

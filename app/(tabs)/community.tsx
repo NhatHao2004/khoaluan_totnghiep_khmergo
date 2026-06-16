@@ -703,19 +703,21 @@ export default function CommunityScreen() {
                       Keyboard.dismiss();
                       setCreateModalVisible(false);
                     }}
-                    style={{ minWidth: s(80), alignItems: 'flex-start' }}
+                    style={{ width: s(90), alignItems: 'flex-start', justifyContent: 'center' }}
                   >
                     <Ionicons name="arrow-back" size={ms(26)} color="#1A1A1A" />
                   </TouchableOpacity>
 
-                  <Text style={styles.modalTitle}>{isEditingPost ? t('edit_post_title') : t('create_post_title')}</Text>
+                  <Text style={[styles.modalTitle, { flex: 1, textAlign: 'center' }]} numberOfLines={1}>
+                    {isEditingPost ? t('edit_post_title') : t('create_post_title')}
+                  </Text>
 
                   <TouchableOpacity
                     onPress={submitPost}
-                    disabled={!createPostText.trim() && !base64Image || isSubmittingPost}
-                    style={{ minWidth: s(80), alignItems: 'flex-end', paddingVertical: vs(5) }}
+                    disabled={(!createPostText.trim() && !base64Image) || isSubmittingPost}
+                    style={{ width: s(90), alignItems: 'flex-end', justifyContent: 'center' }}
                   >
-                    <View style={{ minWidth: s(30), alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={{ height: vs(30), justifyContent: 'center' }}>
                       {isSubmittingPost ? (
                         <ActivityIndicator size="small" color="#1877F2" />
                       ) : (
