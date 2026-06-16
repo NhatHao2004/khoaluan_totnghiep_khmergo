@@ -294,7 +294,7 @@ export default function ProfileScreen() {
               <View style={styles.logoutIconCircle}>
                 <Ionicons name="log-out-outline" size={ms(34)} color="#FF4D4D" />
               </View>
-              <Text style={styles.logoutMsg}>{t('logout_confirm_msg')}</Text>
+              <Text style={styles.logoutMsg} numberOfLines={1} adjustsFontSizeToFit>{t('logout_confirm_msg')}</Text>
             </View>
 
             <View style={styles.logoutActionRow}>
@@ -451,9 +451,8 @@ const styles = StyleSheet.create({
     fontSize: ms(17),
     color: '#1e293b',
     textAlign: 'center',
-    lineHeight: ms(26),
     fontWeight: '400',
-    paddingHorizontal: s(10),
+    paddingHorizontal: s(15), // Slightly more padding for better look on one line
   },
   logoutActionRow: {
     gap: vs(12),
