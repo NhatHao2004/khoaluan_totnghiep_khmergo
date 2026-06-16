@@ -1,9 +1,8 @@
-import { db } from '@/utils/firebaseConfig';
-import { doc, setDoc, getDoc, Timestamp } from 'firebase/firestore';
+import { db, auth } from '@/utils/firebaseConfig';
+import { doc, setDoc, getDoc, Timestamp, collection, query, where, getDocs } from 'firebase/firestore';
 
 /**
  * Service xử lý gửi OTP và xác thực mã qua REST API của EmailJS
- * Cách này ổn định nhất cho Mobile vì không phụ thuộc vào thư viện bên ngoài.
  */
 
 const EMAILJS_SERVICE_ID = 'service_q6cuf7b';
@@ -11,6 +10,19 @@ const EMAILJS_TEMPLATE_ID = 'template_xpgn4j3';
 const EMAILJS_PUBLIC_KEY = 'R_23JTyESZpodGdBB';
 
 export const EmailService = {
+  // 0. Kiểm tra Email đã tồn tại trong hệ thống chưa
+  checkEmailExists: async (email: string) => {
+    try {
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('email', '==', email.toLowerCase().trim()));
+      const querySnapshot = await getDocs(q);
+      return !querySnapshot.empty;
+    } catch (error) {
+      console.error('Lỗi kiểm tra email:', error);
+      return false;
+    }
+  },
+
   // 1. Tạo mã OTP ngẫu nhiên 6 chữ số
   generateOTP: () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
@@ -18,7 +30,7 @@ export const EmailService = {
 
   // 2. Lưu OTP vào Firestore để xác thực sau này
   saveOTP: async (email: string, otp: string) => {
-    const otpRef = doc(db, 'temp_otps', email.toLowerCase());
+    const otpRef = doc(db, 'temp_otps', email.toLowerCase().trim());
     await setDoc(otpRef, {
       otp,
       createdAt: Timestamp.now(),
@@ -35,7 +47,7 @@ export const EmailService = {
         user_id: EMAILJS_PUBLIC_KEY,
         template_params: {
           to_email: email,
-          otp_code: otp, // Tên biến này phải khớp với {{otp_code}} trong Template
+          otp_code: otp,
         },
       };
 
@@ -43,19 +55,12 @@ export const EmailService = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Origin': 'http://localhost' // EmailJS yêu cầu Origin này khi gửi từ Mobile
+          'Origin': 'http://localhost'
         },
         body: JSON.stringify(data),
       });
 
-      if (response.ok) {
-        console.log('EmailJS REST API Success');
-        return true;
-      } else {
-        const errText = await response.text();
-        console.error('EmailJS REST API Error:', errText);
-        return false;
-      }
+      return response.ok;
     } catch (error) {
       console.error('Lỗi kết nối tới EmailJS:', error);
       return false;
@@ -64,7 +69,7 @@ export const EmailService = {
 
   // 4. Kiểm tra OTP người dùng nhập vào
   verifyOTP: async (email: string, inputOtp: string) => {
-    const otpRef = doc(db, 'temp_otps', email.toLowerCase());
+    const otpRef = doc(db, 'temp_otps', email.toLowerCase().trim());
     const snap = await getDoc(otpRef);
     
     if (!snap.exists()) return { success: false, msg: 'Mã xác thực không tồn tại' };
