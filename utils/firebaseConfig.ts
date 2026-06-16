@@ -22,15 +22,15 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 export const db = getFirestore(app);
 setLogLevel('silent');
 
-// Khởi tạo Auth với persistence (chỉ khởi tạo nếu chưa có instance nào để tránh lỗi Reload)
+// Khởi tạo Auth với persistence (Đảm bảo khởi tạo với persistence trước)
 export const auth = (() => {
   try {
-    return getAuth(app);
-  } catch (e) {
     // @ts-ignore
     return initializeAuth(app, {
       persistence: getReactNativePersistence(ReactNativeAsyncStorage),
     });
+  } catch (e) {
+    return getAuth(app);
   }
 })();
 
