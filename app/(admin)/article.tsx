@@ -374,10 +374,10 @@ const ArticleManagement = () => {
             <View style={[styles.confirmIconBg, { backgroundColor: '#fff1f2' }]}>
               <Ionicons name="chatbubble-ellipses" size={ms(32)} color="#ef4444" />
             </View>
-            <Text style={styles.confirmTitle}>Xóa bình luận</Text>
-            <Text style={styles.confirmSubText}>Bạn chắc muốn xóa bình luận này</Text>
+            <Text style={styles.confirmTitle} numberOfLines={1} adjustsFontSizeToFit>Xóa bình luận</Text>
+            <Text style={styles.confirmSubText} numberOfLines={1} adjustsFontSizeToFit>Bạn chắc muốn xóa bình luận này</Text>
             <View style={styles.modalActions}>
-              <TouchableOpacity style={[styles.cancelBtn, { backgroundColor: '#94a3b8' }]} onPress={() => setCommentDeleteConfirmVisible(false)}>
+              <TouchableOpacity style={[styles.cancelBtn, { backgroundColor: '#006affff' }]} onPress={() => setCommentDeleteConfirmVisible(false)}>
                 <Text style={styles.btnText}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.saveBtnSmall, { backgroundColor: '#ef4444' }]} onPress={confirmDeleteComment}>
@@ -396,9 +396,9 @@ const ArticleManagement = () => {
               <Ionicons name="trash" size={ms(32)} color="#ef4444" />
             </View>
             <Text style={styles.confirmTitle} numberOfLines={1} adjustsFontSizeToFit>Xác nhận xóa</Text>
-            <Text style={styles.confirmSubText}>Bài đăng của {pendingDelete?.user} sẽ được chuyển vào thùng rác</Text>
+            <Text style={styles.confirmSubText} numberOfLines={1} adjustsFontSizeToFit>Bài đăng sẽ được chuyển vào thùng rác</Text>
             <View style={styles.modalActions}>
-              <TouchableOpacity style={[styles.cancelBtn, { backgroundColor: '#94a3b8' }]} onPress={() => setDeleteConfirmVisible(false)}>
+              <TouchableOpacity style={[styles.cancelBtn, { backgroundColor: '#006affff' }]} onPress={() => setDeleteConfirmVisible(false)}>
                 <Text style={styles.btnText}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.saveBtnSmall, { backgroundColor: '#ef4444' }]} onPress={confirmDelete}>

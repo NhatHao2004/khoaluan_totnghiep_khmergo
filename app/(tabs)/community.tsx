@@ -448,6 +448,7 @@ export default function CommunityScreen() {
     if (!user || !commentText.trim() || !activePostId) return;
     setIsAddingComment(true);
     const currentComment = commentText.trim();
+    const currentPostId = activePostId; // Capture ID consistently
 
     // Capture reply state BEFORE clearing (for notification logic)
     const capturedReplyToId = replyToId;
@@ -472,11 +473,13 @@ export default function CommunityScreen() {
 
       // Run Firestore updates in parallel
       await Promise.all([
-        Firestore.addDoc(Firestore.collection(db, 'posts', activePostId, 'comments'), commentData),
-        Firestore.updateDoc(Firestore.doc(db, 'posts', activePostId), {
+        Firestore.addDoc(Firestore.collection(db, 'posts', currentPostId, 'comments'), commentData),
+        Firestore.updateDoc(Firestore.doc(db, 'posts', currentPostId), {
           comments: Firestore.increment(1)
         })
       ]);
+
+      triggerToast(t('comment_success'));
 
       // Scroll to bottom after adding comment
       setTimeout(() => {
@@ -484,16 +487,17 @@ export default function CommunityScreen() {
       }, 500);
 
       // Background notification logic (uses captured values, not cleared state)
-      const postSnap = await Firestore.getDoc(Firestore.doc(db, 'posts', activePostId));
+      const postSnap = await Firestore.getDoc(Firestore.doc(db, 'posts', currentPostId));
       if (postSnap.exists()) {
         const postData = postSnap.data();
         if (capturedReplyToId && capturedReplyToUserId) {
-          sendNotification(capturedReplyToUserId, 'reply', activePostId, `${t('someone_replied')}: "${currentComment.substring(0, 30)}..."`);
+          sendNotification(capturedReplyToUserId, 'reply', currentPostId, `${t('someone_replied')}: "${currentComment.substring(0, 30)}..."`);
         } else {
-          sendNotification(postData.userId, 'comment', activePostId, `${t('someone_commented')}: "${currentComment.substring(0, 30)}..."`);
+          sendNotification(postData.userId, 'comment', currentPostId, `${t('someone_commented')}: "${currentComment.substring(0, 30)}..."`);
         }
       }
     } catch (error) {
+      console.error("Submit comment error:", error);
       triggerToast(t('action_failed'), "error");
       // Re-set text if error so user doesn't lose it
       setCommentText(currentComment);
@@ -866,7 +870,7 @@ export default function CommunityScreen() {
                   </View>
                 );
               }}
-              ListEmptyComponent={<View style={{ paddingTop: 215, paddingHorizontal: 40, alignItems: 'center' }}><Text style={{ color: '#999' }}>{t('first_comment_msg')}</Text></View>}
+              ListEmptyComponent={<View style={{ paddingTop: 260, paddingHorizontal: 40, alignItems: 'center' }}><Text style={{ color: '#999' }}>{t('first_comment_msg')}</Text></View>}
             />
 
             {replyToName && (

@@ -582,19 +582,19 @@ export default function HomeScreen() {
                   >
                     <View style={[
                       styles.nIcon,
-                      { backgroundColor: item.type === 'reply' ? '#E0F2FE' : item.type === 'quiz' ? '#FEF3C7' : item.type === 'like' ? '#FEE2E2' : '#F0FDF4' }
+                      { backgroundColor: !item.isRead ? '#FEE2E2' : '#F0FDF4' }
                     ]}>
                       <Ionicons
-                        name={item.type === 'reply' ? 'chatbubble-ellipses-outline' : item.type === 'quiz' ? 'game-controller-outline' : item.type === 'like' ? 'heart-outline' : 'notifications-outline'}
+                        name={!item.isRead ? 'notifications' : 'notifications-outline'}
                         size={20}
-                        color={item.type === 'reply' ? '#007AFF' : item.type === 'quiz' ? '#D97706' : item.type === 'like' ? '#EF4444' : '#10B981'}
+                        color={!item.isRead ? '#EF4444' : '#10B981'}
                       />
                     </View>
                     <View style={styles.nContent}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <View style={{ flex: 1, marginRight: s(10) }}>
                           <Text style={styles.nItemTitle} numberOfLines={2}>
-                            <Text style={{ fontWeight: '400' }}>{item.fromUserName}</Text> {t(item.message)}
+                            <Text style={[{ fontWeight: '400' }, item.type === 'reply' && { color: '#EF4444' }]}>{item.fromUserName}</Text> {t(item.message)}
                           </Text>
                         </View>
                         {deletingId === item.id ? (

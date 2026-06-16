@@ -1,7 +1,7 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import React, { memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Dimensions, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
@@ -228,6 +228,19 @@ const AdminDashboard = () => {
         adminReply: quickReply.trim(),
         repliedAt: new Date()
       });
+
+      // Gửi thông báo cho người dùng
+      if (selectedFeedback.userId) {
+        await addDoc(collection(db, 'notifications'), {
+          toUserId: selectedFeedback.userId,
+          fromUserId: user?.uid,
+          fromUserName: 'Quản trị viên',
+          type: 'reply',
+          message: 'feedback_replied_notif',
+          createdAt: new Date(),
+          isRead: false
+        });
+      }
 
       triggerToast('Đã gửi phản hồi thành công', 'success');
       setQuickReply('');

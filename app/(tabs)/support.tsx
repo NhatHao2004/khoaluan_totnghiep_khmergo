@@ -266,7 +266,7 @@ export default function SupportScreen() {
                   {(item.adminReply || item.reply || item.response) && (
                     <View style={styles.systemReplyBox}>
                       <View style={styles.systemReplyHeader}>
-                        <Ionicons name="chatbubble-ellipses" size={16} color="#0284C7" />
+                        <Ionicons name="chatbubble-ellipses" size={16} color="#EF4444" />
                         <Text style={styles.systemReplyTitle}>{t('system_reply')}</Text>
                       </View>
                       <Text style={[styles.systemReplyText, language === 'km' && { textAlign: 'left' }]}>
@@ -503,9 +503,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginTop: 14,
     borderLeftWidth: 4,
-    borderLeftColor: '#3b82f6',
+    borderLeftColor: '#EF4444',
     borderWidth: 1,
-    borderColor: '#dbeafe',
+    borderColor: '#FEE2E2',
   },
   systemReplyHeader: {
     flexDirection: 'row',
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
   systemReplyTitle: {
     fontSize: 13,
     fontWeight: '400',
-    color: '#0369A1',
+    color: '#EF4444',
     textTransform: 'uppercase',
   },
   systemReplyText: {
