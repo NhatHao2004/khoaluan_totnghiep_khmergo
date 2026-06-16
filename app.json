@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "KhmerGo",
-    "slug": "my-app",
+    "slug": "khmergo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -17,7 +17,6 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.haonhatlam.myapp",
-      "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "resize"
     },
     "web": {
@@ -53,6 +52,6 @@
         "projectId": "f0d6376a-928b-4e75-8a1a-fc33437b0cba"
       }
     },
-    "owner": "haonhatlam"
+    "owner": "lamhao"
   }
 }

@@ -88,3 +88,5 @@ export const EmailService = {
     return { success: true };
   }
 };
+
+export default {};

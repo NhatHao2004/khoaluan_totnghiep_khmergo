@@ -3,12 +3,15 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { auth } from '@/utils/firebaseConfig';
 import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
+
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
+import { WebView } from 'react-native-webview';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -22,9 +25,6 @@ import {
   TouchableWithoutFeedback,
   View
 } from 'react-native';
-import * as Google from 'expo-auth-session/providers/google';
-import * as WebBrowser from 'expo-web-browser';
-import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -36,7 +36,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmailService } from './services/email-service';
 
-WebBrowser.maybeCompleteAuthSession();
+
 
 export default function LoginScreen() {
   const { t } = useLanguage();
@@ -68,34 +68,7 @@ export default function LoginScreen() {
   const toastY = useSharedValue(-120);
   const waveRotation = useSharedValue(0);
 
-  // Google Login Hook
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    webClientId: '836552819344-cngj0c6hlc6qtf56ta25k95gjnvvrur0.apps.googleusercontent.com',
-    iosClientId: '836552819344-cngj0c6hlc6qtf56ta25k95gjnvvrur0.apps.googleusercontent.com', // Dùng tạm Web ID cho môi trường Expo
-    androidClientId: '836552819344-cngj0c6hlc6qtf56ta25k95gjnvvrur0.apps.googleusercontent.com',
-  });
 
-  React.useEffect(() => {
-    const handleGoogleResponse = async () => {
-      if (response?.type === 'success') {
-        const { id_token } = response.params;
-        setLoading(true);
-        try {
-          const credential = GoogleAuthProvider.credential(id_token);
-          await signInWithCredential(auth, credential);
-          await refreshUser();
-          triggerToast(t('login_success'), 'success');
-          router.replace('/(tabs)');
-        } catch (error) {
-          console.error('Google Sign-In Error:', error);
-          triggerToast(t('update_failed'), 'error');
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-    handleGoogleResponse();
-  }, [response]);
 
   React.useEffect(() => {
     waveRotation.value = withRepeat(
@@ -345,33 +318,16 @@ export default function LoginScreen() {
               </LinearGradient>
             </TouchableOpacity>
 
-            <View style={styles.socialFooter}>
-              <View style={styles.dividerBox}>
-                <View style={styles.dividerLine} />
-                <Text style={styles.dividerText}>{t('use_other_account')}</Text>
-                <View style={styles.dividerLine} />
-              </View>
 
-              <View style={styles.socialIconsRow}>
-                <TouchableOpacity 
-                  style={[styles.socialCircle, { backgroundColor: '#FF5A5F' }]}
-                  onPress={() => promptAsync()}
-                  disabled={!request || loading}
-                >
-                  <Ionicons name="logo-google" size={ms(24)} color="#FFF" />
-                </TouchableOpacity>
-
-              </View>
-            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
 
       {/* Forgot Password Modal */}
       <Modal visible={forgotModalVisible} transparent animationType="fade" statusBarTranslucent onRequestClose={() => setForgotModalVisible(false)}>
-        <TouchableOpacity 
-          style={styles.modalOverlay} 
-          activeOpacity={1} 
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
           onPress={() => { setForgotModalVisible(false); setModalError(''); }}
         >
           <KeyboardAvoidingView
@@ -381,85 +337,85 @@ export default function LoginScreen() {
           >
             <TouchableWithoutFeedback>
               <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>{t('reset_password')}</Text>
-                <TouchableOpacity onPress={() => { setForgotModalVisible(false); setModalError(''); }}>
-                  <Ionicons name="close" size={24} color="#64748B" />
-                </TouchableOpacity>
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalTitle}>{t('reset_password')}</Text>
+                  <TouchableOpacity onPress={() => { setForgotModalVisible(false); setModalError(''); }}>
+                    <Ionicons name="close" size={24} color="#64748B" />
+                  </TouchableOpacity>
+                </View>
+
+                {forgotStep === 1 && (
+                  <View style={styles.modalBody}>
+                    <Text style={styles.modalDesc} numberOfLines={1} adjustsFontSizeToFit>{t('enter_email_desc')}</Text>
+                    {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
+                    <View style={styles.modalInputWrapper}>
+                      <Ionicons name="mail-outline" size={ms(20)} color="#94A3B8" />
+                      <TextInput
+                        style={styles.modalInput}
+                        placeholder="example@gmail.com"
+                        value={forgotEmail}
+                        onChangeText={(txt) => { setForgotEmail(txt); setModalError(''); }}
+                        autoCapitalize="none"
+                        keyboardType="email-address"
+                      />
+                    </View>
+                    <TouchableOpacity style={styles.modalActionBtn} onPress={handleRequestCode} disabled={forgotLoading}>
+                      <LinearGradient colors={['#10B981', '#059669']} style={styles.modalActionGradient}>
+                        {forgotLoading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.modalActionText}>{t('send_code')}</Text>}
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                {forgotStep === 2 && (
+                  <View style={styles.modalBody}>
+                    <Text style={styles.modalDesc}>{t('enter_otp_desc')}</Text>
+                    {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
+                    <View style={styles.modalInputWrapper}>
+                      <Ionicons name="keypad-outline" size={ms(20)} color="#94A3B8" />
+                      <TextInput
+                        style={styles.modalInput}
+                        placeholder="Mã xác thực của bạn..."
+                        value={otpCode}
+                        onChangeText={(txt) => { setOtpCode(txt); setModalError(''); }}
+                        keyboardType="number-pad"
+                        maxLength={6}
+                      />
+                    </View>
+                    <TouchableOpacity style={styles.modalActionBtn} onPress={handleVerifyOTP} disabled={forgotLoading}>
+                      <LinearGradient colors={['#10B981', '#059669']} style={styles.modalActionGradient}>
+                        {forgotLoading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.modalActionText}>{t('verify_code')}</Text>}
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                {forgotStep === 3 && (
+                  <View style={styles.modalBody}>
+                    <Text style={styles.modalDesc}>{t('new_password_desc')}</Text>
+                    {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
+                    <View style={styles.modalInputWrapper}>
+                      <Ionicons name="lock-closed-outline" size={ms(20)} color="#94A3B8" />
+                      <TextInput
+                        style={styles.modalInput}
+                        placeholder={t('new_password')}
+                        value={newPassword}
+                        onChangeText={(txt) => { setNewPassword(txt); setModalError(''); }}
+                        secureTextEntry
+                      />
+                    </View>
+                    <TouchableOpacity style={styles.modalActionBtn} onPress={handleResetPassword}>
+                      <LinearGradient colors={['#10B981', '#059669']} style={styles.modalActionGradient}>
+                        <Text style={styles.modalActionText}>{t('save').toUpperCase()}</Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
-
-              {forgotStep === 1 && (
-                <View style={styles.modalBody}>
-                  <Text style={styles.modalDesc} numberOfLines={1} adjustsFontSizeToFit>{t('enter_email_desc')}</Text>
-                  {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
-                  <View style={styles.modalInputWrapper}>
-                    <Ionicons name="mail-outline" size={ms(20)} color="#94A3B8" />
-                    <TextInput
-                      style={styles.modalInput}
-                      placeholder="example@gmail.com"
-                      value={forgotEmail}
-                      onChangeText={(txt) => { setForgotEmail(txt); setModalError(''); }}
-                      autoCapitalize="none"
-                      keyboardType="email-address"
-                    />
-                  </View>
-                  <TouchableOpacity style={styles.modalActionBtn} onPress={handleRequestCode} disabled={forgotLoading}>
-                    <LinearGradient colors={['#10B981', '#059669']} style={styles.modalActionGradient}>
-                      {forgotLoading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.modalActionText}>{t('send_code')}</Text>}
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </View>
-              )}
-
-              {forgotStep === 2 && (
-                <View style={styles.modalBody}>
-                  <Text style={styles.modalDesc}>{t('enter_otp_desc')}</Text>
-                  {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
-                  <View style={styles.modalInputWrapper}>
-                    <Ionicons name="keypad-outline" size={ms(20)} color="#94A3B8" />
-                    <TextInput
-                      style={styles.modalInput}
-                      placeholder="Mã xác thực của bạn..."
-                      value={otpCode}
-                      onChangeText={(txt) => { setOtpCode(txt); setModalError(''); }}
-                      keyboardType="number-pad"
-                      maxLength={6}
-                    />
-                  </View>
-                  <TouchableOpacity style={styles.modalActionBtn} onPress={handleVerifyOTP} disabled={forgotLoading}>
-                    <LinearGradient colors={['#10B981', '#059669']} style={styles.modalActionGradient}>
-                      {forgotLoading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.modalActionText}>{t('verify_code')}</Text>}
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </View>
-              )}
-
-              {forgotStep === 3 && (
-                <View style={styles.modalBody}>
-                  <Text style={styles.modalDesc}>{t('new_password_desc')}</Text>
-                  {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
-                  <View style={styles.modalInputWrapper}>
-                    <Ionicons name="lock-closed-outline" size={ms(20)} color="#94A3B8" />
-                    <TextInput
-                      style={styles.modalInput}
-                      placeholder={t('new_password')}
-                      value={newPassword}
-                      onChangeText={(txt) => { setNewPassword(txt); setModalError(''); }}
-                      secureTextEntry
-                    />
-                  </View>
-                  <TouchableOpacity style={styles.modalActionBtn} onPress={handleResetPassword}>
-                    <LinearGradient colors={['#10B981', '#059669']} style={styles.modalActionGradient}>
-                      <Text style={styles.modalActionText}>{t('save').toUpperCase()}</Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
-      </TouchableOpacity>
-    </Modal>
+            </TouchableWithoutFeedback>
+          </KeyboardAvoidingView>
+        </TouchableOpacity>
+      </Modal>
 
       {showToast && (
         <Animated.View
@@ -513,43 +469,7 @@ const styles = StyleSheet.create({
   btnGradient: { height: vs(60), justifyContent: 'center', alignItems: 'center' },
   btnText: { fontSize: ms(16), fontWeight: '400', color: '#FFF', letterSpacing: 1 },
 
-  socialFooter: {
-    marginTop: vs(40),
-    alignItems: 'center',
-  },
-  dividerBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: s(15),
-    marginBottom: vs(25),
-  },
-  dividerLine: {
-    height: 1,
-    backgroundColor: '#E2E8F0',
-    flex: 1,
-    maxWidth: s(80),
-  },
-  dividerText: {
-    fontSize: ms(13),
-    color: '#94A3B8',
-    fontWeight: '400',
-  },
-  socialIconsRow: {
-    flexDirection: 'row',
-    gap: s(25),
-  },
-  socialCircle: {
-    width: s(54),
-    height: s(54),
-    borderRadius: s(27),
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-  },
+
 
   toastContainer: {
     position: 'absolute',
