@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: s(20),
-    paddingTop: vs(13),
+    paddingTop: vs(0),
     minHeight: vs(50),
     backgroundColor: '#FFFFFF',
     zIndex: 10,

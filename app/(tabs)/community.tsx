@@ -1044,7 +1044,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '400', marginLeft: s(15), flex: 1, letterSpacing: 0.3 },
-  screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: s(20), paddingTop: vs(10), paddingBottom: vs(15), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
+  screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: s(20), paddingTop: vs(8), paddingBottom: vs(15), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   screenTitle: { fontSize: ms(22), fontWeight: '400', color: '#1A1A1A' },
   plusBtn: { width: s(36), height: s(36), borderRadius: s(18), backgroundColor: '#F7F7F7', justifyContent: 'center', alignItems: 'center' },
   listContent: { paddingTop: vs(5), paddingBottom: vs(30) },
