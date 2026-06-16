@@ -146,14 +146,7 @@ export default function HomeScreen() {
           isNew: true, // Marker for fresh data
           route: {
             pathname: detailRoute,
-            params: {
-              id: doc.id,
-              name: data.name,
-              location: data.location,
-              description: data.description,
-              imageUrl: data.imageUrl,
-              source: data.category === 'Chùa' ? 'pagoda' : data.category === 'Văn hóa' ? 'culture' : 'food',
-            }
+            params: { id: doc.id }
           }
         };
       });

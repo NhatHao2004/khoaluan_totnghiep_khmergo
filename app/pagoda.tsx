@@ -155,20 +155,7 @@ export default function PagodaScreen() {
                 style={styles.pagodaCard}
                 onPress={() => router.push({
                   pathname: '/pagoda-detail',
-                  params: {
-                    id: pagoda.id,
-                    name: isKm ? (pagoda.name_khmer || pagoda.name) : pagoda.name,
-                    location: isKm ? (pagoda.location_khmer || pagoda.location) : pagoda.location,
-                    rental: pagoda.rental,
-                    description: pagoda.description,
-                    imageUrl: pagoda.imageUrl,
-                    imageUrl1: pagoda.imageUrl1,
-                    category: pagoda.category,
-                    favorite: pagoda.favorite?.toString(),
-                    latitude: pagoda.latitude?.toString(),
-                    longitude: pagoda.longitude?.toString(),
-                    source: 'pagoda',
-                  }
+                  params: { id: pagoda.id }
                 })}
               >
                 <View style={styles.pagodaImageContainer}>

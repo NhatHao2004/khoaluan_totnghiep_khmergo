@@ -103,15 +103,7 @@ export default function FoodScreen() {
                 style={styles.foodCard}
                 onPress={() => router.push({
                   pathname: '/food-detail',
-                  params: {
-                    id: item.id,
-                    name: item.name,
-                    location: item.location,
-                    description: item.description,
-                    imageUrl: item.imageUrl,
-                    category: item.category,
-                    source: 'food',
-                  }
+                  params: { id: item.id }
                 })}
               >
                 <View style={styles.imageContainer}>

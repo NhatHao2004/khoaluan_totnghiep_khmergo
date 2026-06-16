@@ -69,16 +69,7 @@ export default function FavoritesScreen() {
 
     router.push({
       pathname: detailRoute as any,
-      params: {
-        id: item.id,
-        name: item.name,
-        location: item.location,
-        description: item.description,
-        imageUrl: item.imageUrl,
-        latitude: item.latitude,
-        longitude: item.longitude,
-        favorite: 'true',
-      }
+      params: { id: item.id }
     });
   };
 

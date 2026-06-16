@@ -378,7 +378,7 @@ const UserManagement = () => {
                 <Text style={styles.cancelActionText}>{t('cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.confirmActionBtn, { backgroundColor: pendingUser?.isBlocked ? '#10b981' : '#3b82f6' }]}
+                style={[styles.confirmActionBtn, { backgroundColor: pendingUser?.isBlocked ? '#10b981' : '#fe0000ff' }]}
                 onPress={handleConfirmLock}
               >
                 <Text style={styles.confirmActionText}>{pendingUser?.isBlocked ? t('unlock') : t('lock_now')}</Text>
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
   confirmSub: { fontSize: ms(15), color: '#64748b', textAlign: 'center', lineHeight: vs(22), marginBottom: vs(24) },
   boldText: { fontWeight: '400', color: '#1e293b' },
   confirmActions: { flexDirection: 'row', gap: s(12), width: '100%' },
-  cancelActionBtn: { flex: 1, paddingVertical: vs(12), borderRadius: s(12), backgroundColor: '#94a3b8', alignItems: 'center' },
+  cancelActionBtn: { flex: 1, paddingVertical: vs(12), borderRadius: s(12), backgroundColor: '#006affff', alignItems: 'center' },
   cancelActionText: { fontSize: ms(15), fontWeight: '400', color: '#fff' },
   confirmActionBtn: { flex: 1, paddingVertical: vs(12), borderRadius: s(12), alignItems: 'center' },
   confirmActionText: { fontSize: ms(15), fontWeight: '400', color: '#fff' },

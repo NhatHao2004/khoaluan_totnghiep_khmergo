@@ -6,7 +6,6 @@ import { arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, onSnapshot
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Dimensions,
   FlatList,
   Keyboard,
@@ -182,12 +181,12 @@ const ContentManagement = () => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Quyền truy cập', 'Vui lòng cho phép truy cập thư viện ảnh để sử dụng tính năng này');
+        triggerToast('Vui lòng cho phép truy cập thư viện ảnh', 'error');
         return;
       }
 
       let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: false,
         quality: 0.6,
         base64: true,
@@ -375,7 +374,7 @@ const ContentManagement = () => {
 
   const handleSaveDest = async () => {
     if (!dName.trim() || !dImg.trim()) {
-      Alert.alert('Lỗi', 'Vui lòng nhập tên và link ảnh');
+      triggerToast('Vui lòng nhập tên và link ảnh', 'error');
       return;
     }
     try {

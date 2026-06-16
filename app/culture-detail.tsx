@@ -37,16 +37,16 @@ export default function CultureDetailScreen() {
     if (!id) return;
     setLoading(true);
     const docRef = doc(db, 'destinations', id);
-    const unsubscribe = onSnapshot(docRef, async (docSnap) => {
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         setTempleData({ id, ...data });
         const targetImg = data.imageUrl1 || data.imageUrl || initialImageUrl;
         if (targetImg) {
-          try { await Image.prefetch(targetImg); } catch (e) { }
+          Image.prefetch(targetImg).catch(() => {});
         }
       }
-      setTimeout(() => setLoading(false), 800);
+      setTimeout(() => setLoading(false), 500);
     }, (error) => {
       console.error('Error fetching culture detail:', error);
       setLoading(false);

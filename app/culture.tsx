@@ -109,16 +109,7 @@ export default function CultureScreen() {
                 style={styles.cultureCard}
                 onPress={() => router.push({
                   pathname: '/culture-detail',
-                  params: {
-                    id: item.id,
-                    name: item.name,
-                    location: item.location,
-                    description: item.description,
-                    imageUrl: item.imageUrl,
-                    category: item.category,
-                    isFavorite: item.isFavorite?.toString(),
-                    source: 'culture',
-                  }
+                  params: { id: item.id }
                 })}
               >
                 <View style={styles.imageContainer}>

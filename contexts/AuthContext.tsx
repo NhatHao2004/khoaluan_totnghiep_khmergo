@@ -77,6 +77,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
       }
     } catch (error: any) {
+      // Nếu là lỗi offline, chúng ta vẫn cho phép User cơ bản để vào được app
+      const isOffline = error.message?.includes('offline') || error.code === 'unavailable';
+      
+      if (isOffline) {
+        setUser({
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          isAnonymous: firebaseUser.isAnonymous,
+        });
+        return; // Thoát êm đẹp, chờ onSnapshot xử lý sau
+      }
+
       // Chỉ log lỗi nếu không phải là lỗi bị chặn tài khoản (vì lỗi đó là chủ ý)
       if (error.message !== 'ACCOUNT_BLOCKED') {
         console.error("Error fetching user data:", error);
@@ -99,8 +111,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (currentUser) {
       await fetchAndSetUser(currentUser);
     } else {
-      // Nếu không có currentUser, có thể do fetchAndSetUser vừa gọi signOut
-      // Chúng ta thử kiểm tra lần cuối từ Firestore nếu cần, hoặc đơn giản là ném lỗi
       throw new Error('AUTH_FAILED');
     }
   };
@@ -111,42 +121,51 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
       if (firebaseUser) {
         try {
+          // fetchAndSetUser hiện tại đã an toàn với lỗi offline
           await fetchAndSetUser(firebaseUser);
           
           // Thiết lập listener thời gian thực cho tài khoản đang đăng nhập
           if (unsubDoc) unsubDoc();
-          unsubDoc = onSnapshot(doc(db, 'users', firebaseUser.uid), async (snap) => {
-            if (snap.exists()) {
-              const data = snap.data();
-              const userRole = data.role || data['quyền'] || 'Người dùng';
-              
-              if (data.isBlocked && userRole !== 'Quản trị viên') {
-                await signOut(auth);
-                setUser(null);
-                Alert.alert('Thông báo', 'Tài khoản của bạn đã bị khóa bởi quản trị viên.');
-                return;
-              }
+          unsubDoc = onSnapshot(doc(db, 'users', firebaseUser.uid), {
+            next: (snap) => {
+              if (snap.exists()) {
+                const data = snap.data();
+                const userRole = data.role || data['quyền'] || 'Người dùng';
+                
+                if (data.isBlocked && userRole !== 'Quản trị viên') {
+                  signOut(auth);
+                  setUser(null);
+                  Alert.alert('Thông báo', 'Tài khoản của bạn đã bị khóa bởi quản trị viên.');
+                  return;
+                }
 
-              // Luôn cập nhật trạng thái người dùng khi có thay đổi từ Firestore
-              setUser({
-                uid: firebaseUser.uid,
-                email: firebaseUser.email,
-                name: data.name || data['tên'],
-                avatar: data.avatar || data['hình đại diện'] || null,
-                points: data.points ?? 0,
-                rank: data.rank || 'Đồng',
-                accuracy: data.accuracy ?? 0,
-                completedQuizzes: data.completedQuizzes ?? 0,
-                interests: data.interests || [],
-                isBlocked: data.isBlocked || false,
-                isAnonymous: firebaseUser.isAnonymous,
-                role: userRole,
-              });
+                setUser({
+                  uid: firebaseUser.uid,
+                  email: firebaseUser.email,
+                  name: data.name || data['tên'],
+                  avatar: data.avatar || data['hình đại diện'] || null,
+                  points: data.points ?? 0,
+                  rank: data.rank || 'Đồng',
+                  accuracy: data.accuracy ?? 0,
+                  completedQuizzes: data.completedQuizzes ?? 0,
+                  interests: data.interests || [],
+                  isBlocked: data.isBlocked || false,
+                  isAnonymous: firebaseUser.isAnonymous,
+                  role: userRole,
+                });
+              }
+            },
+            error: (err) => {
+              // Chỉ log lỗi snapshot nếu không phải lỗi offline
+              if (!err.message.includes('offline')) {
+                console.error("Snapshot error:", err);
+              }
             }
           });
 
         } catch (error: any) {
-          if (error.message !== 'ACCOUNT_BLOCKED' && error.message !== 'AUTH_FAILED') {
+          const isOffline = error.message?.includes('offline') || error.code === 'unavailable';
+          if (error.message !== 'ACCOUNT_BLOCKED' && error.message !== 'AUTH_FAILED' && !isOffline) {
             console.error("Unexpected auth error:", error);
           }
         }
