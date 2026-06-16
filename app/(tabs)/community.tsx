@@ -1090,7 +1090,7 @@ const styles = StyleSheet.create({
   thumbnailPreview: { width: s(45), height: s(45), borderRadius: ms(8), backgroundColor: '#F0F0F0' },
   thumbnailRemoveBtn: { position: 'absolute', top: -s(8), right: -s(8), backgroundColor: '#FFF', borderRadius: s(10) },
   tinyAttachBtn: { width: s(40), height: s(40), justifyContent: 'center', alignItems: 'center' },
-  createPostInput: { fontSize: ms(18), color: '#1A1A1A', textAlignVertical: 'top', minHeight: vs(100), paddingHorizontal: s(20), marginTop: vs(10) },
+  createPostInput: { fontSize: ms(18), color: '#1A1A1A', textAlignVertical: 'top', minHeight: vs(100), paddingHorizontal: s(20), marginTop: vs(0) },
   previewImageContainer: { position: 'relative', marginBottom: vs(12), paddingHorizontal: s(20) },
   previewImage: { width: '100%', borderRadius: ms(20), backgroundColor: '#F0F0F0' },
   removeImageBtn: { position: 'absolute', top: vs(10), right: s(30), backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: s(15) },
