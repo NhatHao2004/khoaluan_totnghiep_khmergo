@@ -683,8 +683,8 @@ export default function CommunityScreen() {
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
           <KeyboardAvoidingView
             style={{ flex: 1 }}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -vs(30)}
           >
             <View style={[
               styles.modalContent,
@@ -766,10 +766,8 @@ export default function CommunityScreen() {
                   <View style={[
                     styles.previewImageContainer,
                     {
-                      marginBottom: keyboardHeight > 0
-                        ? vs(20)
-                        : (insets.bottom > 0 ? insets.bottom + vs(10) : vs(20)),
-                      maxHeight: keyboardHeight > 0 ? vs(220) : vs(400)
+                      marginBottom: keyboardHeight > 0 ? vs(40) : (insets.bottom > 0 ? insets.bottom : vs(2)),
+                      maxHeight: keyboardHeight > 0 ? vs(200) : vs(420)
                     }
                   ]}>
                     <Image
@@ -778,7 +776,7 @@ export default function CommunityScreen() {
                         styles.previewImage,
                         {
                           aspectRatio: imageRatio || 1,
-                          maxHeight: keyboardHeight > 0 ? vs(200) : vs(380)
+                          maxHeight: keyboardHeight > 0 ? vs(180) : vs(400)
                         }
                       ]}
                       resizeMode="cover"
