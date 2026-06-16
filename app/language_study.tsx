@@ -2,7 +2,7 @@ import { ThemedText } from '@/components/themed-text';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
-import { Audio } from 'expo-av';
+import { useAudioPlayer } from 'expo-audio';
 import { Image as ExpoImage } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { collection, onSnapshot, query } from 'firebase/firestore';
@@ -63,15 +63,17 @@ export default function LanguageStudyScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlayingInput, setIsPlayingInput] = useState(false);
   const [isPlayingOutput, setIsPlayingOutput] = useState(false);
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const player = useAudioPlayer('');
 
   useEffect(() => {
-    return sound
-      ? () => {
-        sound.unloadAsync();
+    const subscription = player.addListener('playbackStatusUpdate', (status) => {
+      if (!status.playing) {
+        setIsPlayingInput(false);
+        setIsPlayingOutput(false);
       }
-      : undefined;
-  }, [sound]);
+    });
+    return () => subscription.remove();
+  }, [player]);
 
   useEffect(() => {
     if (!inputText.trim()) {
@@ -137,21 +139,14 @@ export default function LanguageStudyScreen() {
   };
 
   const playSound = async (textToPlay: string, langCode: string, type: 'input' | 'output') => {
-    if (!textToPlay || isPlayingInput || isPlayingOutput) return;
+    if (!textToPlay) return;
     try {
       if (type === 'input') setIsPlayingInput(true);
       else setIsPlayingOutput(true);
 
-      if (sound) await sound.unloadAsync();
       const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(textToPlay)}&tl=${langCode}&client=tw-ob`;
-      const { sound: newSound } = await Audio.Sound.createAsync({ uri: url }, { shouldPlay: true });
-      setSound(newSound);
-      newSound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) {
-          setIsPlayingInput(false);
-          setIsPlayingOutput(false);
-        }
-      });
+      player.replace(url);
+      player.play();
     } catch (error) {
       console.error('Lỗi khi phát âm thanh:', error);
       setIsPlayingInput(false);

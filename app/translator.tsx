@@ -1,6 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import { Ionicons } from '@expo/vector-icons';
-import { Audio } from 'expo-av';
+import { useAudioPlayer } from 'expo-audio';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -29,15 +29,14 @@ export default function TranslatorScreen() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const player = useAudioPlayer('');
 
   useEffect(() => {
-    return sound
-      ? () => {
-        sound.unloadAsync();
-      }
-      : undefined;
-  }, [sound]);
+    const subscription = player.addListener('playbackStatusUpdate', (status) => {
+      setIsPlaying(status.playing);
+    });
+    return () => subscription.remove();
+  }, [player]);
 
   // Auto-translate with debounce
   useEffect(() => {
@@ -128,27 +127,13 @@ export default function TranslatorScreen() {
   };
 
   const playSound = async (textToPlay: string, langCode: string) => {
-    if (!textToPlay || isPlaying) return;
+    if (!textToPlay) return;
 
     try {
-      setIsPlaying(true);
-      if (sound) {
-        await sound.unloadAsync();
-      }
-
       const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(textToPlay)}&tl=${langCode}&client=tw-ob`;
-
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: url },
-        { shouldPlay: true }
-      );
-      setSound(newSound);
-
-      newSound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) {
-          setIsPlaying(false);
-        }
-      });
+      
+      player.replace(url);
+      player.play();
     } catch (error) {
       console.error('Lỗi khi phát âm thanh:', error);
       setIsPlaying(false);

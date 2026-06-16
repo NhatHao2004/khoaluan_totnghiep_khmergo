@@ -1,8 +1,9 @@
 import { initializeApp, getApp, getApps } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getFirestore, setLogLevel } from "firebase/firestore";
+// @ts-ignore
+import { getAuth, initializeAuth, getReactNativePersistence } from "firebase/auth";
 import { getStorage } from "firebase/storage";
-// import { getAnalytics } from "firebase/analytics";
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDInHeTU4IWo4kVVsho62WcK6Vg9f83vfg",
@@ -18,14 +19,20 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // Khởi tạo và export Firestore
-import { setLogLevel } from "firebase/firestore";
 export const db = getFirestore(app);
-setLogLevel('silent'); // Chặn thông báo lỗi nền của Firestore gây nhiễu Console/App
+setLogLevel('silent');
 
-// Khởi tạo Auth
-// Ở React Native ta nên dùng persistence với AsyncStorage. Tuy thư viện firebase/auth có mặc định, 
-// nhưng để chắc chắn state không mất khi reload, ta nạp rõ ràng. Tuy nhiên ở đây tạm dùng mặc định:
-export const auth = getAuth(app);
+// Khởi tạo Auth với persistence (chỉ khởi tạo nếu chưa có instance nào để tránh lỗi Reload)
+export const auth = (() => {
+  try {
+    return getAuth(app);
+  } catch (e) {
+    // @ts-ignore
+    return initializeAuth(app, {
+      persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+    });
+  }
+})();
 
 // Khởi tạo Storage
 export const storage = getStorage(app);

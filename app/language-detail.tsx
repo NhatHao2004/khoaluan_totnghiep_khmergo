@@ -2,7 +2,7 @@ import { ThemedText } from '@/components/themed-text';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
-import { Audio } from 'expo-av';
+import { useAudioPlayer } from 'expo-audio';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, onSnapshot } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
@@ -37,38 +37,26 @@ export default function LanguageDetailScreen() {
   }, [categoryId]);
 
   const [playingId, setPlayingId] = useState<string | null>(null);
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const player = useAudioPlayer('');
 
   useEffect(() => {
-    return sound
-      ? () => {
-        sound.unloadAsync();
+    const subscription = player.addListener('playbackStatusUpdate', (status) => {
+      if (!status.playing) {
+        setPlayingId(null);
       }
-      : undefined;
-  }, [sound]);
+    });
+    return () => subscription.remove();
+  }, [player]);
 
   const playSound = async (text: string, langCode: string, id: string) => {
-    if (!text || playingId === id) return;
+    if (!text) return;
 
     try {
       setPlayingId(id);
-      if (sound) {
-        await sound.unloadAsync();
-      }
-
       const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${langCode}&client=tw-ob`;
 
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: url },
-        { shouldPlay: true }
-      );
-      setSound(newSound);
-
-      newSound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) {
-          setPlayingId(null);
-        }
-      });
+      player.replace(url);
+      player.play();
     } catch (error) {
       console.error('Lỗi khi phát âm thanh:', error);
       setPlayingId(null);
