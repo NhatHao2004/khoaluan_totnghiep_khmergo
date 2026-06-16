@@ -223,7 +223,7 @@ export default function AIAssistantScreen() {
         <View style={{ flex: 1 }}>
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 150 }}>
             <View style={styles.cameraSection}>
-              <View style={styles.imageFrame}><View style={styles.innerFrame}>{image ? <Image source={{ uri: image }} style={styles.previewImage} /> : <View style={styles.placeholderContainer} />}</View></View>
+              <View style={styles.imageFrame}><View style={styles.innerFrame}>{image ? <Image source={{ uri: image }} style={styles.previewImage} resizeMode="cover" /> : <View style={styles.placeholderContainer} />}</View></View>
               <View style={styles.aiCard}><Text style={styles.resultTitleSmall}>{result?.title || t('ai_camera_ready')}</Text><Text style={styles.aiBubbleTextSmall}>{result?.content || t('ai_camera_selected_desc')}</Text></View>
             </View>
           </ScrollView>
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
   cameraSection: { padding: 20, alignItems: 'center' },
   imageFrame: { width: SCREEN_WIDTH - s(80), aspectRatio: 1, position: 'relative', marginBottom: 20 },
   innerFrame: { width: '100%', height: '100%', backgroundColor: '#F1F5F9', borderRadius: 25, overflow: 'hidden', borderWidth: 1, borderColor: '#E2E8F0' },
-  previewImage: { width: '100%', height: '100%', resizeMode: 'cover' },
+  previewImage: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '100%' },
   placeholderContainer: { flex: 1, backgroundColor: '#F1F5F9' },
   corner: { position: 'absolute', width: s(45), height: s(45), borderColor: '#000', borderStyle: 'solid', zIndex: 20 },
   topL: { top: 0, left: 0, borderTopWidth: 3.5, borderLeftWidth: 3.5, borderTopLeftRadius: 15 },
