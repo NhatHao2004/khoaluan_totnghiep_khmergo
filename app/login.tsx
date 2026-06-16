@@ -22,6 +22,9 @@ import {
   TouchableWithoutFeedback,
   View
 } from 'react-native';
+import * as Google from 'expo-auth-session/providers/google';
+import * as WebBrowser from 'expo-web-browser';
+import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -33,6 +36,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmailService } from './services/email-service';
 
+WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
   const { t } = useLanguage();
@@ -63,6 +67,35 @@ export default function LoginScreen() {
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
   const toastY = useSharedValue(-120);
   const waveRotation = useSharedValue(0);
+
+  // Google Login Hook
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    webClientId: '836552819344-cngj0c6hlc6qtf56ta25k95gjnvvrur0.apps.googleusercontent.com',
+    iosClientId: '836552819344-cngj0c6hlc6qtf56ta25k95gjnvvrur0.apps.googleusercontent.com', // Dùng tạm Web ID cho môi trường Expo
+    androidClientId: '836552819344-cngj0c6hlc6qtf56ta25k95gjnvvrur0.apps.googleusercontent.com',
+  });
+
+  React.useEffect(() => {
+    const handleGoogleResponse = async () => {
+      if (response?.type === 'success') {
+        const { id_token } = response.params;
+        setLoading(true);
+        try {
+          const credential = GoogleAuthProvider.credential(id_token);
+          await signInWithCredential(auth, credential);
+          await refreshUser();
+          triggerToast(t('login_success'), 'success');
+          router.replace('/(tabs)');
+        } catch (error) {
+          console.error('Google Sign-In Error:', error);
+          triggerToast(t('update_failed'), 'error');
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    handleGoogleResponse();
+  }, [response]);
 
   React.useEffect(() => {
     waveRotation.value = withRepeat(
@@ -320,12 +353,14 @@ export default function LoginScreen() {
               </View>
 
               <View style={styles.socialIconsRow}>
-                <TouchableOpacity style={[styles.socialCircle, { backgroundColor: '#FF5A5F' }]}>
+                <TouchableOpacity 
+                  style={[styles.socialCircle, { backgroundColor: '#FF5A5F' }]}
+                  onPress={() => promptAsync()}
+                  disabled={!request || loading}
+                >
                   <Ionicons name="logo-google" size={ms(24)} color="#FFF" />
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.socialCircle, { backgroundColor: '#1877F2' }]}>
-                  <Ionicons name="logo-facebook" size={ms(24)} color="#FFF" />
-                </TouchableOpacity>
+
               </View>
             </View>
           </View>
