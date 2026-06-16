@@ -945,7 +945,7 @@ export default function CommunityScreen() {
               <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
             </View>
             <Text style={styles.pModalTitle}>{t('login_required')}</Text>
-            <Text style={styles.pModalSub}>{t('login_to_use')}</Text>
+            <Text style={styles.pModalSub} numberOfLines={1} adjustsFontSizeToFit>{t('login_to_use')}</Text>
 
             <View style={styles.pModalActionRow}>
               <TouchableOpacity
@@ -1140,8 +1140,8 @@ const styles = StyleSheet.create({
     fontSize: ms(15),
     color: '#64748B',
     textAlign: 'center',
-    lineHeight: vs(22),
     marginBottom: vs(24),
+    paddingHorizontal: s(5), // Add small padding to ensure it doesn't touch edges
   },
   pModalActionRow: {
     width: '100%',
