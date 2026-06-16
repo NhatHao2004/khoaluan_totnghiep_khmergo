@@ -554,7 +554,7 @@ const styles = StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', paddingHorizontal: s(20), paddingBottom: vs(100) },
   modalContainer: { width: '100%' },
   modalContent: { backgroundColor: '#FFF', borderRadius: s(24), padding: s(20) },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(20) },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(10) },
   modalTitle: { fontSize: ms(20), fontWeight: '400', color: '#1E293B' },
   modalBody: { gap: vs(15) },
   modalDesc: { fontSize: ms(15), color: '#64748B', lineHeight: ms(20) },
