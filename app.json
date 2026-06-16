@@ -17,7 +17,11 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.haonhatlam.myapp",
-      "softwareKeyboardLayoutMode": "resize"
+      "softwareKeyboardLayoutMode": "resize",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "output": "static",
@@ -49,7 +53,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "f0d6376a-928b-4e75-8a1a-fc33437b0cba"
+        "projectId": "541cb882-3bf3-42da-87ab-3656c960e887"
       }
     },
     "owner": "lamhao"
