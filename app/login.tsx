@@ -1,14 +1,17 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { auth } from '@/utils/firebaseConfig';
+import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import { StatusBar } from 'expo-status-bar';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
-import { EmailService } from './services/email-service';
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Modal,
   Platform,
   ScrollView,
@@ -16,13 +19,9 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
-  KeyboardAvoidingView
+  TouchableWithoutFeedback,
+  View
 } from 'react-native';
-import { Image } from 'expo-image';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
-import { s, vs, ms } from '@/utils/responsive';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -31,6 +30,8 @@ import Animated, {
   withSequence,
   withTiming
 } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { EmailService } from './services/email-service';
 
 
 export default function LoginScreen() {
@@ -105,7 +106,7 @@ export default function LoginScreen() {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
       const firebaseUser = userCredential.user;
-      
+
       const { getDoc, doc } = await import('firebase/firestore');
       const { db: firestoreDb } = await import('@/utils/firebaseConfig');
       const userDoc = await getDoc(doc(firestoreDb, 'users', firebaseUser.uid));
@@ -163,10 +164,9 @@ export default function LoginScreen() {
       await EmailService.saveOTP(forgotEmail, otp);
       // 3. Gửi qua Resend (giả lập hoặc gọi API)
       const sent = await EmailService.sendOTPEmail(forgotEmail, otp);
-      
+
       if (sent) {
         setForgotStep(2);
-        triggerToast(t('enter_otp_desc'), 'info');
       } else {
         setModalError(t('update_failed'));
       }
@@ -333,13 +333,19 @@ export default function LoginScreen() {
       </KeyboardAvoidingView>
 
       {/* Forgot Password Modal */}
-      <Modal visible={forgotModalVisible} transparent animationType="fade" statusBarTranslucent>
-        <View style={styles.modalOverlay}>
-          <KeyboardAvoidingView 
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+      <Modal visible={forgotModalVisible} transparent animationType="fade" statusBarTranslucent onRequestClose={() => setForgotModalVisible(false)}>
+        <TouchableOpacity 
+          style={styles.modalOverlay} 
+          activeOpacity={1} 
+          onPress={() => { setForgotModalVisible(false); setModalError(''); }}
+        >
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? vs(50) : 0}
             style={styles.modalContainer}
           >
-            <View style={styles.modalContent}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>{t('reset_password')}</Text>
                 <TouchableOpacity onPress={() => { setForgotModalVisible(false); setModalError(''); }}>
@@ -352,9 +358,9 @@ export default function LoginScreen() {
                   <Text style={styles.modalDesc} numberOfLines={1} adjustsFontSizeToFit>{t('enter_email_desc')}</Text>
                   {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
                   <View style={styles.modalInputWrapper}>
-                    <Ionicons name="mail-outline" size={ ms(20) } color="#94A3B8" />
-                    <TextInput 
-                      style={styles.modalInput} 
+                    <Ionicons name="mail-outline" size={ms(20)} color="#94A3B8" />
+                    <TextInput
+                      style={styles.modalInput}
                       placeholder="example@gmail.com"
                       value={forgotEmail}
                       onChangeText={(txt) => { setForgotEmail(txt); setModalError(''); }}
@@ -372,13 +378,13 @@ export default function LoginScreen() {
 
               {forgotStep === 2 && (
                 <View style={styles.modalBody}>
-                  <Text style={styles.modalDesc} numberOfLines={1} adjustsFontSizeToFit>{t('enter_otp_desc')}</Text>
+                  <Text style={styles.modalDesc}>{t('enter_otp_desc')}</Text>
                   {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
                   <View style={styles.modalInputWrapper}>
-                    <Ionicons name="keypad-outline" size={ ms(20) } color="#94A3B8" />
-                    <TextInput 
-                      style={styles.modalInput} 
-                      placeholder="OTP (e.g. 123456)"
+                    <Ionicons name="keypad-outline" size={ms(20)} color="#94A3B8" />
+                    <TextInput
+                      style={styles.modalInput}
+                      placeholder="Mã xác thực của bạn..."
                       value={otpCode}
                       onChangeText={(txt) => { setOtpCode(txt); setModalError(''); }}
                       keyboardType="number-pad"
@@ -395,12 +401,12 @@ export default function LoginScreen() {
 
               {forgotStep === 3 && (
                 <View style={styles.modalBody}>
-                  <Text style={styles.modalDesc} numberOfLines={1} adjustsFontSizeToFit>{t('new_password_desc')}</Text>
+                  <Text style={styles.modalDesc}>{t('new_password_desc')}</Text>
                   {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
                   <View style={styles.modalInputWrapper}>
-                    <Ionicons name="lock-closed-outline" size={ ms(20) } color="#94A3B8" />
-                    <TextInput 
-                      style={styles.modalInput} 
+                    <Ionicons name="lock-closed-outline" size={ms(20)} color="#94A3B8" />
+                    <TextInput
+                      style={styles.modalInput}
                       placeholder={t('new_password')}
                       value={newPassword}
                       onChangeText={(txt) => { setNewPassword(txt); setModalError(''); }}
@@ -415,9 +421,10 @@ export default function LoginScreen() {
                 </View>
               )}
             </View>
-          </KeyboardAvoidingView>
-        </View>
-      </Modal>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </TouchableOpacity>
+    </Modal>
 
       {showToast && (
         <Animated.View
@@ -437,7 +444,7 @@ export default function LoginScreen() {
               color="#FFF"
             />
           </View>
-          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
+          <Text style={styles.toastText} numberOfLines={2}>{toastMsg}</Text>
         </Animated.View>
       )}
     </View>
@@ -514,7 +521,8 @@ const styles = StyleSheet.create({
     top: 0,
     left: s(20),
     right: s(20),
-    height: vs(56),
+    minHeight: vs(56),
+    paddingVertical: vs(8),
     borderRadius: s(20),
     flexDirection: 'row',
     alignItems: 'center',
@@ -543,13 +551,13 @@ const styles = StyleSheet.create({
   },
 
   // Modal Styles
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: s(20) },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', paddingHorizontal: s(20), paddingBottom: vs(100) },
   modalContainer: { width: '100%' },
   modalContent: { backgroundColor: '#FFF', borderRadius: s(24), padding: s(20) },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(20) },
   modalTitle: { fontSize: ms(20), fontWeight: '400', color: '#1E293B' },
   modalBody: { gap: vs(15) },
-  modalDesc: { fontSize: ms(14), color: '#64748B', lineHeight: ms(20) },
+  modalDesc: { fontSize: ms(15), color: '#64748B', lineHeight: ms(20) },
   modalErrorText: { fontSize: ms(13), color: '#EF4444', fontWeight: '400', marginTop: -vs(2), marginLeft: s(4), marginBottom: vs(5) },
   modalInputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: s(12), paddingHorizontal: s(12), height: vs(50), borderWidth: 1, borderColor: '#F1F5F9' },
   modalInput: { flex: 1, marginLeft: s(10), fontSize: ms(15), color: '#1E293B' },
