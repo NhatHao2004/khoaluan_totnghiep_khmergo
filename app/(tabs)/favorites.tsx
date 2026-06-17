@@ -115,7 +115,9 @@ export default function FavoritesScreen() {
         showsVerticalScrollIndicator={false}
       >
         {isLoading ? (
-          <ActivityIndicator size="large" color="#FF0050" style={{ marginTop: 50 }} />
+          <View style={styles.emptyContainer}>
+            <ActivityIndicator size="large" color="#FF0050" />
+          </View>
         ) : favorites.length === 0 ? (
           <View style={styles.emptyContainer}>
             <View style={styles.emptyIconCircle}>
@@ -178,13 +180,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   scrollContent: {
+    flexGrow: 1,
     paddingBottom: 20,
   },
   emptyContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 250,
     paddingHorizontal: 30,
+    paddingBottom: 10,
   },
   emptyIconCircle: {
     width: 100,
