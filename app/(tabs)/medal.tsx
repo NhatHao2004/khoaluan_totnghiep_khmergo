@@ -152,7 +152,7 @@ export default function MedalScreen() {
                 </View>
 
 
-                <Text style={styles.podiumName} numberOfLines={1}>{topThree[0].name}</Text>
+                <Text style={styles.podiumName}>{topThree[0].name}</Text>
                 <View style={styles.podiumPoints}>
                   <Text style={styles.podiumPointsText} numberOfLines={1} adjustsFontSizeToFit>
                     {`${topThree[0].points} ${t('points')}`}
@@ -175,7 +175,7 @@ export default function MedalScreen() {
                 </View>
 
 
-                <Text style={styles.podiumName} numberOfLines={1}>{topThree[2].name}</Text>
+                <Text style={styles.podiumName}>{topThree[2].name}</Text>
                 <View style={styles.podiumPoints}>
                   <Text style={styles.podiumPointsText} numberOfLines={1} adjustsFontSizeToFit>
                     {`${topThree[2].points} ${t('points')}`}
@@ -219,7 +219,7 @@ export default function MedalScreen() {
                 )}
                 <View style={styles.listItemInfo}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <Text style={[styles.listItemName, isMe && styles.myListItemName]} numberOfLines={1}>
+                    <Text style={[styles.listItemName, isMe && styles.myListItemName]}>
                       {item.name}
                     </Text>
                     {isMe && <View style={styles.meTag}><Text style={styles.meTagText}>{t('you')}</Text></View>}

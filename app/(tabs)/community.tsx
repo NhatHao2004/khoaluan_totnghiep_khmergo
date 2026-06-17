@@ -114,11 +114,11 @@ export default function CommunityScreen() {
             commentsListRef.current?.scrollToIndex({
               index,
               animated: true,
-              viewPosition: 0.3 
+              viewPosition: 0.3
             });
           } catch (e) {
             commentsListRef.current?.scrollToOffset({
-              offset: index * 100, 
+              offset: index * 100,
               animated: true
             });
           }
@@ -128,7 +128,7 @@ export default function CommunityScreen() {
         setTimeout(() => {
           setHighlightId(null);
         }, 3800);
-        
+
         // Chỉ xóa param khi đã tìm thấy và thực hiện scroll
         router.setParams({ targetCommentId: '' });
       }
@@ -1079,7 +1079,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '700', marginLeft: s(15), flex: 1, letterSpacing: 0.3 },
-  screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: s(20), paddingTop: vs(10), paddingBottom: vs(15), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
+  screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: s(20), paddingTop: vs(5), paddingBottom: vs(15), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   screenTitle: { fontSize: ms(22), fontWeight: '400', color: '#1A1A1A' },
   plusBtn: { width: s(36), height: s(36), borderRadius: s(18), backgroundColor: '#F7F7F7', justifyContent: 'center', alignItems: 'center' },
   listContent: { paddingTop: vs(5), paddingBottom: vs(30) },

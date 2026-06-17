@@ -144,7 +144,7 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        <View style={{ flex: 1 }} />
+        <View style={{ height: 0 }} />
 
         {/* Thông tin ứng dụng */}
         <View style={styles.section}>
@@ -182,7 +182,7 @@ export default function SettingsScreen() {
               </TouchableOpacity>
             </View>
 
-            <View style={styles.introScroll}>
+            <ScrollView style={styles.introScroll} showsVerticalScrollIndicator={false}>
 
               {/* App Identity */}
               <View style={styles.appIdentity}>
@@ -191,10 +191,7 @@ export default function SettingsScreen() {
                 <Text style={styles.appVersionTag}>{t('intro_version_label')} 1.0.0</Text>
               </View>
 
-              <Text
-                style={styles.appDesc}
-                {...(language === 'km' ? { numberOfLines: 1, adjustsFontSizeToFit: true } : {})}
-              >
+              <Text style={styles.appDesc}>
                 {t('intro_app_desc')}
               </Text>
 
@@ -226,7 +223,8 @@ export default function SettingsScreen() {
                   <Text style={styles.introItemText}>Lâm Nhật Hào</Text>
                 </View>
               </View>
-            </View>
+              <View style={{ height: vs(40) }} />
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -488,6 +486,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'baseline',
     marginBottom: vs(4),
+    flexWrap: 'wrap',
   },
   introBullet: {
     fontSize: ms(14),
