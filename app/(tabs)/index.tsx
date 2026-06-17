@@ -598,7 +598,7 @@ export default function HomeScreen() {
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <View style={{ flex: 1, marginRight: s(10) }}>
                           <Text style={styles.nItemTitle} numberOfLines={2}>
-                            <Text style={[{ fontWeight: '400' }, item.type === 'reply' && { color: '#EF4444' }]}>{item.fromUserName}</Text> {t(item.message)}
+                            <Text style={{ fontWeight: '400', color: '#EF4444' }}>{item.fromUserName}</Text> {t(item.message)}
                           </Text>
                         </View>
                         {deletingId === item.id ? (
