@@ -44,7 +44,6 @@ export default function RegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showTerms, setShowTerms] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
   // Toast States
@@ -355,67 +354,11 @@ export default function RegisterScreen() {
               </LinearGradient>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.footer} onPress={() => setShowTerms(true)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <Text style={styles.footerText}>{t('terms')}</Text>
-            </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* Terms Modal */}
-      <Modal visible={showTerms} animationType="fade" transparent onRequestClose={() => setShowTerms(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <ThemedText style={styles.modalTitle}>{t('terms_modal_title')}</ThemedText>
-            </View>
 
-            <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
-              <ThemedText style={styles.termsText}>
-                Chào mừng bạn đến với ứng dụng KhmerGo. Khi sử dụng ứng dụng, bạn đồng ý với các điều khoản và điều kiện sau:{"\n\n"}
-
-                <Text style={styles.termsBold}>1. Mục đích sử dụng:</Text>{" "}
-                KhmerGo được phát triển nhằm hỗ trợ tìm hiểu, học tập và quảng bá văn hóa, lịch sử, đời sống và bản sắc của người Khmer Nam Bộ.{"\n\n"}
-
-                <Text style={styles.termsBold}>2. Trách nhiệm người dùng:</Text>{" "}
-                Người dùng cam kết sử dụng ứng dụng đúng mục đích, không vi phạm pháp luật, không đăng tải nội dung phản cảm và luôn tôn trọng giá trị văn hóa cộng đồng Khmer.{"\n\n"}
-
-                <Text style={styles.termsBold}>3. Quyền sở hữu nội dung:</Text>{" "}
-                Toàn bộ hình ảnh, văn bản, dữ liệu và giao diện trên ứng dụng thuộc quyền sở hữu của nhóm phát triển hoặc được sử dụng hợp pháp. Nghiêm cấm sao chép hoặc sử dụng lại khi chưa được cho phép.{"\n\n"}
-
-                <Text style={styles.termsBold}>4. Chính sách bảo mật:</Text>{" "}
-                Ứng dụng có thể thu thập một số dữ liệu cơ bản như phiên bản hệ điều hành và thông tin sử dụng nhằm nâng cao trải nghiệm người dùng. Mọi thông tin đều được bảo mật theo quy định hiện hành.{"\n\n"}
-
-                <Text style={styles.termsBold}>5. Giới hạn trách nhiệm:</Text>{" "}
-                KhmerGo không chịu trách nhiệm đối với các sự cố phát sinh từ thiết bị, kết nối mạng hoặc việc sử dụng thông tin ngoài mục đích tham khảo và học tập.{"\n\n"}
-
-                <Text style={styles.termsBold}>6. Chấm dứt quyền sử dụng:</Text>{" "}
-                Chúng tôi có quyền tạm ngừng hoặc khóa tài khoản nếu phát hiện hành vi vi phạm điều khoản hoặc gây ảnh hưởng đến hệ thống và cộng đồng người dùng.{"\n\n"}
-
-                <Text style={styles.termsBold}>7. Liên hệ hỗ trợ:</Text>{"\n"}
-                <Text numberOfLines={1} adjustsFontSizeToFit style={styles.termsText}>
-                  {"    "}• Email:{" "}
-                  <Text style={{ color: '#1A73E8' }}>
-                    khmergo.support@gmail.com
-                  </Text>
-                </Text>{"\n"}
-                <Text numberOfLines={1} adjustsFontSizeToFit style={styles.termsText}>
-                  {"    "}• Số điện thoại:{" "}
-                  <Text style={{ color: '#1A73E8' }}>
-                    0337048780
-                  </Text>
-                </Text>
-              </ThemedText>
-            </ScrollView>
-            <TouchableOpacity
-              style={styles.acceptBtn}
-              onPress={() => setShowTerms(false)}
-            >
-              <Text style={styles.acceptBtnText}>{t('terms_modal_understand')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
 
       {/* Premium Toast System */}
       {showToast && (
@@ -536,19 +479,6 @@ const styles = StyleSheet.create({
   mainBtn: { borderRadius: s(18), overflow: 'hidden', elevation: 4, shadowColor: '#10B981', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8 },
   btnGradient: { height: vs(60), justifyContent: 'center', alignItems: 'center' },
   btnText: { fontSize: ms(16), fontWeight: '400', color: '#FFF', letterSpacing: 1 },
-
-  footer: { marginTop: vs(24), alignItems: 'center', paddingBottom: vs(10) },
-  footerText: { fontSize: ms(13), color: '#94A3B8', fontWeight: '400' },
-
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(15, 23, 42, 0.6)', justifyContent: 'center', alignItems: 'center', padding: s(20) },
-  modalContent: { backgroundColor: '#FFF', width: '100%', borderRadius: s(32), padding: s(24) },
-  modalHeader: { paddingBottom: vs(15), borderBottomWidth: 1, borderBottomColor: '#F1F5F9' },
-  modalTitle: { fontSize: ms(18), fontWeight: '400', color: '#1e293b', textAlign: 'center' },
-  modalScroll: { marginVertical: vs(20), maxHeight: vs(400) },
-  termsText: { fontSize: ms(14), lineHeight: ms(22), color: '#475569', textAlign: 'justify' },
-  termsBold: { fontWeight: '400', color: '#0F172A' },
-  acceptBtn: { backgroundColor: '#1e293b', height: vs(56), borderRadius: s(16), justifyContent: 'center', alignItems: 'center' },
-  acceptBtnText: { color: '#FFF', fontSize: ms(15), fontWeight: '400' },
 
   toastContainer: {
     position: 'absolute',

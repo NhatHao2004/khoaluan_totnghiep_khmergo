@@ -726,39 +726,38 @@ export default function CommunityScreen() {
                 setEditingPostId(null);
                 setCreatePostText('');
                 setSelectedImage(null);
-                setBase64Image(null);
                 setImageRatio(null);
               }}
             />
           </Animated.View>
           <Animated.View style={[styles.modalContent, animatedCreatePostStyle, { flex: 1 }]}>
             <View style={styles.modalHeader}>
-
               <View style={styles.modalHeaderTitleBox}>
                 <Text style={styles.modalTitle}>{isEditingPost ? t('edit_post_title') : t('create_post_title')}</Text>
+                
+                <View style={{ flex: 1 }} />
+                
                 <TouchableOpacity
                   onPress={submitPost}
                   disabled={!createPostText.trim() && !base64Image || isSubmittingPost}
-                  style={{ minWidth: 80, alignItems: 'flex-end', paddingVertical: 10 }}
+                  style={{ minWidth: 60, alignItems: 'center' }}
                 >
-                  <View style={{ minWidth: 30, alignItems: 'center', justifyContent: 'center', paddingRight: 10 }}>
-                    {isSubmittingPost ? (
-                      <ActivityIndicator size="small" color="#1877F2" />
-                    ) : (
-                      <Text style={{
-                        color: (createPostText.trim() || base64Image) ? '#1877F2' : '#CCC',
-                        fontSize: 16,
-                        fontWeight: '700',
-                      }}>
-                        {isEditingPost ? t('update_post') : t('submit_post')}
-                      </Text>
-                    )}
-                  </View>
+                  {isSubmittingPost ? (
+                    <ActivityIndicator size="small" color="#1877F2" />
+                  ) : (
+                    <Text style={{
+                      color: (createPostText.trim() || base64Image) ? '#1877F2' : '#CCC',
+                      fontSize: 16,
+                      fontWeight: '700',
+                    }}>
+                      {isEditingPost ? t('update_post') : t('submit_post')}
+                    </Text>
+                  )}
                 </TouchableOpacity>
               </View>
             </View>
-
-            <ScrollView
+ 
+             <ScrollView
               style={styles.createPostContent}
               contentContainerStyle={{ flexGrow: 1 }}
               keyboardShouldPersistTaps="handled"
@@ -766,6 +765,10 @@ export default function CommunityScreen() {
               <View style={styles.userInfoRow}>
                 <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.commentAvatar} />
                 <Text style={styles.userNameInModal}>{user?.name || t('user_default')}</Text>
+                
+                <TouchableOpacity onPress={pickImage} style={{ padding: 5 }}>
+                  <Ionicons name="image-outline" size={28} color="#1877F2" />
+                </TouchableOpacity>
               </View>
               <TextInput
                 style={styles.createPostInput}
@@ -786,40 +789,12 @@ export default function CommunityScreen() {
                     style={[styles.previewImage, { aspectRatio: imageRatio || 1 }]}
                   />
                   <TouchableOpacity style={styles.removeImageBtn} onPress={() => { setSelectedImage(null); setBase64Image(null); setImageRatio(null); }}>
-                    <Ionicons name="close-circle" size={ms(24)} color="rgba(0,0,0,0.6)" />
+                    <Ionicons name="close" size={18} color="#FFF" />
                   </TouchableOpacity>
                 </View>
               )}
-              <View style={{ height: keyboardHeight > 0 ? vs(100) : vs(80) }} />
+              <View style={{ height: keyboardHeight > 0 ? vs(80) : vs(20) }} />
             </ScrollView>
-
-            <View style={[styles.createPostActions, {
-              paddingBottom: keyboardHeight > 0 ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom : keyboardHeight) : (insets.bottom + vs(5)),
-              position: 'absolute',
-              bottom: 15,
-              left: 0,
-              right: 0
-            }]}>
-              <TouchableOpacity style={styles.attachAction} onPress={pickImage}>
-                <Ionicons name="image-outline" size={24} color="#1877F2" />
-                <Text style={styles.attachActionText}>{t('image_label')}</Text>
-              </TouchableOpacity>
-              <View style={{ flex: 1 }} />
-              <TouchableOpacity
-                style={styles.closeModalBtn}
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setCreateModalVisible(false);
-                  setIsEditingPost(false);
-                  setEditingPostId(null);
-                  setCreatePostText('');
-                  setSelectedImage(null);
-                  setBase64Image(null);
-                }}
-              >
-                <Ionicons name="close" size={28} color="#FF3B30" />
-              </TouchableOpacity>
-            </View>
           </Animated.View>
         </View>
       </Modal>
@@ -1124,10 +1099,10 @@ const styles = StyleSheet.create({
   createPostContent: { flexGrow: 1 },
   userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(20), paddingHorizontal: s(20), paddingTop: vs(10) },
   userNameInModal: { fontSize: ms(17), fontWeight: '700', color: '#1A1A1A', marginLeft: s(12), paddingRight: s(15), flex: 1 },
-  createPostInput: { fontSize: ms(18), color: '#1A1A1A', textAlignVertical: 'top', minHeight: vs(65), paddingHorizontal: s(20), marginBottom: vs(10) },
+  createPostInput: { fontSize: ms(18), color: '#1A1A1A', textAlignVertical: 'top', minHeight: 65, paddingHorizontal: s(20), marginBottom: 0 },
   previewImageContainer: { position: 'relative', marginBottom: vs(12), paddingHorizontal: s(20) },
   previewImage: { width: '100%', borderRadius: ms(20), backgroundColor: '#F0F0F0' },
-  removeImageBtn: { position: 'absolute', top: vs(10), right: s(30), backgroundColor: 'rgba(255,255,255,0.8)', borderRadius: s(15) },
+  removeImageBtn: { position: 'absolute', top: 10, right: 30, backgroundColor: 'rgba(0,0,0,0.5)', width: 24, height: 24, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
   createPostActions: { flexDirection: 'row', padding: s(15), borderTopWidth: 1, borderTopColor: '#F0F0F0', alignItems: 'center', backgroundColor: '#FFFFFF', zIndex: 10 },
   attachAction: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0F7FF', paddingHorizontal: s(20), paddingVertical: vs(10), borderRadius: ms(22), gap: s(8) },
   attachActionText: { fontSize: ms(14), fontWeight: '700', color: '#1877F2', marginRight: s(2) },
