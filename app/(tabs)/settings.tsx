@@ -144,7 +144,23 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        <View style={{ height: 0 }} />
+        {/* Trợ lý AI */}
+        <View style={styles.section}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>{t('assistant_settings')}</Text>
+            <View style={styles.switchItem}>
+              <Text style={styles.switchLabel}>{t('show_chat_button')}</Text>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => toggleChatButton(!chatButtonEnabled)}
+              >
+                <Animated.View style={[styles.customToggleTrack, animatedChatTrackStyle]}>
+                  <Animated.View style={[styles.customToggleThumb, animatedChatThumbStyle]} />
+                </Animated.View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
 
         {/* Thông tin ứng dụng */}
         <View style={styles.section}>
