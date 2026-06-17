@@ -15,16 +15,16 @@ import {
   Image,
   Keyboard,
   KeyboardAvoidingView,
+  LayoutChangeEvent,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
-  LayoutChangeEvent
+  View
 } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { analyzeImage, chatWithAI } from '../services/ai-service';
 
@@ -145,11 +145,33 @@ export default function AIAssistantScreen() {
     if (!result.canceled) { setImage(result.assets[0].uri); setStatus('selected'); setResult(null); }
   };
 
+  useEffect(() => {
+    if (status === 'analyzing') {
+      scanPos.value = 0;
+      scanPos.value = withSequence(
+        withTiming(1, { duration: 2000 }), // Pass 1: Xuống
+        withTiming(0, { duration: 1500 }), // Pass 2: Lên
+        withTiming(1, { duration: 2000 })  // Pass 3: Xuống
+      );
+    } else {
+      scanPos.value = 0;
+    }
+  }, [status]);
+
+  const SCAN_FRAME_HEIGHT = SCREEN_WIDTH - s(80) - 4;
+
+  const animatedScanStyle = useAnimatedStyle(() => {
+    return {
+      top: scanPos.value * SCAN_FRAME_HEIGHT,
+      opacity: status === 'analyzing' ? 1 : 0,
+    };
+  });
+
   const handleAnalyze = async () => {
     if (!image) return;
     setStatus('analyzing');
     try {
-      const minWait = new Promise(r => setTimeout(r, 6000));
+      const minWait = new Promise(r => setTimeout(r, 5500));
       const manipulated = await ImageManipulator.manipulateAsync(image, [{ resize: { width: 800 } }], { base64: true, format: ImageManipulator.SaveFormat.JPEG });
       const [res] = await Promise.all([analyzeImage(manipulated.base64!), minWait]);
       if (res.artifact) setResult({ title: res.artifact.name, content: t('features_label') + ": " + res.artifact.features });
@@ -179,8 +201,8 @@ export default function AIAssistantScreen() {
                       <View style={styles.aiBubble}>
                         <Text style={styles.aiMessageText}>{msg.text}</Text>
                         {msg.text.includes('[LINK:') && (
-                          <TouchableOpacity 
-                            style={styles.detailBtn} 
+                          <TouchableOpacity
+                            style={styles.detailBtn}
                             onPress={() => {
                               const match = msg.text.match(/\[LINK:(.*?)\]/);
                               if (match) {
@@ -221,17 +243,40 @@ export default function AIAssistantScreen() {
         </View>
       ) : (
         <View style={{ flex: 1 }}>
-          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 150 }}>
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: vs(10) }}>
             <View style={styles.cameraSection}>
-              <View style={styles.imageFrame}><View style={styles.innerFrame}>{image ? <Image source={{ uri: image }} style={styles.previewImage} resizeMode="cover" /> : <View style={styles.placeholderContainer} />}</View></View>
+              <View style={styles.imageFrame}>
+                <View style={styles.innerFrame}>
+                  {image ? <Image source={{ uri: image }} style={styles.previewImage} resizeMode="cover" /> : <View style={styles.placeholderContainer} />}
+                  {status === 'analyzing' && (
+                    <Animated.View style={[styles.scanLine, animatedScanStyle]} />
+                  )}
+                </View>
+              </View>
               <View style={styles.aiCard}><Text style={styles.resultTitleSmall}>{result?.title || t('ai_camera_ready')}</Text><Text style={styles.aiBubbleTextSmall}>{result?.content || t('ai_camera_selected_desc')}</Text></View>
             </View>
           </ScrollView>
-          <View style={[styles.fixedCameraActions, { bottom: keyboardSpacer > 0 ? (keyboardSpacer + vs(20)) : vs(20) }]}>
-             <View style={styles.camBtnRow}>
-                <TouchableOpacity style={styles.rectBtn} onPress={() => pickImage(false)}><Ionicons name="images" size={32} color="#1877F2" /></TouchableOpacity>
-                <TouchableOpacity style={styles.rectBtn} onPress={() => pickImage(true)}><Ionicons name="camera" size={32} color="#1877F2" /></TouchableOpacity>
+          <View style={[styles.fixedCameraActions, { bottom: keyboardSpacer > 0 ? (keyboardSpacer + vs(30)) : vs(30) }]}>
+            {status === 'idle' ? (
+              <View style={styles.camBtnRow}>
+                <TouchableOpacity style={styles.rectBtn} onPress={() => pickImage(false)}>
+                  <Ionicons name="images" size={32} color="#1877F2" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.rectBtn} onPress={() => pickImage(true)}>
+                  <Ionicons name="camera" size={32} color="#1877F2" />
+                </TouchableOpacity>
               </View>
+            ) : status === 'selected' ? (
+              <TouchableOpacity style={styles.analyzeBtn} onPress={handleAnalyze}>
+                <LinearGradient colors={['#1877F2', '#3B82F6']} style={styles.analyzeGradient}>
+                  <Text style={styles.analyzeBtnText}>{t('ai_start_analysis')}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            ) : status === 'analyzing' ? (
+              <View style={[styles.analyzeBtn, { backgroundColor: '#F1F5F9', justifyContent: 'center', alignItems: 'center' }]}>
+                <ActivityIndicator size="large" color="#1877F2" />
+              </View>
+            ) : null}
           </View>
         </View>
       )}
@@ -241,9 +286,15 @@ export default function AIAssistantScreen() {
   return (
     <View style={styles.container} onLayout={onRootLayout}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}><Ionicons name="chevron-back" size={28} color="#1F2937" /></TouchableOpacity>
-        <View style={styles.headerInfo}><Text style={styles.headerTitle}>KhmerGo AI</Text></View>
-        <TouchableOpacity onPress={() => activeTab === 'camera' ? resetCamera() : clearChat()}><Ionicons name="refresh-outline" size={ms(26)} color="#EF4444" /></TouchableOpacity>
+        <TouchableOpacity style={styles.headerLeft} onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={28} color="#1F2937" />
+        </TouchableOpacity>
+        <View style={styles.headerInfo}>
+          <Text style={styles.headerTitle} numberOfLines={1}>KhmerGo AI</Text>
+        </View>
+        <TouchableOpacity style={styles.headerRight} onPress={() => activeTab === 'camera' ? resetCamera() : clearChat()}>
+          <Text style={styles.resetText}>Làm mới</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.tabContainer}>
@@ -272,9 +323,12 @@ export default function AIAssistantScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
-  header: { paddingTop: vs(40), paddingBottom: vs(10), paddingHorizontal: s(20), flexDirection: 'row', alignItems: 'center' },
+  header: { paddingTop: vs(40), paddingBottom: vs(10), paddingHorizontal: s(20), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  headerLeft: { width: s(70), alignItems: 'flex-start' },
+  headerRight: { width: s(70), alignItems: 'flex-end' },
   headerInfo: { flex: 1, alignItems: 'center' },
   headerTitle: { fontSize: ms(20), color: '#1A1A1A', fontWeight: '400' },
+  resetText: { fontSize: ms(15), color: '#EF4444', fontWeight: '400' },
   tabContainer: { paddingHorizontal: s(20), paddingVertical: vs(10) },
   tabWrapper: { flexDirection: 'row', backgroundColor: '#F1F5F9', borderRadius: ms(25), padding: s(4) },
   tab: { flex: 1, flexDirection: 'row', height: vs(40), borderRadius: ms(20), alignItems: 'center', justifyContent: 'center', gap: s(6) },
@@ -300,9 +354,22 @@ const styles = StyleSheet.create({
   inputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(15), paddingTop: vs(12), borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFF' },
   input: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: ms(20), paddingHorizontal: s(15), paddingVertical: vs(10), maxHeight: vs(110), fontSize: ms(16) },
   sendfab: { marginLeft: s(10) },
-  cameraSection: { padding: 20, alignItems: 'center' },
-  imageFrame: { width: SCREEN_WIDTH - s(80), aspectRatio: 1, position: 'relative', marginBottom: 20 },
-  innerFrame: { width: '100%', height: '100%', backgroundColor: '#F1F5F9', borderRadius: 25, overflow: 'hidden', borderWidth: 1, borderColor: '#E2E8F0' },
+  cameraSection: { paddingHorizontal: s(20), paddingTop: vs(20), paddingBottom: 0, alignItems: 'center' },
+  imageFrame: { width: SCREEN_WIDTH - s(80), aspectRatio: 1, position: 'relative', marginBottom: vs(2) },
+  innerFrame: { width: '100%', height: '100%', backgroundColor: '#F1F5F9', borderRadius: 25, overflow: 'hidden', borderWidth: 1, borderColor: '#E2E8F0', position: 'relative' },
+  scanLine: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: vs(4),
+    backgroundColor: '#EF4444',
+    zIndex: 10,
+    shadowColor: '#EF4444',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 10,
+    elevation: 8,
+  },
   previewImage: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '100%' },
   placeholderContainer: { flex: 1, backgroundColor: '#F1F5F9' },
   corner: { position: 'absolute', width: s(45), height: s(45), borderColor: '#000', borderStyle: 'solid', zIndex: 20 },

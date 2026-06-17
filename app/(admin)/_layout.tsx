@@ -19,7 +19,8 @@ export default function AdminLayout() {
       try {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         const userData = userDoc.data();
-        if (userData?.role === 'Quản trị viên') {
+        const userRole = userData?.role || userData?.['quyền'] || 'Người dùng';
+        if (userRole === 'Quản trị viên') {
           setIsAdmin(true);
         } else {
           console.error("Access denied: Not an administrator");

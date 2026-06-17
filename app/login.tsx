@@ -118,7 +118,9 @@ export default function LoginScreen() {
       const userDoc = await getDoc(doc(firestoreDb, 'users', firebaseUser.uid));
       const userData = userDoc.data();
 
-      if (userData?.isBlocked && userData?.role !== 'Quản trị viên') {
+      const userRoleRaw = userData?.role || userData?.['quyền'] || 'Người dùng';
+
+      if (userData?.isBlocked && userRoleRaw !== 'Quản trị viên') {
         setLoading(false);
         const { signOut } = await import('firebase/auth');
         await signOut(auth);
@@ -127,8 +129,10 @@ export default function LoginScreen() {
       }
 
       await refreshUser();
+      
+      const userRole = userData?.role || userData?.['quyền'] || 'Người dùng';
 
-      if (userData?.role === 'Quản trị viên') {
+      if (userRole === 'Quản trị viên') {
         router.replace({ pathname: '/(admin)' as any, params: { toast: 'login_success' } });
       } else if (returnTo) {
         router.replace({
