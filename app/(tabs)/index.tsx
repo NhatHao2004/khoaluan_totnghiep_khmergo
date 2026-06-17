@@ -562,9 +562,7 @@ export default function HomeScreen() {
                       closeNotifications();
 
                       // Chuyển hướng
-                      if (item.type === 'reply') {
-                        router.push('/(tabs)/support' as any);
-                      } else if (item.postId) {
+                      if (item.postId) {
                         if (item.type === 'like') {
                           // Nếu là Like: Chỉ sang Community xem bài viết
                           router.push('/(tabs)/community' as any);
@@ -572,9 +570,15 @@ export default function HomeScreen() {
                           // Nếu là Comment/Reply: Sang Community và mở Modal
                           router.push({
                             pathname: '/(tabs)/community',
-                            params: { openPostId: item.postId }
+                            params: { 
+                              openPostId: item.postId,
+                              targetCommentId: item.targetId
+                            }
                           } as any);
                         }
+                      } else if (item.type === 'reply') {
+                        // Đây là phản hồi feedback từ Admin
+                        router.push('/(tabs)/support' as any);
                       } else {
                         router.push('/(tabs)/community' as any);
                       }

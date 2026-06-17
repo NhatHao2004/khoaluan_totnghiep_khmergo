@@ -58,7 +58,7 @@ export default function CommunityScreen() {
   const { t } = useLanguage();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { openPostId } = useLocalSearchParams();
+  const { openPostId, targetCommentId } = useLocalSearchParams();
 
   // States
   const [posts, setPosts] = useState<Post[]>([]);
@@ -94,12 +94,46 @@ export default function CommunityScreen() {
       // Xóa params sau khi đã mở để có thể trigger lại lần sau
       router.setParams({ openPostId: '' });
 
-      // Tự động cuộn xuống cuối sau khi dữ liệu tải (đợi 1 chút cho animation modal và dữ liệu FB)
-      setTimeout(() => {
-        commentsListRef.current?.scrollToEnd({ animated: true });
-      }, 1000);
+      // Nếu không có targetCommentId thì cuộn xuống cuối (như cũ)
+      if (!targetCommentId) {
+        setTimeout(() => {
+          commentsListRef.current?.scrollToEnd({ animated: true });
+        }, 1000);
+      }
     }
   }, [openPostId]);
+
+  // Tự động cuộn tới bình luận cụ thể nếu có targetCommentId
+  useEffect(() => {
+    if (targetCommentId && comments.length > 0 && isModalVisible) {
+      const index = comments.findIndex(c => c.id === targetCommentId);
+      if (index !== -1) {
+        setHighlightId(targetCommentId as string);
+        setTimeout(() => {
+          try {
+            commentsListRef.current?.scrollToIndex({
+              index,
+              animated: true,
+              viewPosition: 0.3 
+            });
+          } catch (e) {
+            commentsListRef.current?.scrollToOffset({
+              offset: index * 100, 
+              animated: true
+            });
+          }
+        }, 800);
+
+        // Tự động xóa highlight sau 3 giây
+        setTimeout(() => {
+          setHighlightId(null);
+        }, 3800);
+        
+        // Chỉ xóa param khi đã tìm thấy và thực hiện scroll
+        router.setParams({ targetCommentId: '' });
+      }
+    }
+  }, [targetCommentId, comments, isModalVisible]);
 
   // Toast States
   const [showToast, setShowToast] = useState(false);
@@ -111,6 +145,7 @@ export default function CommunityScreen() {
   const [replyToId, setReplyToId] = useState<string | null>(null);
   const [replyToName, setReplyToName] = useState<string | null>(null);
   const [replyToUserId, setReplyToUserId] = useState<string | null>(null);
+  const [highlightId, setHighlightId] = useState<string | null>(null);
 
   // Animation for Options Menu
   const optionsX = useSharedValue(SCREEN_WIDTH);
@@ -310,7 +345,7 @@ export default function CommunityScreen() {
     return () => unsubscribe();
   }, [activePostId]);
 
-  const sendNotification = async (receiverId: string, type: 'like' | 'comment' | 'reply', postId: string, message: string) => {
+  const sendNotification = async (receiverId: string, type: 'like' | 'comment' | 'reply', postId: string, message: string, targetId?: string) => {
     if (!user || user.uid === receiverId) return; // Không tự thông báo cho chính mình
 
     try {
@@ -321,6 +356,7 @@ export default function CommunityScreen() {
         senderAvatar: user.avatar || 'https://i.pravatar.cc/150?u=me',
         type,
         postId,
+        targetId: targetId || null,
         message,
         isRead: false,
         createdAt: Firestore.serverTimestamp()
@@ -472,7 +508,7 @@ export default function CommunityScreen() {
       };
 
       // Run Firestore updates in parallel
-      await Promise.all([
+      const [newCommentRef] = await Promise.all([
         Firestore.addDoc(Firestore.collection(db, 'posts', currentPostId, 'comments'), commentData),
         Firestore.updateDoc(Firestore.doc(db, 'posts', currentPostId), {
           comments: Firestore.increment(1)
@@ -491,9 +527,9 @@ export default function CommunityScreen() {
       if (postSnap.exists()) {
         const postData = postSnap.data();
         if (capturedReplyToId && capturedReplyToUserId) {
-          sendNotification(capturedReplyToUserId, 'reply', currentPostId, `${t('someone_replied')}: "${currentComment.substring(0, 30)}..."`);
+          sendNotification(capturedReplyToUserId, 'reply', currentPostId, `${t('someone_replied')}: "${currentComment.substring(0, 30)}..."`, capturedReplyToId);
         } else {
-          sendNotification(postData.userId, 'comment', currentPostId, `${t('someone_commented')}: "${currentComment.substring(0, 30)}..."`);
+          sendNotification(postData.userId, 'comment', currentPostId, `${t('someone_commented')}: "${currentComment.substring(0, 30)}..."`, newCommentRef.id);
         }
       }
     } catch (error) {
@@ -833,7 +869,11 @@ export default function CommunityScreen() {
                 const isReply = !!item.parentId;
 
                 return (
-                  <View style={[styles.commentItem, isReply && { marginLeft: 45 }]}>
+                  <View style={[
+                    styles.commentItem,
+                    isReply && { marginLeft: 45 },
+                    highlightId === item.id && styles.highlightedComment
+                  ]}>
                     <Image source={{ uri: displayCommentAvatar }} style={[styles.commentAvatar, isReply && { width: 32, height: 32 }]} />
                     <View style={styles.commentBody}>
                       <View style={styles.commentContentArea}>
@@ -1051,7 +1091,8 @@ const styles = StyleSheet.create({
   modalTitle: { fontSize: ms(18), fontWeight: '800', color: '#1A1A1A' },
   commentAvatar: { width: s(36), height: s(36), borderRadius: s(18), backgroundColor: '#F0F0F0' },
   commentsList: { paddingHorizontal: s(20), paddingBottom: vs(20) },
-  commentItem: { flexDirection: 'row', marginBottom: vs(15) },
+  commentItem: { flexDirection: 'row', marginBottom: vs(15), paddingHorizontal: s(10), paddingVertical: vs(5) },
+  highlightedComment: { backgroundColor: '#F0F9FF', borderRadius: ms(12), borderLeftWidth: 3, borderLeftColor: '#3B82F6' },
   commentBody: { marginLeft: s(10), flex: 1, minWidth: 0 },
   commentContentArea: { paddingVertical: vs(2) },
   commentUserRow: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(2), flexWrap: 'wrap' },
