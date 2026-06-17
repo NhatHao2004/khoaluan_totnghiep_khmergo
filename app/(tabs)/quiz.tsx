@@ -127,7 +127,7 @@ export default function QuizScreen() {
             <View style={{ flex: 1.2 }}>
               <TouchableOpacity
                 activeOpacity={0.85}
-                style={[styles.bentoCard, { height: vs(295) }]}
+                style={[styles.bentoCard, { height: vs(240) }]}
                 onPress={() => {
                   if (!user || user.isAnonymous) {
                     setShowLoginModal(true);
@@ -149,7 +149,7 @@ export default function QuizScreen() {
             <View style={{ flex: 1, gap: 15 }}>
               <TouchableOpacity
                 activeOpacity={0.7}
-                style={[styles.bentoCard, { height: vs(140) }]}
+                style={[styles.bentoCard, { height: vs(112) }]}
                 onPress={() => {
                   if (!user || user.isAnonymous) {
                     setShowLoginModal(true);
@@ -168,7 +168,7 @@ export default function QuizScreen() {
 
               <TouchableOpacity
                 activeOpacity={0.7}
-                style={[styles.bentoCard, { height: vs(140) }]}
+                style={[styles.bentoCard, { height: vs(112) }]}
                 onPress={() => {
                   if (!user || user.isAnonymous) {
                     setShowLoginModal(true);
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     marginBottom: vs(15),
     borderWidth: 1,
     borderColor: '#F1F5F9',
-    minHeight: vs(180),
+    minHeight: vs(160),
   },
 
   cardHeader: {
@@ -300,9 +300,9 @@ const styles = StyleSheet.create({
     marginBottom: vs(12),
   },
   avatarWrapper: {
-    width: s(70),
-    height: s(70),
-    borderRadius: s(35),
+    width: s(60),
+    height: s(60),
+    borderRadius: s(30),
     backgroundColor: '#f8fafc',
     justifyContent: 'center',
     alignItems: 'center',
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardName: {
-    fontSize: ms(24),
+    fontSize: ms(20),
     fontWeight: '400',
     color: '#000000ff',
     marginBottom: vs(4),
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   statValue: {
-    fontSize: ms(22),
+    fontSize: ms(20),
     fontWeight: '400',
     color: '#1E293B',
     lineHeight: vs(28),
@@ -422,7 +422,7 @@ const styles = StyleSheet.create({
   },
   bentoCardFull: {
     width: '100%',
-    height: vs(180),
+    height: vs(120),
     borderRadius: ms(24),
     padding: s(20),
     overflow: 'visible',
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
   },
 
   bentoTitle: {
-    fontSize: ms(20),
+    fontSize: ms(18),
     fontWeight: '400',
     color: '#0F172A',
     lineHeight: vs(28),
@@ -459,8 +459,8 @@ const styles = StyleSheet.create({
     lineHeight: vs(18),
   },
   bentoImageContainer: {
-    width: s(110),
-    height: s(110),
+    width: s(90),
+    height: s(90),
     opacity: 1,
     alignSelf: 'center',
     justifyContent: 'center',
@@ -470,8 +470,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   bentoImageContainerSmall: {
-    width: s(70),
-    height: s(70),
+    width: s(60),
+    height: s(60),
     opacity: 1,
     alignSelf: 'center',
     justifyContent: 'center',
@@ -481,8 +481,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   bentoImageContainerFull: {
-    width: s(110),
-    height: s(110),
+    width: s(80),
+    height: s(80),
     opacity: 1,
     backgroundColor: 'transparent',
     borderRadius: ms(20),
