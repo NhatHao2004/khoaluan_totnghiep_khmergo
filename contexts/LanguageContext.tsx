@@ -36,7 +36,7 @@ export const translations: any = {
     app_info: 'Thông tin ứng dụng',
     intro: 'Giới thiệu',
     version: 'Phiên bản',
-    assistant_settings: 'Trợ lý AI',
+    assistant_settings: 'Cài đặt trợ lý AI',
     show_chat_button: 'Hiển thị nút Chat',
     // Support Screen
     support_feedback: 'Hỗ trợ và Phản hồi',
