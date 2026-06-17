@@ -684,6 +684,12 @@ export default function CommunityScreen() {
               setShowLoginModal(true);
               return;
             }
+            setCreatePostText('');
+            setSelectedImage(null);
+            setBase64Image(null);
+            setImageRatio(null);
+            setIsEditingPost(false);
+            setEditingPostId(null);
             setCreateModalVisible(true);
           }}
         >
@@ -716,6 +722,12 @@ export default function CommunityScreen() {
               onPress={() => {
                 Keyboard.dismiss();
                 setCreateModalVisible(false);
+                setIsEditingPost(false);
+                setEditingPostId(null);
+                setCreatePostText('');
+                setSelectedImage(null);
+                setBase64Image(null);
+                setImageRatio(null);
               }}
             />
           </Animated.View>
@@ -1068,7 +1080,7 @@ const styles = StyleSheet.create({
   },
   toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '700', marginLeft: s(15), flex: 1, letterSpacing: 0.3 },
   screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: s(20), paddingTop: vs(10), paddingBottom: vs(15), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
-  screenTitle: { fontSize: ms(22), fontWeight: '800', color: '#1A1A1A' },
+  screenTitle: { fontSize: ms(22), fontWeight: '400', color: '#1A1A1A' },
   plusBtn: { width: s(36), height: s(36), borderRadius: s(18), backgroundColor: '#F7F7F7', justifyContent: 'center', alignItems: 'center' },
   listContent: { paddingTop: vs(5), paddingBottom: vs(30) },
   postContainer: { paddingHorizontal: s(20), paddingVertical: vs(20), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
@@ -1088,7 +1100,7 @@ const styles = StyleSheet.create({
   modalHeader: { alignItems: 'center', paddingVertical: vs(12) },
   modalHandle: { width: s(40), height: vs(5), borderRadius: s(3), backgroundColor: '#E0E0E0', marginBottom: vs(10) },
   modalHeaderTitleBox: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: s(20), marginBottom: vs(10) },
-  modalTitle: { fontSize: ms(18), fontWeight: '800', color: '#1A1A1A' },
+  modalTitle: { fontSize: ms(18), fontWeight: '400', color: '#1A1A1A' },
   commentAvatar: { width: s(36), height: s(36), borderRadius: s(18), backgroundColor: '#F0F0F0' },
   commentsList: { paddingHorizontal: s(20), paddingBottom: vs(20) },
   commentItem: { flexDirection: 'row', marginBottom: vs(15), paddingHorizontal: s(10), paddingVertical: vs(5) },
