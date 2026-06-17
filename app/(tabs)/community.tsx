@@ -910,7 +910,7 @@ export default function CommunityScreen() {
                   </View>
                 );
               }}
-              ListEmptyComponent={<View style={{ paddingTop: 260, paddingHorizontal: 40, alignItems: 'center' }}><Text style={{ color: '#999' }}>{t('first_comment_msg')}</Text></View>}
+              ListEmptyComponent={<View style={{ paddingTop: 260, paddingHorizontal: 40, alignItems: 'center' }}><Text style={{ color: '#999' }} numberOfLines={1} adjustsFontSizeToFit>{t('first_comment_msg')}</Text></View>}
             />
 
             {replyToName && (
