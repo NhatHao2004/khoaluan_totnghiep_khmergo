@@ -357,7 +357,7 @@ export const translations: any = {
     image_too_heavy: 'Ảnh quá nặng, hãy chọn ảnh khác',
     image_process_error: 'Lỗi xử lý hình ảnh',
     user_default: 'Người dùng',
-    reply_action: 'Trả lời',
+    reply_action: 'Phản hồi',
     delete_action: 'Xóa',
     first_comment_msg: 'Hãy là người đầu tiên bình luận',
     replying_to: 'Đang trả lời',
