@@ -846,7 +846,7 @@ const ContentManagement = () => {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-      <Modal visible={deleteConfirmVisible} transparent animationType="fade" statusBarTranslucent><View style={styles.modalBg}><View style={styles.confirmBox}><View style={styles.confirmIconBg}><Ionicons name="trash" size={ms(32)} color="#ef4444" /></View><Text style={styles.confirmTitle}>Xác nhận xóa</Text><Text style={styles.confirmText}>{deleteType === 'destination' ? `"${pendingDelete?.name}" sẽ được chuyển vào thùng rác.` : deleteType === 'topic' ? `Chủ đề "${pendingDelete?.title}" sẽ được chuyển vào thùng rác.` : 'Từ vựng này sẽ bị xóa vĩnh viễn.'}</Text><View style={styles.modalActions}><TouchableOpacity style={styles.cancelBtn} onPress={() => setDeleteConfirmVisible(false)}><Text style={styles.cancelBtnText}>Quay lại</Text></TouchableOpacity><TouchableOpacity style={[styles.saveBtn, { backgroundColor: '#ef4444' }]} onPress={confirmDelete}><Text style={styles.saveBtnText}>Xác nhận xóa</Text></TouchableOpacity></View></View></View></Modal>
+      <Modal visible={deleteConfirmVisible} transparent animationType="fade" statusBarTranslucent><View style={styles.modalBg}><View style={styles.confirmBox}><View style={styles.confirmIconBg}><Ionicons name="trash" size={ms(32)} color="#ef4444" /></View><Text style={styles.confirmTitle}>Xác nhận xóa</Text><Text style={styles.confirmText}>{deleteType === 'destination' ? `"${pendingDelete?.name}" sẽ được chuyển vào thùng rác.` : deleteType === 'topic' ? `Chủ đề "${pendingDelete?.title}" sẽ được chuyển vào thùng rác.` : 'Từ vựng này sẽ bị xóa vĩnh viễn.'}</Text><View style={styles.modalActions}><TouchableOpacity style={styles.cancelBtn} onPress={() => setDeleteConfirmVisible(false)}><Text style={styles.cancelBtnText}>Quay lại</Text></TouchableOpacity><TouchableOpacity style={[styles.saveBtn, { backgroundColor: '#ff0000ff' }]} onPress={confirmDelete}><Text style={styles.saveBtnText}>Xác nhận xóa</Text></TouchableOpacity></View></View></View></Modal>
     </View>
   );
 };
@@ -913,7 +913,7 @@ const styles = StyleSheet.create({
     paddingTop: vs(20),
     gap: s(12),
   },
-  cancelBtn: { flex: 1, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#ff0000ff', alignItems: 'center' },
+  cancelBtn: { flex: 1, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#3b82f6', alignItems: 'center' },
   cancelBtnText: { fontSize: ms(15), fontWeight: '400', color: '#fff' },
   saveBtn: { flex: 2, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#3b82f6', alignItems: 'center' },
   saveBtnText: { fontSize: ms(15), fontWeight: '400', color: '#fff' },
