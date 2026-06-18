@@ -1389,7 +1389,7 @@ const styles = StyleSheet.create({
     height: vs(46),
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#94a3b8',
+    backgroundColor: '#ff0000ff',
     borderRadius: s(14),
   },
   quickCancelText: {
