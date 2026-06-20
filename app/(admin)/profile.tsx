@@ -202,13 +202,13 @@ const AdminProfile = () => {
       {/* Premium Toast System */}
       {showToast && (
         <Animated.View style={[styles.toastContainer, animatedToastStyle, {
-          backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
-          shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
+          backgroundColor: toastType === 'success' ? '#10B981' : '#EF4444',
+          shadowColor: toastType === 'success' ? '#10B981' : '#EF4444',
           top: toastTop,
         }]}>
           <View style={styles.toastIcon}>
             <Ionicons
-              name={toastType === 'success' ? "checkmark" : "close"}
+              name={toastType === 'success' ? "checkmark" : toastType === 'error' ? "close" : "information-circle"}
               size={ms(20)}
               color="#FFF"
             />

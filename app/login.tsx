@@ -427,15 +427,15 @@ export default function LoginScreen() {
             styles.toastContainer,
             animatedToastStyle,
             {
-              backgroundColor: toastType === 'error' ? '#EF4444' : toastType === 'success' ? '#10B981' : '#3B82F6',
-              shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
+              backgroundColor: toastType === 'success' ? '#10B981' : '#EF4444',
+              shadowColor: toastType === 'success' ? '#10B981' : '#EF4444',
               top: insets.top + vs(8),
             }
           ]}
         >
           <View style={styles.toastIcon}>
             <Ionicons
-              name={toastType === 'success' ? "checkmark" : toastType === 'error' ? "close" : "information"}
+              name={toastType === 'success' ? "checkmark" : toastType === 'error' ? "close" : "information-circle"}
               size={ms(20)}
               color="#FFF"
             />

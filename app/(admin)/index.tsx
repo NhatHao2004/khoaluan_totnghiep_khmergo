@@ -341,15 +341,15 @@ const AdminDashboard = () => {
             styles.toastContainer,
             animatedToastStyle,
             {
-              backgroundColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
-              shadowColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
+              backgroundColor: toastType === 'success' ? '#10B981' : '#EF4444',
+              shadowColor: toastType === 'success' ? '#10B981' : '#EF4444',
               top: toastTop,
             }
           ]}
         >
           <View style={styles.toastIcon}>
             <Ionicons
-              name={toastType === 'success' ? "checkmark" : toastType === 'info' ? "notifications" : "close"}
+              name={toastType === 'success' ? "checkmark" : toastType === 'error' ? "close" : "information-circle"}
               size={ms(20)}
               color="#FFF"
             />
@@ -660,15 +660,15 @@ const AdminDashboard = () => {
                 styles.toastContainer,
                 animatedToastStyle,
                 {
-                  backgroundColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
-                  shadowColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
+                  backgroundColor: toastType === 'success' ? '#10B981' : '#EF4444',
+                  shadowColor: toastType === 'success' ? '#10B981' : '#EF4444',
                   top: toastTop,
                 }
               ]}
             >
               <View style={styles.toastIcon}>
                 <Ionicons
-                  name={toastType === 'success' ? "checkmark" : toastType === 'info' ? "notifications" : "close"}
+                  name={toastType === 'success' ? "checkmark" : toastType === 'error' ? "close" : "information-circle"}
                   size={ms(20)}
                   color="#FFF"
                 />

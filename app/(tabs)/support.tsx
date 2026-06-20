@@ -3,11 +3,14 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
 import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { addDoc, collection, deleteDoc, doc, onSnapshot, query, serverTimestamp, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -17,7 +20,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import Animated, { FadeInDown, interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { FadeInDown, interpolate, LinearTransition, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SupportScreen() {
@@ -111,11 +114,13 @@ export default function SupportScreen() {
       return;
     }
 
+    Keyboard.dismiss();
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setIsSending(true);
     try {
       const newFeedbackData = {
         userId: user.uid,
-        userName: user.name || 'User',
+        userName: user.name || t('user_default'),
         avatar: user.avatar || null,
         'e-mail': user.email,
         subject: 'Phản hồi đóng góp',
@@ -125,15 +130,8 @@ export default function SupportScreen() {
 
       await addDoc(collection(db, 'feedback'), newFeedbackData);
 
-      // Cập nhật local state ngay lập tức để người dùng thấy luôn
-      const optimisticFeedback = {
-        id: Date.now().toString(),
-        ...newFeedbackData,
-        createdAt: { toDate: () => new Date() } // Giả lập để không bị lỗi khi render date
-      };
-      setUserFeedbacks(prev => [optimisticFeedback, ...prev]);
-
       showToast(t('feedback_success'), 'success');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setContent('');
     } catch (error) {
       console.error('Error sending feedback:', error);
@@ -184,171 +182,184 @@ export default function SupportScreen() {
         <View style={{ width: 25 }} />
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        {/* FAQ Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('faq')}</Text>
-          <TouchableOpacity style={styles.faqItem} onPress={() => router.push('/faq/learn' as any)}>
-            <View style={[styles.faqIconCircle, { backgroundColor: '#F0FDF4' }]}>
-              <Ionicons name="person-circle-outline" size={24} color="#22C55E" />
-            </View>
-            <View style={styles.faqInfo}>
-              <Text style={styles.faqText}>{t('faq_how_to_learn')}</Text>
-              <Text style={styles.faqSub}>{t('tap_to_see_guide')}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
-          </TouchableOpacity>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
+      >
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+          {/* FAQ Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t('faq')}</Text>
+            <TouchableOpacity style={styles.faqItem} onPress={() => router.push('/faq/learn' as any)}>
+              <View style={[styles.faqIconCircle, { backgroundColor: '#F0FDF4' }]}>
+                <Ionicons name="person-circle-outline" size={24} color="#22C55E" />
+              </View>
+              <View style={styles.faqInfo}>
+                <Text style={styles.faqText}>{t('faq_how_to_learn')}</Text>
+                <Text style={styles.faqSub}>{t('tap_to_see_guide')}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.faqItem} onPress={() => router.push('/faq/use' as any)}>
-            <View style={[styles.faqIconCircle, { backgroundColor: '#EFF6FF' }]}>
-              <Ionicons name="help-circle-outline" size={22} color="#3B82F6" />
-            </View>
-            <View style={styles.faqInfo}>
-              <Text style={styles.faqText}>{t('faq_how_to_use')}</Text>
-              <Text style={styles.faqSub}>{t('tap_to_see_guide')}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.faqItem} onPress={() => router.push('/faq/use' as any)}>
+              <View style={[styles.faqIconCircle, { backgroundColor: '#EFF6FF' }]}>
+                <Ionicons name="help-circle-outline" size={22} color="#3B82F6" />
+              </View>
+              <View style={styles.faqInfo}>
+                <Text style={styles.faqText}>{t('faq_how_to_use')}</Text>
+                <Text style={styles.faqSub}>{t('tap_to_see_guide')}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.faqItem} onPress={() => router.push('/faq/quiz' as any)}>
-            <View style={[styles.faqIconCircle, { backgroundColor: '#FFF7ED' }]}>
-              <Ionicons name="trophy-outline" size={22} color="#F59E0B" />
-            </View>
-            <View style={styles.faqInfo}>
-              <Text style={styles.faqText}>{t('faq_how_to_quiz')}</Text>
-              <Text style={styles.faqSub}>{t('tap_to_see_guide')}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Feedback Section */}
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.section}
-        >
-          <Text style={styles.sectionTitle}>{t('feedback_section')}</Text>
-
-          <View style={styles.formContainer}>
-
-            <View style={styles.inputGroup}>
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder={t('feedback_placeholder')}
-                value={content}
-                onChangeText={setContent}
-                multiline
-                numberOfLines={4}
-                textAlignVertical="top"
-                placeholderTextColor="#94A3B8"
-              />
-            </View>
-
-            <TouchableOpacity
-              style={[styles.sendBtn, isSending && styles.sendBtnDisabled]}
-              onPress={handleSendFeedback}
-              disabled={isSending}
-            >
-              {isSending ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
-              ) : (
-                <>
-                  <Text style={styles.sendBtnText}>{t('send_feedback')}</Text>
-                </>
-              )}
+            <TouchableOpacity style={styles.faqItem} onPress={() => router.push('/faq/quiz' as any)}>
+              <View style={[styles.faqIconCircle, { backgroundColor: '#FFF7ED' }]}>
+                <Ionicons name="trophy-outline" size={22} color="#F59E0B" />
+              </View>
+              <View style={styles.faqInfo}>
+                <Text style={styles.faqText}>{t('faq_how_to_quiz')}</Text>
+                <Text style={styles.faqSub}>{t('tap_to_see_guide')}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
             </TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
 
-        {/* Feedback History Section */}
-        <View style={styles.historySection}>
-          <Text style={styles.historySectionTitle}>{t('feedback_history')}</Text>
+          {/* Feedback Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t('feedback_section')}</Text>
 
-          {loadingFeedbacks ? (
-            <View style={styles.loadingHistory}>
-              <ActivityIndicator size="small" color="#3B82F6" />
-            </View>
-          ) : userFeedbacks.length > 0 ? (
-            userFeedbacks.map((item, index) => (
-              <Animated.View
-                key={item.id}
-                entering={FadeInDown.delay(index * 100).duration(500)}
-                style={styles.historyCardWrapper}
+            <View style={styles.formContainer}>
+
+              <View style={styles.inputGroup}>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  placeholder={t('feedback_placeholder')}
+                  value={content}
+                  onChangeText={setContent}
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                  placeholderTextColor="#94A3B8"
+                />
+              </View>
+
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={[styles.sendBtn, isSending && styles.sendBtnDisabled]}
+                onPress={handleSendFeedback}
+                disabled={isSending}
               >
-                <TouchableOpacity
-                  style={[styles.historyCard, (item.adminReply || item.reply) && styles.repliedCard]}
-                  onLongPress={() => setDeletingId(item.id)}
-                  onPress={() => deletingId && setDeletingId(null)}
-                  activeOpacity={0.8}
+                {isSending ? (
+                  <ActivityIndicator color="#3B82F6" size="small" />
+                ) : (
+                  <>
+                    <Text style={styles.sendBtnText}>{t('send_feedback')}</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Feedback History Section */}
+          <View style={styles.historySection}>
+            <Text style={styles.historySectionTitle}>{t('feedback_history')}</Text>
+
+            {loadingFeedbacks ? (
+              <View style={styles.loadingHistory}>
+                <ActivityIndicator size="small" color="#3B82F6" />
+              </View>
+            ) : userFeedbacks.length > 0 ? (
+              userFeedbacks.map((item, index) => (
+                <Animated.View
+                  key={item.id}
+                  entering={index < 5 ? FadeInDown.delay(index * 80).duration(400) : undefined}
+                  layout={LinearTransition}
+                  style={styles.historyCardWrapper}
                 >
-                  {/* Status Bar */}
-                  <View style={styles.cardHeaderRow}>
-                    <View style={[styles.statusBadge, (item.adminReply || item.reply) ? styles.statusReplied : styles.statusPending]}>
-                      <Ionicons
-                        name={(item.adminReply || item.reply) ? "checkmark-circle" : "time"}
-                        size={ms(12)}
-                        color={(item.adminReply || item.reply) ? "#10B981" : "#F59E0B"}
-                      />
-                      <Text style={[styles.statusText, { color: (item.adminReply || item.reply) ? "#10B981" : "#F59E0B" }]}>
-                        {(item.adminReply || item.reply) ? t('replied_status') || 'Đã trả lời' : t('pending_status') || 'Đang chờ'}
-                      </Text>
-                    </View>
-                    <Text style={styles.historyDate}>{formatDate(item.createdAt)}</Text>
-                  </View>
-
-                  {/* User Message */}
-                  <View style={styles.userMessageArea}>
-                    <View style={styles.userIconCircle}>
-                      <Ionicons name="person" size={ms(14)} color="#64748B" />
-                    </View>
-                    <Text style={styles.userMsgText}>
-                      {item.content || item.message || t('no_content')}
-                    </Text>
-                  </View>
-
-                  {/* Admin Response */}
-                  {(item.adminReply || item.reply) && (
-                    <View style={styles.adminResponseArea}>
-                      <View style={styles.adminHeader}>
-                        <View style={styles.adminIconCircle}>
-                          <Ionicons name="shield-checkmark" size={ms(14)} color="#3B82F6" />
-                        </View>
-                        <Text style={styles.adminName}>{t('admin_reply') || 'Admin phản hồi'}</Text>
-                      </View>
-                      <View style={styles.adminTextBubble}>
-                        <Text style={styles.adminMsgText}>
-                          {item.adminReply || item.reply}
+                  <TouchableOpacity
+                    style={[styles.historyCard, (item.adminReply || item.reply) && styles.repliedCard]}
+                    onLongPress={() => setDeletingId(item.id)}
+                    onPress={() => deletingId && setDeletingId(null)}
+                    activeOpacity={0.9}
+                  >
+                    {/* Status Bar */}
+                    <View style={styles.cardHeaderRow}>
+                      <View style={[styles.statusBadge, (item.adminReply || item.reply) ? styles.statusReplied : styles.statusPending]}>
+                        <Ionicons
+                          name={(item.adminReply || item.reply) ? "checkmark-circle" : "time"}
+                          size={ms(12)}
+                          color="#FFFFFF"
+                        />
+                        <Text style={styles.statusText}>
+                          {t((item.adminReply || item.reply) ? 'replied_status' : 'pending_status')}
                         </Text>
                       </View>
+                      <Text style={styles.historyDate}>{formatDate(item.createdAt)}</Text>
                     </View>
-                  )}
 
-                  {/* Delete Overlay */}
-                  {deletingId === item.id && (
-                    <TouchableOpacity
-                      onPress={() => handleDeleteFeedback(item.id)}
-                      style={styles.deleteOverlay}
-                    >
-                      <View style={styles.deleteBtnContent}>
-                        <Ionicons name="trash" size={24} color="#FFF" />
-                        <Text style={styles.deleteBtnText}>{t('delete') || 'Xóa'}</Text>
+                    {/* User Message */}
+                    <View style={styles.userMessageArea}>
+                      <View style={styles.userIconCircle}>
+                        {item.avatar ? (
+                          <Image
+                            source={{ uri: item.avatar }}
+                            style={styles.userAvatarImg}
+                            contentFit="cover"
+                            transition={200}
+                          />
+                        ) : (
+                          <Ionicons name="person" size={ms(14)} color="#64748B" />
+                        )}
                       </View>
-                    </TouchableOpacity>
-                  )}
-                </TouchableOpacity>
-              </Animated.View>
-            ))
-          ) : (
-            <View style={styles.emptyHistory}>
-              <View style={styles.emptyIconBox}>
-                <Ionicons name="chatbox-ellipses-outline" size={ms(40)} color="#CBD5E1" />
-              </View>
-              <Text style={styles.emptyText}>{t('no_feedback_history') || 'Chưa có lịch sử phản hồi'}</Text>
-            </View>
-          )}
-        </View>
-      </ScrollView>
+                      <Text style={styles.userMsgText}>
+                        {item.content || item.message || t('no_content')}
+                      </Text>
+                    </View>
 
+                    {/* Admin Response */}
+                    {(item.adminReply || item.reply) && (
+                      <View style={styles.adminResponseArea}>
+                        <View style={styles.adminHeader}>
+                          <View style={styles.adminIconCircle}>
+                            <Ionicons name="person-circle" size={ms(16)} color="#3B82F6" />
+                          </View>
+                          <Text style={styles.adminName}>{t('admin_reply')}</Text>
+                        </View>
+                        <View style={styles.adminTextBubble}>
+                          <View style={styles.bubbleArrow} />
+                          <Text style={styles.adminMsgText}>
+                            {item.adminReply || item.reply}
+                          </Text>
+                        </View>
+                      </View>
+                    )}
+
+                    {/* Delete Overlay */}
+                    {deletingId === item.id && (
+                      <TouchableOpacity
+                        onPress={() => handleDeleteFeedback(item.id)}
+                        style={styles.deleteOverlay}
+                      >
+                        <View style={styles.deleteBtnContent}>
+                          <Ionicons name="trash" size={24} color="#FFF" />
+                          <Text style={styles.deleteBtnText}>{t('delete_action')}</Text>
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                  </TouchableOpacity>
+                </Animated.View>
+              ))
+            ) : (
+              <View style={styles.emptyHistory}>
+                <View style={styles.emptyIconBox}>
+                  <Ionicons name="chatbox-ellipses-outline" size={ms(40)} color="#CBD5E1" />
+                </View>
+                <Text style={styles.emptyText}>{t('no_feedback_history') || 'Chưa có lịch sử phản hồi'}</Text>
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
       {/* Premium Toast System */}
       {showToastState && (
         <Animated.View
@@ -457,11 +468,11 @@ const styles = StyleSheet.create({
     borderRadius: s(32),
     borderWidth: 1,
     borderColor: '#F1F5F9',
-    shadowColor: '#64748B',
+    shadowColor: '#3B82F6',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.08,
     shadowRadius: 20,
-    elevation: 5,
+    elevation: 8,
   },
   inputGroup: {
     marginBottom: 16,
@@ -493,19 +504,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: vs(16),
+    height: vs(56), // Fixed height to prevent jerking
     borderRadius: s(18),
     marginTop: vs(10),
     shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 15,
+    elevation: 6,
   },
   sendBtnDisabled: {
-    backgroundColor: '#CBD5E1',
-    shadowOpacity: 0.1,
-    elevation: 0,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#3B82F6',
+    shadowOpacity: 0.05,
+    elevation: 2,
   },
   sendBtnText: {
     color: '#FFFFFF',
@@ -522,7 +535,7 @@ const styles = StyleSheet.create({
     fontSize: ms(18),
     fontWeight: '400',
     color: '#1E293B',
-    marginBottom: vs(5),
+    marginBottom: vs(12),
   },
   historyCardWrapper: {
     marginBottom: vs(12),
@@ -530,19 +543,15 @@ const styles = StyleSheet.create({
   historyCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: s(24),
-    paddingHorizontal: s(16),
-    paddingVertical: vs(14),
-    borderWidth: 1,
-    borderColor: '#F1F5F9',
-    shadowColor: '#64748B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 3,
+    paddingHorizontal: s(20),
+    paddingVertical: vs(18),
+    borderWidth: 1.5,
+    borderColor: '#1A1A1A', // Sharp black/dark border
     overflow: 'hidden',
   },
   repliedCard: {
-    borderColor: '#E0F2FE', // Light blue border for replied ones
+    borderWidth: 1.5,
+    borderColor: '#3B82F6', // Blue border for replied ones
   },
   cardHeaderRow: {
     flexDirection: 'row',
@@ -559,16 +568,16 @@ const styles = StyleSheet.create({
     gap: s(5),
   },
   statusReplied: {
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#10B981', // Solid background for better contrast
   },
   statusPending: {
-    backgroundColor: '#FFFBEB',
+    backgroundColor: '#F59E0B', // Solid background for better contrast
   },
   statusText: {
     fontSize: ms(11),
-    fontWeight: '400',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontWeight: '600', // Making it bolder
+    color: '#FFFFFF', // White text on solid background
+    letterSpacing: 0.3,
   },
   historyDate: {
     fontSize: ms(12),
@@ -577,18 +586,22 @@ const styles = StyleSheet.create({
   },
   userMessageArea: {
     flexDirection: 'row',
+    alignItems: 'center', // Added for alignment
     gap: s(12),
     marginBottom: vs(6),
   },
   userIconCircle: {
-    width: s(28),
-    height: s(28),
-    borderRadius: s(14),
-    backgroundColor: '#F8FAFC',
+    width: s(32),
+    height: s(32),
+    borderRadius: s(16),
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#F1F5F9',
+    overflow: 'hidden',
+  },
+  userAvatarImg: {
+    width: '100%',
+    height: '100%',
   },
   userMsgText: {
     flex: 1,
@@ -598,10 +611,11 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   adminResponseArea: {
-    marginTop: vs(8),
+    marginTop: vs(12),
     paddingTop: vs(12),
     borderTopWidth: 1,
-    borderTopColor: '#F1F5F9',
+    borderTopColor: '#F8FAFC',
+    marginLeft: s(20), // Thụt đầu dòng (indent)
   },
   adminHeader: {
     flexDirection: 'row',
@@ -625,16 +639,29 @@ const styles = StyleSheet.create({
     color: '#3B82F6',
   },
   adminTextBubble: {
-    backgroundColor: '#F8FAFC',
-    padding: s(16),
+    backgroundColor: '#F0F9FF', // Very light blue for response
+    padding: s(15),
     borderRadius: s(16),
     borderTopLeftRadius: s(2),
   },
   adminMsgText: {
     fontSize: ms(14),
     color: '#334155',
-    lineHeight: ms(22),
+    lineHeight: ms(20),
     fontWeight: '400',
+  },
+  bubbleArrow: {
+    position: 'absolute',
+    top: -vs(6),
+    left: s(12),
+    width: 0,
+    height: 0,
+    borderLeftWidth: s(5),
+    borderRightWidth: s(5),
+    borderBottomWidth: vs(6),
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#F0F9FF', // Light blue to match child theme
   },
   deleteOverlay: {
     ...StyleSheet.absoluteFillObject,

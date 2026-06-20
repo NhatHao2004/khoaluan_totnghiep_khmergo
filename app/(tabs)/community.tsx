@@ -739,9 +739,9 @@ export default function CommunityScreen() {
             <View style={styles.modalHeader}>
               <View style={styles.modalHeaderTitleBox}>
                 <Text style={styles.modalTitle}>{isEditingPost ? t('edit_post_title') : t('create_post_title')}</Text>
-                
+
                 <View style={{ flex: 1 }} />
-                
+
                 <TouchableOpacity
                   onPress={submitPost}
                   disabled={!createPostText.trim() && !base64Image || isSubmittingPost}
@@ -761,8 +761,8 @@ export default function CommunityScreen() {
                 </TouchableOpacity>
               </View>
             </View>
- 
-             <ScrollView
+
+            <ScrollView
               style={styles.createPostContent}
               contentContainerStyle={{ flexGrow: 1 }}
               keyboardShouldPersistTaps="handled"
@@ -770,7 +770,7 @@ export default function CommunityScreen() {
               <View style={styles.userInfoRow}>
                 <Image source={{ uri: user?.avatar || 'https://i.pravatar.cc/150?u=me' }} style={styles.commentAvatar} />
                 <Text style={styles.userNameInModal}>{user?.name || t('user_default')}</Text>
-                
+
                 <TouchableOpacity onPress={pickImage} style={{ padding: 5 }}>
                   <Ionicons name="image-outline" size={28} color="#1877F2" />
                 </TouchableOpacity>
@@ -917,7 +917,7 @@ export default function CommunityScreen() {
             <View style={[styles.commentInputContainer, {
               paddingBottom: keyboardHeight > 0 ? (Platform.OS === 'android' ? keyboardHeight - insets.bottom : keyboardHeight) : (insets.bottom + vs(10)),
               position: 'absolute',
-              bottom: 0,
+              bottom: 13,
               left: 0,
               right: 0
             }]}>

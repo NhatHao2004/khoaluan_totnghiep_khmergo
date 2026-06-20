@@ -343,13 +343,15 @@ export default function HomeScreen() {
             styles.toastContainer,
             animatedToastStyle,
             {
+              backgroundColor: toastType === 'success' ? '#10B981' : '#EF4444',
+              shadowColor: toastType === 'success' ? '#10B981' : '#EF4444',
               top: insets.top + vs(8),
             }
           ]}
         >
           <View style={styles.toastIcon}>
             <Ionicons
-              name={toastType === 'success' ? "checkmark" : "close"}
+              name={toastType === 'success' ? "checkmark" : toastType === 'error' ? "close" : "information-circle"}
               size={ms(20)}
               color="#FFF"
             />
