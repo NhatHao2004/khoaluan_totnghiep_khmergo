@@ -82,9 +82,22 @@ export default function PagodaDetailScreen() {
   const imageUrl = templeData?.imageUrl1 || templeData?.imageUrl || initialImageUrl;
 
   const imageSource = React.useMemo(() => {
-    return imageUrl && typeof imageUrl === 'string' && imageUrl !== ''
-      ? { uri: imageUrl }
-      : null;
+    if (!imageUrl || typeof imageUrl !== 'string') return null;
+    
+    if (imageUrl.startsWith('http') || imageUrl.startsWith('data:')) {
+      return { uri: imageUrl };
+    }
+    
+    // Nếu là mã ảnh nội bộ (ví dụ: pagoda_1)
+    const pagodaImages: { [key: string]: any } = {
+      'pagoda_1': require('@/assets/images/chuaang.jpg'),
+      'pagoda_2': require('@/assets/images/chuahang.jpg'),
+      'pagoda_3': require('@/assets/images/kampong.jpg'),
+      'pagoda_4': require('@/assets/images/salengcu.jpg'),
+      'pagoda_5': require('@/assets/images/veluvana.jpg'),
+    };
+    
+    return pagodaImages[imageUrl] || pagodaImages['pagoda_1']; // Fallback về chùa đầu tiên nếu không khớp
   }, [imageUrl]);
 
   const handleShare = async () => {

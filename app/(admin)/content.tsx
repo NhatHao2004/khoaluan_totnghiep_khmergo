@@ -636,7 +636,7 @@ const ContentManagement = () => {
       <Modal visible={destModalVisible} animationType="slide" transparent={false} statusBarTranslucent={true}>
         <View style={{ flex: 1, backgroundColor: '#fff' }}>
           {/* Header */}
-          <View style={[styles.modalHeader, { paddingTop: insets.top + vs(10), paddingBottom: vs(15), borderBottomWidth: 1, borderBottomColor: '#f1f5f9', paddingHorizontal: 0 }]}>
+          <View style={[styles.modalHeader, { paddingTop: insets.top + vs(5), paddingBottom: vs(12), borderBottomWidth: 1, borderBottomColor: '#f1f5f9', paddingHorizontal: 0 }]}>
             <TouchableOpacity onPress={() => setDestModalVisible(false)} style={{ paddingLeft: s(15), width: s(70), height: s(44), justifyContent: 'center' }}>
               <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
             </TouchableOpacity>
@@ -717,7 +717,7 @@ const ContentManagement = () => {
               <ImageSelector label="Ảnh bìa phụ" value={dImg1} onChange={setDImg1} />
             ) : (
               <View style={{ marginBottom: vs(15) }}>
-                <Text style={styles.inputLabel}>Bộ sưu tập ảnh (Thêm tối đa 6 ảnh phụ)</Text>
+                <Text style={styles.inputLabel}>Bộ sưu tập ảnh</Text>
                 <View style={{ flexDirection: 'row', gap: s(10), flexWrap: 'wrap' }}>
                   <ImageSelector label="Ảnh 1" value={dImg1} onChange={setDImg1} style={{ flex: 1, minWidth: '45%' }} />
                   <ImageSelector label="Ảnh 2" value={dImg2} onChange={setDImg2} style={{ flex: 1, minWidth: '45%' }} />

@@ -103,15 +103,13 @@ export default function FoodDetailScreen() {
   const insets = useSafeAreaInsets();
   const galleryImages = React.useMemo(() => {
     const imgs = [];
-    for (let i = 1; i <= 5; i++) {
+    // Ảnh 1 là ảnh bìa phụ (Hero), nên bộ sưu tập bắt đầu từ 2 -> 6
+    for (let i = 2; i <= 6; i++) {
       const url = templeData?.[`imageUrl${i}`] || params?.[`imageUrl${i}`];
       if (url) imgs.push(url);
     }
-    if (imgs.length === 0 && (templeData?.imageUrl || initialImageUrl)) {
-      imgs.push(templeData?.imageUrl || initialImageUrl);
-    }
     return imgs;
-  }, [templeData, params, initialImageUrl]);
+  }, [templeData, params]);
 
   if (loading) {
     return (

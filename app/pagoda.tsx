@@ -161,15 +161,13 @@ export default function PagodaScreen() {
                 <View style={styles.pagodaImageContainer}>
                   <Image
                     source={
-                      typeof pagoda.imageUrl === 'string' && pagoda.imageUrl !== ''
+                      typeof pagoda.imageUrl === 'string' && (pagoda.imageUrl.startsWith('http') || pagoda.imageUrl.startsWith('data:'))
                         ? { uri: pagoda.imageUrl }
-                        : pagoda.imageUrl
-                          ? pagoda.imageUrl
-                          : getPagodaImage(pagoda.id || '', pagoda.name)
+                        : getPagodaImage(pagoda.imageUrl || pagoda.id || '', pagoda.name)
                     }
                     style={styles.pagodaImage}
                     resizeMode="cover"
-                    fadeDuration={0}
+                    fadeDuration={300}
                   />
                 </View>
 
