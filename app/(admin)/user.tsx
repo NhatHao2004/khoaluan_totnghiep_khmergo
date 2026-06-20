@@ -121,10 +121,7 @@ const UserManagement = () => {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withSpring(0, {
-      damping: 15,
-      stiffness: 120,
-    });
+    toastY.value = withTiming(0, { duration: 400 });
 
     setTimeout(() => {
       toastY.value = withTiming(-120, { duration: 400 });
