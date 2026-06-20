@@ -13,6 +13,8 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
+  Dimensions,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -37,6 +39,8 @@ import { EmailService } from './services/email-service';
 
 
 
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+
 export default function LoginScreen() {
   const { t } = useLanguage();
   const insets = useSafeAreaInsets();
@@ -59,6 +63,7 @@ export default function LoginScreen() {
   const [newPassword, setNewPassword] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
   const [modalError, setModalError] = useState('');
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   // Toast States
   const [showToast, setShowToast] = useState(false);
@@ -79,6 +84,15 @@ export default function LoginScreen() {
       true
     );
   }, [waveRotation]);
+
+  React.useEffect(() => {
+    const showSubscription = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow', () => setKeyboardVisible(true));
+    const hideSubscription = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', () => setKeyboardVisible(false));
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
 
   const waveStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${waveRotation.value}deg` }],
@@ -241,7 +255,7 @@ export default function LoginScreen() {
           overScrollMode="never"
           bounces={false}
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + vs(20) }]}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + (isKeyboardVisible ? (SCREEN_HEIGHT > 800 ? vs(60) : vs(25)) : vs(25)) }]}
         >
           <View style={styles.card}>
             <View style={styles.logoWrapper}>

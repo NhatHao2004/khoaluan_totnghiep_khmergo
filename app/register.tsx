@@ -11,6 +11,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
+  Dimensions,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -29,6 +30,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function RegisterScreen() {
   const { t } = useLanguage();
@@ -177,7 +180,7 @@ export default function RegisterScreen() {
         overScrollMode="never"
         bounces={false}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + (isKeyboardVisible ? vs(400) : vs(25)) }]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + (isKeyboardVisible ? (SCREEN_HEIGHT > 800 ? vs(400) : vs(25)) : vs(25)) }]}
       >
         <View style={styles.card}>
           {/* Avatar Picker */}
