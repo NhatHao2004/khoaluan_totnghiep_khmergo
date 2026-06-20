@@ -11,7 +11,6 @@ import { StatusBar } from 'expo-status-bar';
 
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
-import { WebView } from 'react-native-webview';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -129,7 +128,7 @@ export default function LoginScreen() {
       }
 
       await refreshUser();
-      
+
       const userRole = userData?.role || userData?.['quyền'] || 'Người dùng';
 
       if (userRole === 'Quản trị viên') {
@@ -225,8 +224,8 @@ export default function LoginScreen() {
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? vs(20) : 0}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : vs(0)}
       >
         <View style={styles.fixedHeader}>
           <View style={styles.headerTitleRow}>
@@ -241,6 +240,7 @@ export default function LoginScreen() {
           showsVerticalScrollIndicator={false}
           overScrollMode="never"
           bounces={false}
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + vs(20) }]}
         >
           <View style={styles.card}>
@@ -450,14 +450,14 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFF' },
   fixedHeader: { paddingHorizontal: s(20), paddingTop: vs(20), paddingBottom: vs(10), backgroundColor: '#FFF' },
-  scrollContent: { paddingHorizontal: s(20), paddingTop: vs(10), backgroundColor: '#FFF' },
+  scrollContent: { paddingHorizontal: s(20), paddingTop: vs(80), backgroundColor: '#FFF' },
   headerTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', minHeight: vs(50) },
   titleText: { fontSize: ms(32), fontWeight: '400', color: '#1e293b', letterSpacing: -1 },
   registerLinkText: { fontSize: ms(16), color: '#64748B', fontWeight: '400', marginBottom: vs(4) },
 
-  card: { backgroundColor: 'transparent', padding: s(10) },
+  card: { backgroundColor: 'transparent', padding: s(15) },
 
-  logoWrapper: { alignItems: 'center', marginBottom: vs(25) },
+  logoWrapper: { alignItems: 'center', marginBottom: vs(20) },
   logoImage: { width: s(130), height: s(130) },
   logoHintRow: { marginTop: vs(10), flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   logoHint: { fontSize: ms(17), color: '#64748B', fontWeight: '400' },

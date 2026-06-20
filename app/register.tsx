@@ -1,4 +1,3 @@
-import { ThemedText } from '@/components/themed-text';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { auth, db } from '@/utils/firebaseConfig';
 import { ms, s, vs } from '@/utils/responsive';
@@ -12,8 +11,8 @@ import { doc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
+  Keyboard,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -45,6 +44,7 @@ export default function RegisterScreen() {
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   // Toast States
   const [showToast, setShowToast] = useState(false);
@@ -85,6 +85,15 @@ export default function RegisterScreen() {
       setAvatarUri(`data:image/jpeg;base64,${result.assets[0].base64}`);
     }
   };
+
+  React.useEffect(() => {
+    const showSubscription = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow', () => setKeyboardVisible(true));
+    const hideSubscription = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', () => setKeyboardVisible(false));
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
 
   const handleRegister = React.useCallback(async () => {
     if (!name || !email || !password || !repeatPassword) {
@@ -149,214 +158,213 @@ export default function RegisterScreen() {
   }, [name, email, password, repeatPassword, avatarUri, selectedInterests, t, triggerToast, router]);
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? vs(20) : 0}
-      >
-        <View style={styles.fixedHeader}>
-          <View style={styles.headerTitleRow}>
-            <Text style={styles.titleText}>{t('register_title')}</Text>
-            <TouchableOpacity onPress={() => router.replace('/login')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <Text style={styles.loginLinkText}>{t('login_title')}</Text>
-            </TouchableOpacity>
-          </View>
+    <KeyboardAvoidingView
+      style={[styles.container, { paddingTop: insets.top }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={0}
+    >
+      <View style={styles.fixedHeader}>
+        <View style={styles.headerTitleRow}>
+          <Text style={styles.titleText}>{t('register_title')}</Text>
+          <TouchableOpacity onPress={() => router.replace('/login')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            <Text style={styles.loginLinkText}>{t('login_title')}</Text>
+          </TouchableOpacity>
         </View>
+      </View>
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          overScrollMode="never"
-          bounces={false}
-          contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + vs(20) }]}
-        >
-          <View style={styles.card}>
-            {/* Avatar Picker */}
-            <View style={styles.avatarWrapper}>
-              <TouchableOpacity style={styles.avatarContainer} onPress={pickImage} activeOpacity={0.8}>
-                <View style={styles.avatarInner}>
-                  {avatarUri ? (
-                    <Image source={{ uri: avatarUri }} style={styles.avatarImg} contentFit="cover" transition={300} />
-                  ) : (
-                    <LinearGradient
-                      colors={['#F1F5F9', '#E2E8F0']}
-                      style={styles.avatarPlaceholder}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        overScrollMode="never"
+        bounces={false}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + (isKeyboardVisible ? vs(400) : vs(25)) }]}
+      >
+        <View style={styles.card}>
+          {/* Avatar Picker */}
+          <View style={styles.avatarWrapper}>
+            <TouchableOpacity style={styles.avatarContainer} onPress={pickImage} activeOpacity={0.8}>
+              <View style={styles.avatarInner}>
+                {avatarUri ? (
+                  <Image source={{ uri: avatarUri }} style={styles.avatarImg} contentFit="cover" transition={300} />
+                ) : (
+                  <LinearGradient
+                    colors={['#F1F5F9', '#E2E8F0']}
+                    style={styles.avatarPlaceholder}
+                  >
+                    <Ionicons name="camera" size={ms(32)} color="#94A3B8" />
+                  </LinearGradient>
+                )}
+              </View>
+              <View style={styles.addBtnSmall}>
+                <Ionicons name="add" size={ms(16)} color="#FFF" />
+              </View>
+            </TouchableOpacity>
+            <Text style={styles.avatarHint}>{t('avatar_label')}</Text>
+          </View>
+
+          {/* Form */}
+          <View style={styles.form}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>{t('fullname_label') || 'Họ và tên'}</Text>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="person-outline" size={ms(20)} color="#94A3B8" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder={t('fullname_placeholder')}
+                  placeholderTextColor="#CBD5E1"
+                  value={name}
+                  onChangeText={setName}
+                />
+              </View>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Email</Text>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="mail-outline" size={ms(20)} color="#94A3B8" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="example@email.com"
+                  placeholderTextColor="#CBD5E1"
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+              </View>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>{t('password_label')}</Text>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="lock-closed-outline" size={ms(20)} color="#94A3B8" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="••••••••"
+                  placeholderTextColor="#CBD5E1"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                  <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={ms(20)} color="#94A3B8" />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>{t('confirm_password_label')}</Text>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="shield-checkmark-outline" size={ms(20)} color="#94A3B8" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="••••••••"
+                  placeholderTextColor="#CBD5E1"
+                  value={repeatPassword}
+                  onChangeText={setRepeatPassword}
+                  secureTextEntry={!showRepeatPassword}
+                />
+                <TouchableOpacity onPress={() => setShowRepeatPassword(!showRepeatPassword)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                  <Ionicons name={showRepeatPassword ? "eye-off-outline" : "eye-outline"} size={ms(20)} color="#94A3B8" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+
+          {/* Interest Selection - Asymmetric Layout */}
+          <View style={styles.interestsBox}>
+            <Text style={styles.interestsHeader}>{t('select_interests_title') || 'Bạn quan tâm đến gì nào'}</Text>
+            <View style={styles.interestsAsymmetricGrid}>
+              {/* Left Column: Big Card */}
+              <View style={styles.leftCol}>
+                {[
+                  { id: 'Chùa', label: t('temple'), img: require('@/assets/images/pagoda.jpg'), color: '#F59E0B', bg: '#FFFFFF' }
+                ].map((item) => {
+                  const isSelected = selectedInterests.includes(item.id);
+                  return (
+                    <TouchableOpacity
+                      key={item.id}
+                      style={[
+                        styles.interestCardBig,
+                        { backgroundColor: item.bg, borderColor: isSelected ? '#3B82F6' : '#F1F5F9' }
+                      ]}
+                      onPress={() => toggleInterest(item.id)}
+                      activeOpacity={0.8}
                     >
-                      <Ionicons name="camera" size={ms(32)} color="#94A3B8" />
-                    </LinearGradient>
-                  )}
-                </View>
-                <View style={styles.addBtnSmall}>
-                  <Ionicons name="add" size={ms(16)} color="#FFF" />
-                </View>
-              </TouchableOpacity>
-              <Text style={styles.avatarHint}>{t('avatar_label')}</Text>
-            </View>
-
-            {/* Form */}
-            <View style={styles.form}>
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>{t('fullname_label') || 'Họ và tên'}</Text>
-                <View style={styles.inputWrapper}>
-                  <Ionicons name="person-outline" size={ms(20)} color="#94A3B8" style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.input}
-                    placeholder={t('fullname_placeholder')}
-                    placeholderTextColor="#CBD5E1"
-                    value={name}
-                    onChangeText={setName}
-                  />
-                </View>
+                      <Text style={[styles.interestCardTextBig, { color: isSelected ? '#1E293B' : '#64748B' }]} numberOfLines={1} adjustsFontSizeToFit>
+                        {item.label}
+                      </Text>
+                      <Image
+                        source={item.img}
+                        style={styles.interestImgBig}
+                        contentFit="contain"
+                        transition={300}
+                      />
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Email</Text>
-                <View style={styles.inputWrapper}>
-                  <Ionicons name="mail-outline" size={ms(20)} color="#94A3B8" style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="example@email.com"
-                    placeholderTextColor="#CBD5E1"
-                    value={email}
-                    onChangeText={setEmail}
-                    autoCapitalize="none"
-                    keyboardType="email-address"
-                  />
-                </View>
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>{t('password_label')}</Text>
-                <View style={styles.inputWrapper}>
-                  <Ionicons name="lock-closed-outline" size={ms(20)} color="#94A3B8" style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="••••••••"
-                    placeholderTextColor="#CBD5E1"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={!showPassword}
-                  />
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                    <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={ms(20)} color="#94A3B8" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>{t('confirm_password_label')}</Text>
-                <View style={styles.inputWrapper}>
-                  <Ionicons name="shield-checkmark-outline" size={ms(20)} color="#94A3B8" style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="••••••••"
-                    placeholderTextColor="#CBD5E1"
-                    value={repeatPassword}
-                    onChangeText={setRepeatPassword}
-                    secureTextEntry={!showRepeatPassword}
-                  />
-                  <TouchableOpacity onPress={() => setShowRepeatPassword(!showRepeatPassword)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                    <Ionicons name={showRepeatPassword ? "eye-off-outline" : "eye-outline"} size={ms(20)} color="#94A3B8" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-
-            {/* Interest Selection - Asymmetric Layout */}
-            <View style={styles.interestsBox}>
-              <Text style={styles.interestsHeader}>{t('select_interests_title') || 'Bạn quan tâm đến gì nào'}</Text>
-              <View style={styles.interestsAsymmetricGrid}>
-                {/* Left Column: Big Card */}
-                <View style={styles.leftCol}>
-                  {[
-                    { id: 'Chùa', label: t('temple'), img: require('@/assets/images/pagoda.jpg'), color: '#F59E0B', bg: '#FFFFFF' }
-                  ].map((item) => {
-                    const isSelected = selectedInterests.includes(item.id);
-                    return (
-                      <TouchableOpacity
-                        key={item.id}
-                        style={[
-                          styles.interestCardBig,
-                          { backgroundColor: item.bg, borderColor: isSelected ? '#3B82F6' : '#F1F5F9' }
-                        ]}
-                        onPress={() => toggleInterest(item.id)}
-                        activeOpacity={0.8}
-                      >
-                        <Text style={[styles.interestCardTextBig, { color: isSelected ? '#1E293B' : '#64748B' }]} numberOfLines={1} adjustsFontSizeToFit>
-                          {item.label}
-                        </Text>
+              {/* Right Column: Two Small Cards */}
+              <View style={styles.rightCol}>
+                {[
+                  { id: 'Văn hóa', label: t('culture'), img: require('@/assets/images/festival.jpg'), color: '#8B5CF6', bg: '#FFFFFF' },
+                  { id: 'Ẩm thực', label: t('food'), img: require('@/assets/images/amthuc.jpg'), color: '#EF4444', bg: '#FFFFFF' }
+                ].map((item) => {
+                  const isSelected = selectedInterests.includes(item.id);
+                  return (
+                    <TouchableOpacity
+                      key={item.id}
+                      style={[
+                        styles.interestCardSmall,
+                        { backgroundColor: item.bg, borderColor: isSelected ? '#3B82F6' : '#F1F5F9' }
+                      ]}
+                      onPress={() => toggleInterest(item.id)}
+                      activeOpacity={0.8}
+                    >
+                      <View style={styles.smallCardContent}>
                         <Image
                           source={item.img}
-                          style={styles.interestImgBig}
+                          style={styles.interestImgSmall}
                           contentFit="contain"
                           transition={300}
                         />
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-
-                {/* Right Column: Two Small Cards */}
-                <View style={styles.rightCol}>
-                  {[
-                    { id: 'Văn hóa', label: t('culture'), img: require('@/assets/images/festival.jpg'), color: '#8B5CF6', bg: '#FFFFFF' },
-                    { id: 'Ẩm thực', label: t('food'), img: require('@/assets/images/amthuc.jpg'), color: '#EF4444', bg: '#FFFFFF' }
-                  ].map((item) => {
-                    const isSelected = selectedInterests.includes(item.id);
-                    return (
-                      <TouchableOpacity
-                        key={item.id}
-                        style={[
-                          styles.interestCardSmall,
-                          { backgroundColor: item.bg, borderColor: isSelected ? '#3B82F6' : '#F1F5F9' }
-                        ]}
-                        onPress={() => toggleInterest(item.id)}
-                        activeOpacity={0.8}
-                      >
-                        <View style={styles.smallCardContent}>
-                          <Image
-                            source={item.img}
-                            style={styles.interestImgSmall}
-                            contentFit="contain"
-                            transition={300}
-                          />
-                          <Text style={[styles.interestCardTextSmall, { color: isSelected ? '#1E293B' : '#64748B' }]} numberOfLines={1} adjustsFontSizeToFit>
-                            {item.label}
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
+                        <Text style={[styles.interestCardTextSmall, { color: isSelected ? '#1E293B' : '#64748B' }]} numberOfLines={1} adjustsFontSizeToFit>
+                          {item.label}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
-
-            {/* Register Button */}
-            <TouchableOpacity
-              style={styles.mainBtn}
-              onPress={handleRegister}
-              disabled={loading}
-              activeOpacity={0.9}
-            >
-              <LinearGradient
-                colors={['#10B981', '#059669']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.btnGradient}
-              >
-                {loading ? (
-                  <ActivityIndicator color="#FFF" />
-                ) : (
-                  <Text style={styles.btnText}>
-                    {t('register_account').toUpperCase()}
-                  </Text>
-                )}
-              </LinearGradient>
-            </TouchableOpacity>
-
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+
+          {/* Register Button */}
+          <TouchableOpacity
+            style={styles.mainBtn}
+            onPress={handleRegister}
+            disabled={loading}
+            activeOpacity={0.9}
+          >
+            <LinearGradient
+              colors={['#10B981', '#059669']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.btnGradient}
+            >
+              {loading ? (
+                <ActivityIndicator color="#FFF" />
+              ) : (
+                <Text style={styles.btnText}>
+                  {t('register_account').toUpperCase()}
+                </Text>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+
+        </View>
+      </ScrollView>
 
 
 
@@ -383,7 +391,7 @@ export default function RegisterScreen() {
           <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
         </Animated.View>
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
