@@ -948,7 +948,7 @@ const styles = StyleSheet.create({
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: vs(65),
+    marginTop: vs(75),
   },
   emptyText: {
     textAlign: 'center',
