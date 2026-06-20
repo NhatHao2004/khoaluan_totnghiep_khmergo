@@ -23,6 +23,7 @@ const COLORS = {
 };
 
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import React, { useEffect, useRef, useState } from 'react';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -33,7 +34,9 @@ export default function TabsLayout() {
   const pathname = usePathname();
   const router = useRouter();
   const [isChatEnabled, setIsChatEnabled] = useState(true);
+  const { user, loading } = useAuth();
 
+  // Redirect Admin users away from (tabs)
   // Reset position when pathname changes to home
   useEffect(() => {
     const loadChatSetting = async () => {
@@ -144,6 +147,10 @@ export default function TabsLayout() {
       ],
     };
   });
+
+  if (loading) {
+    return null; // Tránh hiển thị giao diện người dùng nếu đang load
+  }
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
@@ -304,6 +311,17 @@ export default function TabsLayout() {
         </>
       )}
 
+      {/* Floating Back to Admin Button - Only for Admins */}
+      {user?.role === 'Quản trị viên' && (
+        <TouchableOpacity
+          style={styles.backToAdminBtn}
+          onPress={() => router.replace('/(admin)')}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="eye-outline" size={ms(22)} color="#1e293b" />
+        </TouchableOpacity>
+      )}
+
       <StatusBar style="auto" />
     </ThemeProvider>
   );
@@ -355,5 +373,24 @@ const styles = StyleSheet.create({
     fontSize: ms(12),
     fontWeight: '400',
     textAlign: 'center',
+  },
+  backToAdminBtn: {
+    position: 'absolute',
+    top: vs(45),
+    right: s(24),
+    backgroundColor: '#FFFFFF',
+    width: s(40),
+    height: s(40),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: s(20),
+    zIndex: 99999,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 12,
   },
 });

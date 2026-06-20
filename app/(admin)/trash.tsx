@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ffe4e6',
   },
-  emptyContainer: { alignItems: 'center', marginTop: vs(300), opacity: 0.5 },
+  emptyContainer: { alignItems: 'center', marginTop: vs(280), opacity: 0.5 },
   emptyText: { marginTop: vs(14), fontSize: ms(16), color: '#94a3b8', fontWeight: '400' },
 
   // Modal Styles

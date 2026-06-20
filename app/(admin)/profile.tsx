@@ -347,14 +347,6 @@ const AdminProfile = () => {
               <Ionicons name="chevron-forward" size={ms(18)} color="#cbd5e1" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionItem}>
-              <View style={[styles.actionIcon, { backgroundColor: '#f1f5f9' }]}>
-                <Ionicons name="notifications-outline" size={ms(20)} color="#1e293b" />
-              </View>
-              <Text style={styles.actionText}>Thông báo hệ thống</Text>
-              <Ionicons name="chevron-forward" size={ms(18)} color="#cbd5e1" />
-            </TouchableOpacity>
-
             <TouchableOpacity
               style={[styles.actionItem, { marginTop: vs(20) }]}
               onPress={() => setLogoutModalVisible(true)}

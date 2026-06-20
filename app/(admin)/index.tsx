@@ -377,6 +377,12 @@ const AdminDashboard = () => {
           </TouchableOpacity>
           <View style={styles.headerRightActions}>
             <TouchableOpacity
+              onPress={() => router.push('/(tabs)')}
+              style={styles.notificationBtn}
+            >
+              <Ionicons name="eye-outline" size={ms(26)} color="#3b82f6" />
+            </TouchableOpacity>
+            <TouchableOpacity
               onPress={() => setShowFeedbackModal(true)}
               style={styles.notificationBtn}
             >

@@ -381,24 +381,26 @@ export default function HomeScreen() {
               <ThemedText style={styles.userName} numberOfLines={1} adjustsFontSizeToFit>{user?.name || t('guest')}</ThemedText>
             </View>
           </View>
-          <TouchableOpacity
-            style={styles.notificationBtnSimple}
-            onPress={() => {
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              setShowNotifications(true);
-              markAllAsRead(); // Đánh dấu đã đọc khi mở bảng thông báo
-              slideX.value = withTiming(0, { duration: 300 });
-            }}
-          >
-            <Animated.View style={animatedBellStyle}>
-              <Ionicons name="notifications-outline" size={30} color="#000" />
-              {unreadCount > 0 && (
-                <View style={styles.notificationBadge}>
-                  <ThemedText style={styles.badgeText}>{unreadCount}</ThemedText>
-                </View>
-              )}
-            </Animated.View>
-          </TouchableOpacity>
+          {user?.role !== 'Quản trị viên' && (
+            <TouchableOpacity
+              style={styles.notificationBtnSimple}
+              onPress={() => {
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                setShowNotifications(true);
+                markAllAsRead(); // Đánh dấu đã đọc khi mở bảng thông báo
+                slideX.value = withTiming(0, { duration: 300 });
+              }}
+            >
+              <Animated.View style={animatedBellStyle}>
+                <Ionicons name="notifications-outline" size={30} color="#000" />
+                {unreadCount > 0 && (
+                  <View style={styles.notificationBadge}>
+                    <ThemedText style={styles.badgeText}>{unreadCount}</ThemedText>
+                  </View>
+                )}
+              </Animated.View>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
