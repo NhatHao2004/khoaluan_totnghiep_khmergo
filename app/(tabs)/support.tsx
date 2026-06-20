@@ -7,7 +7,6 @@ import { addDoc, collection, deleteDoc, doc, onSnapshot, query, serverTimestamp,
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Animated,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -17,6 +16,9 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ms, s, vs } from '@/utils/responsive';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SupportScreen() {
@@ -74,26 +76,29 @@ export default function SupportScreen() {
     return () => unsubscribe();
   }, [user]);
 
-  // Toast State
-  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
-  const translateY = useRef(new Animated.Value(-100)).current;
+  // Toast States
+  const [showToastState, setShowToastState] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
+  const toastY = useSharedValue(-100);
+  const insets = useSafeAreaInsets();
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
-    setToast({ visible: true, message: msg, type });
-    Animated.spring(translateY, {
-      toValue: 40,
-      useNativeDriver: true,
-      friction: 8,
-    }).start();
+    setToastMsg(msg);
+    setToastType(type);
+    setShowToastState(true);
+    toastY.value = withTiming(0, { duration: 400 });
 
     setTimeout(() => {
-      Animated.timing(translateY, {
-        toValue: -100,
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => setToast(prev => ({ ...prev, visible: false })));
+      toastY.value = withTiming(-120, { duration: 400 });
+      setTimeout(() => setShowToastState(false), 400);
     }, 3000);
   };
+
+  const animatedToastStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: toastY.value }],
+    opacity: interpolate(toastY.value, [-100, 0], [0, 1], 'clamp'),
+  }));
 
   const handleSendFeedback = async () => {
     if (!user) {
@@ -292,21 +297,27 @@ export default function SupportScreen() {
         </View>
       </ScrollView>
 
-      {/* Premium Toast */}
-      {toast.visible && (
+      {/* Premium Toast System */}
+      {showToastState && (
         <Animated.View
           style={[
             styles.toastContainer,
-            toast.type === 'success' ? styles.toastSuccess : styles.toastError,
-            { transform: [{ translateY }] }
+            animatedToastStyle,
+            {
+              backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
+              shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
+              top: insets.top + vs(8),
+            }
           ]}
         >
-          <Ionicons
-            name={toast.type === 'success' ? "checkmark-circle" : "alert-circle"}
-            size={24}
-            color="#FFFFFF"
-          />
-          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toast.message}</Text>
+          <View style={styles.toastIcon}>
+            <Ionicons
+              name={toastType === 'success' ? "checkmark" : "close"}
+              size={ms(20)}
+              color="#FFF"
+            />
+          </View>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
         </Animated.View>
       )}
     </SafeAreaView>
@@ -530,34 +541,25 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     textAlign: 'right',
   },
-  // Toast Styles
   toastContainer: {
     position: 'absolute',
-    top: 0,
-    left: 20,
-    right: 20,
+    left: s(16),
+    right: s(16),
+    height: vs(46),
+    borderRadius: ms(10),
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 10,
+    paddingHorizontal: s(14),
     zIndex: 9999,
-    gap: 12,
+    elevation: 10,
   },
-  toastSuccess: {
-    backgroundColor: '#10B981', // Emerald 500
+  toastIcon: {
+    width: s(28),
+    height: s(28),
+    borderRadius: s(14),
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  toastError: {
-    backgroundColor: '#EF4444', // Red 500
-  },
-  toastText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '400',
-    flex: 1,
-  },
+  toastText: { color: '#FFF', fontSize: ms(13), fontWeight: '400', marginLeft: s(10), flex: 1 },
 });

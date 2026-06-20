@@ -6,6 +6,7 @@ import { ms, s, SCREEN_WIDTH, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
@@ -35,6 +36,7 @@ const CATEGORY_CARD_WIDTH = (SCREEN_WIDTH - s(40) - (3 * s(8))) / 4;
 
 export default function HomeScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { t, language } = useLanguage();
   const { user, loading: authLoading } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,14 +60,10 @@ export default function HomeScreen() {
     setToastType(type);
     setShowToast(true);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    toastY.value = withSpring(Platform.OS === 'ios' ? vs(50) : vs(40), {
-      damping: 15,
-      stiffness: 120,
-      mass: 1,
-    });
+    toastY.value = withTiming(0, { duration: 400 });
 
     setTimeout(() => {
-      toastY.value = withTiming(-vs(120), { duration: 400 });
+      toastY.value = withTiming(-120, { duration: 400 });
       setTimeout(() => setShowToast(false), 400);
     }, 4000);
   };
@@ -286,7 +284,7 @@ export default function HomeScreen() {
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-100, 40], [0, 1], 'clamp'),
+    opacity: interpolate(toastY.value, [-100, 0], [0, 1], 'clamp'),
   }));
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -345,8 +343,7 @@ export default function HomeScreen() {
             styles.toastContainer,
             animatedToastStyle,
             {
-              backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
-              shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
+              top: insets.top + vs(8),
             }
           ]}
         >
@@ -807,35 +804,30 @@ const styles = RNStyleSheet.create({
   // Toast Styles
   toastContainer: {
     position: 'absolute',
-    top: 0,
-    left: s(20),
-    right: s(20),
-    height: vs(56),
-    borderRadius: s(20),
+    left: s(16),
+    right: s(16),
+    height: vs(46),
+    borderRadius: ms(10),
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: s(16),
+    paddingHorizontal: s(14),
     zIndex: 9999,
-    shadowOffset: { width: 0, height: vs(10) },
-    shadowOpacity: 0.3,
-    shadowRadius: s(20),
     elevation: 10,
   },
   toastIcon: {
-    width: s(32),
-    height: s(32),
-    borderRadius: s(16),
+    width: s(28),
+    height: s(28),
+    borderRadius: s(14),
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   toastText: {
     color: '#FFF',
-    fontSize: ms(15),
+    fontSize: ms(13),
     fontWeight: '400',
-    marginLeft: s(12),
+    marginLeft: s(10),
     flex: 1,
-    letterSpacing: 0.2,
   },
   cardImageContainer: {
     width: '100%',

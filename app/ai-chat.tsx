@@ -24,7 +24,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { analyzeImage, chatWithAI } from '../services/ai-service';
 
@@ -60,12 +60,17 @@ export default function AIAssistantScreen() {
 
   const triggerToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToastMsg(msg); setToastType(type); setShowToast(true);
-    toastY.value = withTiming(Platform.OS === 'ios' ? vs(50) : vs(40), { duration: 400 });
+    toastY.value = withTiming(0, { duration: 400 });
     setTimeout(() => {
-      toastY.value = withTiming(-vs(120), { duration: 400 });
+      toastY.value = withTiming(-120, { duration: 400 });
       setTimeout(() => setShowToast(false), 400);
     }, 4000);
   };
+
+  const animatedToastStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: toastY.value }],
+    opacity: interpolate(toastY.value, [-100, 0], [0, 1], 'clamp'),
+  }));
 
   const CHAT_HISTORY_KEY = user?.uid ? `KHMERGO_CHAT_HISTORY_${user.uid}` : 'KHMERGO_CHAT_HISTORY_GUEST';
 
@@ -285,6 +290,28 @@ export default function AIAssistantScreen() {
 
   return (
     <View style={styles.container} onLayout={onRootLayout}>
+      {showToast && (
+        <Animated.View
+          style={[
+            styles.toastContainer,
+            animatedToastStyle,
+            {
+              backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
+              shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
+              top: insets.top + vs(8),
+            }
+          ]}
+        >
+          <View style={styles.toastIcon}>
+            <Ionicons
+              name={toastType === 'success' ? "checkmark" : "close"}
+              size={ms(20)}
+              color="#FFF"
+            />
+          </View>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
+        </Animated.View>
+      )}
       <View style={[styles.header, { paddingTop: insets.top + vs(10) }]}>
         <TouchableOpacity 
           style={styles.headerLeft} 
@@ -393,5 +420,32 @@ const styles = StyleSheet.create({
   rectBtn: { flex: 1, height: vs(60), backgroundColor: '#FFF', borderWidth: 1.5, borderColor: '#1877F2', borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
   analyzeBtn: { width: '100%', height: vs(60), borderRadius: 20, overflow: 'hidden' },
   analyzeGradient: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  analyzeBtnText: { color: '#FFF', fontSize: ms(18), fontWeight: '400' }
+  analyzeBtnText: { color: '#FFF', fontSize: ms(18), fontWeight: '400' },
+  toastContainer: {
+    position: 'absolute',
+    left: s(16),
+    right: s(16),
+    height: vs(46),
+    borderRadius: ms(10),
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: s(14),
+    zIndex: 9999,
+    elevation: 10,
+  },
+  toastIcon: {
+    width: s(28),
+    height: s(28),
+    borderRadius: s(14),
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  toastText: {
+    color: '#FFF',
+    fontSize: ms(13),
+    fontWeight: '400',
+    marginLeft: s(10),
+    flex: 1,
+  },
 });

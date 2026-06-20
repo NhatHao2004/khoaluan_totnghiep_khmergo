@@ -56,17 +56,17 @@ export default function RegisterScreen() {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withTiming(Platform.OS === 'ios' ? vs(50) : vs(40), { duration: 400 });
+    toastY.value = withTiming(0, { duration: 400 });
 
     setTimeout(() => {
-      toastY.value = withTiming(-vs(120), { duration: 400 });
+      toastY.value = withTiming(-120, { duration: 400 });
       setTimeout(() => setShowToast(false), 400);
     }, 3000);
   }, [toastY]);
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-100, 40], [0, 1], 'clamp'),
+    opacity: interpolate(toastY.value, [-100, 0], [0, 1], 'clamp'),
   }));
 
   const toggleInterest = React.useCallback((interest: string) => {
@@ -369,13 +369,14 @@ export default function RegisterScreen() {
             {
               backgroundColor: toastType === 'success' || toastType === 'info' ? '#10B981' : '#EF4444',
               shadowColor: toastType === 'success' || toastType === 'info' ? '#10B981' : '#EF4444',
+              top: insets.top + vs(8),
             }
           ]}
         >
           <View style={styles.toastIcon}>
             <Ionicons
               name={toastType === 'success' ? "checkmark" : "close"}
-              size={20}
+              size={ms(20)}
               color="#FFF"
             />
           </View>
@@ -482,34 +483,29 @@ const styles = StyleSheet.create({
 
   toastContainer: {
     position: 'absolute',
-    top: 0,
-    left: s(20),
-    right: s(20),
-    height: vs(56),
-    borderRadius: s(20),
+    left: s(16),
+    right: s(16),
+    height: vs(46),
+    borderRadius: ms(10),
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: s(16),
+    paddingHorizontal: s(14),
     zIndex: 9999,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
     elevation: 10,
   },
   toastIcon: {
-    width: s(32),
-    height: s(32),
-    borderRadius: s(16),
+    width: s(28),
+    height: s(28),
+    borderRadius: s(14),
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   toastText: {
     color: '#FFF',
-    fontSize: ms(15),
+    fontSize: ms(13),
     fontWeight: '400',
-    marginLeft: s(12),
+    marginLeft: s(10),
     flex: 1,
   },
 });

@@ -84,10 +84,7 @@ const TrashManagement = () => {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withSpring(0, {
-      damping: 15,
-      stiffness: 120,
-    });
+    toastY.value = withTiming(0, { duration: 400 });
 
     setTimeout(() => {
       toastY.value = withTiming(-120, { duration: 400 });
@@ -165,13 +162,11 @@ const TrashManagement = () => {
           <View style={styles.toastIcon}>
             <Ionicons
               name={toastType === 'success' ? "checkmark" : "close"}
-              size={ms(18)}
+              size={ms(20)}
               color="#FFF"
             />
           </View>
-          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>
-            {toastMsg}
-          </Text>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
         </Animated.View>
       )}
 
@@ -354,33 +349,30 @@ const styles = StyleSheet.create({
   // Toast Styles
   toastContainer: {
     position: 'absolute',
-    top: 0,
-    left: s(30),
-    right: s(30),
+    left: s(16),
+    right: s(16),
     height: vs(46),
-    borderRadius: s(10),
+    borderRadius: ms(10),
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: s(15),
+    paddingHorizontal: s(14),
     zIndex: 9999,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 8,
+    elevation: 10,
   },
   toastIcon: {
-    width: s(26),
-    height: s(26),
-    borderRadius: s(13),
-    backgroundColor: 'rgba(255,255,255,0.25)',
+    width: s(28),
+    height: s(28),
+    borderRadius: s(14),
+    backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: s(10),
   },
   toastText: {
     color: '#FFF',
     fontSize: ms(13),
     fontWeight: '400',
+    marginLeft: s(10),
+    flex: 1,
   },
 });
 

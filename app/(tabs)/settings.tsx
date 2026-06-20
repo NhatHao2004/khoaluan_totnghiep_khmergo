@@ -23,11 +23,12 @@ import Animated, {
   useSharedValue,
   withTiming
 } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { language, setLanguage, t } = useLanguage();
+  const insets = useSafeAreaInsets();
   const { user } = useContext(AuthContext);
   const [chatButtonEnabled, setChatButtonEnabled] = useState(true);
   const [showIntro, setShowIntro] = useState(false);
@@ -42,7 +43,7 @@ export default function SettingsScreen() {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withTiming(Platform.OS === 'ios' ? 50 : 40, { duration: 400 });
+    toastY.value = withTiming(0, { duration: 400 });
 
     setTimeout(() => {
       toastY.value = withTiming(-120, { duration: 400 });
@@ -90,7 +91,7 @@ export default function SettingsScreen() {
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-100, 40], [0, 1], 'clamp'),
+    opacity: interpolate(toastY.value, [-100, 0], [0, 1], 'clamp'),
   }));
 
 
@@ -254,13 +255,14 @@ export default function SettingsScreen() {
             {
               backgroundColor: toastType === 'success' || toastType === 'info' ? '#10B981' : '#EF4444',
               shadowColor: toastType === 'success' || toastType === 'info' ? '#10B981' : '#EF4444',
+              top: insets.top + vs(8),
             }
           ]}
         >
           <View style={styles.toastIcon}>
             <Ionicons
               name={toastType === 'success' ? "checkmark" : "close"}
-              size={20}
+              size={ms(20)}
               color="#FFF"
             />
           </View>
@@ -554,35 +556,29 @@ const styles = StyleSheet.create({
   // Toast Styles
   toastContainer: {
     position: 'absolute',
-    top: 0,
-    left: 20,
-    right: 20,
-    height: 56,
-    borderRadius: 20,
+    left: s(16),
+    right: s(16),
+    height: vs(46),
+    borderRadius: ms(10),
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: s(14),
     zIndex: 9999,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
     elevation: 10,
   },
   toastIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: s(28),
+    height: s(28),
+    borderRadius: s(14),
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   toastText: {
     color: '#FFF',
-    fontSize: 15,
+    fontSize: ms(13),
     fontWeight: '400',
-    marginLeft: 12,
+    marginLeft: s(10),
     flex: 1,
-    letterSpacing: 0.2,
   },
 });

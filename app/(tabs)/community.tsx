@@ -218,17 +218,17 @@ export default function CommunityScreen() {
     setToastMsg(msg);
     setToastType(type as any);
     setShowToast(true);
-    toastY.value = withTiming(Platform.OS === 'ios' ? 50 : 40, { duration: 400 });
+    toastY.value = withTiming(0, { duration: 400 });
 
     setTimeout(() => {
-      toastY.value = withTiming(-100, { duration: 400 });
+      toastY.value = withTiming(-120, { duration: 400 });
       setTimeout(() => setShowToast(false), 400);
     }, 4000);
   };
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-100, 40], [0, 1], 'clamp'),
+    opacity: interpolate(toastY.value, [-100, 0], [0, 1], 'clamp'),
   }));
 
   // Render Toast Component Helper
@@ -241,12 +241,17 @@ export default function CommunityScreen() {
         {
           backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
           shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
+          top: insets.top + vs(8),
         }
       ]}>
         <View style={styles.toastIcon}>
-          <Ionicons name={toastType === 'success' ? "checkmark" : "close"} size={20} color="#FFF" />
+          <Ionicons
+            name={toastType === 'success' ? "checkmark" : "close"}
+            size={ms(20)}
+            color="#FFF"
+          />
         </View>
-        <Text style={styles.toastText}>{toastMsg}</Text>
+        <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
       </Animated.View>
     );
   };
@@ -1029,31 +1034,25 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
   toastContainer: {
     position: 'absolute',
-    top: 0,
-    left: s(15),
-    right: s(15),
-    zIndex: 10000,
+    left: s(16),
+    right: s(16),
+    height: vs(46),
+    borderRadius: ms(10),
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: vs(14),
-    paddingHorizontal: s(20),
-    borderRadius: ms(22),
-    borderWidth: 0,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: vs(12) },
-    shadowOpacity: 0.2,
-    shadowRadius: s(15),
-    elevation: 25,
+    paddingHorizontal: s(14),
+    zIndex: 9999,
+    elevation: 10,
   },
   toastIcon: {
-    width: s(32),
-    height: s(32),
-    borderRadius: s(16),
+    width: s(28),
+    height: s(28),
+    borderRadius: s(14),
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '700', marginLeft: s(15), flex: 1, letterSpacing: 0.3 },
+  toastText: { color: '#FFF', fontSize: ms(13), fontWeight: '400', marginLeft: s(10), flex: 1 },
   screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: s(20), paddingTop: vs(5), paddingBottom: vs(15), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   screenTitle: { fontSize: ms(22), fontWeight: '400', color: '#1A1A1A' },
   plusBtn: { width: s(36), height: s(36), borderRadius: s(18), backgroundColor: '#F7F7F7', justifyContent: 'center', alignItems: 'center' },
