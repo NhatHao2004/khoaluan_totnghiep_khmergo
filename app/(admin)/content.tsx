@@ -527,8 +527,8 @@ const ContentManagement = () => {
   return (
     <View style={[styles.container, { paddingTop: Math.max(insets.top, vs(10)) }]}>
       {showToast && (
-        <Animated.View style={[styles.toastContainer, animatedToastStyle, { backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981', shadowColor: toastType === 'error' ? '#EF4444' : '#10B981', }]}>
-          <View style={styles.toastIcon}><Ionicons name={toastType === 'success' ? "checkmark" : "close"} size={ms(20)} color="#FFF" /></View>
+        <Animated.View style={[styles.toastContainer, animatedToastStyle, { backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981', shadowColor: toastType === 'error' ? '#EF4444' : '#10B981', top: Math.max(vs(10), insets.top - vs(30)) }]}>
+          <View style={styles.toastIcon}><Ionicons name={toastType === 'success' ? "checkmark" : "close"} size={ms(18)} color="#FFF" /></View>
           <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
         </Animated.View>
       )}
@@ -897,6 +897,36 @@ const styles = StyleSheet.create({
   modalForm: { padding: s(20) },
   inputLabel: { fontSize: ms(14), fontWeight: '400', color: '#64748b', marginBottom: vs(8), marginTop: vs(12) },
   input: { backgroundColor: '#f8fafc', borderRadius: ms(12), padding: s(14), fontSize: ms(15), color: '#1e293b', borderWidth: 1, borderColor: '#e2e8f0', marginBottom: vs(4) },
+  toastContainer: {
+    position: 'absolute',
+    top: 0,
+    left: s(30),
+    right: s(30),
+    height: vs(46),
+    borderRadius: s(10),
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: s(15),
+    zIndex: 9999,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  toastIcon: {
+    width: s(26),
+    height: s(26),
+    borderRadius: s(13),
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: s(10),
+  },
+  toastText: {
+    color: '#FFF',
+    fontSize: ms(13),
+    fontWeight: '400',
+  },
   imagePickerBtn: { height: vs(120), backgroundColor: '#f8fafc', borderRadius: ms(16), borderStyle: 'dashed', borderWidth: 1.5, borderColor: '#cbd5e1', overflow: 'hidden' },
   imagePickerPlaceholder: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: vs(8) },
   imagePickerText: { fontSize: ms(13), color: '#94a3b8', fontWeight: '400' },
@@ -928,9 +958,6 @@ const styles = StyleSheet.create({
   confirmIconBg: { width: s(64), height: s(64), borderRadius: s(32), backgroundColor: '#fef2f2', justifyContent: 'center', alignItems: 'center', marginBottom: vs(16) },
   confirmTitle: { fontSize: ms(20), fontWeight: '400', color: '#1e293b', marginBottom: vs(8) },
   confirmText: { fontSize: ms(14), color: '#64748b', textAlign: 'center', lineHeight: vs(22), marginBottom: vs(24) },
-  toastContainer: { position: 'absolute', top: 0, left: s(16), right: s(16), height: vs(56), borderRadius: ms(18), flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(14), zIndex: 9999, elevation: 10 },
-  toastIcon: { width: s(32), height: s(32), borderRadius: s(16), backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
-  toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '400', marginLeft: s(12), flex: 1 },
 });
 
 export default ContentManagement;

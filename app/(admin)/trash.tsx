@@ -156,17 +156,18 @@ const TrashManagement = () => {
             {
               backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
               shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
+              top: Math.max(vs(10), insets.top - vs(30)),
             }
           ]}
         >
           <View style={styles.toastIcon}>
             <Ionicons
               name={toastType === 'success' ? "checkmark" : "close"}
-              size={ms(20)}
+              size={ms(18)}
               color="#FFF"
             />
           </View>
-          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+          <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>
             {toastMsg}
           </Text>
         </Animated.View>
@@ -352,38 +353,32 @@ const styles = StyleSheet.create({
   toastContainer: {
     position: 'absolute',
     top: 0,
-    left: s(16),
-    right: s(16),
-    minHeight: vs(56),
-    paddingVertical: vs(8),
-    borderRadius: ms(18),
+    left: s(30),
+    right: s(30),
+    height: vs(46),
+    borderRadius: s(10),
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: s(14),
+    paddingHorizontal: s(15),
     zIndex: 9999,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
   },
   toastIcon: {
-    width: s(32),
-    height: s(32),
-    borderRadius: s(16),
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    width: s(26),
+    height: s(26),
+    borderRadius: s(13),
+    backgroundColor: 'rgba(255,255,255,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: s(10),
   },
   toastText: {
     color: '#FFF',
-    fontSize: ms(15),
+    fontSize: ms(13),
     fontWeight: '400',
-    marginLeft: s(12),
-    flex: 1,
-    letterSpacing: 0.2,
-    includeFontPadding: false,
-    lineHeight: ms(22),
   },
 });
 

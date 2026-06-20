@@ -202,23 +202,8 @@ const AdminProfile = () => {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Premium Toast System */}
       {showToast && (
-        <Animated.View
-          style={[
-            styles.toastContainer,
-            animatedToastStyle,
-            {
-              backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
-              shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
-            }
-          ]}
-        >
-          <View style={styles.toastIcon}>
-            <Ionicons
-              name={toastType === 'success' ? "checkmark" : "close"}
-              size={ms(20)}
-              color="#FFF"
-            />
-          </View>
+        <Animated.View style={[styles.toastContainer, animatedToastStyle, { backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981', shadowColor: toastType === 'error' ? '#EF4444' : '#10B981', top: Math.max(vs(10), insets.top - vs(30)) }]}>
+          <View style={styles.toastIcon}><Ionicons name={toastType === 'success' ? "checkmark" : "close"} size={ms(18)} color="#FFF" /></View>
           <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
         </Animated.View>
       )}
@@ -246,7 +231,7 @@ const AdminProfile = () => {
             <TouchableOpacity onPress={handlePressAvatar} activeOpacity={0.9}>
               <Animated.View style={[styles.avatarWrapper, animatedStyle]}>
                 {avatar ? (
-                  <Image source={{ uri: avatar }} style={styles.avatar} contentFit="cover" />
+                  <Image source={{ uri: avatar }} style={styles.avatar} />
                 ) : (
                   <View style={styles.avatarPlaceholder}>
                     <Text style={styles.avatarInitial}>
@@ -281,7 +266,6 @@ const AdminProfile = () => {
           <View style={styles.statsContainer}>
             <View style={styles.statBox}>
               <Text style={styles.statValue}>Quản trị viên</Text>
-              <Text style={styles.statLabel}>Quyền hạn</Text>
             </View>
           </View>
 
@@ -689,31 +673,31 @@ const styles = StyleSheet.create({
   toastContainer: {
     position: 'absolute',
     top: 0,
-    left: s(20),
-    right: s(20),
-    height: vs(50),
-    borderRadius: s(15),
+    left: s(30),
+    right: s(30),
+    height: vs(46),
+    borderRadius: s(10),
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: s(20),
+    paddingHorizontal: s(15),
     zIndex: 9999,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 8,
   },
   toastIcon: {
-    width: s(28),
-    height: s(28),
-    borderRadius: s(14),
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    width: s(26),
+    height: s(26),
+    borderRadius: s(13),
+    backgroundColor: 'rgba(255,255,255,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: s(12),
+    marginRight: s(10),
   },
   toastText: {
     color: '#FFF',
-    fontSize: ms(15),
+    fontSize: ms(13),
     fontWeight: '400',
     flex: 1,
   },

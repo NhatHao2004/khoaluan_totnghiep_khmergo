@@ -312,7 +312,7 @@ export default function TabsLayout() {
       )}
 
       {/* Floating Back to Admin Button - Only for Admins */}
-      {user?.role === 'Quản trị viên' && (
+      {user?.role === 'Quản trị viên' && (pathname === '/' || pathname === '/(tabs)' || pathname === '/(tabs)/') && (
         <TouchableOpacity
           style={styles.backToAdminBtn}
           onPress={() => router.replace('/(admin)')}

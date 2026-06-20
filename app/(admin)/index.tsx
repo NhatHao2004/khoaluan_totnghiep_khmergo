@@ -344,14 +344,14 @@ const AdminDashboard = () => {
             {
               backgroundColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
               shadowColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
-              top: insets.top,
+              top: Math.max(vs(10), insets.top - vs(30)),
             }
           ]}
         >
           <View style={styles.toastIcon}>
             <Ionicons
               name={toastType === 'success' ? "checkmark" : toastType === 'info' ? "notifications" : "close"}
-              size={ms(20)}
+              size={ms(18)}
               color="#FFF"
             />
           </View>
@@ -638,7 +638,7 @@ const AdminDashboard = () => {
                 onPress={() => setShowDetailModal(false)}
               >
                 <Text style={styles.quickCancelText}>Đóng</Text>
-              </TouchableOpacity>
+</TouchableOpacity>
 
               <TouchableOpacity
                 style={[styles.quickSendBtn, (!quickReply.trim() || sendingReply || quickReply.trim() === selectedFeedback?.adminReply) && styles.disabledBtn]}
@@ -663,14 +663,14 @@ const AdminDashboard = () => {
                 {
                   backgroundColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
                   shadowColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
-                  top: insets.top,
+                  top: Math.max(vs(10), insets.top - vs(30)),
                 }
               ]}
             >
               <View style={styles.toastIcon}>
                 <Ionicons
                   name={toastType === 'success' ? "checkmark" : toastType === 'info' ? "notifications" : "close"}
-                  size={ms(20)}
+                  size={ms(18)}
                   color="#FFF"
                 />
               </View>
@@ -1073,23 +1073,23 @@ const styles = StyleSheet.create({
   toastContainer: {
     position: 'absolute',
     top: 0,
-    left: s(20),
-    right: s(20),
-    height: vs(55),
-    borderRadius: s(18),
+    left: s(30),
+    right: s(30),
+    height: vs(46),
+    borderRadius: s(10),
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: s(20),
+    paddingHorizontal: s(15),
     zIndex: 9999,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    elevation: 10,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
   },
   toastIcon: {
-    width: s(32),
-    height: s(32),
-    borderRadius: s(16),
+    width: s(26),
+    height: s(26),
+    borderRadius: s(13),
     backgroundColor: 'rgba(255,255,255,0.25)',
     justifyContent: 'center',
     alignItems: 'center',

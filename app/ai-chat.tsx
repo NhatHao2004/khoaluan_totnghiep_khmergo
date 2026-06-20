@@ -285,14 +285,22 @@ export default function AIAssistantScreen() {
 
   return (
     <View style={styles.container} onLayout={onRootLayout}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.headerLeft} onPress={() => router.back()}>
+      <View style={[styles.header, { paddingTop: insets.top + vs(10) }]}>
+        <TouchableOpacity 
+          style={styles.headerLeft} 
+          onPress={() => router.back()}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <Ionicons name="arrow-back" size={28} color="#1F2937" />
         </TouchableOpacity>
         <View style={styles.headerInfo}>
           <Text style={styles.headerTitle} numberOfLines={1}>KhmerGo AI</Text>
         </View>
-        <TouchableOpacity style={styles.headerRight} onPress={() => activeTab === 'camera' ? resetCamera() : clearChat()}>
+        <TouchableOpacity 
+          style={styles.headerRight} 
+          onPress={() => activeTab === 'camera' ? resetCamera() : clearChat()}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <Text style={styles.resetText}>Làm mới</Text>
         </TouchableOpacity>
       </View>
@@ -323,11 +331,11 @@ export default function AIAssistantScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
-  header: { paddingTop: vs(40), paddingBottom: vs(10), paddingHorizontal: s(20), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  headerLeft: { width: s(70), alignItems: 'flex-start' },
-  headerRight: { width: s(70), alignItems: 'flex-end' },
-  headerInfo: { flex: 1, alignItems: 'center' },
-  headerTitle: { fontSize: ms(20), color: '#1A1A1A', fontWeight: '400' },
+  header: { paddingBottom: vs(10), paddingHorizontal: s(20), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  headerLeft: { minWidth: s(60), alignItems: 'flex-start' },
+  headerRight: { minWidth: s(60), alignItems: 'flex-end' },
+  headerInfo: { flex: 1, alignItems: 'center', paddingHorizontal: s(10) },
+  headerTitle: { fontSize: ms(19), color: '#1A1A1A', fontWeight: '400', textAlign: 'center' },
   resetText: { fontSize: ms(15), color: '#EF4444', fontWeight: '400' },
   tabContainer: { paddingHorizontal: s(20), paddingVertical: vs(10) },
   tabWrapper: { flexDirection: 'row', backgroundColor: '#F1F5F9', borderRadius: ms(25), padding: s(4) },
