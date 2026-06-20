@@ -133,12 +133,14 @@ const AdminDashboard = () => {
     }, 3000);
   }, []);
 
+  const insets = useSafeAreaInsets();
+  const toastTop = Math.max(vs(10), insets.top - vs(30));
+
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-100, -40], [0, 1], 'clamp'),
+    opacity: interpolate(toastY.value, [-100, toastTop], [0, 1], 'clamp'),
   }));
 
-  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     // Lấy số lượng người dùng (loại bỏ Admin một cách an toàn)
@@ -344,7 +346,7 @@ const AdminDashboard = () => {
             {
               backgroundColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
               shadowColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
-              top: Math.max(vs(10), insets.top - vs(30)),
+              top: toastTop,
             }
           ]}
         >
@@ -663,7 +665,7 @@ const AdminDashboard = () => {
                 {
                   backgroundColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
                   shadowColor: toastType === 'error' ? '#EF4444' : toastType === 'info' ? '#3b82f6' : '#10B981',
-                  top: Math.max(vs(10), insets.top - vs(30)),
+                  top: toastTop,
                 }
               ]}
             >

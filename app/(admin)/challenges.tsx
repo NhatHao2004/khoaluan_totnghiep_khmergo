@@ -148,9 +148,11 @@ const ChallengeManagement = () => {
     }, 3000);
   }, []);
 
+  const toastTop = Math.max(vs(10), insets.top - vs(30));
+
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-100, 60], [0, 1], 'clamp'),
+    opacity: interpolate(toastY.value, [-100, toastTop], [0, 1], 'clamp'),
   }));
 
   // Confirm Dialog State
@@ -351,13 +353,14 @@ const ChallengeManagement = () => {
             {
               backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
               shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
+              top: Math.max(vs(10), insets.top - vs(30)),
             }
           ]}
         >
           <View style={styles.toastIcon}>
             <Ionicons
               name={toastType === 'success' ? "checkmark" : "close"}
-              size={ms(20)}
+              size={ms(18)}
               color="#FFF"
             />
           </View>
@@ -462,10 +465,10 @@ const ChallengeManagement = () => {
       {/* --- Quiz Management Modal (Questions List) --- */}
       <Modal visible={!!managingQuizId} animationType="slide" transparent statusBarTranslucent={true}>
         <View style={styles.modalFullBg}>
-          <View style={[styles.modalContentFull, { paddingTop: insets.top + vs(10) }]}>
+          <View style={[styles.modalContentFull, { paddingTop: insets.top }]}>
             <View style={styles.modalHeaderFixed}>
               <TouchableOpacity style={styles.backBtn} onPress={() => setManagingQuizId(null)}>
-                <Ionicons name="chevron-back" size={ms(32)} color="#1e293b" />
+                <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
               </TouchableOpacity>
               <Text style={[styles.modalTitleFull, { fontSize: ms(17) }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
                 {managingQuiz ? getQuizDisplayTitle(managingQuiz) : ''}
@@ -592,10 +595,10 @@ const ChallengeManagement = () => {
       {/* --- Add/Edit Question Modal --- */}
       <Modal visible={questionModalVisible} animationType="slide" transparent statusBarTranslucent={true}>
         <View style={styles.modalFullBg}>
-          <View style={[styles.modalContentFull, { paddingTop: insets.top + vs(10) }]}>
+          <View style={[styles.modalContentFull, { paddingTop: insets.top }]}>
             <View style={styles.modalHeaderFixed}>
               <TouchableOpacity style={styles.backBtn} onPress={() => setQuestionModalVisible(false)}>
-                <Ionicons name="chevron-back" size={ms(32)} color="#1e293b" />
+                <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
               </TouchableOpacity>
               <Text style={styles.modalTitleFull}>{editingQuestion ? 'Sửa câu hỏi' : 'Thêm câu hỏi'}</Text>
               <View style={{ width: s(44) }} />
@@ -607,7 +610,7 @@ const ChallengeManagement = () => {
               keyboardVerticalOffset={Platform.OS === 'ios' ? vs(50) : 0}
             >
               <ScrollView style={styles.formScroll} contentContainerStyle={{ padding: s(20), paddingBottom: vs(120) }} showsVerticalScrollIndicator={false}>
-                <Text style={styles.inputLabel}>Nội dung câu hỏi</Text>
+                <Text style={[styles.inputLabel, { marginTop: 0 }]}>Nội dung câu hỏi</Text>
                 <TextInput
                   style={[styles.input, { height: vs(100), textAlignVertical: 'top' }]}
                   multiline
@@ -720,7 +723,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    paddingBottom: vs(10),
+    paddingBottom: vs(6),
     borderBottomWidth: 1,
     borderBottomColor: '#f1f5f9'
   },
@@ -868,9 +871,36 @@ const styles = StyleSheet.create({
   confirmBtn: { flex: 1, height: vs(50), borderRadius: s(14), justifyContent: 'center', alignItems: 'center' },
   confirmBtnText: { fontSize: ms(15), fontWeight: '400', color: '#fff' },
 
-  toastContainer: { position: 'absolute', top: 0, left: s(16), right: s(16), height: vs(56), borderRadius: ms(18), flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(14), zIndex: 9999, elevation: 10 },
-  toastIcon: { width: s(32), height: s(32), borderRadius: s(16), backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
-  toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '400', marginLeft: s(12), flex: 1 },
+  toastContainer: {
+    position: 'absolute',
+    top: 0,
+    left: s(30),
+    right: s(30),
+    height: vs(46),
+    borderRadius: s(10),
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: s(15),
+    zIndex: 9999,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  toastIcon: {
+    width: s(26),
+    height: s(26),
+    borderRadius: s(13),
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: s(10),
+  },
+  toastText: {
+    color: '#FFF',
+    fontSize: ms(13),
+    fontWeight: '400',
+  },
 });
 
 export default ChallengeManagement;

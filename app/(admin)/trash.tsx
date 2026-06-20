@@ -95,9 +95,11 @@ const TrashManagement = () => {
     }, 3000);
   }, []);
 
+  const toastTop = Math.max(vs(10), insets.top - vs(30));
+
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-100, 40], [0, 1], 'clamp'),
+    opacity: interpolate(toastY.value, [-100, toastTop], [0, 1], 'clamp'),
   }));
 
   useEffect(() => {
@@ -156,7 +158,7 @@ const TrashManagement = () => {
             {
               backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
               shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
-              top: Math.max(vs(10), insets.top - vs(30)),
+              top: toastTop,
             }
           ]}
         >

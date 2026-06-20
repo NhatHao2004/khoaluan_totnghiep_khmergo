@@ -158,9 +158,11 @@ const ContentManagement = () => {
     }, 3000);
   }, []);
 
+  const toastTop = Math.max(vs(10), insets.top - vs(30));
+
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-100, 40], [0, 1], 'clamp'),
+    opacity: interpolate(toastY.value, [-100, toastTop], [0, 1], 'clamp'),
   }));
 
   const getImageSource = useCallback((uri: string, fallback: any = { uri: 'https://via.placeholder.com/150' }) => {
@@ -527,7 +529,7 @@ const ContentManagement = () => {
   return (
     <View style={[styles.container, { paddingTop: Math.max(insets.top, vs(10)) }]}>
       {showToast && (
-        <Animated.View style={[styles.toastContainer, animatedToastStyle, { backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981', shadowColor: toastType === 'error' ? '#EF4444' : '#10B981', top: Math.max(vs(10), insets.top - vs(30)) }]}>
+        <Animated.View style={[styles.toastContainer, animatedToastStyle, { backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981', shadowColor: toastType === 'error' ? '#EF4444' : '#10B981', top: toastTop }]}>
           <View style={styles.toastIcon}><Ionicons name={toastType === 'success' ? "checkmark" : "close"} size={ms(18)} color="#FFF" /></View>
           <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
         </Animated.View>
