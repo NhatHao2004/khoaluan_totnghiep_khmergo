@@ -1067,7 +1067,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   toastText: { color: '#FFF', fontSize: ms(13), fontWeight: '400', marginLeft: s(10), flex: 1 },
-  screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: s(20), paddingTop: vs(5), paddingBottom: vs(15), borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
+  screenHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: s(20), paddingTop: vs(5), paddingBottom: vs(15) },
   screenTitle: { fontSize: ms(22), fontWeight: '400', color: '#1A1A1A' },
   plusBtn: { width: s(36), height: s(36), borderRadius: s(18), backgroundColor: '#F7F7F7', justifyContent: 'center', alignItems: 'center' },
   listContent: { paddingTop: vs(5), paddingBottom: vs(30) },
@@ -1162,11 +1162,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderTopLeftRadius: ms(35),
     borderTopRightRadius: ms(35),
-    paddingTop: vs(12),
+    paddingTop: vs(25),
     paddingHorizontal: s(30),
     width: '100%',
     minHeight: '40%',
-    paddingBottom: vs(15),
+    paddingBottom: vs(5),
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: vs(-10) },
@@ -1187,7 +1187,7 @@ const styles = StyleSheet.create({
   },
   pModalTitle: {
     fontSize: ms(20),
-    fontWeight: '900',
+    fontWeight: '400',
     color: '#1E293B',
     marginBottom: vs(8),
     textAlign: 'center',
@@ -1219,7 +1219,7 @@ const styles = StyleSheet.create({
   pModalPrimaryBtnText: {
     color: '#FFF',
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
   },
   pModalSecondaryBtn: {
     backgroundColor: '#EF4444',
@@ -1232,6 +1232,6 @@ const styles = StyleSheet.create({
   pModalSecondaryBtnText: {
     color: '#FFF',
     fontSize: ms(16),
-    fontWeight: '800',
+    fontWeight: '400',
   },
 });

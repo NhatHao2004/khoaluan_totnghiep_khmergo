@@ -245,7 +245,12 @@ export default function FoodDetailScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setShowLoginModal(false)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: s(24) }}>
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity
+            style={RNStyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={() => setShowLoginModal(false)}
+          />
           <View style={styles.modalContent}>
             <View style={styles.modalIconCircle}>
               <Ionicons name="person-circle-outline" size={ms(40)} color="#3B82F6" />
@@ -415,14 +420,34 @@ const styles = StyleSheet.create({
     shadowRadius: s(8),
   },
   quizStartBtnText: { color: '#FFF', fontSize: ms(15), fontWeight: '400' },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'flex-end',
+  },
   modalContent: {
     backgroundColor: '#FFF',
-    borderRadius: s(32),
-    padding: s(30),
+    borderTopLeftRadius: s(32),
+    borderTopRightRadius: s(32),
+    paddingHorizontal: s(30),
+    paddingTop: vs(25),
+    paddingBottom: vs(5),
     width: '100%',
-    maxWidth: s(340),
+    minHeight: '40%',
     alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: vs(10) }, shadowOpacity: 0.1, shadowRadius: s(20), elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: vs(-4) },
+    shadowOpacity: 0.1,
+    shadowRadius: s(10),
+    elevation: 20,
+  },
+  modalHandle: {
+    width: s(40),
+    height: vs(4),
+    borderRadius: vs(2),
+    backgroundColor: '#E5E7EB',
+    alignSelf: 'center',
+    marginBottom: vs(20),
   },
   modalIconCircle: {
     width: s(80), height: s(80), borderRadius: s(40), backgroundColor: '#EFF6FF',

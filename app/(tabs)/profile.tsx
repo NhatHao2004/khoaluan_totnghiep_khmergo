@@ -247,6 +247,11 @@ export default function ProfileScreen() {
         onRequestClose={() => setLoginRequiredVisible(false)}
       >
         <View style={styles.loginModalOverlay}>
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={() => setLoginRequiredVisible(false)}
+          />
           <View style={styles.loginModalContent}>
             <View style={styles.loginModalIconCircle}>
               <Ionicons name="person-circle-outline" size={ms(40)} color="#3B82F6" />
@@ -491,16 +496,17 @@ const styles = StyleSheet.create({
   loginModalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: s(24)
+    justifyContent: 'flex-end',
   },
   loginModalContent: {
     backgroundColor: '#FFF',
-    borderRadius: s(32),
-    padding: s(30),
+    borderTopLeftRadius: s(32),
+    borderTopRightRadius: s(32),
+    paddingHorizontal: s(30),
+    paddingTop: vs(25),
+    paddingBottom: vs(5),
     width: '100%',
-    maxWidth: 340,
+    minHeight: '40%',
     alignItems: 'center',
   },
   loginModalIconCircle: {
