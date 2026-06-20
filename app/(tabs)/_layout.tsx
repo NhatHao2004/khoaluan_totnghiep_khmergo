@@ -22,9 +22,9 @@ const COLORS = {
   shadow: '#000000ff',
 };
 
-import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import React, { useEffect, useRef, useState } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import React, { useEffect, useState } from 'react';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -40,13 +40,23 @@ export default function TabsLayout() {
   // Reset position when pathname changes to home
   useEffect(() => {
     const loadChatSetting = async () => {
+      // If guest mode (no user or anonymous), force enable AI chat visibility
+      if (!user || user.isAnonymous) {
+        setIsChatEnabled(true);
+        return;
+      }
+
+      // If logged in, respect the manual setting from preferences
       const saved = await AsyncStorage.getItem('chat_button_enabled');
       if (saved !== null) {
         setIsChatEnabled(saved === 'true');
+      } else {
+        // Default to enabled if no setting exists
+        setIsChatEnabled(true);
       }
     };
     loadChatSetting();
-  }, [pathname]);
+  }, [pathname, user?.uid, user?.isAnonymous]);
 
   // Shared values for draggable AI button and animations
   const translateX = useSharedValue(0);
@@ -54,7 +64,6 @@ export default function TabsLayout() {
   const context = useSharedValue({ x: 0, y: 0 });
   const opacity = useSharedValue(1);
   const scale = useSharedValue(1);
-  const dimTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const tooltipOpacity = useSharedValue(0);
   const tooltipSlideX = useSharedValue(20);
@@ -64,7 +73,7 @@ export default function TabsLayout() {
     // Scale animation (3s cycle)
     scale.value = withRepeat(
       withSequence(
-        withTiming(1.05, { duration: 1500 }),
+        withTiming(1.1, { duration: 1500 }),
         withTiming(1, { duration: 1500 })
       ),
       -1,
@@ -244,6 +253,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="personal-info"
           options={{
+            title: t('personal_info'),
             href: null,
           }}
         />
@@ -279,10 +289,10 @@ export default function TabsLayout() {
           {/* "Chat Ngay" Tooltip */}
           <Animated.View style={[styles.tooltipContainer, animatedTooltipStyle]}>
             <View style={styles.tooltipInner}>
-              <Animated.Text 
-                style={styles.tooltipText} 
-                numberOfLines={1} 
-                adjustsFontSizeToFit 
+              <Animated.Text
+                style={styles.tooltipText}
+                numberOfLines={1}
+                adjustsFontSizeToFit
                 minimumFontScale={0.8}
               >
                 {t('explore_now')}

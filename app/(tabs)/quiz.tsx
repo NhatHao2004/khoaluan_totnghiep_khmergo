@@ -21,6 +21,16 @@ export default function QuizScreen() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const lastFetchTime = useRef<number>(0);
 
+  const getBadge = (points: number) => {
+    if (points >= 500) return { name: 'Huyền Thoại', emoji: '👑', icon: 'ribbon-outline', color: '#000000ff' };
+    if (points >= 150) return { name: 'Kim Cương', emoji: '🔷', icon: 'diamond-outline', color: '#000000ff' };
+    if (points >= 125) return { name: 'Bạch Kim', emoji: '💎', icon: 'sparkles-outline', color: '#000000ff' };
+    if (points >= 100) return { name: 'Vàng', emoji: '🥇', icon: 'trophy-outline', color: '#000000ff' };
+    if (points >= 50) return { name: 'Bạc', emoji: '🥈', icon: 'medal-outline', color: '#000000ff' };
+    if (points >= 25) return { name: 'Đồng', emoji: '🥉', icon: 'medal-outline', color: '#000000ff' };
+    return null;
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setQuizLoading(false);
@@ -115,6 +125,25 @@ export default function QuizScreen() {
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{(user && !user.isAnonymous) ? (user.completedQuizzes || 0) : 0}</Text>
               <Text style={styles.statLabel} numberOfLines={1} adjustsFontSizeToFit>{t('completed')}</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <View style={{ height: vs(28), justifyContent: 'center', alignItems: 'center' }}>
+                {(() => {
+                  const badge = getBadge(user?.points || 0);
+                  if (badge) {
+                    return (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: s(4) }}>
+                        <Text style={[styles.statValue, { fontSize: ms(17), color: badge.color }]}>
+                          {badge.emoji} {badge.name}
+                        </Text>
+                      </View>
+                    );
+                  }
+                  return <Ionicons name="medal-outline" size={ms(20)} color="#1E293B" />;
+                })()}
+              </View>
+              <Text style={styles.statLabel} numberOfLines={1} adjustsFontSizeToFit>{t('badge') || 'Huy hiệu'}</Text>
             </View>
           </View>
         </View>
@@ -374,6 +403,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#1E293B',
     lineHeight: vs(28),
+    textAlign: 'center',
   },
   statLabel: {
     fontSize: ms(13),

@@ -363,7 +363,7 @@ export default function HomeScreen() {
         >
           <View style={styles.toastIcon}>
             <Ionicons
-              name={toastType === 'success' ? "checkmark" : toastType === 'error' ? "close" : "information-circle"}
+              name={toastType === 'error' ? "close" : "checkmark"}
               size={ms(20)}
               color="#FFF"
             />
@@ -603,6 +603,9 @@ export default function HomeScreen() {
                       } else if (item.type === 'reply') {
                         // Đây là phản hồi feedback từ Admin
                         router.push('/(tabs)/support' as any);
+                      } else if (item.type === 'achievement') {
+                        // Chuyển sang màn hình Thử thách khi click vào thông báo huy hiệu
+                        router.push('/(tabs)/quiz' as any);
                       } else {
                         router.push('/(tabs)/community' as any);
                       }
@@ -625,7 +628,10 @@ export default function HomeScreen() {
                     <View style={styles.nContent}>
                       <View style={{ flex: 1, marginRight: s(10) }}>
                         <Text style={styles.nItemTitle} numberOfLines={3}>
-                          <Text style={{ fontWeight: '400', color: '#EF4444' }}>{item.fromUserName}</Text> {t(item.message)}
+                          {item.type !== 'achievement' && item.fromUserName ? (
+                            <Text style={{ fontWeight: '400', color: '#EF4444' }}>{item.fromUserName} </Text>
+                          ) : null}
+                          {t(item.message)}
                         </Text>
                       </View>
                       <View style={styles.nItemFooter}>

@@ -65,6 +65,7 @@ export const translations: any = {
     login_now: 'Đăng nhập ngay',
     no_favorites_yet: 'Chưa có mục yêu thích nào',
     explore_and_save_favs: 'Hãy khám phá và lưu lại những điều bạn yêu thích nhé',
+    badge: 'Huy hiệu',
 
     // Quiz Screen
     quiz_title: 'Thử thách',
@@ -103,6 +104,12 @@ export const translations: any = {
     excellent: '🎉 Xuất sắc',
     well_done: '👏 Tốt lắm',
     keep_it_up: '💪 Cố lên',
+    badge_bronze_msg: 'Chúc mừng bạn đã mở khóa huy hiệu Đồng....',
+    badge_silver_msg: 'Chúc mừng bạn đã mở khóa huy hiệu Bạc...',
+    badge_gold_msg: 'Chúc mừng bạn đã mở khóa huy hiệu Vàng...',
+    badge_platinum_msg: 'Chúc mừng bạn đã mở khóa huy hiệu Bạch Kim...',
+    badge_diamond_msg: 'Chúc mừng bạn đã mở khóa huy hiệu Kim Cương...',
+    badge_legend_msg: 'Chúc mừng bạn đã trở thành Huyền Thoại KhmerGo...',
 
     // Matching Game
     matching_challenge: 'Ghép từ vựng',
@@ -130,7 +137,7 @@ export const translations: any = {
     pass_too_short: 'Mật khẩu mới tối thiểu 6 ký tự',
     user_not_found: 'Không tìm thấy tài khoản',
     wrong_old_pass: 'Mật khẩu hiện tại không chính xác',
-    update_success: 'Cập nhật thành công',
+    update_success: 'Cập nhật thông tin thành công',
     update_failed: 'Cập nhật thất bại',
 
     // Support Screen Extra
@@ -486,6 +493,7 @@ export const translations: any = {
     performance: 'សមិទ្ធផល',
     view_all: 'មើលទាំងអស់',
     completed: 'បានបញ្ចប់',
+    badge: 'មេដាយ',
     accuracy: 'ភាពត្រឹមត្រូវ',
     recent_performance: 'ផ្អែកលើការសាកល្បងថ្មីៗ',
     choose_topic: 'តើអ្នកចង់រៀនអ្វីនៅថ្ងៃនេះ',
@@ -510,6 +518,12 @@ export const translations: any = {
     excellent: '🎉 ពូកែណាស់',
     well_done: '👏 ល្អណាស់',
     keep_it_up: '💪 ខិតខំឡើង',
+    badge_bronze_msg: 'អ្នកបានដោះសោគ្រឿងឥស្សរិយយស Đồng!',
+    badge_silver_msg: 'គ្រឿងឥស្សរិយយស Bạc ត្រូវបានដោះសោ!',
+    badge_gold_msg: 'អបអរសាទរ! អ្នកបានឈានដល់កម្រិតថ្មី។',
+    badge_platinum_msg: 'អ្នកកំពុងខិតទៅជិតចំណុចកំពូលហើយ!',
+    badge_diamond_msg: 'គ្រឿងឥស្សរិយយស Kim Cương ជារបស់អ្នកហើយ!',
+    badge_legend_msg: 'Huyền Thoại KhmerGo បានបង្ហាញខ្លួនហើយ!',
 
     // Matching Game
     matching_challenge: 'ផ្គូផ្គងពាក្យ',
