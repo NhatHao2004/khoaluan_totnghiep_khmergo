@@ -52,7 +52,7 @@ const AdminProfile = () => {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withSpring(Platform.OS === 'ios' ? 50 : 40, {
+    toastY.value = withSpring(0, {
       damping: 15,
       stiffness: 120,
     });
@@ -63,11 +63,11 @@ const AdminProfile = () => {
     }, 3000);
   }, []);
 
- const toastTop = Math.max(vs(10), insets.top - vs(30));
+ const toastTop = insets.top + vs(8);
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-100, toastTop], [0, 1], 'clamp'),
+    opacity: interpolate(toastY.value, [-100, 0], [0, 1], 'clamp'),
   }));
 
   const scale = useSharedValue(1);
@@ -204,7 +204,11 @@ const AdminProfile = () => {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Premium Toast System */}
       {showToast && (
-        <Animated.View style={[styles.toastContainer, animatedToastStyle, { backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981', shadowColor: toastType === 'error' ? '#EF4444' : '#10B981', top: toastTop }]}>
+        <Animated.View style={[styles.toastContainer, animatedToastStyle, {
+          backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
+          shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
+          top: toastTop,
+        }]}>
           <View style={styles.toastIcon}><Ionicons name={toastType === 'success' ? "checkmark" : "close"} size={ms(18)} color="#FFF" /></View>
           <Text style={styles.toastText} numberOfLines={1} adjustsFontSizeToFit>{toastMsg}</Text>
         </Animated.View>

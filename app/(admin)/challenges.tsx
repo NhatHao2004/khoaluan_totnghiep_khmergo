@@ -137,7 +137,7 @@ const ChallengeManagement = () => {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withSpring(Platform.OS === 'ios' ? 60 : 50, {
+    toastY.value = withSpring(0, {
       damping: 15,
       stiffness: 120,
     });
@@ -148,11 +148,11 @@ const ChallengeManagement = () => {
     }, 3000);
   }, []);
 
-  const toastTop = Math.max(vs(10), insets.top - vs(30));
+  const toastTop = insets.top + vs(8);
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-100, toastTop], [0, 1], 'clamp'),
+    opacity: interpolate(toastY.value, [-100, 0], [0, 1], 'clamp'),
   }));
 
   // Confirm Dialog State
@@ -305,7 +305,7 @@ const ChallengeManagement = () => {
   const deleteQuiz = useCallback((id: string) => {
     showConfirm(
       'Xóa bộ thử thách',
-      'Tất cả câu hỏi trong bộ này sẽ bị xóa vĩnh viễn và không thể khôi phục.',
+      'Tất cả câu hỏi trong bộ này sẽ bị xóa vĩnh viễn và không thể khôi phục',
       'trash-outline', '#ef4444',
       async () => {
         hideConfirm();
@@ -353,7 +353,7 @@ const ChallengeManagement = () => {
             {
               backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
               shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
-              top: Math.max(vs(10), insets.top - vs(30)),
+              top: toastTop,
             }
           ]}
         >
@@ -507,9 +507,9 @@ const ChallengeManagement = () => {
                 />
               )}
               ListEmptyComponent={
-                <View style={[styles.emptyContainer, { marginTop: vs(100) }]}>
+                <View style={[styles.emptyContainer, { marginTop: vs(260) }]}>
                   <Ionicons name="chatbubbles-outline" size={ms(60)} color="#e2e8f0" />
-                  <Text style={styles.emptyText}>Bộ thử thách chưa có câu hỏi nào</Text>
+                  <Text style={styles.emptyText} numberOfLines={1} adjustsFontSizeToFit>Bộ thử thách chưa có câu hỏi nào</Text>
                 </View>
               }
             />
@@ -520,13 +520,13 @@ const ChallengeManagement = () => {
       {/* --- Add/Edit Quiz Modal --- */}
       <Modal visible={quizModalVisible} animationType="fade" transparent statusBarTranslucent={true}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           style={styles.modalBg}
         >
           <View style={styles.modalContentSmall}>
             <Text style={styles.modalTitle}>{editingQuiz ? 'Sửa Thử thách' : 'Thêm Thử thách'}</Text>
 
-            <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: vs(400) }}>
+            <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: vs(400) }} keyboardShouldPersistTaps="handled" bounces={false}>
               <Text style={styles.inputLabel}>Tên thử thách (tiếng Việt)</Text>
               <TextInput
                 style={styles.input}
@@ -569,7 +569,7 @@ const ChallengeManagement = () => {
                 </ScrollView>
               </View>
 
-              {!qPagodaId && (
+              {!destinations.some(d => d.id === qPagodaId) && (
                 <TextInput
                   style={[styles.input, { marginTop: vs(-5) }]}
                   value={qPagodaId}
@@ -607,9 +607,15 @@ const ChallengeManagement = () => {
             <KeyboardAvoidingView
               behavior={Platform.OS === 'ios' ? 'padding' : undefined}
               style={{ flex: 1 }}
-              keyboardVerticalOffset={Platform.OS === 'ios' ? vs(50) : 0}
+              keyboardVerticalOffset={Platform.OS === 'ios' ? vs(0) : 0}
             >
-              <ScrollView style={styles.formScroll} contentContainerStyle={{ padding: s(20), paddingBottom: vs(120) }} showsVerticalScrollIndicator={false}>
+              <ScrollView
+                style={styles.formScroll}
+                contentContainerStyle={{ padding: s(20), paddingBottom: vs(120) }}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                bounces={false}
+              >
                 <Text style={[styles.inputLabel, { marginTop: 0 }]}>Nội dung câu hỏi</Text>
                 <TextInput
                   style={[styles.input, { height: vs(100), textAlignVertical: 'top' }]}
@@ -691,11 +697,11 @@ const ChallengeManagement = () => {
             <Text style={styles.confirmTitleText}>{confirmDialog.title}</Text>
             <Text style={styles.confirmMessage}>{confirmDialog.message}</Text>
             <View style={styles.confirmActions}>
-              <TouchableOpacity style={[styles.confirmBtn, { backgroundColor: '#f1f5f9' }]} onPress={hideConfirm}>
-                <Text style={[styles.confirmBtnText, { color: '#64748b' }]}>Hủy</Text>
+              <TouchableOpacity style={[styles.confirmBtn, { backgroundColor: '#2353ffff' }]} onPress={hideConfirm}>
+                <Text style={[styles.confirmBtnText, { color: '#ffffffff' }]}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.confirmBtn, { backgroundColor: confirmDialog.iconColor }]}
+                style={[styles.confirmBtn, { backgroundColor: '#ff0000ff' }]}
                 onPress={confirmDialog.onConfirm}
               >
                 <Text style={styles.confirmBtnText}>Xác nhận</Text>

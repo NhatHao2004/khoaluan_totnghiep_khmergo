@@ -122,7 +122,7 @@ const AdminDashboard = () => {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withSpring(vs(10), {
+    toastY.value = withSpring(0, {
       damping: 15,
       stiffness: 120,
     });
@@ -134,11 +134,11 @@ const AdminDashboard = () => {
   }, []);
 
   const insets = useSafeAreaInsets();
-  const toastTop = Math.max(vs(10), insets.top - vs(30));
+  const toastTop = insets.top + vs(8);
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-100, toastTop], [0, 1], 'clamp'),
+    opacity: interpolate(toastY.value, [-100, 0], [0, 1], 'clamp'),
   }));
 
 

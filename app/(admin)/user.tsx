@@ -114,11 +114,14 @@ const UserManagement = () => {
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
   const toastY = useSharedValue(-120);
 
+  const insets = useSafeAreaInsets();
+  const toastTop = insets.top + vs(8);
+
   const triggerToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withSpring(Platform.OS === 'ios' ? 50 : 40, {
+    toastY.value = withSpring(0, {
       damping: 15,
       stiffness: 120,
     });
@@ -131,10 +134,9 @@ const UserManagement = () => {
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-100, 40], [0, 1], 'clamp'),
+    opacity: interpolate(toastY.value, [-100, 0], [0, 1], 'clamp'),
   }));
 
-  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     const unsub = onSnapshot(query(collection(db, 'users'), orderBy('name')), (snap) => {
@@ -166,6 +168,7 @@ const UserManagement = () => {
     try {
       const userRef = doc(db, 'users', pendingUser.id);
       await updateDoc(userRef, { isBlocked: !pendingUser.isBlocked });
+      triggerToast(pendingUser.isBlocked ? t('unlock_success') : t('lock_success'), 'success');
     } catch (error) {
       console.error('Error toggling lock:', error);
       triggerToast(t('action_error'), 'error');
@@ -255,6 +258,7 @@ const UserManagement = () => {
             {
               backgroundColor: toastType === 'error' ? '#EF4444' : '#10B981',
               shadowColor: toastType === 'error' ? '#EF4444' : '#10B981',
+              top: toastTop,
             }
           ]}
         >
@@ -495,9 +499,9 @@ const styles = StyleSheet.create({
   confirmReplyBtn: { flex: 1, paddingVertical: vs(12), borderRadius: s(12), backgroundColor: '#3b82f6', alignItems: 'center' },
   confirmReplyText: { fontSize: ms(15), fontWeight: '400', color: '#fff' },
   disabledBtn: { backgroundColor: '#94a3b8' },
-  toastContainer: { position: 'absolute', top: 0, left: s(16), right: s(16), height: vs(56), borderRadius: ms(18), flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(14), zIndex: 9999, elevation: 10 },
-  toastIcon: { width: s(32), height: s(32), borderRadius: s(16), backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
-  toastText: { color: '#FFF', fontSize: ms(15), fontWeight: '400', marginLeft: s(12), flex: 1 },
+  toastContainer: { position: 'absolute', left: s(16), right: s(16), height: vs(46), borderRadius: ms(10), flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(14), zIndex: 9999, elevation: 10 },
+  toastIcon: { width: s(28), height: s(28), borderRadius: s(14), backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
+  toastText: { color: '#FFF', fontSize: ms(13), fontWeight: '400', marginLeft: s(10), flex: 1 },
 });
 
 export default UserManagement;

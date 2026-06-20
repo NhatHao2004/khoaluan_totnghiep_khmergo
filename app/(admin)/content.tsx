@@ -147,7 +147,7 @@ const ContentManagement = () => {
     setToastMsg(msg);
     setToastType(type);
     setShowToast(true);
-    toastY.value = withSpring(Platform.OS === 'ios' ? 50 : 40, {
+    toastY.value = withSpring(0, {
       damping: 15,
       stiffness: 120,
     });
@@ -158,11 +158,11 @@ const ContentManagement = () => {
     }, 3000);
   }, []);
 
-  const toastTop = Math.max(vs(10), insets.top - vs(30));
+  const toastTop = insets.top + vs(8);
 
   const animatedToastStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: toastY.value }],
-    opacity: interpolate(toastY.value, [-100, toastTop], [0, 1], 'clamp'),
+    opacity: interpolate(toastY.value, [-100, 0], [0, 1], 'clamp'),
   }));
 
   const getImageSource = useCallback((uri: string, fallback: any = { uri: 'https://via.placeholder.com/150' }) => {

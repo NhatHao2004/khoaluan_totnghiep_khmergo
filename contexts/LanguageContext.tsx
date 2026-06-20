@@ -405,6 +405,8 @@ export const translations: any = {
     send_reply: 'Trả lời',
     lock: 'Khóa',
     unlock: 'Mở khóa',
+    lock_success: 'Đã khóa tài khoản người dùng',
+    unlock_success: 'Đã mở khóa tài khoản người dùng',
   },
   km: {
     // Common
@@ -804,6 +806,8 @@ export const translations: any = {
     send_reply: 'ឆ្លើយតប',
     lock: 'ចាក់សោ',
     unlock: 'ដោះសោ',
+    lock_success: 'ចាក់សោគណនីបានជោគជ័យ',
+    unlock_success: 'បើកសិទ្ធិចូលប្រើឡើងវិញបានជោគជ័យ',
   }
 };
 
