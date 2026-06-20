@@ -81,6 +81,7 @@ export default function CommunityScreen() {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [optionsPositionY, setOptionsPositionY] = useState(vs(100));
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const commentInputRef = React.useRef<TextInput>(null);
   const commentsListRef = React.useRef<FlatList>(null);
@@ -153,16 +154,17 @@ export default function CommunityScreen() {
   useEffect(() => {
     if (isOptionsModalVisible) {
       optionsX.value = withTiming(0, {
-        duration: 300,
-        easing: Easing.out(Easing.poly(4)),
+        duration: 250,
       });
     } else {
-      optionsX.value = SCREEN_WIDTH;
+      optionsX.value = withTiming(s(50), { duration: 200 });
     }
   }, [isOptionsModalVisible]);
 
+  const optionsOffset = s(50);
   const animatedOptionsStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: optionsX.value }]
+    transform: [{ translateX: optionsX.value }],
+    opacity: interpolate(optionsX.value, [optionsOffset, 0], [0, 1])
   }));
 
   // Animation for Create/Edit Post Modal
@@ -583,8 +585,12 @@ export default function CommunityScreen() {
     }
   };
 
-  const handlePostOptions = (post: Post) => {
+  const handlePostOptions = (post: Post, event: any) => {
     if (!user || user.uid !== post.userId) return;
+    const y = event.nativeEvent.pageY;
+    // Đảm bảo menu không bị mất ở phía dưới cùng màng hình
+    const adjustedY = y > SCREEN_HEIGHT - vs(150) ? y - vs(100) : y + vs(10);
+    setOptionsPositionY(adjustedY);
     setSelectedPost(post);
     setOptionsModalVisible(true);
   };
@@ -639,7 +645,7 @@ export default function CommunityScreen() {
             <Text style={styles.postTime}>{item.time}</Text>
           </View>
           {isMyPost && (
-            <TouchableOpacity onPress={() => handlePostOptions(item)} style={{ padding: 5 }}>
+            <TouchableOpacity onPress={(e) => handlePostOptions(item, e)} style={{ padding: 5 }}>
               <Ionicons name="ellipsis-vertical" size={20} color="#666" />
             </TouchableOpacity>
           )}
@@ -937,10 +943,10 @@ export default function CommunityScreen() {
         </View>
       </Modal>
 
-      {/* Post Options Bottom Sheet */}
+      {/* Post Options Dropdown */}
       <Modal animationType="fade" transparent={true} statusBarTranslucent={true} visible={isOptionsModalVisible} onRequestClose={() => setOptionsModalVisible(false)}>
         <TouchableOpacity style={styles.optionsOverlay} activeOpacity={1} onPress={() => setOptionsModalVisible(false)}>
-          <Animated.View style={[styles.optionsContent, animatedOptionsStyle, { paddingBottom: insets.bottom + 10 }]}>
+          <Animated.View style={[styles.optionsContent, animatedOptionsStyle, { top: optionsPositionY }]}>
             <TouchableOpacity style={styles.optionRow} onPress={() => { setOptionsModalVisible(false); if (selectedPost) handleEditPost(selectedPost); }}>
               <View style={styles.optionIconContainer}><Ionicons name="create-outline" size={24} color="#3960ffff" /></View>
               <View><Text style={styles.optionText}>{t('edit_post_menu')}</Text></View>
@@ -1000,7 +1006,11 @@ export default function CommunityScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setShowDeleteModal(false)}
       >
-        <View style={styles.pModalOverlay}>
+        <TouchableOpacity
+          style={styles.pModalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowDeleteModal(false)}
+        >
           <View style={styles.pModalContent}>
             <View style={[styles.pModalIconCircle, { backgroundColor: '#FEF2F2', borderColor: '#FEE2E2' }]}>
               <Ionicons name="trash-outline" size={40} color="#EF4444" />
@@ -1024,7 +1034,7 @@ export default function CommunityScreen() {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
       </Modal>
     </SafeAreaView>
   );
@@ -1093,8 +1103,8 @@ const styles = StyleSheet.create({
   replyBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8F9FA', paddingHorizontal: s(20), paddingVertical: vs(8), borderTopWidth: 1, borderTopColor: '#EEE' },
   replyBarText: { fontSize: ms(14), color: '#666', flex: 1, marginRight: s(10) },
   sendBtn: { marginLeft: s(10), width: s(45), height: s(45), justifyContent: 'center', alignItems: 'center' },
-  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: vs(50) },
-  emptyText: { marginTop: vs(35), fontSize: ms(16), color: '#999', fontWeight: '500' },
+  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  emptyText: { marginTop: vs(30), fontSize: ms(16), color: '#999', fontWeight: '500' },
   createPostContent: { flexGrow: 1 },
   userInfoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: vs(20), paddingHorizontal: s(20), paddingTop: vs(10) },
   userNameInModal: { fontSize: ms(17), fontWeight: '700', color: '#1A1A1A', marginLeft: s(12), paddingRight: s(15), flex: 1 },
@@ -1106,32 +1116,59 @@ const styles = StyleSheet.create({
   attachAction: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0F7FF', paddingHorizontal: s(20), paddingVertical: vs(10), borderRadius: ms(22), gap: s(8) },
   attachActionText: { fontSize: ms(14), fontWeight: '700', color: '#1877F2', marginRight: s(2) },
   closeModalBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center', borderRadius: s(22), backgroundColor: '#FFF0F0' },
-  optionsOverlay: { flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end' },
-  optionsContent: { backgroundColor: '#FFFFFF', borderRadius: ms(30), marginHorizontal: s(15), marginBottom: vs(15), paddingHorizontal: s(10), paddingTop: vs(20), paddingBottom: vs(5), shadowColor: '#000', shadowOffset: { width: 0, height: vs(-10) }, shadowOpacity: 0.1, shadowRadius: s(20), elevation: 20 },
-  optionsHandle: { width: s(40), height: vs(4), borderRadius: s(2), backgroundColor: '#E0E0E0', alignSelf: 'center', marginVertical: vs(12) },
-  optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingVertical: vs(10), paddingHorizontal: s(25), width: '100%' },
-  optionIconContainer: { width: s(30), height: s(30), justifyContent: 'center', alignItems: 'center', marginRight: s(15) },
-  optionText: { fontSize: ms(16), fontWeight: '600', color: '#000000ff' },
+  optionsOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+  optionsContent: {
+    position: 'absolute',
+    right: s(20),
+    backgroundColor: '#FFFFFF',
+    borderRadius: ms(20),
+    width: s(200),
+    paddingTop: vs(13),
+    paddingBottom: vs(6),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: vs(5) },
+    shadowOpacity: 0.15,
+    shadowRadius: s(15),
+    elevation: 10
+  },
+  optionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: vs(2),
+    paddingHorizontal: s(12),
+  },
+  optionIconContainer: {
+    width: s(28),
+    height: s(28),
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: s(6)
+  },
+  optionText: { fontSize: ms(15), fontWeight: '600', color: '#1A1A1A' },
 
   pModalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: s(24),
+    justifyContent: 'flex-end',
   },
   pModalContent: {
     backgroundColor: '#FFF',
-    borderRadius: ms(32),
-    padding: s(30),
+    borderTopLeftRadius: ms(35),
+    borderTopRightRadius: ms(35),
+    paddingTop: vs(12),
+    paddingHorizontal: s(30),
     width: '100%',
-    maxWidth: s(340),
+    minHeight: '40%',
+    paddingBottom: vs(15),
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: vs(10) },
+    shadowOffset: { width: 0, height: vs(-10) },
     shadowOpacity: 0.1,
     shadowRadius: s(20),
-    elevation: 10,
+    elevation: 25,
   },
   pModalIconCircle: {
     width: s(80),

@@ -6,7 +6,6 @@ import { ms, s, SCREEN_WIDTH, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
@@ -27,9 +26,9 @@ import Animated, {
   withDelay,
   withRepeat,
   withSequence,
-  withSpring,
   withTiming
 } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const StyleSheet = RNStyleSheet;
 
 const CATEGORY_CARD_WIDTH = (SCREEN_WIDTH - s(40) - (3 * s(8))) / 4;
@@ -399,7 +398,6 @@ export default function HomeScreen() {
               onPress={() => {
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                 setShowNotifications(true);
-                markAllAsRead(); // Đánh dấu đã đọc khi mở bảng thông báo
                 slideX.value = withTiming(0, { duration: 300 });
               }}
             >
@@ -546,6 +544,18 @@ export default function HomeScreen() {
           <Animated.View style={[styles.notificationContainer, animatedSlideStyle]}>
             <View style={styles.nHeader}>
               <Text style={styles.nTitle}>{t('notifications_title')}</Text>
+              {unreadCount > 0 && (
+                <TouchableOpacity
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    markAllAsRead();
+                  }}
+                  style={styles.markReadBtn}
+                >
+                  <Ionicons name="checkmark-done-outline" size={ms(18)} color="#000000ff" />
+                  <Text style={styles.markReadText}>{t('mark_all_read') || 'Đọc tất cả'}</Text>
+                </TouchableOpacity>
+              )}
             </View>
 
             <ScrollView
@@ -557,7 +567,7 @@ export default function HomeScreen() {
                 notifications.map((item) => (
                   <TouchableOpacity
                     key={item.id}
-                    style={[styles.nItem, !item.isRead && { backgroundColor: '#F0F9FF' }]}
+                    style={[styles.nItem, !item.isRead && styles.nItemUnread]}
                     onLongPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                       setDeletingId(item.id);
@@ -584,7 +594,7 @@ export default function HomeScreen() {
                           // Nếu là Comment/Reply: Sang Community và mở Modal
                           router.push({
                             pathname: '/(tabs)/community',
-                            params: { 
+                            params: {
                               openPostId: item.postId,
                               targetCommentId: item.targetId
                             }
@@ -598,19 +608,23 @@ export default function HomeScreen() {
                       }
                     }}
                   >
+                    {!item.isRead && <View style={styles.unreadIndicator} />}
                     <View style={[
                       styles.nIcon,
                       { backgroundColor: !item.isRead ? '#FEE2E2' : '#F0FDF4' }
                     ]}>
-                      <Ionicons
-                        name={!item.isRead ? 'notifications' : 'notifications-outline'}
-                        size={20}
-                        color={!item.isRead ? '#EF4444' : '#10B981'}
-                      />
+                      <Animated.View style={!item.isRead ? animatedBellStyle : null}>
+                        <Ionicons
+                          name={!item.isRead ? 'notifications' : 'notifications-outline'}
+                          size={20}
+                          color={!item.isRead ? '#EF4444' : '#10B981'}
+                        />
+                      </Animated.View>
+                      {!item.isRead && <View style={styles.unreadDot} />}
                     </View>
                     <View style={styles.nContent}>
-                      <View style={{ flex: 1, marginRight: s(30) }}>
-                        <Text style={styles.nItemTitle} numberOfLines={2}>
+                      <View style={{ flex: 1, marginRight: s(10) }}>
+                        <Text style={styles.nItemTitle} numberOfLines={3}>
                           <Text style={{ fontWeight: '400', color: '#EF4444' }}>{item.fromUserName}</Text> {t(item.message)}
                         </Text>
                       </View>
@@ -908,13 +922,13 @@ const styles = RNStyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: vs(20),
+    marginBottom: vs(15),
+    paddingTop: vs(10),
   },
   nTitle: {
-    fontSize: ms(21),
-    fontWeight: '400',
-    color: '#1E293B',
-    marginTop: vs(20),
+    fontSize: ms(20),
+    fontWeight: '600',
+    color: '#1e293b',
   },
   nList: {
     flex: 1,
@@ -926,6 +940,54 @@ const styles = RNStyleSheet.create({
     paddingBottom: vs(15),
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
+    position: 'relative',
+    paddingLeft: s(10),
+  },
+  nItemUnread: {
+    backgroundColor: '#eff6ff', // More distinct light blue
+    borderRadius: s(12),
+    padding: s(15),
+    borderBottomWidth: 0,
+    shadowColor: '#3b82f6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  markReadBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: s(4),
+    paddingVertical: vs(5),
+    paddingHorizontal: s(10),
+    backgroundColor: '#eff6ff',
+    borderRadius: s(20),
+  },
+  markReadText: {
+    fontSize: ms(11),
+    color: '#000000ff',
+    fontWeight: '500',
+  },
+  unreadIndicator: {
+    position: 'absolute',
+    left: 0,
+    top: '25%',
+    bottom: '25%',
+    width: s(4),
+    backgroundColor: '#3b82f6',
+    borderTopRightRadius: s(4),
+    borderBottomRightRadius: s(4),
+  },
+  unreadDot: {
+    position: 'absolute',
+    top: -s(2),
+    right: -s(2),
+    width: s(10),
+    height: s(10),
+    borderRadius: s(5),
+    backgroundColor: '#EF4444',
+    borderWidth: 1.5,
+    borderColor: '#FFF',
   },
   nIcon: {
     width: s(45),
@@ -933,15 +995,17 @@ const styles = RNStyleSheet.create({
     borderRadius: s(10),
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
   },
   nContent: {
     flex: 1,
   },
   nItemTitle: {
-    fontSize: ms(15),
+    fontSize: ms(14),
     fontWeight: '400',
-    color: '#1E293B',
-    marginBottom: vs(4),
+    color: '#1e293b',
+    lineHeight: vs(20),
+    marginBottom: vs(2),
   },
   nItemTime: {
     fontSize: ms(11),

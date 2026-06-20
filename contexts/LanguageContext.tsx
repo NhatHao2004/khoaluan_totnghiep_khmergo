@@ -390,7 +390,7 @@ export const translations: any = {
 
     // Admin
     system: 'Hệ thống',
-    feedback_replied_notif: 'đã phản hồi góp ý của bạn',
+    feedback_replied_notif: 'đã phản hồi góp\u00A0ý\ncủa bạn...',
     user_management: 'Quản lý người dùng',
     no_users: 'Chưa có người dùng nào',
     feedback_from: 'Phản hồi từ',
@@ -412,6 +412,7 @@ export const translations: any = {
     unlock: 'Mở khóa',
     lock_success: 'Đã khóa tài khoản người dùng',
     unlock_success: 'Đã mở khóa tài khoản người dùng',
+    mark_all_read: 'Đọc tất cả',
   },
   km: {
     // Common
@@ -817,6 +818,7 @@ export const translations: any = {
     unlock: 'ដោះសោ',
     lock_success: 'ចាក់សោគណនីបានជោគជ័យ',
     unlock_success: 'បើកសិទ្ធិចូលប្រើឡើងវិញបានជោគជ័យ',
+    mark_all_read: 'អានទាំងអស់',
   }
 };
 
