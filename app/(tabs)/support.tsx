@@ -1,10 +1,11 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
+import { ms, s, vs } from '@/utils/responsive';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { addDoc, collection, deleteDoc, doc, onSnapshot, query, serverTimestamp, where } from 'firebase/firestore';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -16,10 +17,8 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ms, s, vs } from '@/utils/responsive';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, { FadeInDown, interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SupportScreen() {
   const router = useRouter();
@@ -145,9 +144,7 @@ export default function SupportScreen() {
   };
 
   const handleDeleteFeedback = async (id: string) => {
-    // Cập nhật local state trước để UI biến mất ngay lập tức
     setUserFeedbacks(prev => prev.filter(item => item.id !== id));
-
     try {
       await deleteDoc(doc(db, 'feedback', id));
       showToast(t('delete_feedback_success'), 'success');
@@ -155,7 +152,24 @@ export default function SupportScreen() {
     } catch (error) {
       console.error('Error deleting feedback:', error);
       showToast(t('delete_feedback_failed'), 'error');
-      // Nếu lỗi thì nên load lại data từ snapshot (onSnapshot sẽ tự động làm việc này)
+    }
+  };
+
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return '';
+    try {
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+
+      return new Intl.DateTimeFormat(language === 'km' ? 'km-KH' : 'vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour12: false
+      }).format(date);
+    } catch (e) {
+      return '';
     }
   };
 
@@ -251,49 +265,87 @@ export default function SupportScreen() {
           <Text style={styles.historySectionTitle}>{t('feedback_history')}</Text>
 
           {loadingFeedbacks ? (
-            <ActivityIndicator size="small" color="#3B82F6" style={{ marginTop: 20 }} />
+            <View style={styles.loadingHistory}>
+              <ActivityIndicator size="small" color="#3B82F6" />
+            </View>
           ) : userFeedbacks.length > 0 ? (
-            userFeedbacks.map((item) => (
-              <TouchableOpacity
+            userFeedbacks.map((item, index) => (
+              <Animated.View
                 key={item.id}
-                style={styles.ultraSimpleCard}
-                onLongPress={() => setDeletingId(item.id)}
-                onPress={() => deletingId && setDeletingId(null)}
-                activeOpacity={0.7}
+                entering={FadeInDown.delay(index * 100).duration(500)}
+                style={styles.historyCardWrapper}
               >
-                <View style={styles.historyItemGroup}>
-                  <View style={styles.cardMainRow}>
-                    <Text style={[styles.userMsgText, { flex: 1 }, language === 'km' && { textAlign: 'left' }]}>
-                      {t('feedback_content_label')}: {item.content || item.message || (item.thrilled !== item.userName ? item.thrilled : '') || t('no_content')}
+                <TouchableOpacity
+                  style={[styles.historyCard, (item.adminReply || item.reply) && styles.repliedCard]}
+                  onLongPress={() => setDeletingId(item.id)}
+                  onPress={() => deletingId && setDeletingId(null)}
+                  activeOpacity={0.8}
+                >
+                  {/* Status Bar */}
+                  <View style={styles.cardHeaderRow}>
+                    <View style={[styles.statusBadge, (item.adminReply || item.reply) ? styles.statusReplied : styles.statusPending]}>
+                      <Ionicons
+                        name={(item.adminReply || item.reply) ? "checkmark-circle" : "time"}
+                        size={ms(12)}
+                        color={(item.adminReply || item.reply) ? "#10B981" : "#F59E0B"}
+                      />
+                      <Text style={[styles.statusText, { color: (item.adminReply || item.reply) ? "#10B981" : "#F59E0B" }]}>
+                        {(item.adminReply || item.reply) ? t('replied_status') || 'Đã trả lời' : t('pending_status') || 'Đang chờ'}
+                      </Text>
+                    </View>
+                    <Text style={styles.historyDate}>{formatDate(item.createdAt)}</Text>
+                  </View>
+
+                  {/* User Message */}
+                  <View style={styles.userMessageArea}>
+                    <View style={styles.userIconCircle}>
+                      <Ionicons name="person" size={ms(14)} color="#64748B" />
+                    </View>
+                    <Text style={styles.userMsgText}>
+                      {item.content || item.message || t('no_content')}
                     </Text>
                   </View>
 
-                  {(item.adminReply || item.reply || item.response) && (
-                    <View style={styles.systemReplyBox}>
-                      <View style={styles.systemReplyHeader}>
-                        <Ionicons name="chatbubble-ellipses" size={16} color="#EF4444" />
-                        <Text style={styles.systemReplyTitle}>{t('system_reply')}</Text>
+                  {/* Admin Response */}
+                  {(item.adminReply || item.reply) && (
+                    <View style={styles.adminResponseArea}>
+                      <View style={styles.adminHeader}>
+                        <View style={styles.adminIconCircle}>
+                          <Ionicons name="shield-checkmark" size={ms(14)} color="#3B82F6" />
+                        </View>
+                        <Text style={styles.adminName}>{t('admin_reply') || 'Admin phản hồi'}</Text>
                       </View>
-                      <Text style={[styles.systemReplyText, language === 'km' && { textAlign: 'left' }]}>
-                        {item.adminReply || item.reply || item.response}
-                      </Text>
+                      <View style={styles.adminTextBubble}>
+                        <Text style={styles.adminMsgText}>
+                          {item.adminReply || item.reply}
+                        </Text>
+                      </View>
                     </View>
                   )}
-                </View>
 
-                <View style={styles.historyFooter}>
+                  {/* Delete Overlay */}
                   {deletingId === item.id && (
                     <TouchableOpacity
                       onPress={() => handleDeleteFeedback(item.id)}
-                      style={styles.bottomDeleteBtn}
+                      style={styles.deleteOverlay}
                     >
-                      <Ionicons name="close-circle" size={24} color="#EF4444" />
+                      <View style={styles.deleteBtnContent}>
+                        <Ionicons name="trash" size={24} color="#FFF" />
+                        <Text style={styles.deleteBtnText}>{t('delete') || 'Xóa'}</Text>
+                      </View>
                     </TouchableOpacity>
                   )}
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              </Animated.View>
             ))
-          ) : null}
+          ) : (
+            <View style={styles.emptyHistory}>
+              <View style={styles.emptyIconBox}>
+                <Ionicons name="chatbox-ellipses-outline" size={ms(40)} color="#CBD5E1" />
+              </View>
+              <Text style={styles.emptyText}>{t('no_feedback_history') || 'Chưa có lịch sử phản hồi'}</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -352,7 +404,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   section: {
-    marginBottom: 23,
+    marginBottom: vs(10),
   },
   sectionTitle: {
     fontSize: 18,
@@ -399,12 +451,17 @@ const styles = StyleSheet.create({
     textAlign: 'justify',
   },
   formContainer: {
-    marginTop: 20,
-    backgroundColor: '#F8FAFC',
-    padding: 20,
-    borderRadius: 20,
+    marginTop: vs(10),
+    backgroundColor: '#FFFFFF',
+    padding: s(24),
+    borderRadius: s(32),
     borderWidth: 1,
     borderColor: '#F1F5F9',
+    shadowColor: '#64748B',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    elevation: 5,
   },
   inputGroup: {
     marginBottom: 16,
@@ -417,129 +474,211 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   input: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 15,
+    backgroundColor: '#F8FAFC',
+    borderRadius: s(16),
+    paddingHorizontal: s(18),
+    paddingVertical: vs(14),
+    fontSize: ms(15),
     color: '#1E293B',
     borderWidth: 1,
     borderColor: '#E2E8F0',
+    fontWeight: '400',
   },
   textArea: {
-    height: 120,
-    paddingTop: 12,
+    height: vs(140),
+    paddingTop: vs(14),
   },
   sendBtn: {
     backgroundColor: '#3B82F6',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 15,
-    borderRadius: 12,
-    marginTop: 10,
+    paddingVertical: vs(16),
+    borderRadius: s(18),
+    marginTop: vs(10),
     shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
   sendBtnDisabled: {
-    backgroundColor: '#94A3B8',
-    shadowOpacity: 0,
+    backgroundColor: '#CBD5E1',
+    shadowOpacity: 0.1,
+    elevation: 0,
   },
   sendBtnText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '400',
+    fontSize: ms(16),
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
-  // Ultra Simple History Styles
+  // Feedback History Styles Re-designed
   historySection: {
-    paddingVertical: 10,
-    paddingHorizontal: 0,
-    marginTop: -10,
+    paddingBottom: vs(20),
+    marginTop: 7,
   },
   historySectionTitle: {
-    fontSize: 18,
+    fontSize: ms(18),
     fontWeight: '400',
     color: '#1E293B',
-    marginBottom: 25,
+    marginBottom: vs(5),
   },
-  ultraSimpleCard: {
-    backgroundColor: '#fff',
-    marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-    paddingBottom: 15,
+  historyCardWrapper: {
+    marginBottom: vs(12),
   },
-  historyItemGroup: {
+  historyCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: s(24),
+    paddingHorizontal: s(16),
+    paddingVertical: vs(14),
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+    shadowColor: '#64748B',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 3,
+    overflow: 'hidden',
+  },
+  repliedCard: {
+    borderColor: '#E0F2FE', // Light blue border for replied ones
+  },
+  cardHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: vs(14),
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: s(10),
+    paddingVertical: vs(4),
+    borderRadius: s(20),
+    gap: s(5),
+  },
+  statusReplied: {
+    backgroundColor: '#ECFDF5',
+  },
+  statusPending: {
+    backgroundColor: '#FFFBEB',
+  },
+  statusText: {
+    fontSize: ms(11),
+    fontWeight: '400',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  historyDate: {
+    fontSize: ms(12),
+    color: '#94A3B8',
+    fontWeight: '400',
+  },
+  userMessageArea: {
+    flexDirection: 'row',
+    gap: s(12),
+    marginBottom: vs(6),
+  },
+  userIconCircle: {
+    width: s(28),
+    height: s(28),
+    borderRadius: s(14),
     backgroundColor: '#F8FAFC',
-    borderRadius: 20,
-    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#F1F5F9',
   },
   userMsgText: {
-    fontSize: 15,
+    flex: 1,
+    fontSize: ms(14),
     color: '#1E293B',
-    lineHeight: 22,
+    lineHeight: ms(20),
     fontWeight: '400',
-    paddingLeft: 16,
   },
-  cardMainRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
+  adminResponseArea: {
+    marginTop: vs(8),
+    paddingTop: vs(12),
+    borderTopWidth: 1,
+    borderTopColor: '#F1F5F9',
   },
-  inlineDeleteBtn: {
-    paddingLeft: 10,
-  },
-  historyFooter: {
+  adminHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    marginTop: 10,
+    gap: s(8),
+    marginBottom: vs(10),
   },
-  deletePlaceholder: {
-    width: 35,
-    alignItems: 'center',
+  adminIconCircle: {
+    width: s(28),
+    height: s(28),
+    borderRadius: s(14),
+    backgroundColor: '#EFF6FF',
     justifyContent: 'center',
-  },
-  bottomDeleteBtn: {
-    padding: 2,
-  },
-  systemReplyBox: {
-    backgroundColor: '#eff6ff',
-    padding: 16,
-    borderRadius: 16,
-    marginTop: 14,
-    borderLeftWidth: 4,
-    borderLeftColor: '#EF4444',
-    borderWidth: 1,
-    borderColor: '#FEE2E2',
-  },
-  systemReplyHeader: {
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginBottom: 6,
+    borderWidth: 1,
+    borderColor: '#DBEAFE',
   },
-  systemReplyTitle: {
-    fontSize: 13,
+  adminName: {
+    fontSize: ms(13),
     fontWeight: '400',
-    color: '#EF4444',
-    textTransform: 'uppercase',
+    color: '#3B82F6',
   },
-  systemReplyText: {
-    fontSize: 15,
-    color: '#0C4A6E',
-    lineHeight: 22,
+  adminTextBubble: {
+    backgroundColor: '#F8FAFC',
+    padding: s(16),
+    borderRadius: s(16),
+    borderTopLeftRadius: s(2),
+  },
+  adminMsgText: {
+    fontSize: ms(14),
+    color: '#334155',
+    lineHeight: ms(22),
     fontWeight: '400',
   },
-  historyDateText: {
-    fontSize: 11,
+  deleteOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(239, 68, 68, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  deleteBtnContent: {
+    alignItems: 'center',
+    gap: vs(8),
+  },
+  deleteBtnText: {
+    color: '#FFFFFF',
+    fontSize: ms(14),
+    fontWeight: '400',
+  },
+  loadingHistory: {
+    paddingVertical: vs(40),
+    alignItems: 'center',
+  },
+  emptyHistory: {
+    paddingVertical: vs(50),
+    alignItems: 'center',
+    backgroundColor: '#F8FAFC',
+    borderRadius: s(24),
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: '#CBD5E1',
+    marginTop: vs(10),
+  },
+  emptyIconBox: {
+    width: s(64),
+    height: s(64),
+    borderRadius: s(32),
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: vs(15),
+  },
+  emptyText: {
+    fontSize: ms(14),
     color: '#94A3B8',
-    textAlign: 'right',
+    fontWeight: '400',
   },
   toastContainer: {
     position: 'absolute',

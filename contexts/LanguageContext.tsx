@@ -145,6 +145,7 @@ export const translations: any = {
     delete_feedback_success: 'Đã xóa nội dung phản hồi',
     delete_feedback_failed: 'Không thể xóa phản hồi',
     feedback_history: 'Lịch sử phản hồi',
+    no_feedback_history: 'Chưa có lịch sử phản hồi',
     feedback_content_label: 'Nội dung',
     no_content: 'Không có nội dung',
     system_reply: 'Hệ thống phản hồi',
@@ -532,6 +533,7 @@ export const translations: any = {
     pass_too_short: 'ពាក្យសម្ងាត់ថ្មីយ៉ាងហោចណាស់ ៦ តួអក្សរ',
     user_not_found: 'រកមិនឃើញគណនី',
     wrong_old_pass: 'ពាក្យសម្ងាត់បច្ចុប្បន្នមិនត្រឹមត្រូវ',
+    no_feedback_history: 'មិនទាន់មានប្រវត្តិមតិកែលម្អ',
     update_success: 'បច្ចុប្បន្នភាពបានជោគជ័យ',
     update_failed: 'បច្ចុប្បន្នភាពបរាជ័យ',
     // Support Screen Extra
