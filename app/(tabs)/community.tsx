@@ -968,7 +968,11 @@ export default function CommunityScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setShowLoginModal(false)}
       >
-        <View style={styles.pModalOverlay}>
+        <TouchableOpacity
+          style={styles.pModalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowLoginModal(false)}
+        >
           <View style={styles.pModalContent}>
             <View style={styles.pModalIconCircle}>
               <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
@@ -995,7 +999,7 @@ export default function CommunityScreen() {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
       </Modal>
 
       {/* Custom Delete Confirmation Modal */}

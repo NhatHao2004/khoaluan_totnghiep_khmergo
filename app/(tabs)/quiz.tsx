@@ -227,7 +227,11 @@ export default function QuizScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setShowLoginModal(false)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+        <TouchableOpacity
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' }}
+          activeOpacity={1}
+          onPress={() => setShowLoginModal(false)}
+        >
           <View style={styles.modalContent}>
             <View style={styles.modalIconCircle}>
               <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
@@ -254,7 +258,7 @@ export default function QuizScreen() {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
       </Modal>
     </SafeAreaView>
   );
@@ -612,16 +616,19 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#FFF',
-    borderRadius: ms(32),
-    padding: s(30),
+    borderTopLeftRadius: ms(35),
+    borderTopRightRadius: ms(35),
+    paddingTop: vs(25),
+    paddingHorizontal: s(30),
+    paddingBottom: vs(15),
     width: '100%',
-    maxWidth: s(340),
+    minHeight: '40%',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: vs(10) },
+    shadowOffset: { width: 0, height: vs(-10) },
     shadowOpacity: 0.1,
     shadowRadius: s(20),
-    elevation: 10,
+    elevation: 25,
   },
   modalIconCircle: {
     width: s(80),

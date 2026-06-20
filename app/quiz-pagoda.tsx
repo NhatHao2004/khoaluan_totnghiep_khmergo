@@ -145,14 +145,18 @@ export default function QuizPagodaSelectScreen() {
         statusBarTranslucent={true}
         onRequestClose={() => setShowLoginModal(false)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+        <TouchableOpacity
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' }}
+          activeOpacity={1}
+          onPress={() => setShowLoginModal(false)}
+        >
           <View style={styles.modalContent}>
             <View style={styles.modalIconCircle}>
               <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
             </View>
             <Text style={styles.modalTitle} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'តម្រូវឱ្យចូល' : 'Yêu cầu đăng nhập'}</Text>
             <Text style={styles.modalSub} adjustsFontSizeToFit numberOfLines={1}>
-              {isKm ? 'អ្នកត្រូវចូល đểចូលរួមក្នុងបញ្ហាប្រឈមនេះ' : 'Bạn cần đăng nhập để tham gia thử thách và tích luỵ điểm xếp hạng'}
+              {isKm ? 'អ្នកត្រូវចូលđểចូលរួមក្នុងបញ្ហាប្រឈំនេហ្' : 'Bạn cần đăng nhập để tham gia thử thách và tích luỵ điểm xếp hạng'}
             </Text>
 
             <View style={styles.modalActionRow}>
@@ -170,11 +174,11 @@ export default function QuizPagodaSelectScreen() {
                 style={styles.modalSecondaryBtn}
                 onPress={() => setShowLoginModal(false)}
               >
-                <Text style={styles.modalSecondaryBtnText} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'បោះបង់' : 'Huỷ'}</Text>
+                <Text style={styles.modalSecondaryBtnText} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'បោហបង់' : 'Huỷ'}</Text>
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
       </Modal>
     </View>
   );
@@ -249,16 +253,19 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#FFF',
-    borderRadius: ms(32),
-    padding: s(30),
+    borderTopLeftRadius: ms(35),
+    borderTopRightRadius: ms(35),
+    paddingTop: vs(25),
+    paddingHorizontal: s(30),
+    paddingBottom: vs(15),
     width: '100%',
-    maxWidth: s(340),
+    minHeight: '40%',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: vs(10) },
+    shadowOffset: { width: 0, height: vs(-10) },
     shadowOpacity: 0.1,
     shadowRadius: s(20),
-    elevation: 10,
+    elevation: 25,
   },
   modalIconCircle: {
     width: s(80),
