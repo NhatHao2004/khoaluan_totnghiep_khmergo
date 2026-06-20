@@ -151,9 +151,9 @@ export const translations: any = {
     system_reply: 'Hệ thống phản hồi',
     no_feedback_yet: 'Bạn chưa có phản hồi nào',
     tap_to_see_guide: 'Bấm để xem hướng dẫn chi tiết',
-    replied_status: 'Đã trả lời',
-    pending_status: 'Đang chờ',
-    admin_reply: 'Quản trị viên phản hồi',
+    replied_status: 'Đã phản hồi',
+    pending_status: 'Chờ phản hồi',
+    admin_reply: 'Hệ thống phản hồi',
     // FAQ Extra
     faq_how_to_use: 'Cách sử dụng ứng dụng',
     faq_how_to_quiz: 'Cách làm bài thử thách',

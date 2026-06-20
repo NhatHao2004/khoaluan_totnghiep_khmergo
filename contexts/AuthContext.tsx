@@ -1,8 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { onAuthStateChanged, User, signOut } from 'firebase/auth';
-import { auth, db } from '../utils/firebaseConfig';
+import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
-import { Alert } from 'react-native';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { Alert, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { auth, db } from '../utils/firebaseConfig';
+import { Ionicons } from '@expo/vector-icons';
+import { ms, s, vs } from '../utils/responsive';
+import { useLanguage } from './LanguageContext';
 
 export interface UserProfile {
   uid: string;
@@ -30,27 +33,30 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
-  setUser: () => {},
+  setUser: () => { },
   loading: true,
-  logout: async () => {},
-  refreshUser: async () => {},
+  logout: async () => { },
+  refreshUser: async () => { },
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isBlockedModalVisible, setIsBlockedModalVisible] = useState(false);
+  const { t } = useLanguage();
 
   const fetchAndSetUser = async (firebaseUser: User) => {
     try {
       const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
       if (userDoc.exists()) {
         const data = userDoc.data();
-        
+
         // Kiểm tra xem người dùng có bị chặn không (Ngoại trừ Admin)
         const userRole = data.role || data['quyền'] || 'Người dùng';
         if (data.isBlocked && userRole !== 'Quản trị viên') {
           await signOut(auth);
           setUser(null);
+          setIsBlockedModalVisible(true);
           throw new Error('ACCOUNT_BLOCKED');
         }
 
@@ -79,7 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error: any) {
       // Nếu là lỗi offline, chúng ta vẫn cho phép User cơ bản để vào được app
       const isOffline = error.message?.includes('offline') || error.code === 'unavailable';
-      
+
       if (isOffline) {
         setUser({
           uid: firebaseUser.uid,
@@ -93,14 +99,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (error.message !== 'ACCOUNT_BLOCKED') {
         console.error("Error fetching user data:", error);
       }
-      
+
       // Nếu lỗi là do phân quyền (thường là bị chặn bởi Rules)
       if (error.code === 'permission-denied') {
         await signOut(auth);
         setUser(null);
         throw new Error('ACCOUNT_BLOCKED');
       }
-      
+
       throw error;
     }
   };
@@ -117,13 +123,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     let unsubDoc: (() => void) | null = null;
-    
+
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
       if (firebaseUser) {
         try {
           // fetchAndSetUser hiện tại đã an toàn với lỗi offline
           await fetchAndSetUser(firebaseUser);
-          
+
           // Thiết lập listener thời gian thực cho tài khoản đang đăng nhập
           if (unsubDoc) unsubDoc();
           unsubDoc = onSnapshot(doc(db, 'users', firebaseUser.uid), {
@@ -131,11 +137,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               if (snap.exists()) {
                 const data = snap.data();
                 const userRole = data.role || data['quyền'] || 'Người dùng';
-                
+
                 if (data.isBlocked && userRole !== 'Quản trị viên') {
                   signOut(auth);
                   setUser(null);
-                  Alert.alert('Thông báo', 'Tài khoản của bạn đã bị khóa bởi quản trị viên.');
+                  setIsBlockedModalVisible(true);
                   return;
                 }
 
@@ -156,8 +162,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               }
             },
             error: (err) => {
-              // Chỉ log lỗi snapshot nếu không phải lỗi offline
-              if (!err.message.includes('offline')) {
+              // Chỉ log lỗi snapshot nếu không phải lỗi offline hoặc lỗi phân quyền (do bị chặn)
+              const isBlockedError = err.message?.includes('permission-denied') || err.message?.includes('insufficient permissions');
+              if (!err.message.includes('offline') && !isBlockedError) {
                 console.error("Snapshot error:", err);
               }
             }
@@ -197,8 +204,103 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider value={{ user, setUser, loading, logout, refreshUser }}>
       {children}
+
+      <Modal
+        visible={isBlockedModalVisible}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.iconContainer}>
+              <View style={styles.iconCircle}>
+                <Ionicons name="lock-closed" size={ms(40)} color="#EF4444" />
+              </View>
+            </View>
+
+            <Text style={styles.modalTitle} numberOfLines={1} adjustsFontSizeToFit>
+              {t('notifications_title')}
+            </Text>
+
+            <Text style={styles.modalMessage}>
+              {t('account_blocked')}
+            </Text>
+
+            <TouchableOpacity
+              style={styles.okButton}
+              activeOpacity={0.8}
+              onPress={() => setIsBlockedModalVisible(false)}
+            >
+              <Text style={styles.okButtonText}>{t('confirm')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </AuthContext.Provider>
   );
 };
+
+const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: s(24),
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: ms(24),
+    padding: s(24),
+    width: '100%',
+    maxWidth: s(340),
+    alignItems: 'center',
+    // Shadow
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  iconContainer: {
+    marginBottom: vs(20),
+  },
+  iconCircle: {
+    width: ms(80),
+    height: ms(80),
+    borderRadius: ms(40),
+    backgroundColor: '#FEF2F2',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: ms(22),
+    fontWeight: '700',
+    color: '#1E293B',
+    marginBottom: vs(12),
+    textAlign: 'center',
+  },
+  modalMessage: {
+    fontSize: ms(16),
+    color: '#64748B',
+    textAlign: 'center',
+    lineHeight: vs(24),
+    marginBottom: vs(28),
+  },
+  okButton: {
+    backgroundColor: '#EF4444',
+    paddingVertical: vs(14),
+    paddingHorizontal: s(40),
+    borderRadius: ms(14),
+    width: '100%',
+    alignItems: 'center',
+  },
+  okButtonText: {
+    color: '#FFFFFF',
+    fontSize: ms(16),
+    fontWeight: '600',
+  },
+});
 
 export const useAuth = () => useContext(AuthContext);

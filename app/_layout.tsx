@@ -38,13 +38,13 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <AuthProvider>
-          <LanguageProvider>
+        <LanguageProvider>
+          <AuthProvider>
             {!isAppReady ? (
               <LoadingScreen onFinish={() => setIsAppReady(true)} />
             ) : (
               <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                <Stack screenOptions={{ 
+                <Stack screenOptions={{
                   headerShown: false,
                   contentStyle: { backgroundColor: '#FFFFFF' }
                 }}>
@@ -55,8 +55,8 @@ export default function RootLayout() {
                 <StatusBar style="auto" />
               </ThemeProvider>
             )}
-          </LanguageProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </GestureHandlerRootView>
     </SafeAreaProvider>
   );

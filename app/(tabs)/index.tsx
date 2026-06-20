@@ -221,23 +221,31 @@ export default function HomeScreen() {
   }, [language, t, refreshing]);
 
   useEffect(() => {
-    bellRotation.value = withRepeat(
-      withSequence(
-        withTiming(-12, { duration: 100 }),
-        withTiming(12, { duration: 100 }),
-        withTiming(-12, { duration: 100 }),
-        withTiming(12, { duration: 100 }),
-        withTiming(0, { duration: 100 }),
-        withDelay(2000, withTiming(0, { duration: 0 }))
-      ),
-      -1,
-      false
-    );
-  }, []);
+    if (unreadCount > 0) {
+      bellRotation.value = withRepeat(
+        withSequence(
+          withTiming(-12, { duration: 100 }),
+          withTiming(12, { duration: 100 }),
+          withTiming(-12, { duration: 100 }),
+          withTiming(12, { duration: 100 }),
+          withTiming(0, { duration: 100 }),
+          withDelay(2000, withTiming(0, { duration: 0 }))
+        ),
+        -1,
+        false
+      );
+    } else {
+      bellRotation.value = withTiming(0, { duration: 300 });
+    }
+  }, [unreadCount]);
 
   // Real-time Notifications Listener
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setNotifications([]);
+      setUnreadCount(0);
+      return;
+    }
     const { query, collection, where, orderBy, onSnapshot } = require('firebase/firestore');
     const q = query(
       collection(db, 'notifications'),
@@ -253,6 +261,11 @@ export default function HomeScreen() {
       }));
       setNotifications(nData);
       setUnreadCount(nData.filter((n: any) => !n.isRead).length);
+    }, (error: any) => {
+      // Suppress permission errors when user is likely signed out or blocked
+      if (error.code !== 'permission-denied') {
+        console.error("Notifications listener error:", error);
+      }
     });
 
     return () => unsubscribe();
@@ -596,21 +609,19 @@ export default function HomeScreen() {
                       />
                     </View>
                     <View style={styles.nContent}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <View style={{ flex: 1, marginRight: s(10) }}>
-                          <Text style={styles.nItemTitle} numberOfLines={2}>
-                            <Text style={{ fontWeight: '400', color: '#EF4444' }}>{item.fromUserName}</Text> {t(item.message)}
-                          </Text>
-                        </View>
-                        {deletingId === item.id ? (
+                      <View style={{ flex: 1, marginRight: s(30) }}>
+                        <Text style={styles.nItemTitle} numberOfLines={2}>
+                          <Text style={{ fontWeight: '400', color: '#EF4444' }}>{item.fromUserName}</Text> {t(item.message)}
+                        </Text>
+                      </View>
+                      <View style={styles.nItemFooter}>
+                        {deletingId === item.id && (
                           <TouchableOpacity
                             onPress={() => deleteNotification(item.id)}
-                            style={{ padding: s(5) }}
+                            style={styles.deleteBtn}
                           >
                             <Ionicons name="close-circle" size={ms(24)} color="#FF3B30" />
                           </TouchableOpacity>
-                        ) : (
-                          <Text style={styles.nItemTime}>{item.time}</Text>
                         )}
                       </View>
                     </View>
@@ -936,5 +947,17 @@ const styles = RNStyleSheet.create({
     fontSize: ms(11),
     color: '#94A3B8',
     fontWeight: '400',
+  },
+  nItemFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginTop: vs(4),
+  },
+  deleteBtn: {
+    position: 'absolute',
+    right: -s(4),
+    bottom: -vs(4),
+    padding: s(4),
   },
 });
