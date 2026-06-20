@@ -40,6 +40,12 @@ export default function QuizScreen() {
     }
 
     try {
+      // Nếu là Admin thì mặc định hạng 0
+      if (user.role === 'Quản trị viên') {
+        setUserRank(0);
+        return;
+      }
+
       const users = await getLeaderboardUsers(100);
       const index = users.findIndex(u => u.uid === user.uid);
       const newRank = index !== -1 ? index + 1 : '>100';

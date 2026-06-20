@@ -211,6 +211,13 @@ export default function VocabQuizScreen() {
 
     const saveResults = async () => {
         if (!user || score <= 0 || hasSaved || isSaving) return;
+
+        // Nếu là Admin, không lưu điểm vào CSDL
+        if (user.role === 'Quản trị viên') {
+            setHasSaved(true);
+            return;
+        }
+
         setIsSaving(true);
         try {
             const isPerfect = matches.length === leftItems.length;
@@ -338,7 +345,11 @@ export default function VocabQuizScreen() {
                         <Text style={styles.resultScoreNum}>+{score}</Text>
                         <Text style={styles.resultScoreLabel}>{t('points_earned')}</Text>
                         {isSaving && <Text style={styles.savingText}>{t('saving_results')}</Text>}
-                        {hasSaved && <Text style={styles.savedText}>{t('results_saved')}</Text>}
+                        {hasSaved && (
+                            <Text style={styles.savedText}>
+                                {user?.role === 'Quản trị viên' ? 'Chế độ xem trước' : t('results_saved')}
+                            </Text>
+                        )}
                     </View>
                     <TouchableOpacity style={styles.resultPrimaryBtn} onPress={() => prepareGame(selectedCategory!)}>
                         <Ionicons name="refresh" size={20} color="#FFF" />

@@ -173,7 +173,14 @@ export default function GameMCQScreen() {
   const handleFinish = async (finalResults: boolean[]) => {
     const earnedTotal = finalResults.filter(Boolean).length * POINTS_PER_CORRECT;
     setPhase('result');
+
     if (user && earnedTotal > 0) {
+      // Nếu là Admin, không lưu điểm vào CSDL
+      if (user.role === 'Quản trị viên') {
+        setHasSaved(true); // Đánh dấu hoàn tất để hiện kết quả
+        return;
+      }
+
       setIsSaving(true);
       setHasSaved(false);
       try {
@@ -311,7 +318,11 @@ export default function GameMCQScreen() {
           </View>
 
           {isSaving && <Text style={styles.savingText}>Đang lưu điểm...</Text>}
-          {hasSaved && <Text style={styles.savedText}>Đã lưu thành tích</Text>}
+          {hasSaved && (
+            <Text style={styles.savedText}>
+              {user.role === 'Quản trị viên' ? 'Chế độ xem trước' : 'Đã lưu thành tích'}
+            </Text>
+          )}
         </View>
 
         <Text style={styles.resultCorrectLabel}>
