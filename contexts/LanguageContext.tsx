@@ -300,6 +300,7 @@ export const translations: any = {
     ai_intro: 'Tôi là KhmerGo AI - luôn sẵn sàng khám phá văn hóa, địa điểm và ngôn ngữ Khmer cùng bạn',
     thinking: 'Đang suy nghĩ...',
     clear_chat_history: 'Đã dọn dẹp lịch sử trò chuyện',
+    clear_chat_history_success: 'Dọn dẹp lịch sử trò chuyện',
     ai_error_connection: 'Xin lỗi, tôi gặp sự cố kết nối. Bạn thử lại nhé!',
     view_details: 'Xem chi tiết',
     explore_now: 'Khám phá ngay',

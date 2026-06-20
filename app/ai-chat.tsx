@@ -57,6 +57,7 @@ export default function AIAssistantScreen() {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [layoutHeight, setLayoutHeight] = useState(SCREEN_HEIGHT);
   const [initialLayoutHeight, setInitialLayoutHeight] = useState(0);
+  const [showMenu, setShowMenu] = useState(false);
 
   const triggerToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToastMsg(msg); setToastType(type); setShowToast(true);
@@ -313,8 +314,8 @@ export default function AIAssistantScreen() {
         </Animated.View>
       )}
       <View style={[styles.header, { paddingTop: insets.top + vs(10) }]}>
-        <TouchableOpacity 
-          style={styles.headerLeft} 
+        <TouchableOpacity
+          style={styles.headerLeft}
           onPress={() => router.back()}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
@@ -323,12 +324,12 @@ export default function AIAssistantScreen() {
         <View style={styles.headerInfo}>
           <Text style={styles.headerTitle} numberOfLines={1}>KhmerGo AI</Text>
         </View>
-        <TouchableOpacity 
-          style={styles.headerRight} 
-          onPress={() => activeTab === 'camera' ? resetCamera() : clearChat()}
+        <TouchableOpacity
+          style={styles.headerRight}
+          onPress={() => setShowMenu(!showMenu)}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Text style={styles.resetText}>Làm mới</Text>
+          <Ionicons name="ellipsis-vertical" size={24} color="#1F2937" />
         </TouchableOpacity>
       </View>
 
@@ -351,6 +352,40 @@ export default function AIAssistantScreen() {
         <View style={{ flex: 1 }}>
           {renderContentArea()}
         </View>
+      )}
+
+      {showMenu && (
+        <TouchableOpacity
+          style={styles.menuOverlay}
+          activeOpacity={1}
+          onPress={() => setShowMenu(false)}
+        >
+          <View style={[styles.menuDropdown, {
+            top: insets.top + vs(48),
+            width: activeTab === 'chat' ? s(255) : s(236)
+          }]}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                setShowMenu(false);
+                activeTab === 'camera' ? resetCamera() : clearChat();
+              }}
+            >
+              <Ionicons
+                name={activeTab === 'camera' ? "refresh-outline" : "trash-outline"}
+                size={20}
+                color={activeTab === 'camera' ? "#1877F2" : "#EF4444"}
+              />
+              <Text
+                style={styles.menuItemText}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                {activeTab === 'camera' ? 'Làm mới phân tích ngay' : (t('clear_chat_history_success') || 'Dọn dẹp lịch sử')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -447,5 +482,37 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     marginLeft: s(10),
     flex: 1,
+  },
+  menuOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'transparent',
+    zIndex: 1000,
+  },
+  menuDropdown: {
+    position: 'absolute',
+    right: s(20),
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: s(4),
+    // Shadow for iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    // Elevation for Android
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: s(12),
+    gap: s(10),
+  },
+  menuItemText: {
+    fontSize: ms(15),
+    color: '#334155',
+    fontWeight: '400',
   },
 });
