@@ -205,7 +205,7 @@ export default function AIAssistantScreen() {
                     <Image source={require('@/assets/images/AI.jpg')} style={styles.chatAvatar} />
                     <View style={styles.aiBubbleContainer}>
                       <View style={styles.aiBubble}>
-                        <Text style={styles.aiMessageText}>{msg.text}</Text>
+                        <Text style={styles.aiMessageText}>{msg.text.replace(/\[LINK:.*?\]/g, '').replace(/\s+([.!?])/g, '$1').trim()}</Text>
                         {msg.text.includes('[LINK:') && (
                           <TouchableOpacity
                             style={styles.detailBtn}
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
   aiMessageText: { fontSize: ms(16), color: '#1A1A1A', lineHeight: ms(22) },
   userMessageText: { fontSize: ms(16), color: '#FFF', lineHeight: ms(22) },
   chatTime: { fontSize: ms(11), color: '#70757A', marginTop: 4 },
-  detailBtn: { backgroundColor: '#1877F2', paddingHorizontal: s(12), paddingVertical: vs(6), borderRadius: ms(10), marginTop: vs(8), alignSelf: 'flex-start' },
+  detailBtn: { backgroundColor: '#1877F2', paddingHorizontal: s(12), paddingVertical: vs(6), borderRadius: ms(10), marginTop: vs(2), alignSelf: 'flex-start' },
   detailBtnText: { color: '#FFF', fontSize: ms(14), fontWeight: '400' },
   inputContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(15), paddingTop: vs(12), borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFF' },
   input: { flex: 1, backgroundColor: '#F0F2F5', borderRadius: ms(20), paddingHorizontal: s(15), paddingVertical: vs(10), maxHeight: vs(110), fontSize: ms(16) },

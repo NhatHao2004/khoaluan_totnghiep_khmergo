@@ -17,10 +17,14 @@ export const analyzeImage = async (base64Image: string): Promise<AnalysisResult>
     const prompt = `Bạn là một chuyên gia về cổ vật Khmer. Hãy so khớp hình ảnh với danh sách này:
 ${artifactsList}
 
-QUY TẮC TRẢ LỜI:
-1. Nếu khớp >80% với hiện vật trong danh sách, CHỈ TRẢ VỀ DUY NHẤT MÃ ID (ví dụ: "4"). Không thêm bất kỳ văn bản nào khác.
-2. Nếu là hiện vật Khmer nhưng không có trong danh sách, trả về: "DESCRIPTION: [mô tả cực ngắn gọn]".
-3. Trường hợp khác, trả về: "unknown".`;
+QUY TRÌNH PHÂN TÍCH VÀ PHẢN HỒI:
+1. Quan sát kỹ: Màu sắc chủ đạo, hoa văn, hình dáng, các chi tiết đặc trưng (ví dụ: răng nanh, chữ viết, chất liệu gỗ/đá/lá).
+2. So sánh: Đối chiếu kỹ với trường 'Features' của từng hiện vật trong danh sách.
+3. QUY TẮC TRẢ LỜI:
+   - Nếu độ tin cậy TRÊN 95% là một hiện vật trong danh sách: CHỈ trả về đúng mã ID (ví dụ: "4").
+   - Nếu thấy hiện vật Khmer nhưng không chắc chắn hoặc không có trong danh sách: Hãy viết một đoạn mô tả ngắn về hiện vật đó.
+   - Nếu hình ảnh không liên quan: Trả về "unknown".
+4. LƯU Ý: Tuyệt đối không đoán mò. Thà trả về mô tả còn hơn trả về sai ID. Đặc biệt lưu ý sự khác biệt giữa Kinh lá buông (dạng lá) và Mặt nạ (dạng khuôn mặt).`;
 
     const response = await fetch(GROQ_API_URL, {
       method: "POST",
@@ -66,28 +70,32 @@ QUY TẮC TRẢ LỜI:
     const content = data.choices[0].message.content.trim();
     console.log("AI Response:", content);
 
-    // 1. Kiểm tra nếu content chính là một ID trong DB
-    const directMatch = ARTIFACTS_DB.find(a => a.id === content || content.includes(`ID: ${a.id}`) || content.includes(`ID:${a.id}`));
-    if (directMatch) {
-      return { artifact: directMatch, isRecognized: true };
+    // 1. Kiểm tra xem trong nội dung phản hồi có chứa bất kỳ ID nào từ DB không
+    const normalizedContent = content.toLowerCase();
+    
+    // Tìm ID có độ dài khớp nhất để tránh trùng lặp (ví dụ ID 1 và 10)
+    for (const artifact of ARTIFACTS_DB) {
+      const idStr = artifact.id.toLowerCase();
+      // Kiểm tra nếu content là ID đơn thuần, hoặc có chứa "ID: [id]", hoặc "số [id]"
+      if (
+        content === artifact.id || 
+        content.includes(`ID: ${artifact.id}`) || 
+        content.includes(`ID:${artifact.id}`) ||
+        new RegExp(`\\b${artifact.id}\\b`).test(content)
+      ) {
+        return { artifact: artifact, isRecognized: true };
+      }
     }
 
-    // 2. Kiểm tra format DESCRIPTION:
-    if (content.toUpperCase().startsWith("DESCRIPTION:")) {
+    // 2. Nếu không tìm thấy ID cụ thể nhưng AI có mô tả (không phải unknown)
+    if (content.toLowerCase() !== "unknown") {
       return {
         isRecognized: true,
-        rawResponse: content.replace(/DESCRIPTION:/i, "").trim()
+        rawResponse: content
       };
     }
 
-    // 3. Các trường hợp ID: [id] (để an toàn)
-    const idRegex = /ID:\s*(\w+)/i;
-    const match = content.match(idRegex);
-    if (match) {
-      const id = match[1];
-      const artifact = ARTIFACTS_DB.find(a => a.id === id);
-      if (artifact) return { artifact, isRecognized: true };
-    }
+    return { isRecognized: false, rawResponse: content };
 
     return { isRecognized: false, rawResponse: content };
   } catch (error) {
