@@ -1,5 +1,7 @@
+import { fetchAndActivate, getValue } from "firebase/remote-config";
 import { ARTIFACTS_DB, Artifact } from "../constants/ArtifactsDB";
 import { CONFIG } from "../constants/Config";
+import { remoteConfig } from "../utils/firebaseConfig";
 
 export interface AnalysisResult {
   artifact?: Artifact;
@@ -8,6 +10,16 @@ export interface AnalysisResult {
 }
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+const getGroqApiKey = async () => {
+  try {
+    await fetchAndActivate(remoteConfig);
+    const key = getValue(remoteConfig, "groq_api_key").asString();
+    return key || CONFIG.GROQ_API_KEY;
+  } catch (error) {
+    return CONFIG.GROQ_API_KEY; 
+  }
+};
 
 export const analyzeImage = async (base64Image: string): Promise<AnalysisResult> => {
   try {
@@ -26,10 +38,11 @@ QUY TRÌNH PHÂN TÍCH VÀ PHẢN HỒI:
    - Nếu hình ảnh không liên quan: Trả về "unknown".
 4. LƯU Ý: Tuyệt đối không đoán mò. Thà trả về mô tả còn hơn trả về sai ID. Đặc biệt lưu ý sự khác biệt giữa Kinh lá buông (dạng lá) và Mặt nạ (dạng khuôn mặt).`;
 
+    const apiKey = await getGroqApiKey();
     const response = await fetch(GROQ_API_URL, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${CONFIG.GROQ_API_KEY}`,
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -92,8 +105,6 @@ QUY TRÌNH PHÂN TÍCH VÀ PHẢN HỒI:
     }
 
     return { isRecognized: false, rawResponse: content };
-
-    return { isRecognized: false, rawResponse: content };
   } catch (error) {
     throw error;
   }
@@ -141,10 +152,11 @@ export const chatWithAI = async (message: string): Promise<string> => {
     9. TUYỆT ĐỐI KHÔNG trả lời các câu hỏi không liên quan đến văn hóa, ẩm thực, địa danh hoặc con người Khmer (ví dụ: toán học, tiếng Anh, bóng đá, v.v.). Nếu gặp các câu hỏi này, hãy trả về câu: "Rất tiếc, mình là chuyên gia văn hóa Khmer nên chỉ có thể hỗ trợ các thông tin trong phạm vi này. Câu hỏi của bạn nằm ngoài kiến thức của mình."
     10. Luôn giữ thái độ lịch sự, thân thiện nhưng kiên định với vai trò chuyên gia văn hóa.`;
 
+    const apiKey = await getGroqApiKey();
     const response = await fetch(GROQ_API_URL, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${CONFIG.GROQ_API_KEY}`,
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

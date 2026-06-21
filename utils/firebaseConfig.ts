@@ -3,20 +3,22 @@ import { getFirestore, setLogLevel } from "firebase/firestore";
 // @ts-ignore
 import { getAuth, initializeAuth, getReactNativePersistence } from "firebase/auth";
 import { getStorage } from "firebase/storage";
+import { getRemoteConfig } from "firebase/remote-config";
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import { CONFIG } from "../constants/Config";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDInHeTU4IWo4kVVsho62WcK6Vg9f83vfg",
-  authDomain: "khmergo-ba0b0.firebaseapp.com",
-  projectId: "khmergo-ba0b0",
-  storageBucket: "khmergo-ba0b0.firebasestorage.app",
-  messagingSenderId: "563133852511",
-  appId: "1:563133852511:web:f5b7f2aebeab097a3064ea",
-  measurementId: "G-LTBGS11WXY"
+  apiKey: CONFIG.FIREBASE.API_KEY,
+  authDomain: CONFIG.FIREBASE.AUTH_DOMAIN,
+  projectId: CONFIG.FIREBASE.PROJECT_ID,
+  storageBucket: CONFIG.FIREBASE.STORAGE_BUCKET,
+  messagingSenderId: CONFIG.FIREBASE.MESSAGING_SENDER_ID,
+  appId: CONFIG.FIREBASE.APP_ID,
+  measurementId: CONFIG.FIREBASE.MEASUREMENT_ID
 };
 
 // Initialize Firebase (chỉ khởi tạo nếu chưa có app nào để tránh lỗi khi reload)
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 // Khởi tạo và export Firestore
 export const db = getFirestore(app);
@@ -37,5 +39,6 @@ export const auth = (() => {
 // Khởi tạo Storage
 export const storage = getStorage(app);
 
-// Lưu ý: getAnalytics chỉ chạy tốt trên môi trường Web. Ở React Native (iOS/Android),
-// thư viện firebase/analytics thường gây lỗi, nên tạm thời không kích hoạt.
+// Khởi tạo Remote Config
+export const remoteConfig = getRemoteConfig(app);
+remoteConfig.settings.minimumFetchIntervalMillis = 60000; // 1 phút (để test cho nhanh, production nên để 12h)
