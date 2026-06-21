@@ -128,7 +128,6 @@ export default function ProfileScreen() {
       setUserRank(newRank);
       lastFetchTime.current = Date.now();
     } catch (error) {
-      console.log('Error fetching rank:', error);
       setUserRank('---');
     }
   }, [user?.uid, userRank]);

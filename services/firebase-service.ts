@@ -45,7 +45,7 @@ export const toggleFavorite = async (userId: string, temple: any, isFavorite: bo
     } else {
       await deleteDoc(favoriteRef);
     }
-    console.log('Toggled favorite for user', userId, 'temple', temple.id, 'to', isFavorite);
+    // Log toggled favorite locally if needed
   } catch (error) {
     console.error('Error toggling favorite:', error);
     throw error;
@@ -176,7 +176,7 @@ export const seedQuizzes = async (quizzes: any[]): Promise<void> => {
       const { image, ...quizToUpload } = quiz;
       await setDoc(doc(db, 'quizzes', quiz.pagodaId), quizToUpload);
     }
-    console.log('Quizzes seeded successfully');
+    // Success
   } catch (error) {
     console.error('Error seeding quizzes:', error);
     throw error;
@@ -200,7 +200,7 @@ export const seedVocabQuizzes = async (categories: any[]): Promise<void> => {
       
       await setDoc(doc(db, 'vocab_categories', cat.id), catToUpload);
     }
-    console.log('Vocab quizzes seeded successfully');
+    // Success
   } catch (error) {
     console.error('Error seeding vocab quizzes:', error);
     throw error;

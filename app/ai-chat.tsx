@@ -85,7 +85,7 @@ export default function AIAssistantScreen() {
         } else {
           setMessages([{ id: 'default', text: t('ai_intro'), sender: 'ai', timestamp: new Date() }]);
         }
-      } catch (e) { console.error(e); }
+      } catch (e) { /* silent fail */ }
     };
     loadChat();
   }, [user?.uid, CHAT_HISTORY_KEY]);
@@ -100,7 +100,7 @@ export default function AIAssistantScreen() {
       await AsyncStorage.removeItem(CHAT_HISTORY_KEY);
       setMessages([{ id: 'default', text: t('ai_intro'), sender: 'ai', timestamp: new Date() }]);
       triggerToast(t('clear_chat_history'));
-    } catch (e) { console.error(e); }
+    } catch (e) { /* silent fail */ }
   };
 
   const scrollViewRef = useRef<ScrollView>(null);
@@ -139,7 +139,7 @@ export default function AIAssistantScreen() {
         return;
       }
     } catch (e) {
-      console.error('Rate limit check error:', e);
+      // Ignored
     }
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

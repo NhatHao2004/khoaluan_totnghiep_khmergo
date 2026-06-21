@@ -156,7 +156,6 @@ export default function LoginScreen() {
         router.replace({ pathname: '/(tabs)', params: { toast: 'login_success' } });
       }
     } catch (error: any) {
-      console.log('Login error:', error);
       let msg = t('update_failed');
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
         msg = t('wrong_old_pass');

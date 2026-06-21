@@ -47,7 +47,6 @@ export default function MedalScreen() {
       }
       lastFetchTime.current = Date.now();
     } catch (error) {
-      console.log('Error fetching leaderboard:', error);
     } finally {
       setIsLoading(false);
     }

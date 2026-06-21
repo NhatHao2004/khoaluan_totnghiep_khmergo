@@ -55,20 +55,16 @@ QUY TRÌNH PHÂN TÍCH VÀ PHẢN HỒI:
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Groq API Error Status:", response.status);
-      console.error("Groq API Error Data:", JSON.stringify(errorData, null, 2));
       throw new Error(errorData.error?.message || `API Error: ${response.status}`);
     }
 
     const data = await response.json();
 
     if (!data.choices || data.choices.length === 0) {
-      console.error("Unexpected API response format:", JSON.stringify(data, null, 2));
       throw new Error("Không nhận được phản hồi hợp lệ từ AI.");
     }
 
     const content = data.choices[0].message.content.trim();
-    console.log("AI Response:", content);
 
     // 1. Kiểm tra xem trong nội dung phản hồi có chứa bất kỳ ID nào từ DB không
     const normalizedContent = content.toLowerCase();
@@ -99,7 +95,6 @@ QUY TRÌNH PHÂN TÍCH VÀ PHẢN HỒI:
 
     return { isRecognized: false, rawResponse: content };
   } catch (error) {
-    console.error("AI Analysis Error:", error);
     throw error;
   }
 };
@@ -171,7 +166,6 @@ export const chatWithAI = async (message: string): Promise<string> => {
     const data = await response.json();
     return data.choices[0].message.content.trim();
   } catch (error) {
-    console.error("AI Chat Error:", error);
     throw error;
   }
 };

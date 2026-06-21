@@ -854,7 +854,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setLangState(savedLang);
       }
     } catch (error) {
-      console.log('Error loading language', error);
+      // Silent fail
     }
   };
 
@@ -863,14 +863,13 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       await AsyncStorage.setItem('appLanguage', lang);
     } catch (error) {
-      console.log('Error saving language', error);
+      // Silent fail
     }
   };
 
   const t = (key: string) => {
     const translation = translations[language][key as keyof typeof translations['vi']];
     if (!translation) {
-      console.warn(`Missing translation key: ${key} for language: ${language}`);
       return translations['vi'][key as keyof typeof translations['vi']] || key;
     }
     return translation;
