@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Hàm kiểm tra người dùng đã đăng nhập chưa
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Hàm kiểm tra đúng chủ sở hữu tài liệu
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // 1. Bảo mật bộ sưu tập Users
+    match /users/{userId} {
+      // Ai cũng có thể xem profile (tên, avatar, điểm) để làm bảng xếp hạng
+      allow read: if isSignedIn();
+      
+      // Chỉ chủ sở hữu mới được cập nhật thông tin của mình
+      // Lưu ý: field 'role' (nếu có) không được cho phép user tự sửa
+      allow write: if isOwner(userId);
+
+      // Bảo mật danh sách yêu thích (Favorites) bên trong User
+      match /favorites/{templeId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // 2. Bảo mật dữ liệu nội dung (Chùa, Văn hóa, Món ăn, Trắc nghiệm)
+    // Người dùng chỉ có quyền ĐỌC, không có quyền GHI (Ghi dành cho Admin)
+    match /pagodas/{id} { allow read: if isSignedIn(); allow write: if false; }
+    match /culture/{id} { allow read: if isSignedIn(); allow write: if false; }
+    match /foods/{id} { allow read: if isSignedIn(); allow write: if false; }
+    match /quizzes/{id} { allow read: if isSignedIn(); allow write: if false; }
+    match /vocab_categories/{id} { allow read: if isSignedIn(); allow write: if false; }
+
+    // 3. Bảo mật Cộng đồng (Community/Posts)
+    match /posts/{postId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      // Chỉ người đăng bài mới được sửa hoặc xóa bài của mình
+      allow update, delete: if isSignedIn() && request.auth.uid == resource.data.authorId;
+    }
+
+    // 4. Bảo mật cho Admin (Tạm thời khóa, chỉ Admin thật sự mới vào được qua Console)
+    match /articles/{id} { allow read: if isSignedIn(); allow write: if false; }
+    match /challenges/{id} { allow read: if isSignedIn(); allow write: if false; }
+    match /trash/{id} { allow read: if false; allow write: if false; }
+
+    // 5. Mặc định: Từ chối tất cả các truy cập khác
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}

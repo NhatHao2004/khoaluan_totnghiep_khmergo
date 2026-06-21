@@ -125,16 +125,37 @@ export default function AIAssistantScreen() {
 
   const sendMessage = async () => {
     if (!inputText.trim()) return;
+
+    // Rate Limit Check (3 seconds cooldown)
+    const now = Date.now();
+    const lastChatTimeKey = `LAST_CHAT_TIME_${user?.uid || 'GUEST'}`;
+    const COOLDOWN = 3000; 
+
+    try {
+      const lastTime = await AsyncStorage.getItem(lastChatTimeKey);
+      if (lastTime && (now - parseInt(lastTime)) < COOLDOWN) {
+        const secondsLeft = Math.ceil((COOLDOWN - (now - parseInt(lastTime))) / 1000);
+        triggerToast(t('ai_chat_too_fast')?.replace('{seconds}', secondsLeft.toString()) || `Vui lòng đợi ${secondsLeft}s để gửi tin nhắn tiếp theo`, 'info');
+        return;
+      }
+    } catch (e) {
+      console.error('Rate limit check error:', e);
+    }
+
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const userMsg: Message = { id: Date.now().toString(), text: inputText.trim(), sender: 'user', timestamp: new Date() };
     setMessages((prev) => [...prev, userMsg]);
     const currentInput = inputText.trim();
     setInputText('');
+    
     const aiWaitingId = (Date.now() + 1).toString();
     setMessages((prev) => [...prev, { id: aiWaitingId, text: t('thinking'), sender: 'ai', timestamp: new Date() }]);
+
     try {
       const response = await chatWithAI(currentInput);
       setMessages((prev) => prev.map(m => m.id === aiWaitingId ? { ...m, text: response } : m));
+      // Save last successful chat time
+      await AsyncStorage.setItem(lastChatTimeKey, Date.now().toString());
     } catch (e) {
       setMessages((prev) => prev.map(m => m.id === aiWaitingId ? { ...m, text: t('ai_error_connection') } : m));
     }
