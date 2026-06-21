@@ -256,15 +256,28 @@ export default function AIAssistantScreen() {
                     <View style={styles.aiBubbleContainer}>
                       <View style={styles.aiBubble}>
                         <Text style={styles.aiMessageText}>{msg.text.replace(/\[LINK:.*?\]/g, '').replace(/\s+([.!?])/g, '$1').trim()}</Text>
-                        {msg.text.includes('[LINK:') && (
-                          <TouchableOpacity
-                            style={styles.detailBtn}
-                            activeOpacity={0.7}
-                            onPress={() => handleLinkPress(msg.text)}
-                          >
-                            <Text style={styles.detailBtnText}>{t('view_details')}</Text>
-                          </TouchableOpacity>
-                        )}
+                        {msg.text.includes('[LINK:') && (() => {
+                          const match = msg.text.match(/\[LINK:\s*([^\]\s]+)\s*\]/i);
+                          const id = match ? match[1].trim().toLowerCase() : '';
+                          // Kiểm tra mọi khả năng dẫn đến trang danh sách tổng
+                          const isList = id.includes('all') || 
+                                         id === 'food' || 
+                                         id === 'pagoda' || 
+                                         id === 'culture' ||
+                                         id.includes('list');
+                          
+                          return (
+                            <TouchableOpacity
+                              style={styles.detailBtn}
+                              activeOpacity={0.7}
+                              onPress={() => handleLinkPress(msg.text)}
+                            >
+                              <Text style={styles.detailBtnText}>
+                                {isList ? (t('explore_now') || 'Khám phá ngay') : (t('view_details') || 'Xem chi tiết')}
+                              </Text>
+                            </TouchableOpacity>
+                          );
+                        })()}
                       </View>
                       <Text style={styles.chatTime}>{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
                     </View>

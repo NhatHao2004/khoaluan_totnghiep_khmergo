@@ -26,21 +26,13 @@ export const analyzeImage = async (base64Image: string): Promise<AnalysisResult>
   try {
     const artifactsList = ARTIFACTS_DB.map(a => `- ID: ${a.id}, Name: ${a.name}, Features: ${a.features}`).join("\n");
 
-    const prompt = `Bạn là hệ thống AI nhận diện di sản Khmer với tiêu chuẩn độ chính xác cực cao.
+    const prompt = `Bạn là hệ thống AI nhận diện di sản Khmer cấp độ chuyên gia.
 DANH SÁCH HIỆN VẬT:
 ${artifactsList}
 
-QUY TẮC NHẬN DIỆN KHẮT KHE:
-1. CHỈ trả về ID nếu bạn tin tưởng ĐỘ CHÍNH XÁC TRÊN 90%. Nếu thấp hơn, hãy trả về "unknown".
-2. Nếu hình ảnh mờ, thiếu sáng, hoặc không thể nhìn rõ các đặc điểm đặc trưng -> PHẢI trả về "unknown".
-3. TRÁNH NHẦM LẪN:
-   - MÀU SẮC RỰC RỠ, có RĂNG, có MẮT -> ID 4 (Mặt nạ).
-   - THANH LÁ KHÔ màu tự nhiên, có chữ KHẮC -> ID 1 (Kinh lá buông).
-
 QUY TẮC PHẢN HỒI:
 - KHÔNG suy nghĩ, KHÔNG giải thích.
-- Chỉ trả về duy nhất ID (ví dụ: "4") hoặc "unknown".
-- Nếu chắc chắn là đồ Khmer nhưng không có trong danh sách, trả về: "DESCRIPTION: [mô tả ngắn]".`;
+- Chỉ trả về duy nhất ID (ví dụ: "4") hoặc "unknown".`;
 
     const apiKey = await getGroqApiKey();
     const response = await fetch(GROQ_API_URL, {
@@ -77,43 +69,38 @@ QUY TẮC PHẢN HỒI:
 
     const data = await response.json();
     let content = data.choices[0].message.content.trim();
-
     const matchId = content.match(/\d+/);
     let detectedId = matchId ? matchId[0] : "";
-
     if (detectedId) {
       const found = ARTIFACTS_DB.find(a => a.id === detectedId);
       if (found) return { artifact: found, isRecognized: true };
     }
-
-    if (content.toUpperCase().startsWith("DESCRIPTION:")) {
-      return { isRecognized: true, rawResponse: content.replace(/DESCRIPTION:/i, "").trim() };
-    }
-
     return { isRecognized: false, rawResponse: "unknown" };
   } catch (error) {
-    console.error("Analyze Image Error:", error);
     throw error;
   }
 };
 
 export const chatWithAI = async (message: string): Promise<string> => {
   try {
-    const prompt = `Bạn là KhmerGo AI, chuyên gia văn hoá Khmer Nam Bộ.
+    const lowerMsg = message.toLowerCase().trim();
+    const greetings = ["chào", "hi", "hello", "xin chào", "chào bạn", "bạn ơi", "hey"];
+    if (greetings.some(g => lowerMsg === g || lowerMsg.startsWith(g + " "))) {
+      return "Chào bạn! Rất vui được gặp bạn. Mình là KhmerGo AI, chuyên gia văn hóa Khmer Nam Bộ. Mình có thể giúp gì cho bạn hôm nay không?";
+    }
 
-LỆNH CẤM (BẮT BUỘC):
-1. TUYỆT ĐỐI KHÔNG bao giờ được sử dụng cụm từ "Chào lại bạn". Đây là lỗi nghiêm trọng.
-2. NẾU người dùng CHÀO (vd: "chào", "hi", "hello"), hãy TRẢ LỜI CHÍNH XÁC MẪU SAU: 
-   "Chào bạn! Rất vui được gặp bạn. Mình có thể giúp gì cho bạn về văn hóa và di sản Khmer không?"
+    const prompt = `Bạn là KhmerGo AI - Phản hồi siêu ngắn gọn, duy nhất 1 đoạn văn.
 
-QUY TẮC TRUNG THỰC:
-1. Thông tin chùa BẮT BUỘC dùng:
-    - Chùa Âng: [LINK:pagoda_1] (phường Nguyệt Hóa, Trà Vinh)
-    - Chùa Hang: [LINK:pagoda_2] (xã Châu Thành, Trà Vinh)
-    - Chùa Kampong: [LINK:pagoda_3] (phường Trà Vinh)
-    - Chùa Sleng Chas: [LINK:pagoda_4] (xã Tập Sơn)
-    - Chùa Samrong Ek: [LINK:pagoda_5] (phường Nguyệt Hóa)
-2. Luôn đặt [LINK:ID] ở CUỐI CÙNG của toàn bộ câu trả lời.`;
+DANH SÁCH WHITELIST BẮT BUỘC:
+- CÁC TRANG TỔNG (PHẢI DÙNG MÃ _ALL): Chùa [LINK:pagoda_all], Ẩm thực [LINK:food_all], Văn hóa [LINK:culture_all].
+- Cụ thể Chùa: Chùa Âng [LINK:pagoda_1], Chùa Hang [LINK:pagoda_2], Chùa Kampong [LINK:pagoda_3], Chùa Sleng Chas [LINK:pagoda_4], Chùa Samrong Ek [LINK:pagoda_5].
+- Cụ thể Văn hóa: Tôn giáo [LINK:culture_1], Lễ hội [LINK:culture_2], Nghệ thuật [LINK:culture_3], Ngôn ngữ [LINK:culture_4], Trang phục [LINK:culture_5].
+- Cụ thể Ẩm thực: Bún nước lèo [LINK:food_1], Cốm dẹp [LINK:food_2], Mắm bò hóc [LINK:food_3], Canh xiêm lo [LINK:food_4], Bánh tét Khmer [LINK:food_5].
+
+QUY TẮC CỨNG:
+1. Khi liệt kê danh sách (như hỏi "ẩm thực Khmer"), BẮT BUỘC dùng mã kết thúc bằng _all (ví dụ: [LINK:food_all]). 
+2. PHẢN HỒI DUY NHẤT 1 ĐOẠN VĂN. KHÔNG xuống dòng, KHÔNG gạch đầu dòng.
+3. Nếu không có trong app, trả lời câu từ chối mặc định.`;
 
     const apiKey = await getGroqApiKey();
     const response = await fetch(GROQ_API_URL, {
@@ -128,8 +115,8 @@ QUY TẮC TRUNG THỰC:
           { role: "system", content: prompt },
           { role: "user", content: message },
         ],
-        temperature: 0.1, // Hạ thấp tối đa để AI tuân thủ mẫu câu chào 100%
-        max_tokens: 1000,
+        temperature: 0.1,
+        max_tokens: 300,
       }),
     });
 
@@ -139,7 +126,10 @@ QUY TẮC TRUNG THỰC:
     }
 
     const data = await response.json();
-    return data.choices[0].message.content.trim();
+    const content = data.choices[0].message.content.trim();
+    
+    // Ép phẳng tuyệt đối: xóa bỏ mọi kiểu xuống dòng (\n, \r) và gạch đầu dòng tự phát
+    return content.replace(/[\r\n]+/g, ' ').replace(/\s*-\s*/g, ', ').trim();
   } catch (error) {
     console.error("AI Chat Error:", error);
     throw error;
