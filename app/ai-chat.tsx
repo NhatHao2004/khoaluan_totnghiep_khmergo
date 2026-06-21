@@ -161,6 +161,35 @@ export default function AIAssistantScreen() {
     }
   };
 
+  const handleLinkPress = (text: string) => {
+    const match = text.match(/\[LINK:\s*(.*?)\s*\]/i);
+    if (!match) return;
+    
+    const rawId = match[1].trim();
+    const id = rawId.toLowerCase();
+
+    try {
+      // Ưu tiên kiểm tra các ID cụ thể có chứa số (ví dụ: pagoda_1, food_2) trước
+      if (id.startsWith('pagoda_') && id !== 'pagoda_all') {
+        router.push({ pathname: '/pagoda-detail', params: { id: rawId } });
+      } else if (id.startsWith('culture_') && id !== 'culture_all') {
+        router.push({ pathname: '/culture-detail', params: { id: rawId } });
+      } else if (id.startsWith('food_') && id !== 'food_all') {
+        router.push({ pathname: '/food-detail', params: { id: rawId } });
+      } 
+      // Sau đó mới đến các trang danh sách tổng
+      else if (id === 'food' || id === 'food_all') {
+        router.push('/food');
+      } else if (id === 'pagoda' || id === 'pagoda_all') {
+        router.push('/pagoda');
+      } else if (id === 'culture' || id === 'culture_all') {
+        router.push('/culture');
+      }
+    } catch (err) {
+      console.error("Navigation error:", err);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === 'chat') setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
   }, [messages, activeTab]);
@@ -230,18 +259,8 @@ export default function AIAssistantScreen() {
                         {msg.text.includes('[LINK:') && (
                           <TouchableOpacity
                             style={styles.detailBtn}
-                            onPress={() => {
-                              const match = msg.text.match(/\[LINK:(.*?)\]/);
-                              if (match) {
-                                const id = match[1];
-                                if (id === 'food_all') router.push('/food');
-                                else if (id === 'pagoda_all') router.push('/pagoda');
-                                else if (id === 'culture_all') router.push('/culture');
-                                else if (id.startsWith('pagoda_')) router.push({ pathname: '/pagoda-detail', params: { id } });
-                                else if (id.startsWith('culture_')) router.push({ pathname: '/culture-detail', params: { id } });
-                                else if (id.startsWith('food_')) router.push({ pathname: '/food-detail', params: { id } });
-                              }
-                            }}
+                            activeOpacity={0.7}
+                            onPress={() => handleLinkPress(msg.text)}
                           >
                             <Text style={styles.detailBtnText}>{t('view_details')}</Text>
                           </TouchableOpacity>
@@ -395,14 +414,14 @@ export default function AIAssistantScreen() {
               <Ionicons
                 name={activeTab === 'camera' ? "refresh-outline" : "trash-outline"}
                 size={20}
-                color={activeTab === 'camera' ? "#1877F2" : "#EF4444"}
+                color="#EF4444"
               />
               <Text
-                style={styles.menuItemText}
+                style={[styles.menuItemText, (activeTab === 'camera' || activeTab === 'chat') && { color: '#EF4444' }]}
                 numberOfLines={1}
                 adjustsFontSizeToFit
               >
-                {activeTab === 'camera' ? 'Làm mới phân tích ngay' : (t('clear_chat_history_success') || 'Dọn dẹp lịch sử')}
+                {activeTab === 'camera' ? t('refresh_analysis') : (t('clear_chat_history_success') || 'Dọn dẹp lịch sử')}
               </Text>
             </TouchableOpacity>
           </View>
