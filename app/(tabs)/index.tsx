@@ -405,7 +405,7 @@ export default function HomeScreen() {
                 <Ionicons name="notifications-outline" size={30} color="#000" />
                 {unreadCount > 0 && (
                   <View style={styles.notificationBadge}>
-                    <ThemedText style={styles.badgeText}>{unreadCount}</ThemedText>
+                    <Text style={styles.badgeText}>{unreadCount}</Text>
                   </View>
                 )}
               </Animated.View>
@@ -732,26 +732,25 @@ const styles = RNStyleSheet.create({
   },
   notificationBadge: {
     position: 'absolute',
-    top: -vs(2),
+    top: -vs(4),
     right: -s(4),
     backgroundColor: '#EF4444',
-    width: s(18),
-    height: s(18),
-    borderRadius: s(9),
+    minWidth: ms(18),
+    height: ms(18),
+    borderRadius: ms(9),
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: '#FFF',
+    borderColor: '#FFFFFF',
     zIndex: 99,
-    elevation: 5,
   },
   badgeText: {
-    color: '#FFF',
+    color: '#FFFFFF',
     fontSize: ms(10),
-    fontWeight: '400',
+    fontWeight: 'bold',
     textAlign: 'center',
     includeFontPadding: false,
-    lineHeight: ms(14),
+    lineHeight: ms(12),
   },
   content: {
     flex: 1,

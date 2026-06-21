@@ -379,15 +379,17 @@ export default function GameMCQScreen() {
       <View style={styles.headerContainer}>
         <View style={styles.headerInfo}>
           <View style={styles.headerTopRow}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: s(12) }}>
+            <View style={styles.headerLeftSection}>
               <TouchableOpacity onPress={() => setShowExitModal(true)} activeOpacity={0.7}>
-                <Ionicons name="arrow-back" size={28} color="#334155" />
+                <Ionicons name="arrow-back" size={ms(26)} color="#334155" />
               </TouchableOpacity>
-              <Text style={styles.headerTitle}>Câu {questionIndex + 1} / {TOTAL_QUESTIONS}</Text>
+              <Text style={styles.headerTitle} numberOfLines={1}>
+                Câu {questionIndex + 1} / {TOTAL_QUESTIONS}
+              </Text>
             </View>
             <View style={styles.scorePill}>
-              <Ionicons name="flash" size={16} color="#F59E0B" />
-              <Text style={styles.scorePillText}>{score}</Text>
+              <Ionicons name="flash" size={ms(16)} color="#F59E0B" />
+              <Text style={styles.scorePillText} numberOfLines={1}>{score}</Text>
             </View>
           </View>
 
@@ -624,14 +626,12 @@ const styles = StyleSheet.create({
   // ── MODERN HEADER ──
   headerContainer: {
     paddingTop: vs(52),
-    paddingHorizontal: s(13),
+    paddingHorizontal: s(16),
     paddingBottom: vs(20),
-    height: vs(120), // Fixed height
-    flexDirection: 'row',
-    alignItems: 'center',
+    height: vs(122),
     backgroundColor: '#FFF',
-    borderBottomLeftRadius: s(30),
-    borderBottomRightRadius: s(30),
+    borderBottomLeftRadius: s(24),
+    borderBottomRightRadius: s(24),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.03,
@@ -647,11 +647,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: vs(10),
+  },
+  headerLeftSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: s(8),
+    flex: 1,
+    marginRight: s(12),
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: '400',
+    fontSize: ms(17),
+    fontWeight: '600',
     color: '#334155',
   },
   progressContainer: {
@@ -672,24 +679,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFBEB',
-    paddingHorizontal: s(14),
-    paddingVertical: vs(5),
+    paddingHorizontal: s(10),
+    paddingVertical: vs(4),
     borderRadius: ms(20),
-    gap: s(6),
-    borderWidth: 1,
+    gap: s(4),
+    borderWidth: 1.5,
     borderColor: '#FEF3C7',
-    minWidth: s(65),
     justifyContent: 'center',
+    flexShrink: 0,
   },
   scorePillText: {
-    fontSize: ms(16),
-    fontWeight: '400',
+    fontSize: ms(15),
+    fontWeight: '700',
     color: '#D97706',
   },
 
   // ── SCROLL CONTENT ──
   scrollContent: {
-    paddingTop: 24,
+    paddingTop: 30,
     paddingHorizontal: 20,
     flexGrow: 1,
   },
