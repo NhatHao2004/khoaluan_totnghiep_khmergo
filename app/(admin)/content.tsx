@@ -19,7 +19,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { db } from '../../utils/firebaseConfig';
 import { ms, s, vs } from '../../utils/responsive';
@@ -832,7 +832,6 @@ const ContentManagement = () => {
               <TextInput style={styles.input} value={wordVie} onChangeText={setWordVie} placeholder="Nhập nghĩa Việt..." />
               <Text style={styles.inputLabel}>Phiên âm</Text>
               <TextInput style={styles.input} value={wordPron} onChangeText={setWordPron} placeholder="Nhập phiên âm..." />
-              <ImageSelector label="Ảnh minh họa (không bắt buộc)" value={wordImg} onChange={setWordImg} />
             </ScrollView>
             <View style={styles.modalActions}>
               <TouchableOpacity style={styles.cancelBtn} onPress={() => setWordModalVisible(false)}>
@@ -845,7 +844,7 @@ const ContentManagement = () => {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-      <Modal visible={deleteConfirmVisible} transparent animationType="fade" statusBarTranslucent><View style={styles.modalBg}><View style={styles.confirmBox}><View style={styles.confirmIconBg}><Ionicons name="trash" size={ms(32)} color="#ef4444" /></View><Text style={styles.confirmTitle}>Xác nhận xóa</Text><Text style={styles.confirmText}>{deleteType === 'destination' ? `"${pendingDelete?.name}" sẽ được chuyển vào thùng rác` : deleteType === 'topic' ? `Chủ đề "${pendingDelete?.title}" sẽ được chuyển vào thùng rác` : 'Từ vựng này sẽ bị xóa vĩnh viễn.'}</Text><View style={styles.modalActions}><TouchableOpacity style={styles.cancelBtn} onPress={() => setDeleteConfirmVisible(false)}><Text style={styles.cancelBtnText}>Quay lại</Text></TouchableOpacity><TouchableOpacity style={[styles.saveBtn, { backgroundColor: '#ff0000ff' }]} onPress={confirmDelete}><Text style={styles.saveBtnText}>Xác nhận xóa</Text></TouchableOpacity></View></View></View></Modal>
+      <Modal visible={deleteConfirmVisible} transparent animationType="fade" statusBarTranslucent><View style={styles.modalBg}><View style={styles.confirmBox}><View style={styles.confirmIconBg}><Ionicons name="trash" size={ms(32)} color="#ef4444" /></View><Text style={styles.confirmTitle}>Xác nhận xóa</Text><Text style={styles.confirmText}>{deleteType === 'destination' ? `"${pendingDelete?.name}" sẽ được chuyển vào thùng rác` : deleteType === 'topic' ? `Chủ đề "${pendingDelete?.title}" sẽ được chuyển vào thùng rác` : 'Từ vựng này sẽ bị xóa vĩnh viễn.'}</Text><View style={styles.modalActions}><TouchableOpacity style={styles.cancelBtn} onPress={() => setDeleteConfirmVisible(false)}><Text style={styles.cancelBtnText}>Hủy</Text></TouchableOpacity><TouchableOpacity style={[styles.saveBtn, { backgroundColor: '#ff0000ff' }]} onPress={confirmDelete}><Text style={styles.saveBtnText}>Xác nhận xóa</Text></TouchableOpacity></View></View></View></Modal>
     </View>
   );
 };
@@ -944,7 +943,7 @@ const styles = StyleSheet.create({
   },
   cancelBtn: { flex: 1, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#3b82f6', alignItems: 'center' },
   cancelBtnText: { fontSize: ms(15), fontWeight: '400', color: '#fff' },
-  saveBtn: { flex: 2, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#3b82f6', alignItems: 'center' },
+  saveBtn: { flex: 2, paddingVertical: vs(14), borderRadius: s(12), backgroundColor: '#ff0000ff', alignItems: 'center' },
   saveBtnText: { fontSize: ms(15), fontWeight: '400', color: '#fff' },
   catRow: { flexDirection: 'row', gap: s(8), marginBottom: vs(15) },
   catBtn: { flex: 1, paddingVertical: vs(10), borderRadius: s(10), backgroundColor: '#f1f5f9', alignItems: 'center', borderWidth: 1, borderColor: '#e2e8f0' },

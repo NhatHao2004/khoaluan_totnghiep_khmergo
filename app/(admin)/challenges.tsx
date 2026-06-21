@@ -16,7 +16,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { db } from '../../utils/firebaseConfig';
 import { ms, s, vs } from '../../utils/responsive';
@@ -814,7 +814,7 @@ const styles = StyleSheet.create({
   modalTitle: { fontSize: ms(22), fontWeight: '400', color: '#1e293b', marginBottom: vs(20), textAlign: 'center' },
   modalTitleFull: { flex: 1, fontSize: ms(17), fontWeight: '400', color: '#1e293b', textAlign: 'center' },
 
-  inputLabel: { fontSize: clamp(ms(13), 12, 14), fontWeight: '400', color: '#64748b', marginBottom: vs(10), marginTop: vs(15) },
+  inputLabel: { fontSize: clamp(ms(13), 12, 14), fontWeight: '400', color: '#64748b', marginBottom: vs(13), marginTop: vs(15) },
   input: {
     backgroundColor: '#f8fafc',
     borderRadius: ms(14),
@@ -825,10 +825,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e2e8f0'
   },
-  modalActions: { flexDirection: 'row', gap: s(12), marginTop: vs(25) },
+  modalActions: { flexDirection: 'row', gap: s(12), marginTop: vs(30) },
   btnAction: { flex: 1, height: vs(50), borderRadius: s(14), justifyContent: 'center', alignItems: 'center', elevation: 2 },
-  cancelBtn: { backgroundColor: '#ff0000ff' },
-  saveBtn: { backgroundColor: '#3b82f6' },
+  cancelBtn: { backgroundColor: '#3b82f6' },
+  saveBtn: { backgroundColor: '#ff0000ff' },
   btnText: { fontSize: ms(15), fontWeight: '400', color: '#ffffffff' },
 
   destListContainer: { marginBottom: vs(5) },
