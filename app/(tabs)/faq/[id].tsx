@@ -20,22 +20,22 @@ export default function FAQDetailScreen() {
             {
               title: t('faq_use_step1_title'),
               desc: t('faq_use_step1_desc'),
-              image: require('@/assets/images/guide/guide_1.png')
+              image: require('@/assets/images/banner.png')
             },
             {
               title: t('faq_use_step2_title'),
               desc: t('faq_use_step2_desc'),
-              image: require('@/assets/images/guide/guide_2.png')
+              image: require('@/assets/images/ai_camera.png')
             },
             {
               title: t('faq_use_step3_title'),
               desc: t('faq_use_step3_desc'),
-              image: require('@/assets/images/guide/guide_3.png')
+              image: require('@/assets/images/tovisit.jpg')
             },
             {
               title: t('faq_use_step4_title'),
               desc: t('faq_use_step4_desc'),
-              image: require('@/assets/images/guide/guide_4.png')
+              image: require('@/assets/images/giadinh.jpg')
             }
           ]
         };
@@ -47,22 +47,22 @@ export default function FAQDetailScreen() {
             {
               title: t('faq_quiz_step1_title'),
               desc: t('faq_quiz_step1_desc'),
-              image: require('@/assets/images/guide/guide_3.png')
+              image: require('@/assets/images/quiz.jpg')
             },
             {
               title: t('faq_quiz_step2_title'),
               desc: t('faq_quiz_step2_desc'),
-              image: require('@/assets/images/guide/guide_2.png')
+              image: require('@/assets/images/games.jpg')
             },
             {
               title: t('faq_quiz_step3_title'),
               desc: t('faq_quiz_step3_desc'),
-              image: require('@/assets/images/guide/guide_1.png')
+              image: require('@/assets/images/festival.jpg')
             },
             {
               title: t('faq_quiz_step4_title'),
               desc: t('faq_quiz_step4_desc'),
-              image: require('@/assets/images/guide/guide_4.png')
+              image: require('@/assets/images/monan.jpg')
             }
           ]
         };
@@ -74,22 +74,22 @@ export default function FAQDetailScreen() {
             {
               title: t('faq_learn_step1_title'),
               desc: t('faq_learn_step1_desc'),
-              image: require('@/assets/images/guide/guide_4.png')
+              image: require('@/assets/images/hoctap.jpg')
             },
             {
               title: t('faq_learn_step2_title'),
               desc: t('faq_learn_step2_desc'),
-              image: require('@/assets/images/guide/guide_1.png')
+              image: require('@/assets/images/chaohoi.jpg')
             },
             {
               title: t('faq_learn_step3_title'),
               desc: t('faq_learn_step3_desc'),
-              image: require('@/assets/images/guide/guide_2.png')
+              image: require('@/assets/images/cuisine.jpg')
             },
             {
               title: t('faq_learn_step4_title'),
               desc: t('faq_learn_step4_desc'),
-              image: require('@/assets/images/guide/guide_3.png')
+              image: require('@/assets/images/lehoi.jpg')
             }
           ]
         };
