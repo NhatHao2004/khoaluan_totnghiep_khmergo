@@ -1,12 +1,42 @@
 import { ARTIFACTS_DB } from "@/constants/ArtifactsDB";
 import * as SecureStore from 'expo-secure-store';
+import { fetchAndActivate, getString } from "firebase/remote-config";
+import { remoteConfig } from "../utils/firebaseConfig";
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const GROQ_API_KEY_STORAGE_KEY = 'groq_api_key';
 
+// Giá trị mặc định (Fallback)
+let CHAT_MODEL = "llama-3.1-8b-instant";
+let VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
+
+const syncRemoteConfig = async () => {
+  try {
+    await fetchAndActivate(remoteConfig);
+    const remoteChatModel = getString(remoteConfig, "chat_model");
+    const remoteVisionModel = getString(remoteConfig, "vision_model");
+    
+    if (remoteChatModel) CHAT_MODEL = remoteChatModel;
+    if (remoteVisionModel) VISION_MODEL = remoteVisionModel;
+    
+    console.log("Remote Config Updated:", { CHAT_MODEL, VISION_MODEL });
+  } catch (error) {
+    console.warn("Failed to fetch Remote Config:", error);
+  }
+};
+
 const getGroqApiKey = async () => {
   try {
-    // Ưu tiên lấy từ biến môi trường của Expo (.env)
+    // 1. Thử lấy từ Remote Config
+    try {
+      await fetchAndActivate(remoteConfig);
+      const remoteKey = getString(remoteConfig, "groq_api_key");
+      if (remoteKey) return remoteKey;
+    } catch (e) {
+      console.warn("Remote Config key fetch failed, trying local fallback...");
+    }
+
+    // 2. Ưu tiên lấy từ biến môi trường của Expo (.env)
     const envKey = process.env.EXPO_PUBLIC_GROQ_API_KEY;
     if (envKey) return envKey;
 
@@ -24,6 +54,7 @@ const getGroqApiKey = async () => {
 
 export const chatWithAI = async (message: string): Promise<string> => {
   try {
+    await syncRemoteConfig(); // Đồng bộ model trước khi gọi
     const lowerMsg = message.toLowerCase().trim();
 
     // 1. Định nghĩa dữ liệu phản hồi nhanh (Fast Path Data)
@@ -230,7 +261,7 @@ QUY TẮC PHỤ:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
+        model: CHAT_MODEL,
         messages: [
           { role: "system", content: prompt },
           { role: "user", content: message },
@@ -278,6 +309,7 @@ export const analyzeImage = async (base64Image: string): Promise<{
   rawResponse?: string;
 }> => {
   try {
+    await syncRemoteConfig(); // Đồng bộ model trước khi gọi
     const apiKey = await getGroqApiKey();
     const artifactsList = ARTIFACTS_DB.map(a => `- ${a.name}: ${a.description}`).join('\n');
 
@@ -288,7 +320,7 @@ export const analyzeImage = async (base64Image: string): Promise<{
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "meta-llama/llama-4-scout-17b-16e-instruct",
+        model: VISION_MODEL,
         messages: [
           {
             role: "user",
