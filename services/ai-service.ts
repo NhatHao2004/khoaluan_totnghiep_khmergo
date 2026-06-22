@@ -286,7 +286,7 @@ export const analyzeImage = async (base64Image: string): Promise<{
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama-3.2-11b-vision-preview",
+        model: "llama-3.2-90b-vision-preview",
         messages: [
           {
             role: "user",
@@ -314,7 +314,11 @@ YÊU CẦU:
       }),
     });
 
-    if (!response.ok) throw new Error("Vision API Error");
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Groq Vision API Full Error:", JSON.stringify(errorData, null, 2));
+      throw new Error(`Vision API Error: ${errorData.error?.message || response.status}`);
+    }
 
     const data = await response.json();
     const content = data.choices[0].message.content.trim();
