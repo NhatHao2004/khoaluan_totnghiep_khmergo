@@ -9,7 +9,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import {
   Image,
   Modal,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -240,7 +239,7 @@ export default function SettingsScreen() {
                   <Text style={styles.introItemText}>Lâm Nhật Hào</Text>
                 </View>
               </View>
-              <View style={{ height: vs(40) }} />
+              <View style={{ height: vs(0) }} />
             </ScrollView>
           </View>
         </View>
