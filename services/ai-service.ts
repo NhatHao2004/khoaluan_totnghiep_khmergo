@@ -6,9 +6,14 @@ const GROQ_API_KEY_STORAGE_KEY = 'groq_api_key';
 
 const getGroqApiKey = async () => {
   try {
+    // Ưu tiên lấy từ biến môi trường của Expo (.env)
+    const envKey = process.env.EXPO_PUBLIC_GROQ_API_KEY;
+    if (envKey) return envKey;
+
+    // Fallback sang SecureStore 
     const key = await SecureStore.getItemAsync(GROQ_API_KEY_STORAGE_KEY);
     if (!key) {
-      throw new Error("GROQ API Key not found in SecureStore");
+      throw new Error("GROQ API Key not found in Environment or SecureStore");
     }
     return key;
   } catch (error) {
@@ -90,12 +95,12 @@ export const chatWithAI = async (message: string): Promise<string> => {
       "trang phục truyền thống": {
         desc: "Trang phục truyền thống Khmer nổi bật với sắc màu rực rỡ và các họa tiết hoa văn tinh xảo như xà-rông và áo tầm-vông.",
         id: "culture_5",
-        keywords: ["trang phục", "xà rông", "trang phục truyền thống", "trang phục khmer", "trang phục dân tộc", "trang phục dân tộc khmer", "trang phục dân tộc khmer nam bộ", "trang phục dân tộc khmer nam bộ trà vinh", "trang phục dân tộc khmer nam bộ sóc trăng", "trang phục dân tộc khmer nam bộ an giang", "trang phục dân tộc khmer nam bộ đồng tháp", "trang phục dân tộc khmer nam bộ kiên giang", "trang phục dân tộc khmer nam bộ hậu giang", "trang phục dân tộc khmer nam bộ cần thơ", "trang phục dân tộc khmer nam bộ vĩnh long", "trang phục dân tộc khmer nam bộ trà vinh", "trang phục dân tộc khmer nam bộ sóc trăng", "trang phục dân tộc khmer nam bộ an giang", "trang phục dân tộc khmer nam bộ đồng tháp", "trang phục dân tộc khmer nam bộ kiên giang", "trang phục dân tộc khmer nam bộ hậu giang", "trang phục dân tộc khmer nam bộ cần thơ", "trang phục dân tộc khmer nam bộ vĩnh long"]
+        keywords: ["trang phục", "xà rông", "trang phục truyền thống", "trang phục khmer", "trang phục dân tộc", "trang phục dân tộc khmer", "trang phục dân tộc khmer nam bộ", "trang phuc", "xa rong", "trang phuc truyen thong", "trang phuc khmer", "trang phuc dan toc", "trang phuc dan toc khmer", "trang phuc dan toc khmer nam bo"]
       },
       "ngôn ngữ và chữ viết": {
         desc: "Ngôn ngữ và chữ viết Khmer là di sản quý báu, đóng vai trò quan trọng trong việc gìn giữ bản sắc văn hóa dân tộc.",
         id: "culture_4",
-        keywords: ["ngôn ngữ", "chữ viết", "ngôn ngữ khmer", "chữ viết khmer", "ngôn ngữ khmer nam bộ", "chữ viết khmer nam bộ", "ngôn ngữ khmer nam bộ trà vinh", "chữ viết khmer nam bộ trà vinh", "ngôn ngữ khmer nam bộ sóc trăng", "chữ viết khmer nam bộ sóc trăng", "ngôn ngữ khmer nam bộ an giang", "chữ viết khmer nam bộ an giang", "ngôn ngữ khmer nam bộ đồng tháp", "chữ viết khmer nam bộ đồng tháp", "ngôn ngữ khmer nam bộ kiên giang", "chữ viết khmer nam bộ kiên giang", "ngôn ngữ khmer nam bộ hậu giang", "chữ viết khmer nam bộ hậu giang", "ngôn ngữ khmer nam bộ cần thơ", "chữ viết khmer nam bộ cần thơ", "ngôn ngữ khmer nam bộ vĩnh long", "chữ viết khmer nam bộ vĩnh long", "ngôn ngữ khmer nam bộ trà vinh", "chữ viết khmer nam bộ trà vinh", "ngôn ngữ khmer nam bộ sóc trăng", "chữ viết khmer nam bộ sóc trăng", "ngôn ngữ khmer nam bộ an giang", "chữ viết khmer nam bộ an giang", "ngôn ngữ khmer nam bộ đồng tháp", "chữ viết khmer nam bộ đồng tháp", "ngôn ngữ khmer nam bộ kiên giang", "chữ viết khmer nam bộ kiên giang", "ngôn ngữ khmer nam bộ hậu giang", "chữ viết khmer nam bộ hậu giang", "ngôn ngữ khmer nam bộ cần thơ", "chữ viết khmer nam bộ cần thơ", "ngôn ngữ khmer nam bộ vĩnh long", "chữ viết khmer nam bộ vĩnh long"]
+        keywords: ["ngôn ngữ", "chữ viết", "ngôn ngữ khmer", "chữ viết khmer", "ngôn ngữ khmer nam bộ", "chữ viết khmer nam bộ", "ngon ngu", "chu viet", "ngon ngu khmer", "chu viet khmer", "ngon ngu khmer nam bo", "chu viet khmer nam bo"]
       },
       "nghệ thuật ca và múa": {
         desc: "Nghệ thuật Khmer vô cùng phong phú với các điệu múa Rô-băm, dù-kê và âm nhạc ngũ âm truyền thống độc đáo.",
