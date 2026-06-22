@@ -39,7 +39,7 @@ export const translations: any = {
     assistant_settings: 'Cài đặt trợ lý AI',
     show_chat_button: 'Hiển thị nút Chat',
     // Support Screen
-    support_feedback: 'Hỗ trợ và Phản hồi',
+    support_feedback: 'Phản hồi người dùng',
     feedback_type: 'Loại phản hồi',
     suggestion: 'Góp ý',
     report_issue: 'Báo lỗi',
@@ -141,7 +141,6 @@ export const translations: any = {
     update_failed: 'Cập nhật thất bại',
 
     // Support Screen Extra
-    faq: 'Câu hỏi thường gặp',
     feedback_section: 'Gửi phản hồi cho chúng tôi',
     feedback_placeholder: 'Nhập nội dung phản hồi...',
     subject_placeholder: 'Nhập tiêu đề phản hồi...',
@@ -161,43 +160,6 @@ export const translations: any = {
     replied_status: 'Đã phản hồi',
     pending_status: 'Chờ phản hồi',
     admin_reply: 'Hệ thống phản hồi',
-    // FAQ Extra
-    faq_how_to_use: 'Cách sử dụng ứng dụng',
-    faq_how_to_quiz: 'Cách làm bài thử thách',
-    faq_how_to_learn: 'Cách đăng ký và đăng nhập',
-    faq_use_content: 'Chào mừng bạn đến với KhmerGo! Để sử dụng ứng dụng, bạn có thể bắt đầu bằng cách khám phá các ngôi chùa tại mục Trang chủ, tham gia trả lời câu đố tại mục Thử thách để tích lũy điểm và thăng hạng.',
-    faq_quiz_content: 'Mỗi bài thử thách sẽ có các câu hỏi về văn hóa và ngôn ngữ Khmer. Bạn cần chọn câu trả lời đúng trong thời gian quy định để nhận được điểm thưởng.',
-    faq_learn_content: 'Bạn có thể đăng ký tài khoản mới bằng email tại màn hình Đăng ký. Sau khi có tài khoản, hãy sử dụng thông tin đó để Đăng nhập và trải nghiệm đầy đủ các tính năng của ứng dụng như tích lũy điểm và thăng hạng.',
-
-    // FAQ Detail Steps — Use
-    faq_use_step1_title: '1. Khám phá ngay',
-    faq_use_step1_desc: 'Bắt đầu hành trình tại Trang chủ. Bạn có thể tìm thấy các ngôi chùa cổ kính, danh lam thắng cảnh và lễ hội đặc sắc của người Khmer Nam Bộ.',
-    faq_use_step2_title: '2. Tìm hiểu thêm',
-    faq_use_step2_desc: 'Mỗi địa điểm đều có thông tin chi tiết về lịch sử, kiến trúc và các món ăn đặc sản. Hãy đọc kỹ để hiểu sâu hơn về nét đẹp truyền thống.',
-    faq_use_step3_title: '3. Vượt thử thách',
-    faq_use_step3_desc: 'Tham gia các bài trắc nghiệm vui tại mục Thử thách. Trả lời đúng để tích lũy điểm thưởng và thăng hạng trên bảng xếp hạng cộng đồng.',
-    faq_use_step4_title: '4. Trò chuyện AI',
-    faq_use_step4_desc: 'Nếu có bất kỳ thắc mắc nào, hãy nhấn vào biểu tượng Chat để trò chuyện với Trợ lý AI thông minh của KhmerGo.',
-
-    // FAQ Detail Steps — Quiz
-    faq_quiz_step1_title: '1. Chọn chủ đề',
-    faq_quiz_step1_desc: 'Bạn có thể chọn các chủ đề như: Chùa Khmer, Văn hóa, Ẩm thực hoặc Học tiếng Khmer để bắt đầu thử thách kiến thức.',
-    faq_quiz_step2_title: '2. Chơi thử thách',
-    faq_quiz_step2_desc: 'Mỗi câu hỏi sẽ có 4 lựa chọn. Hãy suy nghĩ kỹ và chọn đáp án chính xác nhất trong thời gian quy định.',
-    faq_quiz_step3_title: '3. Nhận quà tặng',
-    faq_quiz_step3_desc: 'Sau khi hoàn thành, bạn sẽ nhận được điểm thưởng dựa trên số câu trả lời đúng. Điểm này dùng để thăng hạng thành viên.',
-    faq_quiz_step4_title: '4. Xem xếp hạng',
-    faq_quiz_step4_desc: 'Xem thứ hạng của mình so với các người dùng khác tại bảng xếp hạng chung để nỗ lực đạt vị trí cao hơn mỗi ngày.',
-
-    // FAQ Detail Steps — Learn (Register/Login)
-    faq_learn_step1_title: '1. Vào hồ sơ',
-    faq_learn_step1_desc: 'Nhấn vào biểu tượng Hồ sơ ở thanh điều hướng phía dưới, sau đó chọn Đăng nhập hoặc Đăng ký tài khoản.',
-    faq_learn_step2_title: '2. Đăng ký ngay',
-    faq_learn_step2_desc: 'Nếu bạn chưa có tài khoản, hãy nhập Email và Mật khẩu để tạo mới. Sau đó bạn có thể chọn các chủ đề mình quan tâm.',
-    faq_learn_step3_title: '3. Cộng đồng Khmer',
-    faq_learn_step3_desc: 'Khi đã đăng nhập, bạn có thể tham gia bình luận, chia sẻ ảnh và lưu lại các địa điểm yêu thích của mình.',
-    faq_learn_step4_title: '4. Đổi mật khẩu',
-    faq_learn_step4_desc: 'Bạn có thể thay đổi mật khẩu, cập nhật thông tin cá nhân hoặc quản lý quyền riêng tư trong mục Cài đặt tài khoản.',
 
     // Home Screen
     promotions: 'Khám phá ngay',
@@ -451,7 +413,7 @@ export const translations: any = {
     assistant_settings: 'ជំនួយការ AI',
     show_chat_button: 'បង្ហាញប៊ូតុងជជែក AI',
     // Support Screen
-    support_feedback: 'ជំនួយ និងមតិកែលម្អ',
+    support_feedback: 'មតិកែលម្អរបស់អ្នកប្រើប្រាស់',
     feedback_type: 'ប្រភេទមតិកែលម្អ',
     suggestion: 'មតិកែលម្អ',
     report_issue: 'រាយការណ៍បញ្ហា',
@@ -558,7 +520,6 @@ export const translations: any = {
     update_success: 'បច្ចុប្បន្នភាពបានជោគជ័យ',
     update_failed: 'បច្ចុប្បន្នភាពបរាជ័យ',
     // Support Screen Extra
-    faq: 'សំណួរដែលសួរញឹកញាប់',
     feedback_section: 'ផ្ញើមតិកែលម្អមកយើង',
     feedback_placeholder: 'បញ្ចូលខ្លឹមសារមតិកែលម្អ...',
     subject_placeholder: 'បញ្ចូលប្រធានបទមតិ...',

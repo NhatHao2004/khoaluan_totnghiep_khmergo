@@ -187,47 +187,9 @@ export default function SupportScreen() {
         style={{ flex: 1 }}
       >
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-          {/* FAQ Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('faq')}</Text>
-            <TouchableOpacity style={styles.faqItem} onPress={() => router.push('/faq/learn' as any)}>
-              <View style={[styles.faqIconCircle, { backgroundColor: '#F0FDF4' }]}>
-                <Ionicons name="person-circle-outline" size={24} color="#22C55E" />
-              </View>
-              <View style={styles.faqInfo}>
-                <Text style={styles.faqText}>{t('faq_how_to_learn')}</Text>
-                <Text style={styles.faqSub}>{t('tap_to_see_guide')}</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.faqItem} onPress={() => router.push('/faq/use' as any)}>
-              <View style={[styles.faqIconCircle, { backgroundColor: '#EFF6FF' }]}>
-                <Ionicons name="help-circle-outline" size={22} color="#3B82F6" />
-              </View>
-              <View style={styles.faqInfo}>
-                <Text style={styles.faqText}>{t('faq_how_to_use')}</Text>
-                <Text style={styles.faqSub}>{t('tap_to_see_guide')}</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.faqItem} onPress={() => router.push('/faq/quiz' as any)}>
-              <View style={[styles.faqIconCircle, { backgroundColor: '#FFF7ED' }]}>
-                <Ionicons name="trophy-outline" size={22} color="#F59E0B" />
-              </View>
-              <View style={styles.faqInfo}>
-                <Text style={styles.faqText}>{t('faq_how_to_quiz')}</Text>
-                <Text style={styles.faqSub}>{t('tap_to_see_guide')}</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
-            </TouchableOpacity>
-          </View>
 
           {/* Feedback Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('feedback_section')}</Text>
-
             <View style={styles.formContainer}>
 
               <View style={styles.inputGroup}>
@@ -351,9 +313,6 @@ export default function SupportScreen() {
               ))
             ) : (
               <View style={styles.emptyHistory}>
-                <View style={styles.emptyIconBox}>
-                  <Ionicons name="chatbox-ellipses-outline" size={ms(40)} color="#CBD5E1" />
-                </View>
                 <Text style={styles.emptyText}>{t('no_feedback_history') || 'Chưa có lịch sử phản hồi'}</Text>
               </View>
             )}
@@ -423,35 +382,6 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
     marginBottom: 0,
     lineHeight: 26,
-  },
-  faqItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 18,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-  },
-  faqIconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  faqInfo: {
-    flex: 1,
-  },
-  faqText: {
-    fontSize: 15,
-    color: '#1E293B',
-    fontWeight: '400',
-    marginBottom: 2,
-  },
-  faqSub: {
-    fontSize: 13,
-    color: '#94A3B8',
-    fontWeight: '400',
   },
   sectionSub: {
     fontSize: 14,
@@ -684,7 +614,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyHistory: {
-    paddingVertical: vs(50),
+    paddingVertical: vs(150),
     alignItems: 'center',
     backgroundColor: '#F8FAFC',
     borderRadius: s(24),
@@ -692,15 +622,6 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     borderColor: '#CBD5E1',
     marginTop: vs(10),
-  },
-  emptyIconBox: {
-    width: s(64),
-    height: s(64),
-    borderRadius: s(32),
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: vs(15),
   },
   emptyText: {
     fontSize: ms(14),

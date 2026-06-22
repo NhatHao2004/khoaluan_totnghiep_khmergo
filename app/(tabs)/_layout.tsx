@@ -275,12 +275,6 @@ export default function TabsLayout() {
             href: null, // Hide from tab bar
           }}
         />
-        <Tabs.Screen
-          name="faq/[id]"
-          options={{
-            href: null, // Hide from tab bar
-          }}
-        />
       </Tabs>
 
       {/* Floating AI Chat Button - Globally visible in tabs */}
