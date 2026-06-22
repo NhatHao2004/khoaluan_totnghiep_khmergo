@@ -22,20 +22,60 @@ export const chatWithAI = async (message: string): Promise<string> => {
     const lowerMsg = message.toLowerCase().trim();
 
     // 1. Định nghĩa dữ liệu phản hồi nhanh (Fast Path Data)
-    const pagodaMap: Record<string, string> = {
-      "chùa âng": "Chùa Âng là một trong những ngôi chùa Khmer cổ và nổi tiếng nhất tại Trà Vinh, mang giá trị lịch sử và kiến trúc đặc sắc. [LINK:pagoda_1]",
-      "chùa hang": "Chùa Hang (Wat Kompong Chray) nổi bật với cổng chùa hình chim thần đạo độc đáo và khuôn viên rợp bóng cây cổ thụ. [LINK:pagoda_2]",
-      "chùa kompong": "Chùa Kompong (Wat Kompong) là ngôi chùa có bề dày lịch sử lâu đời và là trung tâm giáo dục quan trọng của cộng đồng. [LINK:pagoda_3]",
-      "chùa samrong ek": "Chùa Samrong Ek là nơi gìn giữ nhiều nét đẹp văn hóa tâm linh của người Khmer với kiến trúc mái chùa uy nghi. [LINK:pagoda_5]",
-      "chùa sleng chas": "Chùa Sleng Chas là ngôi chùa cổ kính với những hàng cột vững chãi và họa tiết trang trí tinh xảo. [LINK:pagoda_4]",
+    const pagodaData: Record<string, { desc: string; id: string; keywords: string[] }> = {
+      "chùa âng": {
+        desc: "Chùa Âng là một trong những ngôi chùa Khmer cổ và nổi tiếng nhất tại Trà Vinh, mang giá trị lịch sử và kiến trúc đặc sắc.",
+        id: "pagoda_1",
+        keywords: ["wat ang", "chùa âng", "chua ang"]
+      },
+      "chùa hang": {
+        desc: "Chùa Hang (Wat Kompong Chray) nổi bật với cổng chùa hình chim thần đạo độc đáo và khuôn viên rợp bóng cây cổ thụ.",
+        id: "pagoda_2",
+        keywords: ["wat kompong chray", "chùa kompong chray", "chùa hang", "chua hang"]
+      },
+      "chùa kompong": {
+        desc: "Chùa Kompong (Wat Kompong) là ngôi chùa có bề dày lịch sử lâu đời và là trung tâm giáo dục quan trọng của cộng đồng.",
+        id: "pagoda_3",
+        keywords: ["wat kompong", "chùa ông mẹt", "chua ong met"]
+      },
+      "chùa samrong ek": {
+        desc: "Chùa Samrong Ek là nơi gìn giữ nhiều nét đẹp văn hóa tâm linh của người Khmer với kiến trúc mái chùa uy nghi.",
+        id: "pagoda_5",
+        keywords: ["wat samrong ek", "chùa samrong ek", "chua samrong ek"]
+      },
+      "chùa sleng chas": {
+        desc: "Chùa Sleng Chas là ngôi chùa cổ kính với những hàng cột vững chãi và họa tiết trang trí tinh xảo.",
+        id: "pagoda_4",
+        keywords: ["wat sleng chas", "chùa sleng chas", "chua sleng chas"]
+      }
     };
 
-    const foodMap: Record<string, string> = {
-      "bún nước lèo": "Bún nước lèo là món ăn đặc trưng của người Khmer Nam Bộ với hương vị đậm đà được nấu từ mắm bò hóc hảo hạng. [LINK:food_1]",
-      "mắm bò hóc": "Mắm bò hóc là loại gia vị truyền thống linh hồn trong hầu hết các món truyền thống của người Khmer Nam Bộ. [LINK:food_3]",
-      "bánh tét": "Bánh tét Khmer với nhân đậu mỡ béo ngậy được gói cẩn thận, là món ăn không thể thiếu trong các dịp lễ hội. [LINK:food_5]",
-      "cốm dẹp": "Cốm dẹp được làm từ loại nếp vừa chín tới, mang hương vị thơm ngon đặc biệt trong lễ hội Ok Om Bok. [LINK:food_2]",
-      "canh xiêm lo": "Canh xiêm lo là món canh truyền thống bổ dưỡng của người Khmer với sự kết hợp của nhiều loại rau quả. [LINK:food_4]",
+    const foodData: Record<string, { desc: string; id: string; keywords: string[] }> = {
+      "bún nước lèo": {
+        desc: "Bún nước lèo là món ăn đặc trưng của người Khmer Nam Bộ với hương vị đậm đà được nấu từ mắm bò hóc hảo hạng.",
+        id: "food_1",
+        keywords: ["nước lèo", "bún lèo", "bun nuoc leo", "bun leo"]
+      },
+      "mắm bò hóc": {
+        desc: "Mắm bò hóc là loại gia vị truyền thống linh hồn trong hầu hết các món truyền thống của người Khmer Nam Bộ.",
+        id: "food_3",
+        keywords: ["prahok", "mắm khmer", "mam khmer"]
+      },
+      "bánh tét": {
+        desc: "Bánh tét Khmer với nhân đậu mỡ béo ngậy được gói cẩn thận, là món ăn không thể thiếu trong các dịp lễ hội.",
+        id: "food_5",
+        keywords: ["bánh tét khmer", "bánh tét", "banh tet khmer", "banh tet"]
+      },
+      "cốm dẹp": {
+        desc: "Cốm dẹp được làm từ loại nếp vừa chín tới, mang hương vị thơm ngon đặc biệt trong lễ hội Ok Om Bok.",
+        id: "food_2",
+        keywords: ["cốm dẹp", "com dep"]
+      },
+      "canh xiêm lo": {
+        desc: "Canh xiêm lo là món canh truyền thống bổ dưỡng của người Khmer với sự kết hợp của nhiều loại rau quả.",
+        id: "food_4",
+        keywords: ["xiêm lo", "canh khmer", "xiem lo", "canh khmer"]
+      }
     };
 
     const CULTURES = [
@@ -50,35 +90,37 @@ export const chatWithAI = async (message: string): Promise<string> => {
       "trang phục truyền thống": {
         desc: "Trang phục truyền thống Khmer nổi bật với sắc màu rực rỡ và các họa tiết hoa văn tinh xảo như xà-rông và áo tầm-vông.",
         id: "culture_5",
-        keywords: ["trang phục", "xà rông"]
+        keywords: ["trang phục", "xà rông", "trang phục truyền thống", "trang phục khmer", "trang phục dân tộc", "trang phục dân tộc khmer", "trang phục dân tộc khmer nam bộ", "trang phục dân tộc khmer nam bộ trà vinh", "trang phục dân tộc khmer nam bộ sóc trăng", "trang phục dân tộc khmer nam bộ an giang", "trang phục dân tộc khmer nam bộ đồng tháp", "trang phục dân tộc khmer nam bộ kiên giang", "trang phục dân tộc khmer nam bộ hậu giang", "trang phục dân tộc khmer nam bộ cần thơ", "trang phục dân tộc khmer nam bộ vĩnh long", "trang phục dân tộc khmer nam bộ trà vinh", "trang phục dân tộc khmer nam bộ sóc trăng", "trang phục dân tộc khmer nam bộ an giang", "trang phục dân tộc khmer nam bộ đồng tháp", "trang phục dân tộc khmer nam bộ kiên giang", "trang phục dân tộc khmer nam bộ hậu giang", "trang phục dân tộc khmer nam bộ cần thơ", "trang phục dân tộc khmer nam bộ vĩnh long"]
       },
       "ngôn ngữ và chữ viết": {
         desc: "Ngôn ngữ và chữ viết Khmer là di sản quý báu, đóng vai trò quan trọng trong việc gìn giữ bản sắc văn hóa dân tộc.",
         id: "culture_4",
-        keywords: ["ngôn ngữ", "chữ viết"]
+        keywords: ["ngôn ngữ", "chữ viết", "ngôn ngữ khmer", "chữ viết khmer", "ngôn ngữ khmer nam bộ", "chữ viết khmer nam bộ", "ngôn ngữ khmer nam bộ trà vinh", "chữ viết khmer nam bộ trà vinh", "ngôn ngữ khmer nam bộ sóc trăng", "chữ viết khmer nam bộ sóc trăng", "ngôn ngữ khmer nam bộ an giang", "chữ viết khmer nam bộ an giang", "ngôn ngữ khmer nam bộ đồng tháp", "chữ viết khmer nam bộ đồng tháp", "ngôn ngữ khmer nam bộ kiên giang", "chữ viết khmer nam bộ kiên giang", "ngôn ngữ khmer nam bộ hậu giang", "chữ viết khmer nam bộ hậu giang", "ngôn ngữ khmer nam bộ cần thơ", "chữ viết khmer nam bộ cần thơ", "ngôn ngữ khmer nam bộ vĩnh long", "chữ viết khmer nam bộ vĩnh long", "ngôn ngữ khmer nam bộ trà vinh", "chữ viết khmer nam bộ trà vinh", "ngôn ngữ khmer nam bộ sóc trăng", "chữ viết khmer nam bộ sóc trăng", "ngôn ngữ khmer nam bộ an giang", "chữ viết khmer nam bộ an giang", "ngôn ngữ khmer nam bộ đồng tháp", "chữ viết khmer nam bộ đồng tháp", "ngôn ngữ khmer nam bộ kiên giang", "chữ viết khmer nam bộ kiên giang", "ngôn ngữ khmer nam bộ hậu giang", "chữ viết khmer nam bộ hậu giang", "ngôn ngữ khmer nam bộ cần thơ", "chữ viết khmer nam bộ cần thơ", "ngôn ngữ khmer nam bộ vĩnh long", "chữ viết khmer nam bộ vĩnh long"]
       },
       "nghệ thuật ca và múa": {
         desc: "Nghệ thuật Khmer vô cùng phong phú với các điệu múa Rô-băm, dù-kê và âm nhạc ngũ âm truyền thống độc đáo.",
         id: "culture_3",
-        keywords: ["nghệ thuật", "ca múa", "nhạc ngũ âm"]
+        keywords: ["nghệ thuật", "ca múa", "nhạc ngũ âm", "nghe thuat", "ca mua", "nhac ngu am"]
       },
       "lễ hội truyền thống": {
         desc: "Các lễ hội Khmer như Chol Chnam Thmay, Sen Dolta và Ok Om Bok là những nét đẹp văn hóa truyền thống vô cùng đặc sắc.",
-        id: "culture_",
-        keywords: ["lễ hội", "chol chnam thmay", "sen dolta", "ok om bok"]
+        id: "culture_2",
+        keywords: ["lễ hội", "chol chnam thmay", "sen dolta", "ok om bok", "le hoi", "chol chnam thmay", "sen dolta", "ok om bok"]
       },
       "tôn giáo và đời sống": {
         desc: "Tôn giáo và tín ngưỡng đóng vai trò cốt lõi trong đời sống người Khmer, với ngôi chùa là trung tâm sinh hoạt tâm linh.",
-        id: "culture_",
-        keywords: ["tôn giáo", "đời sống", "tín ngưỡng"]
+        id: "culture_1",
+        keywords: ["tôn giáo", "đời sống", "tín ngưỡng", "ton giao", "doi song", "tin nguong"]
       }
     };
 
     // 2. Kiểm tra từ khóa hợp lệ (Dựa trên toàn bộ dữ liệu có sẵn)
     const ALL_SPECIFIC_KEYWORDS = [
-      ...Object.keys(pagodaMap),
-      ...Object.keys(foodMap),
+      ...Object.keys(pagodaData),
+      ...Object.keys(foodData),
       ...CULTURES,
+      ...Object.values(pagodaData).flatMap(p => p.keywords),
+      ...Object.values(foodData).flatMap(f => f.keywords),
       ...Object.values(cultureData).flatMap(c => c.keywords)
     ];
 
@@ -104,12 +146,22 @@ export const chatWithAI = async (message: string): Promise<string> => {
     }
 
     // Kiểm tra Chùa
-    const matchedPagoda = Object.keys(pagodaMap).find(p => lowerMsg.includes(p));
-    if (matchedPagoda) return pagodaMap[matchedPagoda];
+    const matchedPagodaKey = Object.keys(pagodaData).find(key =>
+      lowerMsg.includes(key) || pagodaData[key].keywords.some(kw => lowerMsg.includes(kw))
+    );
+    if (matchedPagodaKey) {
+      const { desc, id } = pagodaData[matchedPagodaKey];
+      return `${desc} [LINK:${id}]`;
+    }
 
     // Kiểm tra Món ăn
-    const matchedFood = Object.keys(foodMap).find(f => lowerMsg.includes(f));
-    if (matchedFood) return foodMap[matchedFood];
+    const matchedFoodKey = Object.keys(foodData).find(key =>
+      lowerMsg.includes(key) || foodData[key].keywords.some(kw => lowerMsg.includes(kw))
+    );
+    if (matchedFoodKey) {
+      const { desc, id } = foodData[matchedFoodKey];
+      return `${desc} [LINK:${id}]`;
+    }
 
     // Kiểm tra Văn hóa
     const matchedCultureKey = CULTURES.find(key =>
