@@ -193,8 +193,12 @@ export default function LoginScreen() {
         setModalError(t('update_failed'));
       }
     } catch (error: any) {
-      console.error(error);
-      setModalError(t('update_failed'));
+      if (error.code === 'permission-denied') {
+        setModalError(t('cooldown_active').replace('{time}', '2 giờ'));
+      } else {
+        console.error('Lỗi yêu cầu mã:', error);
+        setModalError(t('update_failed'));
+      }
     } finally {
       setForgotLoading(false);
     }

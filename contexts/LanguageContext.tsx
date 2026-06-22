@@ -300,10 +300,11 @@ export const translations: any = {
     reset_password: 'Đặt lại mật khẩu',
     enter_email_desc: 'Nhập email của bạn để đặt lại mật khẩu',
     send_code: 'Gửi yêu cầu',
-    enter_otp_desc: 'Hướng dẫn đã được gửi đến email của bạn\nVui lòng kiểm tra hộp thư đến.',
+    enter_otp_desc: 'Hướng dẫn đã được gửi đến email của bạn\nVui lòng kiểm tra hộp thư đến',
     verify_code: 'Xác thực',
     new_password_desc: 'Tạo mật khẩu mới cho tài khoản của bạn',
     reset_password_success: 'Đã đặt lại mật khẩu thành công',
+    cooldown_active: 'Vui lòng quay lại sau {time} để yêu cầu mã mới',
 
     // Tab Labels
     tab_home: 'Trang chủ',
@@ -719,6 +720,7 @@ export const translations: any = {
     verify_code: 'បញ្ជាក់',
     new_password_desc: 'បង្កើតពាក្យសម្ងាត់ថ្មីសម្រាប់គណនីរបស់អ្នក',
     reset_password_success: 'បានដាក់ពាក្យសម្ងាត់ឡើងវិញដោយជោគជ័យ',
+    cooldown_active: 'សូមព្យាយามម្តងទៀតបន្ទាប់ពី {time} ដើម្បីស្នើសុំលេខកូដថ្មី',
 
     // Tab Labels
     tab_home: 'ទំព័រដើម',

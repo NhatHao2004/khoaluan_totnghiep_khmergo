@@ -1,56 +1,511 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Hàm kiểm tra người dùng đã đăng nhập chưa
+
+    // ======================
+    // HÀM KIỂM TRA (HELPERS)
+    // ======================
+
     function isSignedIn() {
       return request.auth != null;
     }
 
-    // Hàm kiểm tra đúng chủ sở hữu tài liệu
+
+    function userExists() {
+      return isSignedIn()
+      &&
+      exists(
+        /databases/$(database)/documents/users/$(request.auth.uid)
+      );
+    }
+
+
+    function isAdmin() {
+
+      return userExists()
+      &&
+      (
+        get(
+          /databases/$(database)/documents/users/$(request.auth.uid)
+        ).data.role == 'Quản trị viên'
+
+        ||
+
+        get(
+          /databases/$(database)/documents/users/$(request.auth.uid)
+        ).data['quyền'] == 'Quản trị viên'
+      );
+
+    }
+
+
     function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
+
+      return isSignedIn()
+      &&
+      request.auth.uid == userId;
+
     }
 
-    // 1. Bảo mật bộ sưu tập Users
+
+    function isNotModifying(fields) {
+
+      return !request.resource.data
+      .diff(resource.data)
+      .affectedKeys()
+      .hasAny(fields);
+
+    }
+
+
+
+
+    // ======================
+    // TEMP OTP
+    // QUÊN MẬT KHẨU
+    // ======================
+
+    match /temp_otps/{email} {
+
+      // Tạo OTP lần đầu
+      allow create: if true;
+
+      // Đọc OTP để xác thực
+      allow read: if true;
+
+      // CẬP NHẬT OTP (GỬI LẠI MÃ): Phải đợi ít nhất 2 giờ
+      allow update: if request.time > resource.data.createdAt + duration(2, 'h');
+
+      // Xóa OTP sau khi dùng
+      allow delete: if true;
+
+    }
+
+
+
+
+
+
+
+    // ======================
+    // USERS
+    // ======================
+
     match /users/{userId} {
-      // Ai cũng có thể xem profile (tên, avatar, điểm) để làm bảng xếp hạng
-      allow read: if isSignedIn();
-      
-      // Chỉ chủ sở hữu mới được cập nhật thông tin của mình
-      // Lưu ý: field 'role' (nếu có) không được cho phép user tự sửa
-      allow write: if isOwner(userId);
 
-      // Bảo mật danh sách yêu thích (Favorites) bên trong User
-      match /favorites/{templeId} {
-        allow read, write: if isOwner(userId);
-      }
+
+      // Kiểm tra email:
+      // - Đăng ký
+      // - Quên mật khẩu
+
+      allow read:
+
+        if true;
+
+
+
+
+      // Tạo user
+
+      allow create:
+
+        if isSignedIn()
+        &&
+        request.auth.uid == userId;
+
+
+
+
+      // Update profile
+
+      allow update:
+
+        if isAdmin()
+
+        ||
+
+        (
+          isOwner(userId)
+
+          &&
+
+          isNotModifying(
+          [
+            'role',
+            'quyền',
+            'points',
+            'điểm',
+            'masteredQuizzes',
+            'quizBestScores'
+          ])
+
+        );
+
+
+
+
+      // Xóa user
+
+      allow delete:
+
+        if isAdmin();
+
     }
 
-    // 2. Bảo mật dữ liệu nội dung (Chùa, Văn hóa, Món ăn, Trắc nghiệm)
-    // Người dùng chỉ có quyền ĐỌC, không có quyền GHI (Ghi dành cho Admin)
-    match /pagodas/{id} { allow read: if isSignedIn(); allow write: if false; }
-    match /culture/{id} { allow read: if isSignedIn(); allow write: if false; }
-    match /foods/{id} { allow read: if isSignedIn(); allow write: if false; }
-    match /quizzes/{id} { allow read: if isSignedIn(); allow write: if false; }
-    match /vocab_categories/{id} { allow read: if isSignedIn(); allow write: if false; }
 
-    // 3. Bảo mật Cộng đồng (Community/Posts)
+
+
+
+
+
+    // ======================
+    // USERS SUBCOLLECTION
+    // favorites,...
+    // ======================
+
+    match /users/{userId}/{allPaths=**} {
+
+
+      allow read:
+
+        if isOwner(userId)
+        ||
+        isAdmin();
+
+
+
+
+      allow write:
+
+        if isOwner(userId)
+        ||
+        isAdmin();
+
+    }
+
+
+
+
+
+
+
+    // ======================
+    // FEEDBACK
+    // ======================
+
+    match /feedback/{feedbackId} {
+
+
+      allow create:
+
+        if isSignedIn();
+
+
+
+
+      allow read:
+
+        if isAdmin()
+
+        ||
+
+        (
+          isSignedIn()
+
+          &&
+
+          (
+            resource.data.userId == request.auth.uid
+
+            ||
+
+            resource.data['e-mail']
+            ==
+            request.auth.token.email
+          )
+        );
+
+
+
+
+      allow update:
+
+        if isAdmin();
+
+
+
+
+      allow delete:
+
+        if isAdmin()
+
+        ||
+
+        (
+          isSignedIn()
+
+          &&
+
+          (
+            resource.data.userId == request.auth.uid
+
+            ||
+
+            resource.data['e-mail']
+            ==
+            request.auth.token.email
+          )
+        );
+
+    }
+
+
+
+
+
+
+
+    // ======================
+    // POSTS
+    // ======================
+
     match /posts/{postId} {
-      allow read: if isSignedIn();
-      allow create: if isSignedIn();
-      // Chỉ người đăng bài mới được sửa hoặc xóa bài của mình
-      allow update, delete: if isSignedIn() && request.auth.uid == resource.data.authorId;
+
+
+      allow read:
+
+        if true;
+
+
+
+
+      allow create:
+
+        if isSignedIn();
+
+
+
+
+      allow delete:
+
+        if isAdmin()
+
+        ||
+
+        (
+          isSignedIn()
+          &&
+          resource.data.userId == request.auth.uid
+        );
+
+
+
+
+      allow update:
+
+        if isAdmin()
+
+        ||
+
+        (
+          isSignedIn()
+          &&
+          resource.data.userId == request.auth.uid
+        )
+
+        ||
+
+        (
+          isSignedIn()
+
+          &&
+
+          request.resource.data
+          .diff(resource.data)
+          .affectedKeys()
+          .hasOnly(
+          [
+            'likes',
+            'likedBy',
+            'comments'
+          ])
+        );
+
+
+
+
+
+      // COMMENTS
+
+      match /comments/{commentId} {
+
+
+        allow read:
+
+          if true;
+
+
+
+
+        allow create:
+
+          if isSignedIn();
+
+
+
+
+        allow update, delete:
+
+          if isAdmin()
+
+          ||
+
+          (
+            isSignedIn()
+            &&
+            resource.data.userId == request.auth.uid
+          );
+
+      }
+
     }
 
-    // 4. Bảo mật cho Admin (Tạm thời khóa, chỉ Admin thật sự mới vào được qua Console)
-    match /articles/{id} { allow read: if isSignedIn(); allow write: if false; }
-    match /challenges/{id} { allow read: if isSignedIn(); allow write: if false; }
-    match /trash/{id} { allow read: if false; allow write: if false; }
 
-    // 5. Mặc định: Từ chối tất cả các truy cập khác
+
+
+
+
+
+    // ======================
+    // NOTIFICATIONS
+    // ======================
+
+    match /notifications/{notificationId} {
+
+
+      allow create:
+
+        if isSignedIn();
+
+
+
+
+      allow read, update, delete:
+
+        if isAdmin()
+
+        ||
+
+        (
+          isSignedIn()
+          &&
+          request.auth.uid == resource.data.toUserId
+        );
+
+    }
+
+
+
+
+
+
+
+    // ======================
+    // LOGS
+    // ======================
+
+    match /logs/{logId} {
+
+
+      allow create:
+
+        if isSignedIn();
+
+
+
+
+      allow read, update, delete:
+
+        if isAdmin();
+
+    }
+
+
+
+
+
+
+
+    // ======================
+    // SYSTEM TRASH
+    // ======================
+
+    match /system_trash/{documentId} {
+
+
+      allow create:
+
+        if isSignedIn();
+
+
+
+
+      allow read, update, delete:
+
+        if isAdmin();
+
+    }
+
+
+
+
+    match /system_trash/{documentId}/{allPaths=**} {
+
+
+      allow create:
+
+        if isSignedIn();
+
+
+
+
+      allow read, update, delete: if isAdmin();
+
+    }
+
+
+
+
+
+
+
+    // ======================
+    // COLLECTION CONTENT
+    // Chùa - Văn hóa - Ẩm thực
+    // ======================
+
     match /{path=**} {
-      allow read, write: if false;
+
+
+      // Public đọc dữ liệu
+
+      allow read:
+
+        if true;
+
+
+
+
+      // Admin ghi dữ liệu
+
+      allow write:
+
+        if isAdmin();
+
     }
+
+
   }
 }
