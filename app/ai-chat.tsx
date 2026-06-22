@@ -11,6 +11,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Dimensions,
   Image,
   Keyboard,
@@ -162,31 +163,47 @@ export default function AIAssistantScreen() {
   };
 
   const handleLinkPress = (text: string) => {
-    const match = text.match(/\[LINK:\s*(.*?)\s*\]/i);
-    if (!match) return;
+    const match = text.match(/\[[^\]]*?LINK\s*[:：]\s*([^\]\s]+)\s*\]/i);
+    if (!match) {
+      Alert.alert("Lỗi", "Không tìm thấy nội dung liên kết trong tin nhắn.");
+      return;
+    }
     
-    const rawId = match[1].trim();
-    const id = rawId.toLowerCase();
+    const linkId = match[1].trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+    console.log("LINK_ID:", linkId);
+
+    const LINK_ROUTES: Record<string, string> = {
+      'food_all': '/food',
+      'pagoda_all': '/pagoda',
+      'culture_all': '/culture',
+      'food': '/food',
+      'pagoda': '/pagoda',
+      'culture': '/culture',
+    };
 
     try {
-      // Ưu tiên kiểm tra các ID cụ thể có chứa số (ví dụ: pagoda_1, food_2) trước
-      if (id.startsWith('pagoda_') && id !== 'pagoda_all') {
-        router.push({ pathname: '/pagoda-detail', params: { id: rawId } });
-      } else if (id.startsWith('culture_') && id !== 'culture_all') {
-        router.push({ pathname: '/culture-detail', params: { id: rawId } });
-      } else if (id.startsWith('food_') && id !== 'food_all') {
-        router.push({ pathname: '/food-detail', params: { id: rawId } });
-      } 
-      // Sau đó mới đến các trang danh sách tổng
-      else if (id === 'food' || id === 'food_all') {
-        router.push('/food');
-      } else if (id === 'pagoda' || id === 'pagoda_all') {
-        router.push('/pagoda');
-      } else if (id === 'culture' || id === 'culture_all') {
-        router.push('/culture');
+      if (LINK_ROUTES[linkId]) {
+        console.log("NAVIGATING TO:", LINK_ROUTES[linkId]);
+        router.push(LINK_ROUTES[linkId] as any);
+      } else if (linkId.includes('_')) {
+        const [type] = linkId.split('_');
+        const detailRoutes: Record<string, string> = {
+          'pagoda': '/pagoda-detail',
+          'food': '/food-detail',
+          'culture': '/culture-detail',
+        };
+        if (detailRoutes[type]) {
+          console.log("NAVIGATING TO DETAIL:", detailRoutes[type], "ID:", linkId);
+          router.push({ pathname: detailRoutes[type] as any, params: { id: linkId } });
+        } else {
+          Alert.alert("Thông báo", "Chưa hỗ trợ màn hình chi tiết cho: " + type);
+        }
+      } else {
+        Alert.alert("Thông báo", "ID liên kết không hợp lệ: " + linkId);
       }
     } catch (err) {
       console.error("Navigation error:", err);
+      Alert.alert("Lỗi điều hướng", "Không thể chuyển hướng: " + String(err));
     }
   };
 
@@ -255,16 +272,11 @@ export default function AIAssistantScreen() {
                     <Image source={require('@/assets/images/AI.jpg')} style={styles.chatAvatar} />
                     <View style={styles.aiBubbleContainer}>
                       <View style={styles.aiBubble}>
-                        <Text style={styles.aiMessageText}>{msg.text.replace(/\[LINK:.*?\]/g, '').replace(/\s+([.!?])/g, '$1').trim()}</Text>
-                        {msg.text.includes('[LINK:') && (() => {
-                          const match = msg.text.match(/\[LINK:\s*([^\]\s]+)\s*\]/i);
-                          const id = match ? match[1].trim().toLowerCase() : '';
-                          // Kiểm tra mọi khả năng dẫn đến trang danh sách tổng
-                          const isList = id.includes('all') || 
-                                         id === 'food' || 
-                                         id === 'pagoda' || 
-                                         id === 'culture' ||
-                                         id.includes('list');
+                        <Text style={styles.aiMessageText}>{msg.text.replace(/\[[^\]]*?LINK[\s\S]*?\]/gi, '').replace(/\s+([.!?])/g, '$1').trim()}</Text>
+                        {/\[[^\]]*?LINK[\s\S]*?\]/i.test(msg.text) && (() => {
+                          const match = msg.text.match(/\[[^\]]*?LINK\s*[:：]\s*([^\]\s]+)\s*\]/i);
+                          const linkId = match ? match[1].trim().toLowerCase().replace(/[^a-z0-9_]/g, '') : '';
+                          const isList = linkId.endsWith('_all');
                           
                           return (
                             <TouchableOpacity
