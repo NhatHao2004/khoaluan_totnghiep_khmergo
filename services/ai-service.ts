@@ -108,9 +108,9 @@ export const chatWithAI = async (message: string): Promise<string> => {
         keywords: ["nghệ thuật", "ca múa", "nhạc ngũ âm", "nghe thuat", "ca mua", "nhac ngu am"]
       },
       "lễ hội truyền thống": {
-        desc: "Các lễ hội Khmer như Chol Chnam Thmay, Sen Dolta và Ok Om Bok là những nét đẹp văn hóa truyền thống vô cùng đặc sắc.",
+        desc: "Các lễ hội Khmer như Chol Chnam Thmay, Sen Dolta, Ok Om Bok và đua ghe ngo là những nét đẹp văn hóa truyền thống vô cùng đặc sắc.",
         id: "culture_2",
-        keywords: ["lễ hội", "chol chnam thmay", "sen dolta", "ok om bok", "le hoi", "chol chnam thmay", "sen dolta", "ok om bok"]
+        keywords: ["lễ hội", "chol chnam thmay", "sen dolta", "ok om bok", "le hoi", "chol chnam thmay", "sen dolta", "ok om bok", "đua ghe ngo", "dua ghe ngo", "đua ghe", "dua ghe"]
       },
       "tôn giáo và đời sống": {
         desc: "Tôn giáo và tín ngưỡng đóng vai trò cốt lõi trong đời sống người Khmer, với ngôi chùa là trung tâm sinh hoạt tâm linh.",
@@ -136,7 +136,11 @@ export const chatWithAI = async (message: string): Promise<string> => {
       ...ALL_SPECIFIC_KEYWORDS
     ];
 
-    const isRelated = ALLOWED_KEYWORDS.some(keyword =>
+    // 3. Phản hồi nhanh (Fast Path Execution) - Ưu tiên từ cụ thể
+    const greetings = ["chào", "hi", "hello", "xin chào", "bạn ơi"];
+    const isGreeting = greetings.some(g => lowerMsg === g || lowerMsg.startsWith(g + " "));
+
+    const isRelated = isGreeting || ALLOWED_KEYWORDS.some(keyword =>
       lowerMsg.includes(keyword)
     );
 
@@ -144,10 +148,8 @@ export const chatWithAI = async (message: string): Promise<string> => {
       return "Xin lỗi, tôi chỉ hỗ trợ nội dung văn hóa Khmer Nam Bộ trong ứng dụng KhmerGo.";
     }
 
-    // 3. Phản hồi nhanh (Fast Path Execution) - Ưu tiên từ cụ thể
-    const greetings = ["chào", "hi", "hello", "xin chào", "bạn ơi"];
-    if (greetings.some(g => lowerMsg === g || lowerMsg.startsWith(g + " "))) {
-      return "Chào bạn! Mình là KhmerGo AI. Mình có thể giúp gì cho bạn về văn hóa Khmer Nam Bộ không?";
+    if (isGreeting) {
+      return "Chào bạn! Mình là KhmerGo AI. Mình có thể giúp bạn tìm hiểu về văn hóa Khmer Nam Bộ.";
     }
 
     // Kiểm tra Chùa
@@ -286,7 +288,7 @@ export const analyzeImage = async (base64Image: string): Promise<{
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama-3.2-90b-vision-preview",
+        model: "meta-llama/llama-4-scout-17b-16e-instruct",
         messages: [
           {
             role: "user",
