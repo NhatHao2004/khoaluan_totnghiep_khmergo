@@ -341,7 +341,7 @@ export default function LoginScreen() {
       </KeyboardAvoidingView>
 
       {/* Forgot Password Modal */}
-      <Modal visible={forgotModalVisible} transparent animationType="fade" statusBarTranslucent onRequestClose={() => setForgotModalVisible(false)}>
+      <Modal visible={forgotModalVisible} transparent animationType="slide" statusBarTranslucent onRequestClose={() => setForgotModalVisible(false)}>
         <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
@@ -353,7 +353,7 @@ export default function LoginScreen() {
             style={styles.modalContainer}
           >
             <TouchableWithoutFeedback>
-              <View style={styles.modalContent}>
+              <View style={[styles.modalContent, { paddingTop: insets.top + vs(20) }]}>
                 <View style={styles.modalHeader}>
                   <Text style={styles.modalTitle}>{t('reset_password')}</Text>
                   <TouchableOpacity onPress={() => { setForgotModalVisible(false); setModalError(''); }}>
@@ -362,19 +362,21 @@ export default function LoginScreen() {
                 </View>
 
                 {forgotStep === 1 && (
-                  <View style={styles.modalBody}>
-                    <Text style={styles.modalDesc} numberOfLines={1} adjustsFontSizeToFit>{t('enter_email_desc')}</Text>
-                    {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
-                    <View style={styles.modalInputWrapper}>
-                      <Ionicons name="mail-outline" size={ms(20)} color="#94A3B8" />
-                      <TextInput
-                        style={styles.modalInput}
-                        placeholder="example@gmail.com"
-                        value={forgotEmail}
-                        onChangeText={(txt) => { setForgotEmail(txt); setModalError(''); }}
-                        autoCapitalize="none"
-                        keyboardType="email-address"
-                      />
+                  <View style={{ flex: 1, justifyContent: 'space-between' }}>
+                    <View style={styles.modalBody}>
+                      <Text style={styles.modalDesc} numberOfLines={1} adjustsFontSizeToFit>{t('enter_email_desc')}</Text>
+                      {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
+                      <View style={styles.modalInputWrapper}>
+                        <Ionicons name="mail-outline" size={ms(20)} color="#94A3B8" />
+                        <TextInput
+                          style={styles.modalInput}
+                          placeholder="example@gmail.com"
+                          value={forgotEmail}
+                          onChangeText={(txt) => { setForgotEmail(txt); setModalError(''); }}
+                          autoCapitalize="none"
+                          keyboardType="email-address"
+                        />
+                      </View>
                     </View>
                     <TouchableOpacity style={styles.modalActionBtn} onPress={handleRequestCode} disabled={forgotLoading}>
                       <LinearGradient colors={['#10B981', '#059669']} style={styles.modalActionGradient}>
@@ -385,19 +387,21 @@ export default function LoginScreen() {
                 )}
 
                 {forgotStep === 2 && (
-                  <View style={styles.modalBody}>
-                    <Text style={styles.modalDesc}>{t('enter_otp_desc')}</Text>
-                    {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
-                    <View style={styles.modalInputWrapper}>
-                      <Ionicons name="keypad-outline" size={ms(20)} color="#94A3B8" />
-                      <TextInput
-                        style={styles.modalInput}
-                        placeholder="Mã xác thực của bạn..."
-                        value={otpCode}
-                        onChangeText={(txt) => { setOtpCode(txt); setModalError(''); }}
-                        keyboardType="number-pad"
-                        maxLength={6}
-                      />
+                  <View style={{ flex: 1, justifyContent: 'space-between' }}>
+                    <View style={styles.modalBody}>
+                      <Text style={styles.modalDesc}>{t('enter_otp_desc')}</Text>
+                      {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
+                      <View style={styles.modalInputWrapper}>
+                        <Ionicons name="keypad-outline" size={ms(20)} color="#94A3B8" />
+                        <TextInput
+                          style={styles.modalInput}
+                          placeholder="Mã xác thực của bạn..."
+                          value={otpCode}
+                          onChangeText={(txt) => { setOtpCode(txt); setModalError(''); }}
+                          keyboardType="number-pad"
+                          maxLength={6}
+                        />
+                      </View>
                     </View>
                     <TouchableOpacity style={styles.modalActionBtn} onPress={handleVerifyOTP} disabled={forgotLoading}>
                       <LinearGradient colors={['#10B981', '#059669']} style={styles.modalActionGradient}>
@@ -408,18 +412,20 @@ export default function LoginScreen() {
                 )}
 
                 {forgotStep === 3 && (
-                  <View style={styles.modalBody}>
-                    <Text style={styles.modalDesc}>{t('new_password_desc')}</Text>
-                    {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
-                    <View style={styles.modalInputWrapper}>
-                      <Ionicons name="lock-closed-outline" size={ms(20)} color="#94A3B8" />
-                      <TextInput
-                        style={styles.modalInput}
-                        placeholder={t('new_password')}
-                        value={newPassword}
-                        onChangeText={(txt) => { setNewPassword(txt); setModalError(''); }}
-                        secureTextEntry
-                      />
+                  <View style={{ flex: 1, justifyContent: 'space-between' }}>
+                    <View style={styles.modalBody}>
+                      <Text style={styles.modalDesc}>{t('new_password_desc')}</Text>
+                      {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
+                      <View style={styles.modalInputWrapper}>
+                        <Ionicons name="lock-closed-outline" size={ms(20)} color="#94A3B8" />
+                        <TextInput
+                          style={styles.modalInput}
+                          placeholder={t('new_password')}
+                          value={newPassword}
+                          onChangeText={(txt) => { setNewPassword(txt); setModalError(''); }}
+                          secureTextEntry
+                        />
+                      </View>
                     </View>
                     <TouchableOpacity style={styles.modalActionBtn} onPress={handleResetPassword}>
                       <LinearGradient colors={['#10B981', '#059669']} style={styles.modalActionGradient}>
@@ -518,14 +524,26 @@ const styles = StyleSheet.create({
   },
 
   // Modal Styles
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', paddingHorizontal: s(20), paddingBottom: vs(100) },
-  modalContainer: { width: '100%' },
-  modalContent: { backgroundColor: '#FFF', borderRadius: s(24), padding: s(20) },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-start' },
+  modalContainer: { width: '100%', height: SCREEN_HEIGHT * 0.4 },
+  modalContent: {
+    flex: 1,
+    backgroundColor: '#FFF',
+    borderBottomLeftRadius: s(32),
+    borderBottomRightRadius: s(32),
+    paddingHorizontal: s(24),
+    paddingBottom: vs(24),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 25
+  },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(10) },
   modalTitle: { fontSize: ms(20), fontWeight: '400', color: '#1E293B' },
   modalBody: { gap: vs(15) },
   modalDesc: { fontSize: ms(15), color: '#64748B', lineHeight: ms(20) },
-  modalErrorText: { fontSize: ms(13), color: '#EF4444', fontWeight: '400', marginTop: -vs(2), marginLeft: s(4), marginBottom: vs(5) },
+  modalErrorText: { fontSize: ms(13), color: '#EF4444', fontWeight: '400', marginTop: -vs(2), marginBottom: vs(5) },
   modalInputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: s(12), paddingHorizontal: s(12), height: vs(50), borderWidth: 1, borderColor: '#F1F5F9' },
   modalInput: { flex: 1, marginLeft: s(10), fontSize: ms(15), color: '#1E293B' },
   modalActionBtn: { borderRadius: s(12), overflow: 'hidden', marginTop: vs(5) },
