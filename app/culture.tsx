@@ -84,7 +84,7 @@ export default function CultureScreen() {
 
         <View style={styles.headerTitleContainer}>
           <ThemedText style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
-            {t('culture')}
+            {t('culture').replace('\n', ' ')}
           </ThemedText>
         </View>
 

@@ -22,12 +22,12 @@ export default function QuizScreen() {
   const lastFetchTime = useRef<number>(0);
 
   const getBadge = (points: number) => {
-    if (points >= 500) return { name: 'Huyền Thoại', emoji: '👑', icon: 'ribbon-outline', color: '#000000ff' };
-    if (points >= 150) return { name: 'Kim Cương', emoji: '🔷', icon: 'diamond-outline', color: '#000000ff' };
-    if (points >= 125) return { name: 'Bạch Kim', emoji: '💎', icon: 'sparkles-outline', color: '#000000ff' };
-    if (points >= 100) return { name: 'Vàng', emoji: '🥇', icon: 'trophy-outline', color: '#000000ff' };
-    if (points >= 50) return { name: 'Bạc', emoji: '🥈', icon: 'medal-outline', color: '#000000ff' };
-    if (points >= 25) return { name: 'Đồng', emoji: '🥉', icon: 'medal-outline', color: '#000000ff' };
+    if (points >= 500) return { name: t('rank_legend'), emoji: '👑', icon: 'ribbon-outline', color: '#000000ff' };
+    if (points >= 150) return { name: t('rank_diamond'), emoji: '🔷', icon: 'diamond-outline', color: '#000000ff' };
+    if (points >= 125) return { name: t('rank_platinum'), emoji: '💎', icon: 'sparkles-outline', color: '#000000ff' };
+    if (points >= 100) return { name: t('rank_gold'), emoji: '🥇', icon: 'trophy-outline', color: '#000000ff' };
+    if (points >= 50) return { name: t('rank_silver'), emoji: '🥈', icon: 'medal-outline', color: '#000000ff' };
+    if (points >= 25) return { name: t('rank_bronze'), emoji: '🥉', icon: 'medal-outline', color: '#000000ff' };
     return null;
   };
 
@@ -91,7 +91,7 @@ export default function QuizScreen() {
 
       <ScrollView
         style={styles.scrollContent}
-        contentContainerStyle={{ paddingBottom: 25 }}
+        contentContainerStyle={[styles.scrollContentContainer, { paddingBottom: vs(20) }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Card - Floating */}
@@ -101,7 +101,7 @@ export default function QuizScreen() {
               {user?.avatar ? (
                 <Image source={{ uri: user.avatar }} style={styles.cardAvatar} />
               ) : (
-                <Ionicons name="person" size={ms(40)} color="#000000ff" />
+                <Ionicons name="person-circle" size={ms(40)} color="#000000ff" />
               )}
             </View>
 
@@ -127,13 +127,13 @@ export default function QuizScreen() {
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
-              <View style={{ height: vs(28), justifyContent: 'center', alignItems: 'center' }}>
+              <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 {(() => {
                   const badge = getBadge(user?.points || 0);
                   if (badge) {
                     return (
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: s(4) }}>
-                        <Text style={[styles.statValue, { fontSize: ms(17), color: badge.color }]}>
+                        <Text style={[styles.statValue, { fontSize: ms(15), color: badge.color }]} numberOfLines={1} adjustsFontSizeToFit>
                           {badge.emoji} {badge.name}
                         </Text>
                       </View>
@@ -275,14 +275,14 @@ export default function QuizScreen() {
                   router.push('/login');
                 }}
               >
-                <Text style={styles.modalPrimaryBtnText}>Đăng nhập</Text>
+                <Text style={styles.modalPrimaryBtnText}>{t('login_user')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.modalSecondaryBtn}
                 onPress={() => setShowLoginModal(false)}
               >
-                <Text style={styles.modalSecondaryBtnText}>Quay lại</Text>
+                <Text style={styles.modalSecondaryBtnText}>{t('back')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -299,8 +299,13 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flex: 1,
+  },
+  scrollContentContainer: {
     paddingHorizontal: s(20),
-    paddingTop: vs(10),
+    paddingTop: vs(5),
+    paddingBottom: vs(20),
+    flexGrow: 1,
+    justifyContent: 'space-between',
   },
   header: {
     flexDirection: 'row',
@@ -401,7 +406,7 @@ const styles = StyleSheet.create({
     fontSize: ms(20),
     fontWeight: '400',
     color: '#1E293B',
-    lineHeight: vs(28),
+    lineHeight: vs(24),
     textAlign: 'center',
   },
   statLabel: {

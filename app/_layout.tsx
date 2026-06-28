@@ -21,7 +21,8 @@ const { width } = Dimensions.get('window');
 SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
-  anchor: '(tabs)',
+  // Ensure that reloading on `/login` keeps a back button present.
+  initialRouteName: '(tabs)',
 };
 
 function AchievementManager() {
@@ -165,16 +166,14 @@ function AchievementManager() {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [isAppReady, setIsAppReady] = useState(false);
-
+  // Perfect APK Transition
   useEffect(() => {
-    async function prepare() {
-      try {
-        await SplashScreen.hideAsync();
-      } catch (e) {
-        console.warn(e);
-      }
+    async function hideSplash() {
+      // Small 100ms burst to ensure JS background is painted
+      await new Promise(resolve => setTimeout(resolve, 100));
+      SplashScreen.hideAsync().catch(() => {});
     }
-    prepare();
+    hideSplash();
   }, []);
 
   return (
@@ -184,7 +183,11 @@ export default function RootLayout() {
           <AuthProvider>
             <AchievementManager />
             {!isAppReady ? (
-              <LoadingScreen onFinish={() => setIsAppReady(true)} />
+              <LoadingScreen 
+                onFinish={() => {
+                  setIsAppReady(true);
+                }} 
+              />
             ) : (
               <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
                 <Stack screenOptions={{

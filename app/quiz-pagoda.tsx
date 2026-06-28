@@ -63,7 +63,7 @@ export default function QuizPagodaSelectScreen() {
           <Ionicons name="arrow-back" size={28} color="#000000" />
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
-          <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
+          <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.3}>
             {isKm ? 'វត្តអារាមខ្មែរ' : 'Ngôi chùa Khmer'}
           </Text>
         </View>

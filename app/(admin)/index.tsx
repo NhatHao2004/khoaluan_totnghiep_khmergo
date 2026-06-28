@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { addDoc, collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import React, { memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Dimensions, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../../contexts/AuthContext';
 import { db } from '../../utils/firebaseConfig';
@@ -82,10 +82,27 @@ PodiumItem.displayName = 'PodiumItem';
 
 const ActivityCard = memo(({ activity }: any) => (
   <View style={styles.activityCard}>
-    <Text style={styles.activityItemTitle} numberOfLines={1} adjustsFontSizeToFit>{activity.name}</Text>
-    <View style={styles.activityBottomRow}>
-      <Text style={styles.activityDesc} numberOfLines={1} adjustsFontSizeToFit>Đã đăng ký tài khoản thành công</Text>
-      <Text style={styles.activityTime}>{activity.timeAgo || 'Vừa xong'}</Text>
+    <View style={styles.activityMainRow}>
+      <View style={styles.activityAvatarBox}>
+        {activity.avatar ? (
+          <Image
+            source={{ uri: activity.avatar }}
+            style={styles.activityAvatar}
+            contentFit="cover"
+            transition={200}
+          />
+        ) : (
+          <View style={styles.activityAvatarPlaceholder}>
+            <Ionicons name="person" size={ms(18)} color="#94a3b8" />
+          </View>
+        )}
+      </View>
+      <View style={styles.activityInfo}>
+        <View style={styles.activityHeaderRow}>
+          <Text style={styles.activityItemTitle} numberOfLines={1}>{activity.name}</Text>
+        </View>
+        <Text style={styles.activityDesc} numberOfLines={1} adjustsFontSizeToFit>Đã đăng ký tài khoản thành công</Text>
+      </View>
     </View>
   </View>
 ));
@@ -101,6 +118,7 @@ const AdminDashboard = () => {
   const [allSortedUsers, setAllSortedUsers] = useState<any[]>([]);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [adminName, setAdminName] = useState('');
+  const [adminAvatar, setAdminAvatar] = useState('');
   const [pendingFeedback, setPendingFeedback] = useState(0);
   const [recentFeedbacks, setRecentFeedbacks] = useState<any[]>([]);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -183,6 +201,10 @@ const AdminDashboard = () => {
       const recentUsers = snap.docs
         .map(doc => ({ id: doc.id, ...doc.data() }))
         .filter((u: any) => {
+          // Lọc: Không phải admin VÀ phải trong vòng 24h
+          const isAdmin = u.role === 'Quản trị viên' || u['quyền'] === 'Quản trị viên';
+          if (isAdmin) return false;
+
           if (!u.createdAt) return false;
           const createTime = u.createdAt.toDate ? u.createdAt.toDate().getTime() : new Date(u.createdAt).getTime();
           return (now - createTime) < oneDayInMs;
@@ -197,6 +219,7 @@ const AdminDashboard = () => {
       const activities = sortedRecent.slice(0, 5).map((u: any) => ({
         id: u.id,
         name: u.name || u['tên'] || 'Người dùng mới',
+        avatar: u.avatar || '',
         timeAgo: getTimeAgo(u.createdAt)
       }));
 
@@ -209,6 +232,7 @@ const AdminDashboard = () => {
         if (docSnap.exists()) {
           const data = docSnap.data();
           setAdminName(data.name || data['tên'] || '');
+          setAdminAvatar(data.avatar || '');
         }
       }, (err) => console.error('Snapshot admin context error:', err));
     }
@@ -368,8 +392,22 @@ const AdminDashboard = () => {
           <TouchableOpacity
             onPress={() => router.push('/(admin)/profile' as any)}
             activeOpacity={0.7}
-            style={{ flex: 1 }}
+            style={styles.headerAdminInfo}
           >
+            <View style={styles.adminHeaderAvatar}>
+              {adminAvatar ? (
+                <Image
+                  source={{ uri: adminAvatar }}
+                  style={styles.adminHeaderAvatarImg}
+                  contentFit="cover"
+                  transition={200}
+                />
+              ) : (
+                <View style={styles.adminHeaderAvatarPlaceholder}>
+                  <Ionicons name="person" size={ms(16)} color="#94a3b8" />
+                </View>
+              )}
+            </View>
             <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
               {adminName || 'Quản trị viên'}
             </Text>
@@ -379,13 +417,13 @@ const AdminDashboard = () => {
               onPress={() => router.push('/(tabs)')}
               style={styles.notificationBtn}
             >
-              <Ionicons name="eye-outline" size={ms(26)} color="#3b82f6" />
+              <MaterialCommunityIcons name="shield-account-outline" size={ms(26)} color="#000000ff" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setShowFeedbackModal(true)}
               style={styles.notificationBtn}
             >
-              <Ionicons name="chatbubbles-outline" size={ms(26)} color="#3b82f6" />
+              <Ionicons name="chatbox-ellipses-outline" size={ms(26)} color="#000000ff" />
               {pendingFeedback > 0 && (
                 <View style={styles.notificationBadge}>
                   <Text style={styles.badgeText}>{pendingFeedback > 99 ? '99+' : pendingFeedback}</Text>
@@ -426,7 +464,7 @@ const AdminDashboard = () => {
 
         {/* Leaderboard Chart Section */}
         <View style={styles.chartHeader}>
-          <Text style={styles.chartTitle} numberOfLines={1} adjustsFontSizeToFit>Biểu đồ bảng xếp hạng</Text>
+          <Text style={styles.chartTitle} numberOfLines={1} adjustsFontSizeToFit>Bảng xếp hạng người dùng</Text>
         </View>
 
         <View style={styles.podiumContainer}>
@@ -446,10 +484,10 @@ const AdminDashboard = () => {
 
         {/* Recent Activity Section */}
         <View style={styles.activityHeader}>
-          <Text style={styles.activityTitle} numberOfLines={1} adjustsFontSizeToFit>Hoạt động gần đây</Text>
+          <Text style={styles.activityTitle} numberOfLines={1} adjustsFontSizeToFit>Người dùng mới</Text>
           <TouchableOpacity
             style={styles.seeAllBtn}
-            onPress={() => router.push('/(admin)/users' as any)}
+            onPress={() => router.push('/(admin)/user' as any)}
           >
             <Text style={styles.seeAllText} numberOfLines={1} adjustsFontSizeToFit>Xem tất cả</Text>
           </TouchableOpacity>
@@ -534,7 +572,7 @@ const AdminDashboard = () => {
                             </Text>
                             <Text style={styles.feedbackTime}>{f.createdAt ? getTimeAgo(f.createdAt) : 'Vừa xong'}</Text>
                           </View>
-                          <Text style={styles.feedbackSubText}>Đã gửi phản hồi, nhấn vào để xem chi tiết...</Text>
+                          <Text style={styles.feedbackSubText} numberOfLines={1} adjustsFontSizeToFit>Đã gửi phản hồi, nhấn vào để xem...</Text>
                         </View>
                       </View>
                     </View>
@@ -543,7 +581,7 @@ const AdminDashboard = () => {
               ) : (
                 <View style={styles.emptyFeedback}>
                   <View style={styles.emptyIconCircle}>
-                    <Ionicons name="chatbox-ellipses-outline" size={ms(50)} color="#94a3b8" />
+                    <Ionicons name="chatbox-ellipses-outline" size={ms(40)} color="#94a3b8" />
                   </View>
                   <Text style={styles.emptyFeedbackText}>Chưa có phản hồi mới nào từ người dùng</Text>
                 </View>
@@ -619,7 +657,7 @@ const AdminDashboard = () => {
               </View>
 
               <View style={styles.replySection}>
-                <Text style={styles.replyLabel}>Trả lời nhanh</Text>
+                <Text style={styles.replyLabel}>Trả lời phản hồi</Text>
                 <TextInput
                   style={styles.replyInput}
                   value={quickReply}
@@ -637,7 +675,7 @@ const AdminDashboard = () => {
                 onPress={() => setShowDetailModal(false)}
               >
                 <Text style={styles.quickCancelText}>Đóng</Text>
-</TouchableOpacity>
+              </TouchableOpacity>
 
               <TouchableOpacity
                 style={[styles.quickSendBtn, (!quickReply.trim() || sendingReply || quickReply.trim() === selectedFeedback?.adminReply) && styles.disabledBtn]}
@@ -705,6 +743,34 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#1e293b',
     letterSpacing: -0.5,
+    flex: 1,
+  },
+  headerAdminInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: s(10),
+  },
+  adminHeaderAvatar: {
+    width: s(36),
+    height: s(36),
+    borderRadius: s(18),
+    backgroundColor: '#f1f5f9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  adminHeaderAvatarImg: {
+    width: '100%',
+    height: '100%',
+  },
+  adminHeaderAvatarPlaceholder: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerRightActions: {
     flexDirection: 'row',
@@ -921,16 +987,47 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#f1f5f9',
   },
+  activityMainRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: s(12),
+  },
+  activityAvatarBox: {
+    width: s(40),
+    height: s(40),
+    borderRadius: s(20),
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: vs(2),
+  },
+  activityAvatar: {
+    width: '100%',
+    height: '100%',
+  },
+  activityAvatarPlaceholder: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8fafc',
+  },
+  activityInfo: {
+    flex: 1,
+    gap: vs(2),
+  },
   activityItemTitle: {
     fontSize: ms(16),
     fontWeight: '400',
     color: '#1e293b',
   },
-  activityBottomRow: {
+  activityHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: vs(4),
   },
   activityDesc: {
     fontSize: ms(14),
@@ -1101,8 +1198,6 @@ const styles = StyleSheet.create({
     height: s(42),
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8fafc',
-    borderRadius: s(12),
   },
   notificationBadge: {
     position: 'absolute',
@@ -1210,7 +1305,7 @@ const styles = StyleSheet.create({
     lineHeight: vs(20),
   },
   feedbackSubText: {
-    fontSize: ms(10),
+    fontSize: ms(14.5),
     color: '#64748b',
     fontWeight: '400',
     fontStyle: 'italic',
@@ -1228,8 +1323,8 @@ const styles = StyleSheet.create({
     paddingBottom: vs(140),
   },
   emptyIconCircle: {
-    width: s(120),
-    height: s(120),
+    width: s(80),
+    height: s(80),
     borderRadius: s(60),
     backgroundColor: '#f8fafc',
     justifyContent: 'center',

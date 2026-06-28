@@ -52,7 +52,7 @@ const DestItem = memo(({ item, onEdit, onDelete, onPreview }: any) => (
 
         <View style={styles.rightActions}>
           <TouchableOpacity style={styles.editBtn} onPress={() => onEdit(item)}>
-            <Ionicons name="create-outline" size={ms(18)} color="#3b82f6" />
+            <Ionicons name="pencil" size={ms(18)} color="#3b82f6" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.deleteBtn} onPress={() => onDelete(item.id, item.name)}>
             <Ionicons name="trash-outline" size={ms(18)} color="#ef4444" />
@@ -87,7 +87,7 @@ const VocabItem = memo(({ item, onManage, onEdit, onDelete, getImageSource }: an
 
         <View style={styles.vocabCardFooter}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.vocabLargeTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+            <Text style={styles.vocabLargeTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.3}>
               {item.title === 'cat_family' ? 'Gia đình thân yêu' :
                 item.title === 'cat_food' ? 'Ẩm thực đặc sắc' :
                   item.title === 'cat_greetings' ? 'Chào hỏi thông dụng' :
@@ -547,7 +547,7 @@ const ContentManagement = () => {
           }}
           style={styles.addBtnHeader}
         >
-          <Ionicons name="add" size={ms(32)} color="#3b82f6" />
+          <Ionicons name="add" size={ms(30)} color="#0062ffff" />
         </TouchableOpacity>
       </View>
 
@@ -596,13 +596,13 @@ const ContentManagement = () => {
         <View style={[styles.container, { paddingTop: Math.max(insets.top, vs(10)) }]}>
           <View style={[styles.header, { marginTop: 0, paddingHorizontal: s(12) }]}>
             <TouchableOpacity style={styles.backBtn} onPress={() => setManagingTopicId(null)}><Ionicons name="arrow-back" size={ms(28)} color="#1e293b" /></TouchableOpacity>
-            <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>{managingTopic?.title === 'cat_family' ? 'Gia đình thân yêu' : managingTopic?.title === 'cat_food' ? 'Ẩm thực đặc sắc' : managingTopic?.title === 'cat_greetings' ? 'Chào hỏi thông dụng' : managingTopic?.title === 'cat_numbers' ? 'Số đếm cơ bản' : managingTopic?.title}</Text>
+            <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.3}>{managingTopic?.title === 'cat_family' ? 'Gia đình thân yêu' : managingTopic?.title === 'cat_food' ? 'Ẩm thực đặc sắc' : managingTopic?.title === 'cat_greetings' ? 'Chào hỏi thông dụng' : managingTopic?.title === 'cat_numbers' ? 'Số đếm cơ bản' : managingTopic?.title}</Text>
             <TouchableOpacity style={styles.addBtnHeader} onPress={() => { setSelectedTopic(managingTopic); setEditingWord(null); setWordKhm(''); setWordVie(''); setWordPron(''); setWordImg(''); setWordModalVisible(true); }}><Ionicons name="add" size={ms(26)} color="#3b82f6" /></TouchableOpacity>
           </View>
           <FlatList
             data={managingTopic?.words || []}
             keyExtractor={(item, index) => item.id || index.toString()}
-            contentContainerStyle={{ padding: s(16) }}
+            contentContainerStyle={{ padding: s(16), flexGrow: 1 }}
             renderItem={({ item }: { item: any }) => (
               <WordItem
                 word={item}
@@ -844,7 +844,7 @@ const ContentManagement = () => {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-      <Modal visible={deleteConfirmVisible} transparent animationType="fade" statusBarTranslucent><View style={styles.modalBg}><View style={styles.confirmBox}><View style={styles.confirmIconBg}><Ionicons name="trash" size={ms(32)} color="#ef4444" /></View><Text style={styles.confirmTitle}>Xác nhận xóa</Text><Text style={styles.confirmText}>{deleteType === 'destination' ? `"${pendingDelete?.name}" sẽ được chuyển vào thùng rác` : deleteType === 'topic' ? `Chủ đề "${pendingDelete?.title}" sẽ được chuyển vào thùng rác` : 'Từ vựng này sẽ bị xóa vĩnh viễn.'}</Text><View style={styles.modalActions}><TouchableOpacity style={styles.cancelBtn} onPress={() => setDeleteConfirmVisible(false)}><Text style={styles.cancelBtnText}>Hủy</Text></TouchableOpacity><TouchableOpacity style={[styles.saveBtn, { backgroundColor: '#ff0000ff' }]} onPress={confirmDelete}><Text style={styles.saveBtnText}>Xác nhận xóa</Text></TouchableOpacity></View></View></View></Modal>
+      <Modal visible={deleteConfirmVisible} transparent animationType="fade" statusBarTranslucent><View style={styles.modalBg}><View style={styles.confirmBox}><View style={styles.confirmIconBg}><Ionicons name="trash" size={ms(32)} color="#ef4444" /></View><Text style={styles.confirmTitle}>Xác nhận xóa</Text><Text style={styles.confirmText}>{deleteType === 'destination' ? `"${pendingDelete?.name}" sẽ được chuyển vào thùng rác` : deleteType === 'topic' ? `Chủ đề này sẽ được chuyển vào thùng rác` : 'Từ vựng này sẽ bị xóa vĩnh viễn'}</Text><View style={styles.modalActions}><TouchableOpacity style={styles.cancelBtn} onPress={() => setDeleteConfirmVisible(false)}><Text style={styles.cancelBtnText}>Hủy</Text></TouchableOpacity><TouchableOpacity style={[styles.saveBtn, { backgroundColor: '#ff0000ff' }]} onPress={confirmDelete}><Text style={styles.saveBtnText}>Xác nhận xóa</Text></TouchableOpacity></View></View></View></Modal>
     </View>
   );
 };
@@ -854,7 +854,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(16), paddingBottom: vs(15) },
   backBtn: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center' },
   headerTitle: { flex: 1, fontSize: ms(20), fontWeight: '400', color: '#1e293b', textAlign: 'center' },
-  addBtnHeader: { width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center' },
+  addBtnHeader: { width: s(42), height: s(42), backgroundColor: '#eff6ff', borderRadius: s(12), justifyContent: 'center', alignItems: 'center' },
   tabBar: { flexDirection: 'row', marginHorizontal: s(16), backgroundColor: '#f1f5f9', borderRadius: s(12), padding: s(4), marginBottom: vs(15) },
   tab: { flex: 1, paddingVertical: vs(10), alignItems: 'center', borderRadius: s(10) },
   activeTab: { backgroundColor: '#fff', elevation: 2, shadowOpacity: 0.1, shadowRadius: 5 },
@@ -891,7 +891,7 @@ const styles = StyleSheet.create({
   modalContentFull: { flex: 1, backgroundColor: '#fff', width: '100%' },
   modalContentSmall: { backgroundColor: '#fff', width: '90%', borderRadius: ms(24), padding: s(24) },
   modalHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(20) },
-  modalTitle: { fontSize: ms(20), fontWeight: '400', color: '#1e293b' },
+  modalTitle: { fontSize: ms(20), fontWeight: '400', color: '#1e293b', textAlign: 'center' },
   modalForm: { padding: s(20) },
   inputLabel: { fontSize: ms(14), fontWeight: '400', color: '#64748b', marginBottom: vs(8), marginTop: vs(12) },
   input: { backgroundColor: '#f8fafc', borderRadius: ms(12), padding: s(14), fontSize: ms(15), color: '#1e293b', borderWidth: 1, borderColor: '#e2e8f0', marginBottom: vs(4) },
@@ -950,7 +950,7 @@ const styles = StyleSheet.create({
   activeCatBtn: { backgroundColor: '#3b82f6', borderColor: '#3b82f6' },
   catBtnText: { fontSize: ms(13), fontWeight: '400', color: '#64748b' },
   activeCatBtnText: { color: '#fff' },
-  emptyStateContainer: { alignItems: 'center', marginTop: vs(100), opacity: 0.5 },
+  emptyStateContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', opacity: 0.5, paddingBottom: vs(100) },
   emptyWords: { fontSize: ms(16), color: '#94a3b8', textAlign: 'center', marginTop: vs(15), fontWeight: '400' },
   confirmBox: { backgroundColor: '#fff', width: '85%', borderRadius: ms(24), padding: s(24), alignItems: 'center' },
   confirmIconBg: { width: s(64), height: s(64), borderRadius: s(32), backgroundColor: '#fef2f2', justifyContent: 'center', alignItems: 'center', marginBottom: vs(16) },

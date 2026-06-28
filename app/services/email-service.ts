@@ -1,16 +1,12 @@
-import { db, auth } from '@/utils/firebaseConfig';
-import { doc, setDoc, getDoc, Timestamp, collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '@/utils/firebaseConfig';
+import { doc, getDoc, Timestamp, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 
 /**
- * Service xử lý gửi OTP và xác thực mã qua REST API của EmailJS
+ * Service xử lý gửi OTP và đổi mật khẩu qua Google Apps Script (Backend Free)
  */
 
-const EMAILJS_SERVICE_ID = 'service_q6cuf7b';
-const EMAILJS_TEMPLATE_ID = 'template_xpgn4j3';
-const EMAILJS_PUBLIC_KEY = 'R_23JTyESZpodGdBB';
-
 export const EmailService = {
-  // 0. Kiểm tra Email đã tồn tại trong hệ thống chưa
+  // 1. Kiểm tra Email đã tồn tại chưa
   checkEmailExists: async (email: string) => {
     try {
       const usersRef = collection(db, 'users');
@@ -23,70 +19,83 @@ export const EmailService = {
     }
   },
 
-  // 1. Tạo mã OTP ngẫu nhiên 6 chữ số
+  // 2. Tạo mã OTP ngẫu nhiên
   generateOTP: () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
   },
 
-  // 2. Lưu OTP vào Firestore để xác thực sau này
+  // 3. Lưu OTP vào Firestore (tạm thời)
   saveOTP: async (email: string, otp: string) => {
-    const otpRef = doc(db, 'temp_otps', email.toLowerCase().trim());
-    await setDoc(otpRef, {
-      otp,
-      createdAt: Timestamp.now(),
-      expiresAt: new Timestamp(Timestamp.now().seconds + 300, 0), // Hết hạn sau 5 phút
-    });
-  },
-
-  // 3. Gửi Email qua REST API (Ổn định 100%)
-  sendOTPEmail: async (email: string, otp: string) => {
     try {
-      const data = {
-        service_id: EMAILJS_SERVICE_ID,
-        template_id: EMAILJS_TEMPLATE_ID,
-        user_id: EMAILJS_PUBLIC_KEY,
-        template_params: {
-          to_email: email,
-          otp_code: otp,
-        },
-      };
-
-      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Origin': 'http://localhost'
-        },
-        body: JSON.stringify(data),
+      const otpRef = doc(db, 'temp_otps', email.toLowerCase().trim());
+      await setDoc(otpRef, {
+        otp,
+        createdAt: Timestamp.now(),
+        expiresAt: new Timestamp(Timestamp.now().seconds + 300, 0),
       });
-
-      return response.ok;
-    } catch (error) {
-      console.error('Lỗi kết nối tới EmailJS:', error);
-      return false;
+    } catch (err) {
+      console.error('Lỗi lưu OTP vào Firestore:', err);
+      throw err;
     }
   },
 
-  // 4. Kiểm tra OTP người dùng nhập vào
+  // 4. Gửi Email qua Google Apps Script (Inbox 100%)
+  sendOTPEmail: async (email: string, otp: string) => {
+    try {
+      const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzooMp7tE7xVwV3XjsLroYdZryp-b9T7Nwh3Y5CiQd7wwVuvkmTXiiwvWc17LrwF5yT/exec';
+
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'sendOTP',
+          email: email.toLowerCase().trim(),
+          otp: otp
+        }),
+      });
+
+      const res = await response.json();
+      return { success: res.success, msg: res.error };
+    } catch (error: any) {
+      console.error('Lỗi gửi mail qua Apps Script:', error);
+      return { success: false, msg: 'Lỗi kết nối máy chủ gửi mail' };
+    }
+  },
+
+  // 5. Kiểm tra mã OTP
   verifyOTP: async (email: string, inputOtp: string) => {
     const otpRef = doc(db, 'temp_otps', email.toLowerCase().trim());
     const snap = await getDoc(otpRef);
-    
-    if (!snap.exists()) return { success: false, msg: 'Mã xác thực không tồn tại' };
-    
+    if (!snap.exists()) return { success: false, msg: 'Mã không tồn tại' };
     const data = snap.data();
-    const now = Timestamp.now();
-
-    if (now.seconds > data.expiresAt.seconds) {
-      return { success: false, msg: 'Mã xác thực đã hết hạn' };
-    }
-
-    if (data.otp !== inputOtp) {
-      return { success: false, msg: 'Mã xác thực không chính xác' };
-    }
-
+    if (Timestamp.now().seconds > data.expiresAt.seconds) return { success: false, msg: 'Mã đã hết hạn' };
+    if (data.otp !== inputOtp) return { success: false, msg: 'Mã không chính xác' };
     return { success: true };
+  },
+
+  // 6. Gọi Apps Script đổi mật khẩu thật
+  resetPasswordWithOTP: async (email: string, otp: string, newPassword: string) => {
+    try {
+      const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzooMp7tE7xVwV3XjsLroYdZryp-b9T7Nwh3Y5CiQd7wwVuvkmTXiiwvWc17LrwF5yT/exec';
+
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'resetPassword',
+          email: email.toLowerCase().trim(),
+          otp: otp,
+          newPassword: newPassword
+        }),
+      });
+
+      const res = await response.json();
+      return { success: res.success, msg: res.error };
+    } catch (error: any) {
+      console.error('Lỗi gọi Backend Apps Script:', error);
+      return { success: false, msg: 'Lỗi kết nối máy chủ đổi mật khẩu' };
+    }
   }
 };
 
-export default {};
+export default EmailService;

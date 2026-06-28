@@ -141,11 +141,9 @@ export default function CultureDetailScreen() {
               <TouchableOpacity onPress={() => router.back()} style={styles.iconBtn}>
                 <Ionicons name="arrow-back" size={ms(24)} color="#1E293B" />
               </TouchableOpacity>
-              {!user?.role?.includes('Quản trị viên') && (
                 <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
                   <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={ms(22)} color={isFavorite ? "#EF4444" : "#1E293B"} />
                 </TouchableOpacity>
-              )}
             </View>
         </View>
 
@@ -164,7 +162,6 @@ export default function CultureDetailScreen() {
               </Text>
             </TouchableOpacity>
 
-            {!user?.role?.includes('Quản trị viên') && (
               <TouchableOpacity
                 onPress={() => setActiveTab('quiz')}
                 style={[styles.tabItem, activeTab === 'quiz' && styles.tabItemActive]}
@@ -173,7 +170,6 @@ export default function CultureDetailScreen() {
                   {isKm ? 'ការប្រកួត' : 'Thử thách'}
                 </Text>
               </TouchableOpacity>
-            )}
           </View>
 
           {activeTab === 'gallery' ? (
@@ -231,7 +227,7 @@ export default function CultureDetailScreen() {
                     });
                   }}
                 >
-                  <Text style={styles.quizStartBtnText} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'ចាប់ផ្តើមការប្រកួត' : 'Bắt đầu ngay'}</Text>
+                  <Text style={styles.quizStartBtnText} adjustsFontSizeToFit numberOfLines={1}>{isKm ? 'ចាប់ផ្តើមការប្រកួត' : 'Bắt đầu thử thách'}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -258,7 +254,7 @@ export default function CultureDetailScreen() {
               <Ionicons name="person-circle-outline" size={ms(40)} color="#3B82F6" />
             </View>
             <Text style={styles.modalTitle} adjustsFontSizeToFit numberOfLines={1}>{t('login_required') || 'Yêu cầu đăng nhập'}</Text>
-            <Text style={styles.modalSub} adjustsFontSizeToFit numberOfLines={2}>
+            <Text style={styles.modalSub} adjustsFontSizeToFit numberOfLines={1}>
               {t('login_to_use') || 'Bạn cần đăng nhập để sử dụng tính năng này'}
             </Text>
 

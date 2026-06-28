@@ -1,3 +1,8 @@
+if (typeof global.indexedDB === 'undefined') {
+  // @ts-ignore
+  global.indexedDB = undefined;
+}
+
 import { initializeApp, getApp, getApps } from "firebase/app";
 import { getFirestore, setLogLevel } from "firebase/firestore";
 // @ts-ignore
@@ -41,4 +46,13 @@ export const storage = getStorage(app);
 
 // Khởi tạo Remote Config
 export const remoteConfig = getRemoteConfig(app);
-remoteConfig.settings.minimumFetchIntervalMillis = 60000; // 1 phút (để test cho nhanh, production nên để 12h)
+
+// Cấu hình Remote Config (Chạy bất đồng bộ)
+import { isSupported } from "firebase/remote-config";
+isSupported().then(supported => {
+  if (supported) {
+    remoteConfig.settings.minimumFetchIntervalMillis = 60000; // 1 phút
+  }
+}).catch(() => {
+  // Bỏ qua lỗi nếu môi trường không hỗ trợ
+});

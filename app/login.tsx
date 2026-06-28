@@ -172,7 +172,6 @@ export default function LoginScreen() {
     if (!forgotEmail) { setModalError(t('error_required')); return; }
     setForgotLoading(true);
     try {
-      // Ả. Kiểm tra Email có tồn tại trong hệ thống (Firestore) không
       const exists = await EmailService.checkEmailExists(forgotEmail);
       if (!exists) {
         setModalError(t('user_not_found'));
@@ -180,25 +179,21 @@ export default function LoginScreen() {
         return;
       }
 
-      // 1. Tạo OTP 6 số
+      // 1. Tạo OTP
       const otp = EmailService.generateOTP();
-      // 2. Lưu vào Firestore (hết hạn sau 5 phút)
+      // 2. Lưu vào Firestore để verify sau này
       await EmailService.saveOTP(forgotEmail, otp);
-      // 3. Gửi qua Resend (giả lập hoặc gọi API)
-      const sent = await EmailService.sendOTPEmail(forgotEmail, otp);
+      // 3. Gửi qua Apps Script (Tên đẹp, Inbox 100%)
+      const res = await EmailService.sendOTPEmail(forgotEmail, otp);
 
-      if (sent) {
+      if (res.success) {
         setForgotStep(2);
       } else {
-        setModalError(t('update_failed'));
+        setModalError(res.msg || t('update_failed'));
       }
     } catch (error: any) {
-      if (error.code === 'permission-denied') {
-        setModalError(t('cooldown_active').replace('{time}', '2 giờ'));
-      } else {
-        console.error('Lỗi yêu cầu mã:', error);
-        setModalError(t('update_failed'));
-      }
+      console.error('Lỗi gửi OTP:', error);
+      setModalError(t('update_failed'));
     } finally {
       setForgotLoading(false);
     }
@@ -213,7 +208,7 @@ export default function LoginScreen() {
       if (res.success) {
         setForgotStep(3);
       } else {
-        setModalError(res.msg || 'Error');
+        setModalError(res.msg || 'Mã xác thực không đúng');
       }
     } catch (e) {
       setModalError(t('update_failed'));
@@ -222,15 +217,27 @@ export default function LoginScreen() {
     }
   };
 
-  const handleResetPassword = () => {
+  const handleResetPassword = async () => {
     setModalError('');
     if (newPassword.length < 6) { setModalError(t('pass_too_short')); return; }
-    // Simulation: In a custom backend flow, you'd send the resetToken + new password.
-    // For Firebase native, the link in Step 1 handles this.
-    triggerToast(t('reset_password_success'), 'success');
-    setForgotModalVisible(false);
-    setForgotStep(1);
-    setModalError('');
+    setForgotLoading(true);
+    try {
+      // Gọi Apps Script để đổi mật khẩu thật (có quyền Admin)
+      const res = await EmailService.resetPasswordWithOTP(forgotEmail, otpCode, newPassword);
+      if (res.success) {
+        triggerToast(t('reset_password_success'), 'success');
+        setForgotModalVisible(false);
+        setForgotStep(1);
+        setNewPassword('');
+        setOtpCode('');
+      } else {
+        setModalError(res.msg || t('update_failed'));
+      }
+    } catch (error: any) {
+      setModalError(t('update_failed'));
+    } finally {
+      setForgotLoading(false);
+    }
   };
 
   return (
@@ -361,7 +368,6 @@ export default function LoginScreen() {
                 <View style={styles.modalHeader}>
                   <Text style={styles.modalTitle}>{t('reset_password')}</Text>
                   <TouchableOpacity onPress={() => { setForgotModalVisible(false); setModalError(''); }}>
-                    <Ionicons name="close" size={24} color="#64748B" />
                   </TouchableOpacity>
                 </View>
 
@@ -371,7 +377,7 @@ export default function LoginScreen() {
                       <Text style={styles.modalDesc} numberOfLines={1} adjustsFontSizeToFit>{t('enter_email_desc')}</Text>
                       {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
                       <View style={styles.modalInputWrapper}>
-                        <Ionicons name="mail-outline" size={ms(20)} color="#94A3B8" />
+                        <Ionicons name="mail-outline" size={ms(20)} color="#000000ff" />
                         <TextInput
                           style={styles.modalInput}
                           placeholder="example@gmail.com"
@@ -384,7 +390,7 @@ export default function LoginScreen() {
                     </View>
                     <TouchableOpacity style={styles.modalActionBtn} onPress={handleRequestCode} disabled={forgotLoading}>
                       <LinearGradient colors={['#10B981', '#059669']} style={styles.modalActionGradient}>
-                        {forgotLoading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.modalActionText}>{t('send_code')}</Text>}
+                        {forgotLoading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.modalActionText}>{t('send_code') || 'Gửi mã xác thực'}</Text>}
                       </LinearGradient>
                     </TouchableOpacity>
                   </View>
@@ -393,13 +399,13 @@ export default function LoginScreen() {
                 {forgotStep === 2 && (
                   <View style={{ flex: 1, justifyContent: 'space-between' }}>
                     <View style={styles.modalBody}>
-                      <Text style={styles.modalDesc}>{t('enter_otp_desc')}</Text>
+                      <Text style={styles.modalDesc} numberOfLines={2} adjustsFontSizeToFit>{t('enter_otp_desc') || 'Nhập mã 6 số đã được gửi đến email của bạn'}</Text>
                       {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
                       <View style={styles.modalInputWrapper}>
-                        <Ionicons name="keypad-outline" size={ms(20)} color="#94A3B8" />
+                        <Ionicons name="keypad-outline" size={ms(20)} color="#000" />
                         <TextInput
                           style={styles.modalInput}
-                          placeholder="Mã xác thực của bạn..."
+                          placeholder="Mã 6 chữ số"
                           value={otpCode}
                           onChangeText={(txt) => { setOtpCode(txt); setModalError(''); }}
                           keyboardType="number-pad"
@@ -409,7 +415,7 @@ export default function LoginScreen() {
                     </View>
                     <TouchableOpacity style={styles.modalActionBtn} onPress={handleVerifyOTP} disabled={forgotLoading}>
                       <LinearGradient colors={['#10B981', '#059669']} style={styles.modalActionGradient}>
-                        {forgotLoading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.modalActionText}>{t('verify_code')}</Text>}
+                        {forgotLoading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.modalActionText}>{t('verify_code') || 'Xác nhận mã'}</Text>}
                       </LinearGradient>
                     </TouchableOpacity>
                   </View>
@@ -418,22 +424,22 @@ export default function LoginScreen() {
                 {forgotStep === 3 && (
                   <View style={{ flex: 1, justifyContent: 'space-between' }}>
                     <View style={styles.modalBody}>
-                      <Text style={styles.modalDesc}>{t('new_password_desc')}</Text>
+                      <Text style={styles.modalDesc} numberOfLines={1} adjustsFontSizeToFit>{t('new_password_desc') || 'Tạo mật khẩu mới cho tài khoản của bạn'}</Text>
                       {modalError ? <Text style={styles.modalErrorText}>{modalError}</Text> : null}
                       <View style={styles.modalInputWrapper}>
-                        <Ionicons name="lock-closed-outline" size={ms(20)} color="#94A3B8" />
+                        <Ionicons name="lock-closed-outline" size={ms(20)} color="#000" />
                         <TextInput
                           style={styles.modalInput}
-                          placeholder={t('new_password')}
+                          placeholder={t('new_password') || 'Mật khẩu mới'}
                           value={newPassword}
                           onChangeText={(txt) => { setNewPassword(txt); setModalError(''); }}
                           secureTextEntry
                         />
                       </View>
                     </View>
-                    <TouchableOpacity style={styles.modalActionBtn} onPress={handleResetPassword}>
+                    <TouchableOpacity style={styles.modalActionBtn} onPress={handleResetPassword} disabled={forgotLoading}>
                       <LinearGradient colors={['#10B981', '#059669']} style={styles.modalActionGradient}>
-                        <Text style={styles.modalActionText}>{t('save').toUpperCase()}</Text>
+                        {forgotLoading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.modalActionText}>{t('save').toUpperCase()}</Text>}
                       </LinearGradient>
                     </TouchableOpacity>
                   </View>

@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/utils/firebaseConfig';
 import { ms, s, SCREEN_WIDTH, vs } from '@/utils/responsive';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -120,7 +120,12 @@ export default function HomeScreen() {
     return getFallbackImage(category, docId || item.id);
   };
 
-  const loadFeaturedData = (forceRandom = false) => {
+  const [allDestinations, setAllDestinations] = useState<any[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Subscribe to raw destinations once
+  useEffect(() => {
+    if (authLoading) return;
     setIsLoading(true);
     const q = query(collection(db, 'destinations'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -147,77 +152,86 @@ export default function HomeScreen() {
           }
         };
       });
-      // Sort everything by newest first
-      const sortedByNewest = [...allItems].sort((a, b) => {
-        const dateA = a.createdAt?.seconds || (a.createdAt instanceof Date ? a.createdAt.getTime() / 1000 : 0);
-        const dateB = b.createdAt?.seconds || (b.createdAt instanceof Date ? b.createdAt.getTime() / 1000 : 0);
-        return dateB - dateA;
-      });
-
-      const pagodas = sortedByNewest.filter(i => i.category === 'Chùa');
-      const cultures = sortedByNewest.filter(i => i.category === 'Văn hóa');
-      const foods = sortedByNewest.filter(i => i.category === 'Ẩm thực');
-
-      let featured: any[] = [];
-      const userInterests: string[] = user?.interests || [];
-
-      if (userInterests.length > 0 && !forceRandom) {
-        // Lấy tất cả các mục thuộc các danh mục mà người dùng quan tâm
-        const itemsInInterests = sortedByNewest.filter(i => userInterests.includes(i.category));
-
-        if (itemsInInterests.length > 0) {
-          // Trộn ngẫu nhiên các mục này để tạo sự đa dạng
-          const shuffled = [...itemsInInterests].sort(() => Math.random() - 0.5);
-          featured = shuffled.slice(0, 3);
-        }
-
-        // Nếu vẫn chưa đủ 3 mục (do danh mục quan tâm ít dữ liệu), bù thêm từ các danh mục khác
-        if (featured.length < 3) {
-          const others = sortedByNewest.filter(i => !featured.find(f => f.id === i.id));
-          featured.push(...others.slice(0, 3 - featured.length));
-        }
-      } else {
-        // Default: 3 newest items from DIFFERENT categories if possible
-        const newestPagoda = pagodas[0];
-        const newestCulture = cultures[0];
-        const newestFood = foods[0];
-
-        if (newestPagoda) featured.push(newestPagoda);
-        if (newestCulture) featured.push(newestCulture);
-        if (newestFood) featured.push(newestFood);
-
-        // If still less than 3, just take newest from any
-        if (featured.length < 3) {
-          const remaining = sortedByNewest.filter(i => !featured.find(f => f.id === i.id));
-          featured.push(...remaining.slice(0, 3 - featured.length));
-        }
-      }
-
-      // Final unique & limit
-      featured = featured.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i).slice(0, 3);
-
-      setFeaturedDestinations(featured);
+      setAllDestinations(allItems);
       setIsLoading(false);
-      setRefreshing(false);
     }, (error) => {
       console.error("Firestore Error in loadFeaturedData:", error);
       setIsLoading(false);
-      setRefreshing(false);
     });
-    return unsubscribe;
-  };
-
-  useEffect(() => {
-    if (authLoading) return;
-    const unsubscribe = loadFeaturedData();
     return () => unsubscribe();
-  }, [language, t, authLoading, user?.uid, JSON.stringify(user?.interests)]);
+  }, [authLoading]);
+
+  // Compute suggestions based on state and inputs
+  useEffect(() => {
+    if (allDestinations.length === 0) return;
+
+    // Sort everything by newest first
+    const sortedByNewest = [...allDestinations].sort((a, b) => {
+      const dateA = a.createdAt?.seconds || (a.createdAt instanceof Date ? a.createdAt.getTime() / 1000 : 0);
+      const dateB = b.createdAt?.seconds || (b.createdAt instanceof Date ? b.createdAt.getTime() / 1000 : 0);
+      return dateB - dateA;
+    });
+
+    const pagodas = sortedByNewest.filter(i => i.category === 'Chùa');
+    const cultures = sortedByNewest.filter(i => i.category === 'Văn hóa');
+    const foods = sortedByNewest.filter(i => i.category === 'Ẩm thực');
+
+    let featured: any[] = [];
+    const userInterests: string[] = user?.interests || [];
+
+    // If refreshKey > 0, we force random shuffling to give new recommendations upon refreshing
+    if (userInterests.length > 0 && refreshKey === 0) {
+      // Lấy tất cả các mục thuộc các danh mục mà người dùng quan tâm
+      const itemsInInterests = sortedByNewest.filter(i => userInterests.includes(i.category));
+
+      if (itemsInInterests.length > 0) {
+        // Trộn ngẫu nhiên các mục này để tạo sự đa dạng
+        const shuffled = [...itemsInInterests].sort(() => Math.random() - 0.5);
+        featured = shuffled.slice(0, 3);
+      }
+
+      // Nếu vẫn chưa đủ 3 mục (do danh mục quan tâm ít dữ liệu), bù thêm từ các danh mục khác
+      if (featured.length < 3) {
+        const others = sortedByNewest.filter(i => !featured.find(f => f.id === i.id));
+        featured.push(...others.slice(0, 3 - featured.length));
+      }
+    } else {
+      // Shuffled newest selections
+      const shuffledPagodas = [...pagodas].sort(() => Math.random() - 0.5);
+      const shuffledCultures = [...cultures].sort(() => Math.random() - 0.5);
+      const shuffledFoods = [...foods].sort(() => Math.random() - 0.5);
+
+      const newestPagoda = shuffledPagodas[0] || pagodas[0];
+      const newestCulture = shuffledCultures[0] || cultures[0];
+      const newestFood = shuffledFoods[0] || foods[0];
+
+      if (newestPagoda) featured.push(newestPagoda);
+      if (newestCulture) featured.push(newestCulture);
+      if (newestFood) featured.push(newestFood);
+
+      // If still less than 3, just take newest from remaining in random order
+      if (featured.length < 3) {
+        const remaining = sortedByNewest.filter(i => !featured.find(f => f.id === i.id));
+        const shuffledRemaining = remaining.sort(() => Math.random() - 0.5);
+        featured.push(...shuffledRemaining.slice(0, 3 - featured.length));
+      }
+    }
+
+    // Final unique & limit
+    featured = featured.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i).slice(0, 3);
+    setFeaturedDestinations(featured);
+  }, [allDestinations, user?.interests, refreshKey, language]);
 
   const onRefresh = React.useCallback(() => {
     if (refreshing) return;
     setRefreshing(true);
-    loadFeaturedData(true); // Force random pick on refresh
-  }, [language, t, refreshing]);
+    setRefreshKey(prev => prev + 1);
+
+    // Simulate refresh loader spinning to prevent synchronous batching of false state
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 850);
+  }, [refreshing]);
 
   useEffect(() => {
     if (unreadCount > 0) {
@@ -392,7 +406,18 @@ export default function HomeScreen() {
               <ThemedText style={styles.userName} numberOfLines={1} adjustsFontSizeToFit>{user?.name || t('guest')}</ThemedText>
             </View>
           </View>
-          {user?.role !== 'Quản trị viên' && (
+          <View style={styles.headerRightActions}>
+            {user?.role === 'Quản trị viên' && (
+              <TouchableOpacity
+                style={styles.notificationBtnSimple}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  router.replace('/(admin)');
+                }}
+              >
+                <MaterialCommunityIcons name="shield-account-outline" size={27} color="#000" />
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               style={styles.notificationBtnSimple}
               onPress={() => {
@@ -410,7 +435,7 @@ export default function HomeScreen() {
                 )}
               </Animated.View>
             </TouchableOpacity>
-          )}
+          </View>
         </View>
       </View>
 
@@ -459,7 +484,7 @@ export default function HomeScreen() {
                     transition={200}
                     contentFit="contain"
                   />
-                  <ThemedText style={styles.serviceLabelMini} numberOfLines={2} adjustsFontSizeToFit>{item.label}</ThemedText>
+                  <ThemedText style={styles.serviceLabelMini} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.3}>{item.label}</ThemedText>
                 </TouchableOpacity>
               </View>
             ))}
@@ -508,7 +533,7 @@ export default function HomeScreen() {
 
                 <View style={styles.cardContent}>
                   <View style={styles.cardHeaderRow}>
-                    <ThemedText style={styles.cardTitle} numberOfLines={1}>
+                    <ThemedText style={styles.cardTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.3}>
                       {language === 'km' ? (item.name_khmer || item.name || item.title) : (item.name || item.title)}
                     </ThemedText>
                   </View>
@@ -611,38 +636,47 @@ export default function HomeScreen() {
                       }
                     }}
                   >
-                    {!item.isRead && <View style={styles.unreadIndicator} />}
-                    <View style={[
-                      styles.nIcon,
-                      { backgroundColor: !item.isRead ? '#FEE2E2' : '#F0FDF4' }
-                    ]}>
-                      <Animated.View style={!item.isRead ? animatedBellStyle : null}>
-                        <Ionicons
-                          name={!item.isRead ? 'notifications' : 'notifications-outline'}
-                          size={20}
-                          color={!item.isRead ? '#EF4444' : '#10B981'}
-                        />
-                      </Animated.View>
-                      {!item.isRead && <View style={styles.unreadDot} />}
-                    </View>
+                    <TouchableOpacity
+                      style={[
+                        styles.nIcon,
+                        { backgroundColor: deletingId === item.id ? '#FEE2E2' : (!item.isRead ? '#FEE2E2' : '#F0FDF4') }
+                      ]}
+                      onPress={() => {
+                        if (deletingId === item.id) {
+                          deleteNotification(item.id);
+                        }
+                      }}
+                    >
+                      {deletingId === item.id ? (
+                        <Ionicons name="close" size={24} color="#EF4444" />
+                      ) : (
+                        <Animated.View style={!item.isRead ? animatedBellStyle : null}>
+                          <Ionicons
+                            name={!item.isRead ? 'notifications' : 'notifications-outline'}
+                            size={18}
+                            color={!item.isRead ? '#EF4444' : '#10B981'}
+                          />
+                        </Animated.View>
+                      )}
+                    </TouchableOpacity>
                     <View style={styles.nContent}>
                       <View style={{ flex: 1, marginRight: s(10) }}>
-                        <Text style={styles.nItemTitle} numberOfLines={3}>
-                          {item.type !== 'achievement' && item.fromUserName ? (
-                            <Text style={{ fontWeight: '400', color: '#EF4444' }}>{item.fromUserName} </Text>
-                          ) : null}
-                          {t(item.message)}
-                        </Text>
-                      </View>
-                      <View style={styles.nItemFooter}>
-                        {deletingId === item.id && (
-                          <TouchableOpacity
-                            onPress={() => deleteNotification(item.id)}
-                            style={styles.deleteBtn}
-                          >
-                            <Ionicons name="close-circle" size={ms(24)} color="#FF3B30" />
-                          </TouchableOpacity>
-                        )}
+                        <View style={{ flexDirection: 'column' }}>
+                          {item.type !== 'achievement' && item.fromUserName && (
+                            <Text style={[styles.nItemTitle, { color: '#EF4444', fontWeight: 'bold', fontSize: ms(15) }]} numberOfLines={1}>
+                              {item.fromUserName}
+                            </Text>
+                          )}
+                          {(() => {
+                            const messageStr = t(item.message);
+                            const action = messageStr.includes(': ') ? messageStr.split(': ')[0] : messageStr;
+                            return (
+                              <Text style={[styles.nItemTitle, { marginTop: vs(1), fontSize: ms(15) }]}>
+                                {action}
+                              </Text>
+                            );
+                          })()}
+                        </View>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -723,6 +757,10 @@ const styles = RNStyleSheet.create({
     fontSize: ms(20),
     fontWeight: '400',
     color: '#1E293B',
+  },
+  headerRightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   notificationBtnSimple: {
     width: s(52),
@@ -940,6 +978,7 @@ const styles = RNStyleSheet.create({
   },
   nItem: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: s(15),
     marginBottom: vs(20),
     paddingBottom: vs(15),
@@ -973,16 +1012,6 @@ const styles = RNStyleSheet.create({
     color: '#000000ff',
     fontWeight: '500',
   },
-  unreadIndicator: {
-    position: 'absolute',
-    left: 0,
-    top: '25%',
-    bottom: '25%',
-    width: s(4),
-    backgroundColor: '#3b82f6',
-    borderTopRightRadius: s(4),
-    borderBottomRightRadius: s(4),
-  },
   unreadDot: {
     position: 'absolute',
     top: -s(2),
@@ -995,22 +1024,22 @@ const styles = RNStyleSheet.create({
     borderColor: '#FFF',
   },
   nIcon: {
-    width: s(45),
-    height: s(43),
+    width: s(34),
+    height: s(34),
     borderRadius: s(10),
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
+    marginRight: s(-6),
   },
   nContent: {
     flex: 1,
   },
   nItemTitle: {
-    fontSize: ms(14),
+    fontSize: ms(15),
     fontWeight: '400',
     color: '#1e293b',
-    lineHeight: vs(20),
-    marginBottom: vs(2),
+    lineHeight: vs(21),
+    marginBottom: vs(4),
   },
   nItemTime: {
     fontSize: ms(11),

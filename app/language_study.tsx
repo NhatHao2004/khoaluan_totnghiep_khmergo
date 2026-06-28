@@ -182,8 +182,8 @@ export default function LanguageStudyScreen() {
             <Ionicons name="arrow-back" size={28} color="#000000" />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
-            <ThemedText style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
-              {t('language_study')}
+            <ThemedText style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.3}>
+              {t('language_study').replace('\n', ' ')}
             </ThemedText>
           </View>
           <View style={{ width: 40 }} />
@@ -197,7 +197,7 @@ export default function LanguageStudyScreen() {
               onPress={() => setActiveTab('topics')}
             >
               <ThemedText style={[styles.tabText, activeTab === 'topics' && styles.activeTabText]} adjustsFontSizeToFit numberOfLines={1} minimumFontScale={0.8}>
-                {t('learn_by_topic')}
+                {t('learn_by_topic').replace('\n', ' ')}
               </ThemedText>
             </TouchableOpacity>
 
@@ -206,7 +206,7 @@ export default function LanguageStudyScreen() {
               onPress={() => setActiveTab('translator')}
             >
               <ThemedText style={[styles.tabText, activeTab === 'translator' && styles.activeTabText]} adjustsFontSizeToFit numberOfLines={1} minimumFontScale={0.8}>
-                {t('vocab_translation')}
+                {t('vocab_translation').replace('\n', ' ')}
               </ThemedText>
             </TouchableOpacity>
           </View>
@@ -250,7 +250,7 @@ export default function LanguageStudyScreen() {
                     <View style={styles.categoryCardBody}>
                       <View style={styles.cardInfoRow}>
                         <View style={styles.textContainer}>
-                          <ThemedText style={styles.categoryCardTitle} adjustsFontSizeToFit numberOfLines={1} minimumFontScale={0.4}>
+                          <ThemedText style={styles.categoryCardTitle} adjustsFontSizeToFit numberOfLines={1} minimumFontScale={0.3}>
                             {isKm && category.titleKm ? category.titleKm : t(category.title)}
                           </ThemedText>
                         </View>

@@ -23,6 +23,7 @@ import {
   View
 } from 'react-native';
 import Animated, {
+  FadeInDown,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
@@ -295,7 +296,7 @@ export default function RegisterScreen() {
                       activeOpacity={0.8}
                     >
                       <Text style={[styles.interestCardTextBig, { color: isSelected ? '#1E293B' : '#64748B' }]} numberOfLines={1} adjustsFontSizeToFit>
-                        {item.label}
+                        {item.label.replace('\n', ' ')}
                       </Text>
                       <Image
                         source={item.img}
@@ -333,7 +334,7 @@ export default function RegisterScreen() {
                           transition={300}
                         />
                         <Text style={[styles.interestCardTextSmall, { color: isSelected ? '#1E293B' : '#64748B' }]} numberOfLines={1} adjustsFontSizeToFit>
-                          {item.label}
+                          {item.label.replace('\n', ' ')}
                         </Text>
                       </View>
                     </TouchableOpacity>
@@ -416,7 +417,7 @@ const styles = StyleSheet.create({
   addBtnSmall: { position: 'absolute', bottom: 0, right: 0, width: s(28), height: s(28), borderRadius: s(14), backgroundColor: '#10B981', justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: '#FFF' },
   avatarHint: { marginTop: vs(10), fontSize: ms(13), color: '#94A3B8', fontWeight: '400' },
 
-  form: { gap: vs(18), marginBottom: vs(25) },
+  form: { gap: vs(18), marginBottom: vs(12) },
   inputGroup: { gap: vs(8) },
   inputLabel: { fontSize: ms(14), fontWeight: '400', color: '#475569', marginLeft: s(4) },
   inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8FAFC', borderRadius: s(16), paddingHorizontal: s(16), height: vs(56), borderWidth: 1, borderColor: '#F1F5F9' },

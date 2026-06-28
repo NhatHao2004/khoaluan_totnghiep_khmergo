@@ -242,7 +242,7 @@ export default function VocabQuizScreen() {
                         </TouchableOpacity>
 
                         <View style={styles.headerTitleContainer}>
-                            <Text style={styles.headerTitle} adjustsFontSizeToFit numberOfLines={1}>
+                            <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.3}>
                                 {t('vocab_quiz')}
                             </Text>
                         </View>
@@ -277,7 +277,7 @@ export default function VocabQuizScreen() {
 
                                     {/* Content */}
                                     <View style={styles.categoryCardBody}>
-                                        <Text style={styles.categoryCardTitle} adjustsFontSizeToFit numberOfLines={1}>
+                                        <Text style={styles.categoryCardTitle} adjustsFontSizeToFit numberOfLines={1} minimumFontScale={0.3}>
                                             {isKm && category.titleKm ? category.titleKm : t(category.title)}
                                         </Text>
                                         <Text style={styles.categoryCardSub} adjustsFontSizeToFit numberOfLines={1}>{Math.min(10, category.words?.length || 0)} {t('vocab_challenge_questions')}</Text>

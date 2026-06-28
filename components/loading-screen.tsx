@@ -1,19 +1,20 @@
 import { useEffect, useRef } from 'react';
-import { Animated, Dimensions, Image, StyleSheet, View } from 'react-native';
+import { Animated, Dimensions, Image, StyleSheet, View, Text } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { s, vs, ms } from '@/utils/responsive';
 
 const { width } = Dimensions.get('window');
 
-export function LoadingScreen({ onFinish }: { onFinish?: () => void }) {
+export function LoadingScreen({ onFinish, onReady }: { onFinish?: () => void, onReady?: () => void }) {
   const { t } = useLanguage();
   // Sử dụng Animated chuẩn của React Native
   const progress = useRef(new Animated.Value(0)).current;
 
+  // Signal that we are ready and start progress
   useEffect(() => {
+    if (onReady) onReady();
+
     // Chỉ giữ lại Animation cho thanh tiến trình
     Animated.timing(progress, {
       toValue: 1,
@@ -23,7 +24,7 @@ export function LoadingScreen({ onFinish }: { onFinish?: () => void }) {
       // Khi thanh chạy đầy (4000ms), gọi hàm onFinish để chuyển trang ngay
       if (onFinish) onFinish();
     });
-  }, [onFinish]);
+  }, []); // Remove onFinish from dependencies to only run once on mount
 
   const barWidth = s(width * 0.8 / (width / 393)); // Adjusted logic or just use s(330)
   // Actually, barWidth in original was width * 0.85. 
@@ -31,7 +32,7 @@ export function LoadingScreen({ onFinish }: { onFinish?: () => void }) {
   const responsiveBarWidth = s(320); 
 
   return (
-    <ThemedView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.centerContent}>
         <View style={styles.logoContainer}>
           <Image
@@ -41,16 +42,16 @@ export function LoadingScreen({ onFinish }: { onFinish?: () => void }) {
           />
         </View>
 
-        <ThemedText style={styles.title}>
+        <Text style={styles.title}>
           KhmerGo
-        </ThemedText>
-        <ThemedText 
+        </Text>
+        <Text 
           style={styles.subtitle}
           numberOfLines={1}
           adjustsFontSizeToFit
         >
           {t('loading_preparing')}
-        </ThemedText>
+        </Text>
       </View>
 
       <View style={styles.bottomContent}>
@@ -67,20 +68,20 @@ export function LoadingScreen({ onFinish }: { onFinish?: () => void }) {
             ]}
           />
         </View>
-        <ThemedText style={styles.loadingText}>
+        <Text style={styles.loadingText}>
           {t('loading_text')}
-        </ThemedText>
+        </Text>
       </View>
-    </ThemedView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    justifyContent: 'space-between',
     paddingVertical: vs(80),
+    flex: 1,
+    backgroundColor: '#FFFFFF', // Đổi sang màu trắng cố định
+    justifyContent: 'space-between',
   },
   centerContent: {
     flex: 1,
@@ -89,26 +90,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: s(20),
   },
   logoContainer: {
-    marginBottom: vs(5),
+    marginBottom: vs(20), // Tăng khoảng cách một chút khi không có nền
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   logo: {
-    width: s(250),
-    height: vs(180),
+    width: s(180),
+    height: s(180),
   },
   title: {
     fontSize: ms(42),
-    fontWeight: '400',
-    color: '#000',
+    fontWeight: '700',
+    color: '#000000', // Chuyển sang màu đen
     marginBottom: vs(8),
-    includeFontPadding: false,
-    lineHeight: ms(52),
     textAlign: 'center',
   },
   subtitle: {
     fontSize: ms(16),
-    color: '#666',
+    color: '#000000', // Chuyển sang màu đen
     fontWeight: '400',
-    includeFontPadding: false,
     textAlign: 'center',
   },
   bottomContent: {
@@ -118,18 +118,18 @@ const styles = StyleSheet.create({
   progressBarContainer: {
     width: s(320),
     height: vs(6),
-    backgroundColor: '#f0f0f0',
+    backgroundColor: 'rgba(0, 0, 0, 0.1)', // Đổi sang màu nền xám nhẹ
     borderRadius: vs(3),
     overflow: 'hidden',
     marginBottom: vs(15),
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#FFCC00',
+    backgroundColor: '#FFCC00', // Đảm bảo màu vàng
   },
   loadingText: {
     fontSize: ms(14),
-    color: '#999',
+    color: '#000000', // Chuyển sang màu đen
     fontWeight: '400',
   },
 });

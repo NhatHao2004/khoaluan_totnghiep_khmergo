@@ -111,8 +111,12 @@ export default function PagodaScreen() {
   };
 
 
-  // Sắp xếp theo ID (pagoda_1 → pagoda_2 → ... → pagoda_5)
-  const filteredPagodas = [...temples];
+  // Sắp xếp theo bảng chữ cái abc
+  const filteredPagodas = [...temples].sort((a, b) => {
+    const nameA = (isKm ? (a.name_khmer || a.name) : a.name) || '';
+    const nameB = (isKm ? (b.name_khmer || b.name) : b.name) || '';
+    return nameA.localeCompare(nameB, isKm ? 'km' : 'vi');
+  });
 
   return (
     <View style={styles.container}>
@@ -126,7 +130,7 @@ export default function PagodaScreen() {
         </TouchableOpacity>
 
         <View style={styles.headerTitleContainer}>
-          <ThemedText style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>{t('temple').replace('\n', '')}</ThemedText>
+          <ThemedText style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>{t('temple').replace('\n', ' ')}</ThemedText>
         </View>
 
         {/* Empty view to balance the header (matching backBtn width) */}

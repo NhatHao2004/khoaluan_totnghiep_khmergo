@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword, verifyBeforeUpdateEmail } from 'firebase/auth';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
@@ -35,6 +35,7 @@ const AdminProfile = () => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [avatar, setAvatar] = useState('');
+  const [email, setEmail] = useState('');
 
   // Change Password States
   const [changePassModalVisible, setChangePassModalVisible] = useState(false);
@@ -85,6 +86,7 @@ const AdminProfile = () => {
         setName(data.name || data['tên'] || '');
         setPhone(data.phone || data['số điện thoại'] || '');
         setAvatar(data.avatar || '');
+        setEmail(user.email || '');
       }
     } catch (error) {
       console.error(error);
@@ -98,15 +100,34 @@ const AdminProfile = () => {
     try {
       setLoading(true);
       const docRef = doc(db, 'users', user.uid);
+      
+      // Update Auth Email if changed
+      const currentUser = auth.currentUser;
+      if (currentUser && email !== currentUser.email) {
+        try {
+          await verifyBeforeUpdateEmail(currentUser, email);
+          triggerToast('Vui lòng kiểm tra email mới để xác nhận thay đổi', 'info');
+        } catch (authError: any) {
+          if (authError.code === 'auth/requires-recent-login') {
+            triggerToast('Vui lòng đăng nhập lại để thay đổi email bảo mật', 'error');
+            setLoading(false);
+            return;
+          }
+          throw authError;
+        }
+      }
+
       await updateDoc(docRef, {
         name: name,
         phone: phone,
         avatar: avatar,
+        email: email,
         updatedAt: new Date(),
       });
       setIsEditing(false);
       triggerToast('Đã cập nhật hồ sơ cá nhân', 'success');
     } catch (error) {
+      console.error(error);
       triggerToast('Không thể cập nhật hồ sơ', 'error');
     } finally {
       setLoading(false);
@@ -287,7 +308,18 @@ const AdminProfile = () => {
               </View>
               <View style={styles.detailContent}>
                 <Text style={styles.detailLabel}>Email</Text>
-                <Text style={styles.detailValue}>{user?.email}</Text>
+                {isEditing ? (
+                  <TextInput
+                    style={styles.valueInput}
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholder="Nhập email..."
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                ) : (
+                  <Text style={styles.detailValue}>{email}</Text>
+                )}
               </View>
             </View>
 

@@ -178,7 +178,7 @@ export default function SupportScreen() {
         <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={28} color="#1A1A1A" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>{t('support_feedback')}</Text>
+        <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.3}>{t('support_feedback')}</Text>
         <View style={{ width: 25 }} />
       </View>
 

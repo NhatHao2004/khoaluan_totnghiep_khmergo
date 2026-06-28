@@ -160,7 +160,7 @@ export default function TranslatorScreen() {
             <Ionicons name="arrow-back" size={28} color="#000000ff" />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
-            <ThemedText style={styles.headerTitle} numberOfLines={1}>
+            <ThemedText style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.3}>
               {t('vocab_translation')}
             </ThemedText>
           </View>

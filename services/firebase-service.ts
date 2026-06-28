@@ -6,6 +6,7 @@ export interface UserProfile {
   name: string;
   points: number;
   avatar?: string | null;
+  role?: string;
 }
 
 export interface Temple {
@@ -92,6 +93,7 @@ export const getLeaderboardUsers = async (count: number = 20): Promise<UserProfi
         name: data.name || data['tên'] || 'Anonymous',
         points: data.points ?? 0,
         avatar: data.avatar || data['hình đại diện'] || null,
+        role: data.role || data['quyền'] || 'User',
       });
     });
     

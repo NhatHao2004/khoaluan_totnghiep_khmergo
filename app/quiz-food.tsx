@@ -73,7 +73,7 @@ export default function QuizFoodSelectScreen() {
           <Ionicons name="arrow-back" size={28} color="#000000" />
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
-          <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
+          <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.3}>
             {isKm ? 'ម្ហូបខ្ mែរ' : 'Ẩm thực Khmer'}
           </Text>
         </View>

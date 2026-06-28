@@ -84,7 +84,7 @@ export default function QuizCultureSelectScreen() {
           <Ionicons name="arrow-back" size={28} color="#000000" />
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
-          <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
+          <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.3}>
             {isKm ? 'វប្បធម៌ខ្មែរ' : 'Văn hóa Khmer'}
           </Text>
         </View>

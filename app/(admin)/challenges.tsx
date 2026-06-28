@@ -315,8 +315,8 @@ const ChallengeManagement = () => {
   const deleteQuestion = useCallback((quizId: string, question: any) => {
     showConfirm(
       'Xóa câu hỏi',
-      'Câu hỏi này sẽ bị xóa vĩnh viễn khỏi bộ thử thách.',
-      'help-circle-outline', '#f59e0b',
+      'Câu hỏi này sẽ bị xóa khỏi bộ thử thách',
+      'trash-outline', '#ef4444',
       async () => {
         hideConfirm();
         await updateDoc(doc(db, 'quizzes', quizId), {
@@ -378,27 +378,8 @@ const ChallengeManagement = () => {
             setQuizModalVisible(true);
           }}
         >
-          <Ionicons name="add" size={ms(30)} color="#3b82f6" />
+          <Ionicons name="add" size={ms(30)} color="#0062ffff" />
         </TouchableOpacity>
-      </View>
-
-      {/* Search Bar */}
-      <View style={styles.searchSection}>
-        <View style={styles.searchBar}>
-          <Ionicons name="search" size={ms(20)} color="#94a3b8" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Tìm kiếm bộ thử thách..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholderTextColor="#94a3b8"
-          />
-          {searchQuery !== '' && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={ms(18)} color="#94a3b8" />
-            </TouchableOpacity>
-          )}
-        </View>
       </View>
 
       {/* Tabs */}
@@ -557,7 +538,6 @@ const ChallengeManagement = () => {
                         onPress={() => {
                           setQPagodaId(d.id);
                           if (!qTitle) setQTitle(d.name);
-                          if (!qTitleKm) setQTitleKm(d.name_khmer);
                         }}
                       >
                         <Text style={[styles.destChipText, qPagodaId === d.id && styles.activeDestChipText]}>{d.name}</Text>
@@ -568,7 +548,7 @@ const ChallengeManagement = () => {
 
               {!destinations.some(d => d.id === qPagodaId) && (
                 <TextInput
-                  style={[styles.input, { marginTop: vs(-5) }]}
+                  style={[styles.input, { marginTop: vs(10) }]}
                   value={qPagodaId}
                   onChangeText={setQPagodaId}
                   placeholder="Nhập ID nội dung thủ công..."

@@ -31,7 +31,7 @@ type MenuItem = {
 const menuItems: MenuItem[] = [
   { id: 'personal-info', titleKey: 'edit_profile', icon: 'person-outline' },
   { id: 'favorites', titleKey: 'favorites', icon: 'heart-outline' },
-  { id: 'medal', titleKey: 'achievements', icon: 'ribbon-outline' },
+  { id: 'medal', titleKey: 'medal', icon: 'ribbon-outline' },
   { id: 'support', titleKey: 'support_feedback', icon: 'chatbox-ellipses-outline' },
   { id: 'settings', titleKey: 'settings', icon: 'settings-outline' },
   { id: 'login', titleKey: 'login', icon: 'power-outline', color: '#0022ffff' },

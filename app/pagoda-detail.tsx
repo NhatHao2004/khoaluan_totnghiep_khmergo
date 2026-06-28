@@ -37,6 +37,7 @@ export default function PagodaDetailScreen() {
   const [activeTab, setActiveTab] = useState<'map' | 'quiz'>('map');
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [prefetchedQuiz, setPrefetchedQuiz] = useState<any>(null);
 
   // Fetch destination data
   useEffect(() => {
@@ -74,6 +75,22 @@ export default function PagodaDetailScreen() {
     });
     return () => unsubFav();
   }, [id, user?.uid]);
+  
+  // Prefetch quiz data when tab is switched to quiz
+  useEffect(() => {
+    if (activeTab === 'quiz' && id && !prefetchedQuiz) {
+      const fetchQuiz = async () => {
+        try {
+          const { getQuizData } = require('@/services/firebase-service');
+          const data = await getQuizData(id);
+          if (data) setPrefetchedQuiz(data);
+        } catch (e) {
+          console.log("Prefetch quiz error:", e);
+        }
+      };
+      fetchQuiz();
+    }
+  }, [activeTab, id, prefetchedQuiz]);
 
   const name = isKm ? (templeData?.name_khmer || templeData?.name || initialName) : (templeData?.name || initialName);
   const location = isKm ? (templeData?.location_khmer || templeData?.location || initialLocation) : (templeData?.location || initialLocation);
@@ -210,11 +227,9 @@ export default function PagodaDetailScreen() {
               <Ionicons name="arrow-back" size={24} color="#000" />
             </TouchableOpacity>
             <View style={{ flexDirection: 'row', gap: s(12) }}>
-              {user?.role !== 'Quản trị viên' && (
-                <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
-                  <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={ms(22)} color={isFavorite ? "#FF4B4B" : "#000"} />
-                </TouchableOpacity>
-              )}
+              <TouchableOpacity onPress={handleToggleFavorite} style={styles.iconBtn}>
+                <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={ms(22)} color={isFavorite ? "#FF4B4B" : "#000"} />
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -261,17 +276,15 @@ export default function PagodaDetailScreen() {
                 <Text style={[styles.tabBtnText, activeTab === 'map' && styles.tabBtnTextActive]} numberOfLines={1} adjustsFontSizeToFit>{t('map_location')}</Text>
               </TouchableOpacity>
 
-              {user?.role !== 'Quản trị viên' && (
-                <TouchableOpacity
-                  onPress={() => setActiveTab('quiz')}
-                  style={[
-                    styles.tabBtn,
-                    activeTab === 'quiz' && { backgroundColor: '#FF6B2C', borderColor: '#FF6B2C' }
-                  ]}
-                >
-                  <Text style={[styles.tabBtnText, activeTab === 'quiz' && styles.tabBtnTextActive]} numberOfLines={1} adjustsFontSizeToFit>{isKm ? 'ការប្រកួត' : 'THỬ THÁCH'}</Text>
-                </TouchableOpacity>
-              )}
+              <TouchableOpacity
+                onPress={() => setActiveTab('quiz')}
+                style={[
+                  styles.tabBtn,
+                  activeTab === 'quiz' && { backgroundColor: '#FF6B2C', borderColor: '#FF6B2C' }
+                ]}
+              >
+                <Text style={[styles.tabBtnText, activeTab === 'quiz' && styles.tabBtnTextActive]} numberOfLines={1} adjustsFontSizeToFit>{isKm ? 'ការប្រកួត' : 'THỬ THÁCH'}</Text>
+              </TouchableOpacity>
             </View>
 
             {activeTab === 'map' ? (
@@ -326,7 +339,8 @@ export default function PagodaDetailScreen() {
                       params: {
                         pagodaId: id,
                         imageUrl: imageUrl,
-                        pagodaLocation: location
+                        pagodaLocation: location,
+                        preFetchedData: prefetchedQuiz ? JSON.stringify(prefetchedQuiz) : undefined
                       }
                     });
                   }}

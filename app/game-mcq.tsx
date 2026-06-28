@@ -27,13 +27,29 @@ type AnswerState = 'idle' | 'correct' | 'wrong';
 
 export default function GameMCQScreen() {
   const router = useRouter();
-  const { pagodaId, imageUrl, pagodaLocation } = useLocalSearchParams<{ pagodaId: string; imageUrl?: string; pagodaLocation?: string }>();
+  const { pagodaId, imageUrl, pagodaLocation, preFetchedData } = useLocalSearchParams<{ 
+    pagodaId: string; 
+    imageUrl?: string; 
+    pagodaLocation?: string;
+    preFetchedData?: string;
+  }>();
+
   const { user, refreshUser } = useAuth();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const isKm = language === 'km';
 
-  const [quizData, setQuizData] = useState<PagodaQuizData | null>(null);
-  const [dataLoading, setDataLoading] = useState(true);
+  const [quizData, setQuizData] = useState<PagodaQuizData | null>(() => {
+    if (preFetchedData) {
+      try {
+        const parsed = JSON.parse(preFetchedData);
+        if (parsed && parsed.questions) return parsed;
+      } catch (e) {
+        console.error("Error parsing preFetchedData in state init:", e);
+      }
+    }
+    return null;
+  });
+  const [dataLoading, setDataLoading] = useState(!quizData);
   const [phase, setPhase] = useState<Phase>('question');
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -60,6 +76,21 @@ export default function GameMCQScreen() {
   // Fetch Dynamic Quiz Data
   useEffect(() => {
     const loadQuiz = async () => {
+      // 1. Try to use pre-fetched data from navigation
+      if (preFetchedData) {
+        try {
+          const parsed = JSON.parse(preFetchedData);
+          if (parsed && parsed.questions) {
+            setQuizData(parsed);
+            setDataLoading(false);
+            return;
+          }
+        } catch (e) {
+          console.error("Error parsing preFetchedData:", e);
+        }
+      }
+
+      // 2. Otherwise fetch from Firestore
       try {
         const firestoreData = await getQuizData(pagodaId as string);
         if (firestoreData) {
@@ -78,7 +109,7 @@ export default function GameMCQScreen() {
       }
     };
     loadQuiz();
-  }, [pagodaId]);
+  }, [pagodaId, preFetchedData]);
 
   const heroImage = useMemo(() => {
     // 1. Prioritize dynamic imageUrl from navigation (Firestore Destinations)
@@ -175,12 +206,6 @@ export default function GameMCQScreen() {
     setPhase('result');
 
     if (user && earnedTotal > 0) {
-      // Nếu là Admin, không lưu điểm vào CSDL
-      if (user.role === 'Quản trị viên') {
-        setHasSaved(true); // Đánh dấu hoàn tất để hiện kết quả
-        return;
-      }
-
       setIsSaving(true);
       setHasSaved(false);
       try {
@@ -243,7 +268,7 @@ export default function GameMCQScreen() {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator size="large" color="#FF6B2C" />
-        <Text style={{ marginTop: vs(12), color: '#64748B' }}>Đang tải câu hỏi...</Text>
+        <Text style={{ marginTop: vs(12), color: '#64748B' }}>{t('loading_questions')}</Text>
       </View>
     );
   }
@@ -256,23 +281,23 @@ export default function GameMCQScreen() {
         <View style={styles.guestIconCircle}>
           <Ionicons name="lock-closed" size={ms(50)} color="#3B82F6" />
         </View>
-        <Text style={styles.guestTitle}>Yêu cầu đăng nhập</Text>
+        <Text style={styles.guestTitle}>{t('login_required')}</Text>
         <Text style={styles.guestSub}>
-          Bạn cần đăng nhập để tham gia thử thách,{'\n'}lưu lại thành tích và tích luỹ điểm thưởng.
+          {t('guest_login_msg')}
         </Text>
 
         <TouchableOpacity
           style={[styles.guestPrimaryBtn, { backgroundColor: '#3B82F6' }]}
           onPress={() => router.push('/login')}
         >
-          <Text style={styles.guestPrimaryBtnText}>Đăng nhập ngay</Text>
+          <Text style={styles.guestPrimaryBtnText}>{t('login_now')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.guestSecondaryBtn}
           onPress={() => router.back()}
         >
-          <Text style={styles.guestSecondaryBtnText}>Để sau, quay lại</Text>
+          <Text style={styles.guestSecondaryBtnText}>{t('go_back_now')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -307,26 +332,26 @@ export default function GameMCQScreen() {
         </View>
 
         <Text style={styles.resultTitle}>
-          {correctCount === TOTAL_QUESTIONS ? '🎉 Xuất sắc' : correctCount >= TOTAL_QUESTIONS * 0.8 ? '👏 Tốt lắm' : '💪 Cố lên'}
+          {correctCount === TOTAL_QUESTIONS ? t('excellent') : correctCount >= TOTAL_QUESTIONS * 0.8 ? t('well_done') : t('keep_it_up')}
         </Text>
 
         {/* Score card */}
         <View style={[styles.resultScoreCard, { borderColor: quizData?.color + '40' }]}>
           <View style={styles.resultScoreRow}>
             <Text style={[styles.resultScoreNum, { color: quizData?.color }]}>+{displayPoints}</Text>
-            <Text style={styles.resultScoreLabel}>điểm vừa tích luỹ</Text>
+            <Text style={styles.resultScoreLabel}>{t('points_earned')}</Text>
           </View>
 
-          {isSaving && <Text style={styles.savingText}>Đang lưu điểm...</Text>}
+          {isSaving && <Text style={styles.savingText}>{t('saving_points')}</Text>}
           {hasSaved && (
             <Text style={styles.savedText}>
-              {user.role === 'Quản trị viên' ? 'Chế độ xem trước' : 'Đã lưu thành tích'}
+              {t('results_saved')}
             </Text>
           )}
         </View>
 
         <Text style={styles.resultCorrectLabel}>
-          Trả lời đúng {correctCount}/{TOTAL_QUESTIONS} câu
+          {t('answered_correctly')} {correctCount}/{TOTAL_QUESTIONS} {t('questions_count')}
         </Text>
 
         {/* Result dot row */}
@@ -346,7 +371,7 @@ export default function GameMCQScreen() {
           onPress={handleReplay}
         >
           <Ionicons name="refresh" size={18} color="#FFF" />
-          <Text style={styles.resultPrimaryBtnText}>Chơi lại</Text>
+          <Text style={styles.resultPrimaryBtnText}>{t('replay')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -361,7 +386,7 @@ export default function GameMCQScreen() {
             }
           }}
         >
-          <Text style={styles.resultSecondaryBtnText}>Chọn bộ câu hỏi khác</Text>
+          <Text style={styles.resultSecondaryBtnText}>{t('choose_another_quiz')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -383,8 +408,8 @@ export default function GameMCQScreen() {
               <TouchableOpacity onPress={() => setShowExitModal(true)} activeOpacity={0.7}>
                 <Ionicons name="arrow-back" size={ms(26)} color="#334155" />
               </TouchableOpacity>
-              <Text style={styles.headerTitle} numberOfLines={1}>
-                Câu {questionIndex + 1} / {TOTAL_QUESTIONS}
+              <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.3}>
+                {t('question_label')} {questionIndex + 1} / {TOTAL_QUESTIONS}
               </Text>
             </View>
             <View style={styles.scorePill}>
@@ -492,7 +517,7 @@ export default function GameMCQScreen() {
                 />
               </View>
               <Text style={[styles.statusText, answerState === 'wrong' && styles.statusTextWrong]}>
-                {answerState === 'correct' ? 'Tuyệt vời' : 'Chưa chính xác'}
+                {answerState === 'correct' ? t('amazing') : t('incorrect')}
               </Text>
             </View>
 
@@ -510,7 +535,7 @@ export default function GameMCQScreen() {
 
             <View style={styles.correctAnswerBox}>
               <Text style={[styles.correctAnswerLabel, answerState === 'wrong' && styles.correctAnswerLabelWrong]}>
-                Đáp án đúng
+                {t('correct_answer_label')}
               </Text>
               <Text style={[styles.correctAnswerText, answerState === 'wrong' && styles.correctAnswerTextWrong]}>
                 {currentQuestion?.options[currentQuestion.correctIndex]}
@@ -522,7 +547,7 @@ export default function GameMCQScreen() {
               onPress={moveToNextQuestion}
               activeOpacity={0.9}
             >
-              <Text style={styles.nextBtnTextNew}>Tiếp tục</Text>
+              <Text style={styles.nextBtnTextNew}>{t('continue_btn')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -541,14 +566,14 @@ export default function GameMCQScreen() {
             <View style={styles.exitIconCircle}>
               <Ionicons name="exit-outline" size={35} color="#EF4444" />
             </View>
-            <Text style={styles.exitTitle}>Thoát khỏi trò chơi</Text>
+            <Text style={styles.exitTitle}>{t('exit_game_title')}</Text>
 
             <View style={styles.exitActionRow}>
               <TouchableOpacity
                 style={styles.stayBtn}
                 onPress={() => setShowExitModal(false)}
               >
-                <Text style={styles.stayBtnText} adjustsFontSizeToFit numberOfLines={1}>Tiếp tục chơi</Text>
+                <Text style={styles.stayBtnText} adjustsFontSizeToFit numberOfLines={1}>{t('stay_and_play')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -558,7 +583,7 @@ export default function GameMCQScreen() {
                   router.back();
                 }}
               >
-                <Text style={styles.confirmExitBtnText} adjustsFontSizeToFit numberOfLines={1}>Thoát</Text>
+                <Text style={styles.confirmExitBtnText} adjustsFontSizeToFit numberOfLines={1}>{t('exit')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -578,12 +603,12 @@ export default function GameMCQScreen() {
             <View style={[styles.exitIconCircle, { backgroundColor: '#EFF6FF', borderColor: '#DBEAFE' }]}>
               <Ionicons name="person-circle-outline" size={40} color="#3B82F6" />
             </View>
-            <Text style={styles.exitTitle}>Bạn chưa đăng nhập</Text>
+            <Text style={styles.exitTitle}>{t('not_logged_in_title')}</Text>
             <Text
               style={styles.exitSub}
               numberOfLines={2}
             >
-              Hãy đăng nhập để lưu lại thành tích{'\n'}và tích luỹ điểm thưởng nhé!
+              {t('login_to_save_points')}
             </Text>
 
             <View style={styles.exitActionRow}>
@@ -594,14 +619,14 @@ export default function GameMCQScreen() {
                   router.push('/login');
                 }}
               >
-                <Text style={styles.stayBtnText} adjustsFontSizeToFit numberOfLines={1}>Đăng nhập ngay</Text>
+                <Text style={styles.stayBtnText} adjustsFontSizeToFit numberOfLines={1}>{t('login_now')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.confirmExitBtn}
                 onPress={() => setShowLoginModal(false)}
               >
-                <Text style={styles.confirmExitBtnText} adjustsFontSizeToFit numberOfLines={1}>Để sau</Text>
+                <Text style={styles.confirmExitBtnText} adjustsFontSizeToFit numberOfLines={1}>{t('maybe_later')}</Text>
               </TouchableOpacity>
             </View>
           </View>

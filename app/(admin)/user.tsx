@@ -2,10 +2,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { addDoc, collection, doc, getDocs, onSnapshot, orderBy, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, orderBy, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Dimensions, FlatList, KeyboardAvoidingView, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { db } from '../../utils/firebaseConfig';
 import { ms, s, vs } from '../../utils/responsive';
@@ -14,10 +14,17 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // --- Memoized Components ---
 
-const UserItem = memo(({ item, onFeedback, onToggleLock, t }: any) => (
+const UserItem = memo(({ item, onFeedback, onToggleLock, onDelete, isDeleteMode, t }: any) => (
   <View style={[styles.userCard, item.isBlocked && styles.userCardLocked]}>
     <View style={styles.userInfoRow}>
-      {item.avatar ? (
+      {isDeleteMode ? (
+        <TouchableOpacity
+          style={styles.deleteAvatarBtn}
+          onPress={() => onDelete(item)}
+        >
+          <Ionicons name="trash" size={ms(26)} color="#fff" />
+        </TouchableOpacity>
+      ) : item.avatar ? (
         <Image
           source={{ uri: item.avatar }}
           style={styles.avatar}
@@ -107,6 +114,12 @@ const UserManagement = () => {
   const [replyingFeedback, setReplyingFeedback] = useState<any>(null);
   const [replyMessage, setReplyMessage] = useState('');
   const [sendingReply, setSendingReply] = useState(false);
+
+  // New Delete States
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const [deleteVisible, setDeleteVisible] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<any>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Toast States
   const [showToast, setShowToast] = useState(false);
@@ -240,9 +253,44 @@ const UserManagement = () => {
     }
   };
 
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    setDeleting(true);
+    try {
+      // 1. Xóa người dùng khỏi Firestore
+      await deleteDoc(doc(db, 'users', userToDelete.id));
+
+      // 2. Có thể xóa feedbacks liên quan (tùy chọn nhưng nên làm)
+      // Tìm và xóa feedbacks của email này
+      const q = query(collection(db, 'feedback'), where('e-mail', '==', userToDelete.email));
+      const feedbackSnap = await getDocs(q);
+      const deletePromises = feedbackSnap.docs.map(d => deleteDoc(d.ref));
+      await Promise.all(deletePromises);
+
+      triggerToast('Xóa người dùng thành công', 'success');
+      setDeleteVisible(false);
+      setUserToDelete(null);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      triggerToast(t('action_error'), 'error');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const renderItem = useCallback(({ item }: any) => (
-    <UserItem item={item} onFeedback={openFeedback} onToggleLock={toggleUserLock} t={t} />
-  ), [openFeedback, toggleUserLock, t]);
+    <UserItem
+      item={item}
+      onFeedback={openFeedback}
+      onToggleLock={toggleUserLock}
+      onDelete={(u: any) => {
+        setUserToDelete(u);
+        setDeleteVisible(true);
+      }}
+      isDeleteMode={isDeleteMode}
+      t={t}
+    />
+  ), [openFeedback, toggleUserLock, t, isDeleteMode]);
 
   return (
     <View style={[styles.container, { paddingTop: Math.max(insets.top, vs(10)) }]}>
@@ -275,6 +323,17 @@ const UserManagement = () => {
           <Ionicons name="arrow-back" size={ms(28)} color="#1e293b" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>{t('user_management')}</Text>
+
+        <TouchableOpacity
+          style={styles.menuHeaderBtn}
+          onPress={() => setIsDeleteMode(!isDeleteMode)}
+        >
+          <MaterialCommunityIcons
+            name="dots-vertical"
+            size={ms(26)}
+            color="#1e293b"
+          />
+        </TouchableOpacity>
       </View>
 
       <FlatList
@@ -296,131 +355,184 @@ const UserManagement = () => {
         onRequestClose={() => setFeedbackVisible(false)}
         statusBarTranslucent={true}
       >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { paddingBottom: insets.bottom + vs(20) }]}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle} numberOfLines={1}>{t('feedback_from')} {selectedUser?.name}</Text>
-              <TouchableOpacity onPress={() => setFeedbackVisible(false)}>
-                <Ionicons name="close-circle" size={ms(32)} color="#ef4444" />
-              </TouchableOpacity>
-            </View>
-
-            {fetchingFeedback ? (
-              <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#3b82f6" />
-                <Text style={styles.loadingText}>{t('loading_feedback')}</Text>
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.modalOverlay}
+          onPress={() => setFeedbackVisible(false)}
+        >
+          <TouchableOpacity activeOpacity={1}>
+            <View style={[styles.modalContent, { paddingBottom: insets.bottom + vs(20) }]}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle} numberOfLines={1}>{t('feedback_from')} {selectedUser?.name}</Text>
               </View>
-            ) : userFeedbacks.length > 0 ? (
-              <FlatList
-                data={userFeedbacks}
-                keyExtractor={(item) => item.id}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item }) => (
-                  <View style={styles.feedbackItem}>
-                    <Text style={styles.feedbackSubject}>{item.subject || t('no_subject')}</Text>
-                    <Text style={[styles.feedbackMessage, language === 'km' && { textAlign: 'left' }]}>
-                      {t('feedback_content_label')}: {(item.message || item.content) + ' '}
-                    </Text>
 
-                    {item.adminReply && (
-                      <View style={styles.adminReplyContainer}>
-                        <View style={styles.adminReplyHeader}>
-                          <Ionicons name="chatbubble-ellipses" size={ms(14)} color="#3b82f6" />
-                          <Text style={styles.adminReplyTitle}>{t('system_reply')}</Text>
+              {fetchingFeedback ? (
+                <View style={styles.centerContainer}>
+                  <ActivityIndicator size="large" color="#3b82f6" />
+                  <Text style={styles.loadingText}>{t('loading_feedback')}</Text>
+                </View>
+              ) : userFeedbacks.length > 0 ? (
+                <FlatList
+                  data={userFeedbacks}
+                  keyExtractor={(item) => item.id}
+                  showsVerticalScrollIndicator={false}
+                  renderItem={({ item }) => (
+                    <View style={styles.feedbackItem}>
+                      <Text style={styles.feedbackSubject}>{item.subject || t('no_subject')}</Text>
+                      <Text style={[styles.feedbackMessage, language === 'km' && { textAlign: 'left' }]}>
+                        {t('feedback_content_label')}: {(item.message || item.content) + ' '}
+                      </Text>
+
+                      {item.adminReply && (
+                        <View style={styles.adminReplyContainer}>
+                          <View style={styles.adminReplyHeader}>
+                            <Ionicons name="chatbubble-ellipses" size={ms(14)} color="#3b82f6" />
+                            <Text style={styles.adminReplyTitle}>{t('system_reply')}</Text>
+                          </View>
+                          <Text style={[styles.adminReplyText, language === 'km' && { textAlign: 'left' }]}>{item.adminReply + ' '}</Text>
                         </View>
-                        <Text style={[styles.adminReplyText, language === 'km' && { textAlign: 'left' }]}>{item.adminReply + ' '}</Text>
-                      </View>
-                    )}
+                      )}
 
-                    <View style={styles.feedbackFooter}>
-                      <TouchableOpacity
-                        style={styles.replyBtn}
-                        onPress={() => {
-                          setReplyingFeedback(item);
-                          setReplyMessage(item.adminReply || '');
-                          setReplyModalVisible(true);
-                        }}
-                      >
-                        <Text style={styles.replyBtnText}>{item.adminReply ? t('edit_reply') : t('reply_feedback')}</Text>
-                      </TouchableOpacity>
+                      <View style={styles.feedbackFooter}>
+                        <TouchableOpacity
+                          style={styles.replyBtn}
+                          onPress={() => {
+                            setReplyingFeedback(item);
+                            setReplyMessage(item.adminReply || '');
+                            setReplyModalVisible(true);
+                          }}
+                        >
+                          <Text style={styles.replyBtnText}>{item.adminReply ? t('edit_reply') : t('reply_feedback')}</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                  </View>
-                )}
-                contentContainerStyle={styles.feedbackList}
-              />
-            ) : (
-              <View style={styles.centerContainer}>
-                <Text style={styles.noFeedbackText} numberOfLines={1} adjustsFontSizeToFit>{t('user_no_feedback')}</Text>
-              </View>
-            )}
-          </View>
-        </View>
+                  )}
+                  contentContainerStyle={styles.feedbackList}
+                />
+              ) : (
+                <View style={styles.centerContainer}>
+                  <Text style={styles.noFeedbackText} numberOfLines={1} adjustsFontSizeToFit>{t('user_no_feedback')}</Text>
+                </View>
+              )}
+            </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
 
       {/* Confirm Modal */}
       <Modal visible={confirmVisible} transparent animationType="fade" statusBarTranslucent>
-        <View style={styles.confirmOverlay}>
-          <View style={styles.confirmContent}>
-            <View style={[styles.confirmIconBg, { backgroundColor: pendingUser?.isBlocked ? '#ecfdf5' : '#fef2f2' }]}>
-              <Ionicons
-                name={pendingUser?.isBlocked ? "lock-open" : "lock-closed"}
-                size={ms(34)}
-                color={pendingUser?.isBlocked ? "#10b981" : "#ef4444"}
-              />
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.confirmOverlay}
+          onPress={() => setConfirmVisible(false)}
+        >
+          <TouchableOpacity activeOpacity={1}>
+            <View style={styles.confirmContent}>
+              <View style={[styles.confirmIconBg, { backgroundColor: pendingUser?.isBlocked ? '#ecfdf5' : '#fef2f2' }]}>
+                <Ionicons
+                  name={pendingUser?.isBlocked ? "lock-open" : "lock-closed"}
+                  size={ms(34)}
+                  color={pendingUser?.isBlocked ? "#10b981" : "#ef4444"}
+                />
+              </View>
+              <Text style={styles.confirmTitle} numberOfLines={1} adjustsFontSizeToFit>
+                {pendingUser?.isBlocked ? t('unlock_user_account') : t('lock_user_account')}
+              </Text>
+              <Text style={styles.confirmSub}>
+                {pendingUser?.isBlocked ? t('confirm_unlock_user') : t('confirm_lock_user')} <Text style={styles.boldText}>{pendingUser?.name}</Text>
+              </Text>
+              <View style={styles.confirmActions}>
+                <TouchableOpacity style={styles.cancelActionBtn} onPress={() => setConfirmVisible(false)}>
+                  <Text style={styles.cancelActionText}>{t('cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.confirmActionBtn, { backgroundColor: pendingUser?.isBlocked ? '#10b981' : '#fe0000ff' }]}
+                  onPress={handleConfirmLock}
+                >
+                  <Text style={styles.confirmActionText}>{pendingUser?.isBlocked ? t('unlock') : t('lock_now')}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <Text style={styles.confirmTitle} numberOfLines={1} adjustsFontSizeToFit>
-              {pendingUser?.isBlocked ? t('unlock_user_account') : t('lock_user_account')}
-            </Text>
-            <Text style={styles.confirmSub}>
-              {pendingUser?.isBlocked ? t('confirm_unlock_user') : t('confirm_lock_user')} <Text style={styles.boldText}>{pendingUser?.name}</Text>
-            </Text>
-            <View style={styles.confirmActions}>
-              <TouchableOpacity style={styles.cancelActionBtn} onPress={() => setConfirmVisible(false)}>
-                <Text style={styles.cancelActionText}>{t('cancel')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.confirmActionBtn, { backgroundColor: pendingUser?.isBlocked ? '#10b981' : '#fe0000ff' }]}
-                onPress={handleConfirmLock}
-              >
-                <Text style={styles.confirmActionText}>{pendingUser?.isBlocked ? t('unlock') : t('lock_now')}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
 
       {/* Reply Modal */}
       <Modal visible={replyModalVisible} transparent animationType="fade" statusBarTranslucent>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.replyOverlay}>
-          <View style={styles.replyContent}>
-            <Text style={styles.replyTitle} numberOfLines={1} adjustsFontSizeToFit>{t('reply_feedback')}</Text>
-            <View style={styles.originalFeedbackBox}>
-              <Text style={[styles.replyOriginalMessage, language === 'km' && { textAlign: 'left' }]}>
-                {t('feedback_content_label')}: {(replyingFeedback?.message || replyingFeedback?.content) + ' '}
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.replyOverlay}
+          onPress={() => setReplyModalVisible(false)}
+        >
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ width: '100%' }}>
+            <TouchableOpacity activeOpacity={1}>
+              <View style={styles.replyContent}>
+                <Text style={styles.replyTitle} numberOfLines={1} adjustsFontSizeToFit>{t('reply_feedback')}</Text>
+                <View style={styles.originalFeedbackBox}>
+                  <Text style={[styles.replyOriginalMessage, language === 'km' && { textAlign: 'left' }]}>
+                    {t('feedback_content_label')}: {(replyingFeedback?.message || replyingFeedback?.content) + ' '}
+                  </Text>
+                </View>
+                <TextInput
+                  style={styles.replyInput}
+                  placeholder={t('reply_placeholder')}
+                  value={replyMessage}
+                  onChangeText={setReplyMessage}
+                  multiline
+                  textAlignVertical="top"
+                />
+                <View style={styles.replyActions}>
+                  <TouchableOpacity style={styles.cancelReplyBtn} onPress={() => setReplyModalVisible(false)}>
+                    <Text style={styles.cancelReplyText}>{t('cancel')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.confirmReplyBtn, !replyMessage.trim() && styles.disabledBtn]}
+                    onPress={handleSendReply}
+                    disabled={sendingReply || !replyMessage.trim()}
+                  >
+                    {sendingReply ? <ActivityIndicator color="#fff" size="small" /> : <Text style={styles.confirmReplyText}>{t('send_reply') || t('reply_feedback')}</Text>}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </KeyboardAvoidingView>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Delete Confirm Modal (Bottom Sheet Style) */}
+      <Modal visible={deleteVisible} transparent animationType="slide" statusBarTranslucent>
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.bottomModalOverlay}
+          onPress={() => setDeleteVisible(false)}
+        >
+          <TouchableOpacity activeOpacity={1} style={styles.bottomSheet50}>
+            <View style={styles.bottomSheetContent}>
+              <View style={[styles.confirmIconBg, { backgroundColor: '#fef2f2', marginTop: vs(20) }]}>
+                <Ionicons name="trash-sharp" size={ms(38)} color="#ef4444" />
+              </View>
+              <Text style={styles.confirmTitle} numberOfLines={1} adjustsFontSizeToFit>
+                Xác nhận xóa người dùng
               </Text>
+              <Text style={styles.confirmSub}>
+                Xóa vĩnh viễn <Text style={styles.boldText}>{userToDelete?.name}</Text> khỏi hệ thống
+              </Text>
+
+              <View style={[styles.confirmActions, { marginTop: vs(20), marginBottom: insets.bottom + vs(10) }]}>
+                <TouchableOpacity style={styles.cancelActionBtn} onPress={() => setDeleteVisible(false)}>
+                  <Text style={styles.cancelActionText}>Quay lại</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.confirmActionBtn, { backgroundColor: '#ef4444' }]}
+                  onPress={handleDeleteUser}
+                  disabled={deleting}
+                >
+                  {deleting ? <ActivityIndicator color="#fff" size="small" /> : <Text style={styles.confirmActionText}>Xóa vĩnh viễn</Text>}
+                </TouchableOpacity>
+              </View>
             </View>
-            <TextInput
-              style={styles.replyInput}
-              placeholder={t('reply_placeholder')}
-              value={replyMessage}
-              onChangeText={setReplyMessage}
-              multiline
-              textAlignVertical="top"
-            />
-            <View style={styles.replyActions}>
-              <TouchableOpacity style={styles.cancelReplyBtn} onPress={() => setReplyModalVisible(false)}>
-                <Text style={styles.cancelReplyText}>{t('cancel')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.confirmReplyBtn, !replyMessage.trim() && styles.disabledBtn]}
-                onPress={handleSendReply}
-                disabled={sendingReply || !replyMessage.trim()}
-              >
-                {sendingReply ? <ActivityIndicator color="#fff" size="small" /> : <Text style={styles.confirmReplyText}>{t('send_reply') || t('reply_feedback')}</Text>}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
     </View>
   );
@@ -430,6 +542,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#ffffff' },
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: s(12), height: vs(50), backgroundColor: 'transparent', justifyContent: 'center' },
   backBtn: { position: 'absolute', left: s(12), width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center', zIndex: 10 },
+  menuHeaderBtn: { position: 'absolute', right: s(12), width: s(44), height: s(44), justifyContent: 'center', alignItems: 'center', zIndex: 10 },
   headerTitle: { fontSize: ms(20), fontWeight: '400', color: '#1e293b', textAlign: 'center' },
   listContent: { padding: s(16) },
   userCard: { backgroundColor: '#fff', borderRadius: s(20), padding: s(16), marginBottom: vs(16), shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 10, elevation: 3 },
@@ -454,11 +567,22 @@ const styles = StyleSheet.create({
   textWhite: { color: '#fff' },
   textWhiteLight: { color: 'rgba(255, 255, 255, 0.8)' },
   actionRowLocked: { borderTopColor: 'rgba(255, 255, 255, 0.2)' },
+  deleteAvatarBtn: {
+    width: s(60),
+    height: s(60),
+    borderRadius: s(30),
+    backgroundColor: '#ef4444',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   emptyText: { textAlign: 'center', color: '#94a3b8', marginTop: vs(330), fontSize: ms(16) },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  bottomModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: '#ffffff', borderTopLeftRadius: s(30), borderTopRightRadius: s(30), height: '80%', padding: s(20) },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: vs(15) },
   modalTitle: { fontSize: ms(18), fontWeight: '400', color: '#1e293b', flex: 1, marginRight: s(10) },
+  bottomSheet50: { backgroundColor: '#ffffff', borderTopLeftRadius: s(32), borderTopRightRadius: s(32), minHeight: '40%', width: '100%' },
+  bottomSheetContent: { flex: 1, padding: s(24), alignItems: 'center', justifyContent: 'center' },
   centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: vs(10) },
   loadingText: { color: '#64748b', fontSize: ms(14) },
   noFeedbackText: { color: '#94a3b8', fontSize: ms(15) },
@@ -477,7 +601,7 @@ const styles = StyleSheet.create({
   confirmContent: { backgroundColor: '#fff', borderRadius: s(24), padding: s(24), width: '100%', alignItems: 'center' },
   confirmIconBg: { width: s(70), height: s(70), borderRadius: s(35), justifyContent: 'center', alignItems: 'center', marginBottom: vs(15) },
   confirmTitle: { fontSize: ms(20), fontWeight: '400', color: '#1e293b', marginBottom: vs(8) },
-  confirmSub: { fontSize: ms(15), color: '#64748b', textAlign: 'center', lineHeight: vs(22), marginBottom: vs(24) },
+  confirmSub: { fontSize: ms(15), color: '#64748b', textAlign: 'center', lineHeight: vs(22), marginBottom: vs(12) },
   boldText: { fontWeight: '400', color: '#1e293b' },
   confirmActions: { flexDirection: 'row', gap: s(12), width: '100%' },
   cancelActionBtn: { flex: 1, paddingVertical: vs(12), borderRadius: s(12), backgroundColor: '#006affff', alignItems: 'center' },

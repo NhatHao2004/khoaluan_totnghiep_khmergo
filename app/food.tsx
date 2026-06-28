@@ -80,7 +80,7 @@ export default function FoodScreen() {
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
           <ThemedText style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
-            {t('food')}
+            {t('food').replace('\n', ' ')}
           </ThemedText>
         </View>
         <View style={{ width: s(40) }} />

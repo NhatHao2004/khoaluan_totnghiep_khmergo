@@ -110,7 +110,7 @@ export default function LanguageDetailScreen() {
         </TouchableOpacity>
 
         <View style={styles.headerTitleContainer}>
-          <ThemedText style={styles.headerTitle} numberOfLines={1}>
+          <ThemedText style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.3}>
             {title ? t(title as string) : t(category.title)}
           </ThemedText>
         </View>

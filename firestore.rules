@@ -75,8 +75,8 @@ service cloud.firestore {
       // Đọc OTP để xác thực
       allow read: if true;
 
-      // CẬP NHẬT OTP (GỬI LẠI MÃ): Phải đợi ít nhất 2 giờ
-      allow update: if request.time > resource.data.createdAt + duration(2, 'h');
+      // CẬP NHẬT OTP (GỬI LẠI MÃ): Phải đợi ít nhất 1 phút để test
+      allow update: if request.time > resource.data.createdAt + duration(1, 'm');
 
       // Xóa OTP sau khi dùng
       allow delete: if true;

@@ -387,7 +387,7 @@ export default function AIAssistantScreen() {
           <Ionicons name="arrow-back" size={28} color="#1F2937" />
         </TouchableOpacity>
         <View style={styles.headerInfo}>
-          <Text style={styles.headerTitle} numberOfLines={1}>KhmerGo AI</Text>
+          <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.3}>KhmerGo AI</Text>
         </View>
         <TouchableOpacity
           style={styles.headerRight}
@@ -401,10 +401,12 @@ export default function AIAssistantScreen() {
       <View style={styles.tabContainer}>
         <View style={styles.tabWrapper}>
           <TouchableOpacity style={[styles.tab, activeTab === 'chat' && styles.activeTab]} onPress={() => setActiveTab('chat')}>
-            <Ionicons name="chatbubbles" size={ms(20)} color={activeTab === 'chat' ? '#FFF' : '#6B7280'} /><Text style={[styles.tabText, activeTab === 'chat' && styles.activeTabText]}>AI Chatbot</Text>
+            <Ionicons name="chatbubbles" size={ms(18)} color={activeTab === 'chat' ? '#FFF' : '#6B7280'} />
+            <Text style={[styles.tabText, activeTab === 'chat' && styles.activeTabText]} numberOfLines={1} adjustsFontSizeToFit>AI Chatbot</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.tab, activeTab === 'camera' && styles.activeTab]} onPress={() => setActiveTab('camera')}>
-            <Ionicons name="camera" size={ms(20)} color={activeTab === 'camera' ? '#FFF' : '#6B7280'} /><Text style={[styles.tabText, activeTab === 'camera' && styles.activeTabText]}>AI Camera</Text>
+            <Ionicons name="camera" size={ms(18)} color={activeTab === 'camera' ? '#FFF' : '#6B7280'} />
+            <Text style={[styles.tabText, activeTab === 'camera' && styles.activeTabText]} numberOfLines={1} adjustsFontSizeToFit>AI Camera</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -425,31 +427,30 @@ export default function AIAssistantScreen() {
           activeOpacity={1}
           onPress={() => setShowMenu(false)}
         >
-          <View style={[styles.menuDropdown, {
-            top: insets.top + vs(48),
-            width: activeTab === 'chat' ? s(255) : s(236)
-          }]}>
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setShowMenu(false);
-                activeTab === 'camera' ? resetCamera() : clearChat();
-              }}
-            >
-              <Ionicons
-                name={activeTab === 'camera' ? "refresh-outline" : "trash-outline"}
-                size={20}
-                color="#EF4444"
-              />
-              <Text
-                style={[styles.menuItemText, (activeTab === 'camera' || activeTab === 'chat') && { color: '#EF4444' }]}
-                numberOfLines={1}
-                adjustsFontSizeToFit
+            <View style={[styles.menuDropdown, {
+              top: insets.top + vs(48),
+              minWidth: s(180),
+              maxWidth: SCREEN_WIDTH - s(40),
+            }]}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setShowMenu(false);
+                  activeTab === 'camera' ? resetCamera() : clearChat();
+                }}
               >
-                {activeTab === 'camera' ? t('refresh_analysis') : (t('clear_chat_history_success') || 'Dọn dẹp lịch sử')}
-              </Text>
-            </TouchableOpacity>
-          </View>
+                <Ionicons
+                  name={activeTab === 'camera' ? "refresh-outline" : "trash-outline"}
+                  size={ms(20)}
+                  color="#EF4444"
+                />
+                <Text
+                  style={[styles.menuItemText, { color: '#EF4444' }]}
+                >
+                  {activeTab === 'camera' ? (t('refresh_analysis') || 'Làm mới phân tích ngay') : (t('clear_chat_history_success') || 'Dọn dẹp lịch sử')}
+                </Text>
+              </TouchableOpacity>
+            </View>
         </TouchableOpacity>
       )}
     </View>
@@ -466,7 +467,7 @@ const styles = StyleSheet.create({
   resetText: { fontSize: ms(15), color: '#EF4444', fontWeight: '400' },
   tabContainer: { paddingHorizontal: s(20), paddingVertical: vs(10) },
   tabWrapper: { flexDirection: 'row', backgroundColor: '#F1F5F9', borderRadius: ms(25), padding: s(4) },
-  tab: { flex: 1, flexDirection: 'row', height: vs(40), borderRadius: ms(20), alignItems: 'center', justifyContent: 'center', gap: s(6) },
+  tab: { flex: 1, flexDirection: 'row', height: vs(40), borderRadius: ms(20), alignItems: 'center', justifyContent: 'center', gap: s(4), paddingHorizontal: s(6) },
   activeTab: { backgroundColor: '#1877F2' },
   tabText: { fontSize: ms(13), color: '#64748B' },
   activeTabText: { color: '#FFF' },

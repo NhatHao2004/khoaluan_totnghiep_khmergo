@@ -121,9 +121,8 @@ export default function FavoritesScreen() {
         ) : favorites.length === 0 ? (
           <View style={styles.emptyContainer}>
             <View style={styles.emptyIconCircle}>
-              <Ionicons name="heart-dislike-outline" size={50} color="#FF4D4D" />
+              <Ionicons name="heart-dislike-outline" size={35} color="#FF4D4D" />
             </View>
-            <Text style={styles.emptyTitle}>{t('no_favorites_yet')}</Text>
             <Text style={styles.emptySub}>{t('explore_and_save_favs')}</Text>
           </View>
         ) : (
@@ -191,8 +190,8 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   emptyIconCircle: {
-    width: 100,
-    height: 100,
+    width: 70,
+    height: 70,
     borderRadius: 50,
     backgroundColor: '#FFE5E5',
     alignItems: 'center',

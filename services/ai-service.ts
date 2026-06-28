@@ -1,6 +1,6 @@
 import { ARTIFACTS_DB } from "@/constants/ArtifactsDB";
 import * as SecureStore from 'expo-secure-store';
-import { fetchAndActivate, getString } from "firebase/remote-config";
+import { fetchAndActivate, getString, isSupported } from "firebase/remote-config";
 import { remoteConfig } from "../utils/firebaseConfig";
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
@@ -12,6 +12,19 @@ let VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
 
 const syncRemoteConfig = async () => {
   try {
+    // Kiểm tra xem Remote Config có được hỗ trợ không
+    let supported = false;
+    try {
+      supported = await isSupported();
+    } catch (e) {
+      supported = false;
+    }
+
+    if (!supported) {
+      console.log("Remote Config is not supported in this environment, using defaults.");
+      return;
+    }
+    
     await fetchAndActivate(remoteConfig);
     const remoteChatModel = getString(remoteConfig, "chat_model");
     const remoteVisionModel = getString(remoteConfig, "vision_model");
@@ -29,9 +42,14 @@ const getGroqApiKey = async () => {
   try {
     // 1. Thử lấy từ Remote Config
     try {
-      await fetchAndActivate(remoteConfig);
-      const remoteKey = getString(remoteConfig, "groq_api_key");
-      if (remoteKey) return remoteKey;
+      let supported = false;
+      try { supported = await isSupported(); } catch (e) { supported = false; }
+      
+      if (supported) {
+        await fetchAndActivate(remoteConfig);
+        const remoteKey = getString(remoteConfig, "groq_api_key");
+        if (remoteKey) return remoteKey;
+      }
     } catch (e) {
       console.warn("Remote Config key fetch failed, trying local fallback...");
     }

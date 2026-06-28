@@ -315,16 +315,8 @@ export default function TabsLayout() {
         </>
       )}
 
-      {/* Floating Back to Admin Button - Only for Admins */}
-      {user?.role === 'Quản trị viên' && (pathname === '/' || pathname === '/(tabs)' || pathname === '/(tabs)/') && (
-        <TouchableOpacity
-          style={styles.backToAdminBtn}
-          onPress={() => router.replace('/(admin)')}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="eye-outline" size={ms(22)} color="#1e293b" />
-        </TouchableOpacity>
-      )}
+
+
 
       <StatusBar style="auto" />
     </ThemeProvider>
@@ -381,7 +373,7 @@ const styles = StyleSheet.create({
   backToAdminBtn: {
     position: 'absolute',
     top: vs(45),
-    right: s(24),
+    left: s(24),
     backgroundColor: '#FFFFFF',
     width: s(40),
     height: s(40),
