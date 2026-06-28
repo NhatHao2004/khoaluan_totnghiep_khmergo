@@ -300,7 +300,8 @@ export default function CommunityScreen() {
             time: timeDisplay
           };
         }) as Post[];
-        setPosts(postsData);
+        const approvedPosts = postsData.filter(post => (post as any).approved !== false);
+        setPosts(approvedPosts);
         setLoading(false);
       } catch (err) {
         console.error("Error processing posts snapshot:", err);
@@ -419,8 +420,9 @@ export default function CommunityScreen() {
           content: createPostText.trim(),
           image: base64Image,
           imageAspectRatio: imageRatio || 1,
+          approved: false,
         });
-        triggerToast(t('update_post_success'));
+        triggerToast(t('post_pending_approval'));
       } else {
         await Firestore.addDoc(Firestore.collection(db, 'posts'), {
           userId: user.uid,
@@ -432,9 +434,10 @@ export default function CommunityScreen() {
           likes: 0,
           comments: 0,
           likedBy: [],
+          approved: false,
           createdAt: Firestore.serverTimestamp()
         });
-        triggerToast(t('post_success'));
+        triggerToast(t('post_pending_approval'));
       }
 
       setCreatePostText('');

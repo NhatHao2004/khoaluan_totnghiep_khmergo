@@ -120,7 +120,10 @@ const AdminDashboard = () => {
   const [adminName, setAdminName] = useState('');
   const [adminAvatar, setAdminAvatar] = useState('');
   const [pendingFeedback, setPendingFeedback] = useState(0);
+  const [pendingPosts, setPendingPosts] = useState(0);
   const [recentFeedbacks, setRecentFeedbacks] = useState<any[]>([]);
+
+  const totalPending = useMemo(() => pendingFeedback + pendingPosts, [pendingFeedback, pendingPosts]);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [selectedFeedback, setSelectedFeedback] = useState<any>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -168,22 +171,29 @@ const AdminDashboard = () => {
     }, (err) => console.error('Snapshot users error:', err));
 
     // Lấy số lượng địa điểm/nội dung
-    onSnapshot(collection(db, 'destinations'), (snap) => {
+    const unsubDestinations = onSnapshot(collection(db, 'destinations'), (snap) => {
       setStats(prev => ({ ...prev, content: snap.size }));
     }, (err) => console.error('Snapshot destinations error:', err));
 
     // Lấy số lượng thử thách
-    onSnapshot(collection(db, 'quizzes'), (snap) => {
+    const unsubQuizzes = onSnapshot(collection(db, 'quizzes'), (snap) => {
       setStats(prev => ({ ...prev, challenges: snap.size }));
     }, (err) => console.error('Snapshot quizzes error:', err));
 
-    // Lấy số lượng bài viết
-    onSnapshot(collection(db, 'posts'), (snap) => {
+    // Lấy số lượng bài viết và số bài đăng chờ duyệt
+    const unsubPosts = onSnapshot(collection(db, 'posts'), (snap) => {
       setStats(prev => ({ ...prev, posts: snap.size }));
+      const pendingCount = snap.docs.filter(doc => doc.data().approved === false).length;
+      setPendingPosts(prev => {
+        if (pendingCount > prev && prev !== 0) {
+          triggerToast('Có bài viết mới đang chờ duyệt', 'info');
+        }
+        return pendingCount;
+      });
     }, (err) => console.error('Snapshot posts error:', err));
 
     // Lấy bảng xếp hạng
-    onSnapshot(collection(db, 'users'), (snap) => {
+    const unsubLeaderboard = onSnapshot(collection(db, 'users'), (snap) => {
       const allUsers = snap.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
@@ -239,6 +249,10 @@ const AdminDashboard = () => {
     return () => {
       unsubUsers();
       unsubRecent();
+      unsubDestinations();
+      unsubQuizzes();
+      unsubPosts();
+      unsubLeaderboard();
       if (unsubAdmin) unsubAdmin();
     };
   }, []);
@@ -423,10 +437,10 @@ const AdminDashboard = () => {
               onPress={() => setShowFeedbackModal(true)}
               style={styles.notificationBtn}
             >
-              <Ionicons name="chatbox-ellipses-outline" size={ms(26)} color="#000000ff" />
-              {pendingFeedback > 0 && (
+              <Ionicons name="notifications-outline" size={ms(28)} color="#000000ff" />
+              {totalPending > 0 && (
                 <View style={styles.notificationBadge}>
-                  <Text style={styles.badgeText}>{pendingFeedback > 99 ? '99+' : pendingFeedback}</Text>
+                  <Text style={styles.badgeText}>{totalPending > 99 ? '99+' : totalPending}</Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -531,11 +545,51 @@ const AdminDashboard = () => {
                 numberOfLines={1}
                 adjustsFontSizeToFit
               >
-                Phản hồi người dùng
+                Thông báo
               </Text>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
+              {pendingPosts > 0 && (
+                <TouchableOpacity
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    backgroundColor: '#fffbeb',
+                    borderRadius: s(14),
+                    padding: s(14),
+                    marginBottom: vs(12),
+                    borderWidth: 1,
+                    borderColor: '#fde68a',
+                    gap: s(12),
+                  }}
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    setShowFeedbackModal(false);
+                    router.push('/(admin)/article' as any);
+                  }}
+                >
+                  <View style={{
+                    width: s(40),
+                    height: s(40),
+                    borderRadius: s(20),
+                    backgroundColor: '#f59e0b',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                    <Ionicons name="newspaper-outline" size={ms(20)} color="#ffffff" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: ms(14), fontWeight: '600', color: '#000000ff' }} numberOfLines={1}>
+                      {pendingPosts} bài viết chờ duyệt
+                    </Text>
+                    <Text style={{ fontSize: ms(12), color: '#000000ff', marginTop: vs(2) }} numberOfLines={1}>
+                      Nhấn để xem và phê duyệt
+                    </Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={ms(18)} color="#000000ff" />
+                </TouchableOpacity>
+              )}
               {recentFeedbacks.length > 0 ? (
                 recentFeedbacks.map((f, i) => (
                   <TouchableOpacity
@@ -572,7 +626,7 @@ const AdminDashboard = () => {
                             </Text>
                             <Text style={styles.feedbackTime}>{f.createdAt ? getTimeAgo(f.createdAt) : 'Vừa xong'}</Text>
                           </View>
-                          <Text style={styles.feedbackSubText} numberOfLines={1} adjustsFontSizeToFit>Đã gửi phản hồi, nhấn vào để xem...</Text>
+                          <Text style={styles.feedbackSubText} numberOfLines={1} adjustsFontSizeToFit>Đã gửi phản hồi, nhấn vào xem chi tiết</Text>
                         </View>
                       </View>
                     </View>
@@ -1308,7 +1362,7 @@ const styles = StyleSheet.create({
     fontSize: ms(14.5),
     color: '#64748b',
     fontWeight: '400',
-    fontStyle: 'italic',
+    fontStyle: 'normal',
   },
   feedbackTime: {
     fontSize: ms(11),

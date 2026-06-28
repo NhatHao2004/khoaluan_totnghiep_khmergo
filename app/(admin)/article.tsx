@@ -7,20 +7,19 @@ import {
   ActivityIndicator,
   FlatList,
   Modal,
-  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View
 } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { db } from '../../utils/firebaseConfig';
 import { ms, s, vs } from '../../utils/responsive';
 
 // --- Memoized Components ---
 
-const PostItem = memo(({ item, onDelete, onShowComments }: any) => {
+const PostItem = memo(({ item, onDelete, onShowComments, onApprove }: any) => {
   const formattedDate = useMemo(() => {
     return item.createdAt?.seconds
       ? new Date(item.createdAt.seconds * 1000).toLocaleDateString('vi-VN')
@@ -40,6 +39,14 @@ const PostItem = memo(({ item, onDelete, onShowComments }: any) => {
           <Text style={styles.postUserName} numberOfLines={1} adjustsFontSizeToFit>{item.user || 'Người dùng'}</Text>
           <Text style={styles.postDate} numberOfLines={1} adjustsFontSizeToFit>{formattedDate}</Text>
         </View>
+        {item.approved === false && (
+          <TouchableOpacity
+            style={styles.approvePostBtn}
+            onPress={() => onApprove(item)}
+          >
+            <Ionicons name="checkmark-outline" size={ms(20)} color="#10b981" />
+          </TouchableOpacity>
+        )}
         <TouchableOpacity style={styles.deletePostBtn} onPress={() => onDelete(item)}>
           <Ionicons name="trash-outline" size={ms(20)} color="#ef4444" />
         </TouchableOpacity>
@@ -111,6 +118,7 @@ const ArticleManagement = () => {
   const insets = useSafeAreaInsets();
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'pending' | 'approved'>('pending');
 
   // Delete Confirm State
   const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
@@ -144,6 +152,26 @@ const ArticleManagement = () => {
     transform: [{ translateY: toastY.value }],
     opacity: interpolate(toastY.value, [-100, 0], [0, 1], 'clamp'),
   }));
+
+  const handleApprovePost = useCallback(async (post: any) => {
+    try {
+      await updateDoc(doc(db, 'posts', post.id), {
+        approved: true
+      });
+      triggerToast('Đã phê duyệt bài đăng thành công', 'success');
+    } catch (e) {
+      console.error("Error approving post: ", e);
+      triggerToast('Lỗi khi duyệt bài viết', 'error');
+    }
+  }, [triggerToast]);
+
+  const filteredPosts = useMemo(() => {
+    if (activeTab === 'pending') {
+      return posts.filter(p => p.approved === false);
+    } else {
+      return posts.filter(p => p.approved !== false);
+    }
+  }, [posts, activeTab]);
 
   useEffect(() => {
     setLoading(true);
@@ -278,18 +306,48 @@ const ArticleManagement = () => {
         <View style={{ width: s(44) }} />
       </View>
 
+      {/* Tabs */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tabButton, activeTab === 'pending' && styles.tabButtonActive]}
+          onPress={() => setActiveTab('pending')}
+        >
+          <Text style={[styles.tabText, activeTab === 'pending' && styles.tabTextActive]}>
+            Chờ duyệt ({posts.filter(p => p.approved === false).length})
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabButton, activeTab === 'approved' && styles.tabButtonActive]}
+          onPress={() => setActiveTab('approved')}
+        >
+          <Text style={[styles.tabText, activeTab === 'approved' && styles.tabTextActive]}>
+            Đã duyệt ({posts.filter(p => p.approved !== false).length})
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#3b82f6" />
         </View>
       ) : (
         <FlatList
-          data={posts}
+          style={{ flex: 1 }}
+          data={filteredPosts}
           keyExtractor={item => item.id}
           renderItem={({ item }) => (
-            <PostItem item={item} onDelete={handleDeletePost} onShowComments={showComments} />
+            <PostItem
+              item={item}
+              onDelete={handleDeletePost}
+              onShowComments={showComments}
+              onApprove={handleApprovePost}
+            />
           )}
-          contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + vs(20) }]}
+          contentContainerStyle={[
+            styles.listContent,
+            { paddingBottom: insets.bottom + vs(20) },
+            filteredPosts.length === 0 && { flexGrow: 1, justifyContent: 'center', alignItems: 'center' }
+          ]}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
@@ -320,6 +378,7 @@ const ArticleManagement = () => {
               <ActivityIndicator size="large" color="#3b82f6" style={{ marginTop: vs(50) }} />
             ) : (
               <FlatList
+                style={{ flex: 1 }}
                 data={(() => {
                   // Build threaded list: parent comments followed by their children
                   const parentComments = comments.filter(c => !c.parentId);
@@ -357,7 +416,10 @@ const ArticleManagement = () => {
                     <Text style={styles.emptyText}>Chưa có bình luận nào</Text>
                   </View>
                 }
-                contentContainerStyle={{ paddingBottom: insets.bottom + vs(50) }}
+                contentContainerStyle={[
+                  { paddingBottom: insets.bottom + vs(50) },
+                  comments.length === 0 && { flexGrow: 1, justifyContent: 'center', alignItems: 'center' }
+                ]}
                 showsVerticalScrollIndicator={false}
               />
             )}
@@ -467,8 +529,8 @@ const styles = StyleSheet.create({
   commentText: { fontSize: ms(14), color: '#475569', lineHeight: ms(20) },
   deleteCommentBtn: { padding: s(8) },
 
-  emptyContainer: { alignItems: 'center', marginTop: vs(300), opacity: 0.5 },
-  emptyText: { marginTop: vs(16), fontSize: ms(16), color: '#94a3b8', fontWeight: '400' },
+  emptyContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', opacity: 0.5, paddingBottom: vs(80) },
+  emptyText: { marginTop: vs(16), fontSize: ms(16), color: '#94a3b8', fontWeight: '400', textAlign: 'center' },
 
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modalContentFull: { width: '100%', height: '100%', backgroundColor: '#fff', paddingHorizontal: s(20) },
@@ -522,6 +584,43 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     marginLeft: s(10),
     flex: 1,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#f1f5f9',
+    borderRadius: ms(12),
+    padding: s(4),
+    marginHorizontal: s(16),
+    marginVertical: vs(12),
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: vs(8),
+    alignItems: 'center',
+    borderRadius: ms(8),
+  },
+  tabButtonActive: {
+    backgroundColor: '#ffffff',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 2,
+  },
+  tabText: {
+    fontSize: ms(14),
+    fontWeight: '500',
+    color: '#64748b',
+  },
+  tabTextActive: {
+    color: '#0f172a',
+    fontWeight: '700',
+  },
+  approvePostBtn: {
+    padding: s(8),
+    borderRadius: s(10),
+    backgroundColor: '#ecfdf5',
+    marginRight: s(8),
   },
 });
 
