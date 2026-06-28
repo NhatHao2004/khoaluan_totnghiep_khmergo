@@ -350,9 +350,8 @@ DỮ LIỆU HIỆN VẬT CÓ SẴN:
 ${artifactsList}
 
 YÊU CẦU:
-1. Nếu là hiện vật trong danh sách trên, hãy trả về CHỈ mã JSON sau: {"artifactName": "Tên chính xác trong danh sách"}
-2. Nếu là hiện vật Khmer nhưng không có trong danh sách, hãy mô tả ngắn gọn (30 từ) và trả về: {"isKhmer": true, "description": "..."}
-3. Nếu không liên quan văn hóa Khmer, hãy trả về: {"isKhmer": false}`
+1. Nếu hình ảnh trùng khớp với một trong các hiện vật trong danh sách trên, hãy trả về CHỈ mã JSON sau: {"artifactName": "Tên chính xác trong danh sách"}
+2. Nếu không trùng khớp với bất kỳ hiện vật nào trong danh sách trên, hãy trả về: {"artifactName": null}`
               },
               {
                 type: "image_url",
@@ -382,11 +381,12 @@ YÊU CẦU:
 
       if (result.artifactName) {
         const artifact = ARTIFACTS_DB.find(a => a.name === result.artifactName);
-        if (artifact) return { artifact: { name: artifact.name, features: artifact.features } };
-      }
-
-      if (result.isKhmer) {
-        return { isRecognized: true, rawResponse: result.description };
+        if (artifact) {
+          return { 
+            artifact: { name: artifact.name, features: artifact.features },
+            isRecognized: true 
+          };
+        }
       }
     }
 
