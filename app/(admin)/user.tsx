@@ -77,7 +77,7 @@ const UserItem = memo(({ item, onFeedback, onToggleLock, onDelete, isDeleteMode,
           color="#3b82f6"
         />
         <Text style={[styles.actionBtnText, styles.feedbackBtnText]} numberOfLines={1} adjustsFontSizeToFit>
-          {t('reply_action')}
+          {t('send_reply')}
         </Text>
       </TouchableOpacity>
 
@@ -360,8 +360,8 @@ const UserManagement = () => {
           style={styles.modalOverlay}
           onPress={() => setFeedbackVisible(false)}
         >
-          <TouchableOpacity activeOpacity={1}>
-            <View style={[styles.modalContent, { paddingBottom: insets.bottom + vs(20) }]}>
+          <TouchableOpacity activeOpacity={1} style={{ width: '100%', height: '80%', justifyContent: 'flex-end' }}>
+            <View style={[styles.modalContent, { height: '100%', paddingBottom: insets.bottom + vs(20) }]}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle} numberOfLines={1}>{t('feedback_from')} {selectedUser?.name}</Text>
               </View>
@@ -426,7 +426,7 @@ const UserManagement = () => {
           style={styles.confirmOverlay}
           onPress={() => setConfirmVisible(false)}
         >
-          <TouchableOpacity activeOpacity={1}>
+          <TouchableOpacity activeOpacity={1} style={{ width: '100%', alignItems: 'center' }}>
             <View style={styles.confirmContent}>
               <View style={[styles.confirmIconBg, { backgroundColor: pendingUser?.isBlocked ? '#ecfdf5' : '#fef2f2' }]}>
                 <Ionicons
@@ -465,7 +465,7 @@ const UserManagement = () => {
           onPress={() => setReplyModalVisible(false)}
         >
           <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ width: '100%' }}>
-            <TouchableOpacity activeOpacity={1}>
+            <TouchableOpacity activeOpacity={1} style={{ width: '100%' }}>
               <View style={styles.replyContent}>
                 <Text style={styles.replyTitle} numberOfLines={1} adjustsFontSizeToFit>{t('reply_feedback')}</Text>
                 <View style={styles.originalFeedbackBox}>
